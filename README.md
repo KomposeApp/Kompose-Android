@@ -8,9 +8,9 @@
 
 # Team
 
-Dino Bolliger (bdino)
-Florian Moser (moserfl)
-Lino Lendi (llendi)
-Lukas Tobler (lutobler)
-Mark Arnold (arnomark)
-Tobias Brodmann (brotobia)
+Dino Bolliger (bdino)  
+Florian Moser (moserfl)  
+Lino Lendi (llendi)  
+Lukas Tobler (lutobler)  
+Mark Arnold (arnomark)  
+Tobias Brodmann (brotobia)  
