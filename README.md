@@ -13,4 +13,8 @@ Florian Moser (moserfl)
 Lino Lendi (llendi)  
 Lukas Tobler (lutobler)  
 Mark Arnold (arnomark)  
-Tobias Brodmann (brotobia)  
+Tobias Brodmann (brotobia)
+
+# Meetings
+
+- Monday 13.11.17, 16:30 (CHN green floor?)
