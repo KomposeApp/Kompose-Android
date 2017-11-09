@@ -33,4 +33,5 @@ There already exists a library for Android that does this [2].
 
 
 [1] https://developer.android.com/training/connect-devices-wirelessly/nsd.html
+
 [2] https://github.com/HaarigerHarald/android-youtubeExtractor
