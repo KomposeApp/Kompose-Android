@@ -1,0 +1,24 @@
+Motivation
+
+We want to create an app where users can brainstorm together. 
+They can draw together at the same time on their own tablet/smartphone.
+First they connect with a server to build new groups. 
+When they finish or out of ideas they can store and reload it from the server 
+whenever they want.
+
+Implementation 
+
+-> connection with server 
+-> communication via udp
+-> just overdrawing things
+-> tool for drawing by android -> https://developer.android.com/training/custom-views/custom-drawing.html#overrideondraw
+
+Feature List
+
+- communication via server
+- ability to draw down ideas
+- every user has a name 
+- you can build several groups which you can join 
+  (you can only work at on project at the same time) 
+- picture is saving automaticaly every second 
+  (so joining a group during a brainstorm would not be problem) 
