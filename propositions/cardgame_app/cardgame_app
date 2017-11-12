@@ -1,0 +1,25 @@
+Motivation
+
+We want to create an app where users can play a cardgame (trinkspiel, poker, uno) together.
+The goal is to play the game p2p with any device, that supports our app.
+We use a hybrid model of p2p, in which a server helps the peers to find each other.
+The game itself is then played by the peers without any communication to the server.
+
+Implementation
+
+Find Game
+-> connection to server (create/join games)
+-> server broadcasts created games and connects players
+
+Play Game
+-> players select unique identifier
+-> randomly choose sequence
+-> game gets shuffled and starts
+-> each player saves the game on his device
+-> token travels around (active player)
+-> decision gets broadcasted
+
+Additional challenge
+Implement it as "mental poker", each player only knows own cards. Comes
+with lots of challenges, particularly with regard to encryption and players
+disconnecting.
