@@ -57,3 +57,8 @@ freeline_project_description.json
 
 proposal-tex/aux
 proposal-tex/*.pdf
+proposal-tex/*.aux
+proposal-tex/*.bbl
+proposal-tex/*.blg
+proposal-tex/*.log
+
