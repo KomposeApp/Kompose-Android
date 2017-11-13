@@ -1,0 +1,50 @@
+problem: >
+    distributed drawing game
+    
+why important: >
+    visually it is much easier to scetch out ideas
+    would be very nice for brainstorming sessions without the need for large wandtafeln
+    
+DS challenges: >
+    find other devices of group
+    prevent abuse from third parties
+    pass around drawed objects
+    
+technical challenges: >
+    implement drawings which are distributable to other devices
+    implement server which stores the drawings
+    
+background information: >
+    none
+
+use case: >
+    user opens app, chooses wheter to create or join game
+    they download the existing drawing from the server
+    they draw a sequence
+    they can persist any personal state they want
+    
+unclear: >
+    who decides when to load or not load from persisted states?
+    are persisted states per user or per group?
+    can group of local network or internet group be joined?
+    
+work packages: >
+    allow to set username
+    connect to existing game parties / create new one
+    implement server which distributes drawings
+    download drawing from server to device
+    upload drawing from server to device
+    draw on device and upload only that part
+    get notified from server if new parts have arried and display them
+    create logo, look & feel of the application
+    implement design 
+    create presentation
+    testing
+ 
+milestones:
+    milestone 1: implement server which has list of users and can store drawings
+    milestone 2: connect to lobby
+    milestone 3: download / upload drawings to server
+    milestone 4: download / upload parts of drawings to server
+    milestone 5: implement design
+    milestone 6: testing & finalizing

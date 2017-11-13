@@ -1,9 +1,8 @@
 problem: >
     distributed cardgame
     
-    
 why important: >
-    can be generalized to other problems such as which products to buy next
+    can be generalized to round-robin decisions such as event distribution
  
 DS challenges: >
     find other devices which want to play
