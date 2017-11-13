@@ -18,10 +18,25 @@ project proposal:
         work plan to carry out project
         distribute it
         
-development:
-    time: >
-        4 weeks time
-    
+task distribution:
+    general: >
+        over 4 weeks time
+        two people each take responsability in one part
+        help out other parts to balance out time spent
+    organisation: >
+        write project proposal per 15.11. (wednesday)
+        coordinate design & technical
+        do final testing & presentation
+    technical: >
+        ensure application is up to spec
+        solve DS challenges
+        organize other team members if help is needed
+        implement by 25.11. (two weeks)
+    design: >
+        create mockups / design look & feel
+        create logo & presentation template
+        implement by 02.12. (three weeks) 
+        
 hand in:
     deadline: >
         15.12.2017 at NOON
