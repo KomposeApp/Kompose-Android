@@ -54,4 +54,6 @@ freeline_project_description.json
 *.out
 *.aux
 *.synctex.gz
-*.pdf
+
+proposal-tex/aux
+proposal-tex/*.pdf
