@@ -11,11 +11,11 @@
 
 Dino Bolliger (bdino)  
 Florian Moser (moserfl)  
-Lino Lendi (llendi)  
+Lino Lendi (llendi)  11-714-383
 Lukas Tobler (lutobler)  
-Mark Arnold (arnomark)  
-Tobias Brodmann (brotobia)
+Mark Arnold (arnomark)  15-917-701
+Tobias Brodmann (brotobia) 15-934-565
 
 ## Meetings
 
-- Monday 13.11.17, 16:30 (CHN green floor?)
+- Monday 27.11.17, 11:00 (CHN green floor)

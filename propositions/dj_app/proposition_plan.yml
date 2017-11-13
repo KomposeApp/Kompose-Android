@@ -1,18 +1,18 @@
 problem: >
     mostly one device is connected to audio station
-    distribute who can choose music, and deter abuse
+    distribute who can choose music
     
 why important: >
+    prevent arguing between friends
     can be generalized to other problems such as which products to buy next
  
 DS challenges: >
     find device connected to music station
-    prevent abuse from third parties
     synchonize playlist to all devices
-    order playlist requests correctly
+    order playlist requests correctly -> master decides
     
 technical challenges: >
-    connect to master device
+    discovery service
     play / stream song without interruptions (mabye even cache if needed)    
 
 background information: >
@@ -24,6 +24,7 @@ use case: >
     can choose if master or client
     if master, connect to soundboard and display authentication code for other clients
     if client, connect to one of the masters and requests songs
+    master normal client, youtube 
     
 work packages: >
     allow to set username
@@ -36,13 +37,11 @@ work packages: >
     create presentation
     testing
 
-left out: >
-    order playlist requests 
- 
 extensions: >
     allow to skip currently playing song by quorum
     allow to vote down playlist entries
     allow to switch master device
+    
 
 milestones:
     milestone 1: connect to master device

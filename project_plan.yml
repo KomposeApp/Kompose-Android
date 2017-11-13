@@ -19,23 +19,18 @@ project proposal:
         distribute it
         
 task distribution:
-    general: >
-        over 4 weeks time
-        two people each take responsability in one part
-        help out other parts to balance out time spent
-    organisation: >
-        write project proposal per 15.11. (wednesday)
-        coordinate design & technical
-        do final testing & presentation
+    project proposal: >
+        lukas, done till 16.11.
     technical: >
         ensure application is up to spec
         solve DS challenges
-        organize other team members if help is needed
         implement by 25.11. (two weeks)
+        done by Lukas, Tobi, Dino
     design: >
         create mockups / design look & feel
         create logo & presentation template
         implement by 02.12. (three weeks) 
+        done by Florian, Lino, Mark
         
 hand in:
     deadline: >
