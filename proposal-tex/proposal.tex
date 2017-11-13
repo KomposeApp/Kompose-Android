@@ -9,7 +9,7 @@
 \usepackage{subfigure}
 \usepackage{enumitem}
 \usepackage{url}
-
+\usepackage{float}
 
 \usepackage{color}
 \definecolor{orange}{rgb}{1,0.5,0}
@@ -74,8 +74,7 @@
 
 % General information
 
-\title{Project Title\\
-\normalsize{Distributed Systems -- Project Proposal}}
+\title{Kompose - A distributed playlist}
 \subtitle{subtitle}
 
 % Use the \alignauthor commands to handle the names
@@ -97,8 +96,8 @@
 % e-mail address with \email.
 %
 % 1st. author
-\alignauthor \normalsize{Mark Arnold, Dino Bollinger, Tobias Brodmann, Lino Lendi, Florian Moser, Lukas Tobler}\\
-	\affaddr{\normalsize{ETH ID-1 XX-XXX-XXX, ETH ID-2 XX-XXX-XXX, ETH ID-3 XX-XXX-XXX, ETH ID-4 XX-XXX-XXX, ETH ID-5 XX-XXX-XXX, ETH ID-6 14-942-007}}\\
+    \alignauthor \normalsize{Mark Arnold (15-917-701), Dino Bollinger (14-923-676), Tobias Brodmann (15-934-565), Lino Lendi (11-714-383), Florian Moser (15-930-704), Lukas Tobler (14-942-007)}\\
+	% \affaddr{\normalsize{ETH ID-1 15-917-701, ETH ID-2 14-923-676, ETH ID-3 15-934-565, ETH ID-4 11-714-383, ETH ID-5 15-930-704, ETH ID-6 14-942-007}}\\
 	\email{\normalsize{arnomark@student.ethz.ch, bdino@student.ethz.ch, brotobia@student.ethz.ch, llendi@student.ethz.ch, moserfl@studen.ethz.ch, lutobler@student.ethz.ch}}
 }
 
@@ -106,39 +105,101 @@
 
 \maketitle
 
-% TODO
 \begin{abstract}
-More like KONKRET
+\emph{Kompose} is an Android app that allows many participants to share a playlist and
+request songs to be played at a social events. Users will be able to share,
+synchronize and vote on songs in a fully distributed fashion. One device will
+act as the host and prefetch items in the play queue from YouTube.
 \end{abstract}
 
-% TODO
 \section{Introduction}
-Motherfucking best app ever !!!111einself
+At social events, such as parties, we often face the problem of deciding who is
+in charge of the music being played. In our experience, many people will be
+dissatisfied with that persons taste in music, and he will frequently be
+bothered with song requests.
+
+\emph{Kompose} solves this problem by creating a distributed playlist that anyone
+can add songs to. One device will start a session (the \emph{host}, usually connected
+to a stereo), and other devices on the local network can join in and start
+adding songs to the queue.  Apart from choosing the name for the party,
+the host will also have the same functionality of the other clients.
+All clients can \emph{downvote} a specific song, and when the host realizes
+a majority of clients downvoted a song, it will be skipped.  Past sessions
+will be kept, so the users can review playlists at a later date.
+
+The source of music will be YouTube, clients send a YouTube URL with
+their song request to the host. The host will then download and cache the
+audio from YouTube ahead of time to allow continuous playback.
+
+The challenges in this project are automatically announcing and finding
+services on the network, synchronizing the playlist state to all devices,
+and keeping track of all clients that are still alive. Further, voting on
+skipping songs should be fair for all clients. A protocol that supports all
+these features must be devised.
 
 % TODO
 \section{System Overview}
-Two words: Fucken good
+\subsection{Client/Server architecture}
+The host device will act as the server in our system. All communication is
+done over the host, i.e. there is no peer-to-peer communication between
+clients. Our communication protocol will provide functionality such as:
+registering a client, unregistering a client, sending a song request,
+voting to skip a song, and sending session state information to the clients.
+To add some resilience against clients dropping off the network,
+clients send a keep-alive message to the host every 30 seconds.
 
-% TODO
+Both client and server listen on the network for messages,
+the host for requests from the clients, and the clients for state updates
+from the host. To avoid manual IP/port configuration, \emph{Network Service Discovery}
+\cite{nsd} is used. This gives the clients the hosts' IP and port,
+to which they can send a \emph{register} messgage containing the IP and port they
+will be listening on for state updates.
+
+For messaging, a JSON based protocol will be used over TCP.
+
+\subsection{User interface}
+Figure 1 shows a mockup of the user interface design. The start screen
+(top center) allows the user to either join or create a party. The host chooses
+a party name, while the clients will listen for a service announcement
+from a host. If an announcement is received, the party name shows up
+in a list and can be joined.
+
+The playlist view has a list of all items currently in the play queue.
+Every list item has a button to downvote (not shown in mockup).
+
+Past playlist are available from the home screen, or from the action bar
+overflow menu in the playlist view, which also has an option to leave a party.
+
+The host will additionally have a play/pause button in the action bar.
+
+\subsection{YouTube file downloads}
+The host fetches songs from YouTube by using a library \cite{youtubeExtractor}
+to extract the URL for the audio file. Songs in the play queue are pre-fetched
+to guarantee continuous playback. The number of items that are cached can be
+configured in the settings. This is of course handled asynchronously in
+the background.
+
 \section{Requirements}
-Skill and dedication m8
+\begin{itemize}
+    \item {\bf Discovery service}: Android Network Service Discovery API \cite{nsd}
+    \item {\bf YouTube Downloads}: android-youtubeExtractor \cite{youtubeExtractor}
+\end{itemize}
 
-% TODO
 \section{Work Packages}
 \begin{itemize}
-    \item {\bf WP1}: XYZ \ldots
-    \item {\bf WP2}: Set and Configuring Backend Serve \ldots
-    \item {\bf WP3}: Integration \ldots
-    \item {\bf WPx}: \ldots
+    \item {\bf WP1}: Protocol specification
+    \item {\bf WP2}: Client/Server implementation
+    \item {\bf WP3}: User inteface design
+    \item {\bf WP4}: UI and implementation integration, testing
 \end{itemize}
 
 % TODO
 \section{Milestones}
 \subsection*{Work plan}
 \begin{itemize}
-    \item {\bf A:} a
-    \item {\bf B:} b
-    \item {\bf C:} c
+    \item {\bf WP1/WP2:} 25.11.17 (lutobler, brotobia, bdino)
+    \item {\bf WP2:} (moserfl, llendi, arnomark)
+    \item {\bf WP3:} (bdino, moserfl, arnomark)
 \end{itemize}
 
 \subsection*{Deadlines}
@@ -156,5 +217,9 @@ Skill and dedication m8
 % You must have a proper ".bib" file
 
 %\balancecolumns % GM June 2007
+\begin{figure*}
+    \includegraphics[width=\textwidth]{../design/mockups.pdf}
+    \caption{User interface mockup (created with \cite{balsamiq})}
+\end{figure*}
 
 \end{document}

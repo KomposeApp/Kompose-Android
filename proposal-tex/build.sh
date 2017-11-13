@@ -1,8 +1,5 @@
 #!/bin/sh
 
-aux_dir=aux
-pdfl="pdflatex --output-directory=$aux_dir"
+pdfl="pdflatex"
 
-[ -d "$aux_dir" ] || mkdir "$aux_dir"
-$pdfl proposal.tex
-mv $aux_dir/*.pdf .
+$pdfl proposal.tex && bibtex proposal && $pdfl proposal.tex && $pdfl proposal.tex
