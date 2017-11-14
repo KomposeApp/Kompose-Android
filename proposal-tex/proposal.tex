@@ -107,9 +107,10 @@
 
 \begin{abstract}
 \emph{Kompose} is an Android app that allows many participants to share a playlist and
-request songs to be played at a social events. Users will be able to share,
-synchronize and vote on songs in a fully distributed fashion. One device will
-act as the host and prefetch items in the play queue from YouTube.
+request songs to be played at social events. Users will be able to share,
+synchronize and vote on YouTube songs in a fully distributed fashion. One device will
+act as the host which controls the music station and plays the songs in the play queue
+with the order agreed upon by all clients.
 \end{abstract}
 
 \section{Introduction}
@@ -122,20 +123,20 @@ bothered with song requests.
 can add songs to. One device will start a session (the \emph{host}, usually connected
 to a stereo), and other devices on the local network can join in and start
 adding songs to the queue.  Apart from choosing the name for the party,
-the host will also have the same functionality of the other clients.
-All clients can \emph{downvote} a specific song, and when the host realizes
-a majority of clients downvoted a song, it will be skipped.  Past sessions
-will be kept, so the users can review playlists at a later date.
+the host will have the same functionality and capabilities like the other clients.
+Clients can \emph{downvote} a specific song, and when the host realizes
+a majority of clients downvoted a song, it will be removed from the play queue.  
+Past sessions will be kept, so the users can review playlists at a later date.
 
-The source of music will be YouTube, clients send a YouTube URL with
+The source of music will be YouTube. Clients send a YouTube URL with
 their song request to the host. The host will then download and cache the
 audio from YouTube ahead of time to allow continuous playback.
 
 The challenges in this project are automatically announcing and finding
 services on the network, synchronizing the playlist state to all devices,
-and keeping track of all clients that are still alive. Further, voting on
-skipping songs should be fair for all clients. A protocol that supports all
-these features must be devised.
+and keeping track of all clients that are still alive (to allow the majority based voting). 
+Adding new songs to the playlist, and voting on skipping songs should be fair 
+for all clients. A protocol that supports all these features must be devised.
 
 % TODO
 \section{System Overview}
@@ -144,9 +145,10 @@ The host device will act as the server in our system. All communication is
 done over the host, i.e. there is no peer-to-peer communication between
 clients. Our communication protocol will provide functionality such as:
 registering a client, unregistering a client, sending a song request,
-voting to skip a song, and sending session state information to the clients.
+voting to skip a song, and sending the playlist state (including all songs
+in the play queue, at the received downvotes for each of the songs) to the clients.
 To add some resilience against clients dropping off the network,
-clients send a keep-alive message to the host every 30 seconds.
+clients send a keep-alive message to the host every few seconds.
 
 Both client and server listen on the network for messages,
 the host for requests from the clients, and the clients for state updates
