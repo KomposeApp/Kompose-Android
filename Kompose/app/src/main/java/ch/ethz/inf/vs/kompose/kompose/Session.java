@@ -12,52 +12,67 @@ import java.util.UUID;
 
 public class Session {
 
-    private Queue<PlaylistItem> playQueue;
     private String sessionName;
     private String hostUserName;
     private UUID hostUUID;
+    private Queue<PlaylistItem> playQueue;
 
     private int idCounter = 0;
     private Context context;
 
-    public Session(String sessionName, String hostUserName, UUID hostUUID, Context context) {
+    // creates an empty playlist
+    public Session(Context context,
+                   String sessionName,
+                   String hostUserName,
+                   UUID hostUUID) {
+        this.context = context;
         this.sessionName = sessionName;
         this.hostUserName = hostUserName;
         this.hostUUID = hostUUID;
-        this.context = context;
         this.playQueue = new LinkedList<>();
     }
 
-    public Session(JSONObject json, Context context) {
+    public Session(Context context, JSONObject json) throws JSONException {
         this.context = context;
         this.sessionName = json.optString("session_name");
         this.hostUserName = json.optString("host_username");
-        this.hostUUID = UUID.fromString(json.optString("host_UUID"));
+        this.hostUUID = UUID.fromString(json.optString("host_uuid"));
+
+        // build the playlist from JSON
         this.playQueue = new LinkedList<>();
+        JSONArray playlistArray = json.optJSONArray("playlist");
+        if (playlistArray != null) {
+            for (int i = 0; i < playlistArray.length(); i++) {
+                JSONObject playlistItemJSON = playlistArray.optJSONObject(i);
+                if (playlistItemJSON != null) {
+                    this.playQueue.add(new PlaylistItem(context, playlistItemJSON));
+                }
+            }
+        }
     }
 
     public JSONObject toJSON() throws JSONException {
-        JSONObject sessionJSON = new JSONObject();
-        sessionJSON.put("session_name", sessionName);
-        sessionJSON.put("host_username", hostUserName);
-        sessionJSON.put("host_UUID", hostUUID.toString());
+        JSONObject json = new JSONObject();
+        json.put("session_name", sessionName);
+        json.put("host_username", hostUserName);
+        json.put("host_uuid", hostUUID.toString());
         JSONArray playlistArray = new JSONArray();
         for (PlaylistItem p : playQueue) {
             playlistArray.put(p.toJSON());
         }
-        sessionJSON.put("playlist", playlistArray);
-        return sessionJSON;
+        json.put("playlist", playlistArray);
+        return json;
     }
 
-    public void addItem(String URL) {
-        playQueue.add(new PlaylistItem(context, URL, idCounter));
-        idCounter++;
+    public void addItem(PlaylistItem playlistItem) {
+        playQueue.add(playlistItem);
     }
 
     public void removeItem(int id) {
         for (PlaylistItem p : playQueue) {
             if (p.getId() == id) {
                 playQueue.remove(p);
+                break;
             }
         }
     }

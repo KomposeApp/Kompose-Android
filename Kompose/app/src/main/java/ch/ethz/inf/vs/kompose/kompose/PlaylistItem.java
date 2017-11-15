@@ -4,16 +4,11 @@ import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
-import android.util.SparseArray;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-
-import at.huber.youtubeExtractor.VideoMeta;
-import at.huber.youtubeExtractor.YouTubeExtractor;
-import at.huber.youtubeExtractor.YtFile;
 
 class PlaylistItem {
 
@@ -24,21 +19,33 @@ class PlaylistItem {
     private OnDownloadFinished onFinishedCallback;
     private Context context;
 
-    // original YouTube URL
-    private String youTubeUrl;
-
-    // extracted download URL
-    private String downloadUrl;
-
-    private String title;
     private int id;
+    private int numDownvotes;
+    private String downloadUrl;
+    private String youTubeUrl;
+    private String title;
 
-    private int numDownvotes = 0;
-
-    PlaylistItem(Context context, String url, int id) {
+    PlaylistItem(Context context,
+                 int id,
+                 int numDownvotes,
+                 String title,
+                 String downloadUrl,
+                 String youTubeUrl) {
         this.context = context;
-        this.youTubeUrl = url;
         this.id = id;
+        this.numDownvotes = numDownvotes;
+        this.title = title;
+        this.downloadUrl = downloadUrl;
+        this.youTubeUrl = youTubeUrl;
+    }
+
+    PlaylistItem(Context context, JSONObject json) {
+        this.context = context;
+        this.id = json.optInt("id");
+        this.numDownvotes = json.optInt("num_downvotes");
+        this.title = json.optString("title");
+        this.downloadUrl = json.optString("download_url");
+        this.youTubeUrl = json.optString("youtube_url");
     }
 
     boolean getIsDownloaded() {
@@ -104,31 +111,17 @@ class PlaylistItem {
     // Extract the YouTube download URL and then start an AsyncTask to download the file.
     void downloadInBackground() {
         Log.d(LOG_TAG, "starting background download");
-        Log.d(LOG_TAG, "extracting: " + youTubeUrl);
-        YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
-            @Override
-            protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
-                if (sparseArray!= null) {
-                    int itag = 140;
-                    downloadUrl = sparseArray.get(itag).getUrl();
-                    title = videoMeta.getTitle();
-                    Log.d(LOG_TAG, "extracted YouTube URL: " + downloadUrl);
-
-                    // start the file download
-                    DownloadAudioTask dlTask = new DownloadAudioTask(getThis());
-                    dlTask.execute(downloadUrl);
-                }
-            }
-        };
-        youTubeExtractor.extract(youTubeUrl, true, false);
+        DownloadAudioTask dlTask = new DownloadAudioTask(getThis());
+        dlTask.execute(downloadUrl);
     }
 
     JSONObject toJSON() throws JSONException {
-        JSONObject playlistItemJSON = new JSONObject();
-        playlistItemJSON.put("id", id);
-        playlistItemJSON.put("title", title);
-        playlistItemJSON.put("num_downvotes", title);
-        playlistItemJSON.put("youtube_url", youTubeUrl);
-        return playlistItemJSON;
+        JSONObject json = new JSONObject();
+        json.put("id", id);
+        json.put("num_downvotes", numDownvotes);
+        json.put("title", title);
+        json.put("download_url", downloadUrl);
+        json.put("youtube_url", youTubeUrl);
+        return json;
     }
 }
