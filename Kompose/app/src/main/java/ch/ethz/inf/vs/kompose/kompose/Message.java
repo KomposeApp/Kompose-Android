@@ -42,7 +42,7 @@ public class Message {
 
     // Construct a message from JSON
     // Context is required for the Session field
-    public Message(Context context, JSONObject json) throws MessageException {
+    public Message(Context context, JSONObject json) throws MessageException,JSONException {
         MessageType msgType = stringTypeToEnum(json.optString("type"));
         if (msgType == null) {
             throw new MessageException("Invalid message type");

@@ -30,17 +30,19 @@ information about the current session, such as its name, the play queue, etc.
 - SESSION_UPDATE,
 - REQUEST_SONG,
 - VOTE_SKIP_SONG,
+- KEEP_ALIVE,
 - ERROR
 
 An message for registering a client looks like this:
 
 JSON fields:
-    - `type`: message type (string)
-    - `username`: sender username (string)
-    - `uuid`: a standard uuid (string)
-    - `body`: message body, content depends on `type`. (string)
-    - `session`: table that can be deserialized to a session object (JSON object)
-    - `song_details`: song request details, such as title and download url
+
+- `type`: message type (string)
+- `username`: sender username (string)
+- `uuid`: a standard uuid (string)
+- `body`: message body, content depends on `type`. (string)
+- `session`: table that can be deserialized to a session object (JSON object)
+- `song_details`: song request details, such as title and download url
 
 `session.playlist` items and `song_details` are both serialized `PlaylistItem`
 objects.
