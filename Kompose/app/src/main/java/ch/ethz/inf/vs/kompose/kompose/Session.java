@@ -17,7 +17,6 @@ public class Session {
     private UUID hostUUID;
     private Queue<PlaylistItem> playQueue;
 
-    private int idCounter = 0;
     private Context context;
 
     // creates an empty playlist
