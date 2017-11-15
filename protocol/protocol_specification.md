@@ -99,7 +99,7 @@ Examples:
     type: "VOTE_SKIP_SONG",
     username: "Mario Huana",
     UUID: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: "#420"
+    body: "420"
     session: {}
 }
 ```
