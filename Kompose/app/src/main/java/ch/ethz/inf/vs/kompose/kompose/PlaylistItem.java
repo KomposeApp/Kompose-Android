@@ -6,6 +6,9 @@ import android.net.Uri;
 import android.util.Log;
 import android.util.SparseArray;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 
 import at.huber.youtubeExtractor.VideoMeta;
@@ -28,12 +31,14 @@ class PlaylistItem {
     private String downloadUrl;
 
     private String title;
-    private String id;
+    private int id;
 
-    PlaylistItem(Context context, String url) {
-        isDownloaded = false;
-        this.youTubeUrl = url;
+    private int numDownvotes = 0;
+
+    PlaylistItem(Context context, String url, int id) {
         this.context = context;
+        this.youTubeUrl = url;
+        this.id = id;
     }
 
     boolean getIsDownloaded() {
@@ -60,6 +65,10 @@ class PlaylistItem {
         return title;
     }
 
+    int getId() {
+        return id;
+    }
+
     void setStoredFile(File file) {
         storedFile = file;
     }
@@ -68,24 +77,18 @@ class PlaylistItem {
         isDownloaded = status;
     }
 
-    /**
-     * Store a callback that will be executed when the file download has completed.
-     */
+    // Store a callback that will be executed when the file download has completed.
     void registerOnDownloadFinishedCallback(OnDownloadFinished callback) {
         this.onFinishedCallback = callback;
     }
 
-    /**
-     * Deregister the onFinished callback.
-     */
+    // Deregister the onFinished callback.
     void unregisterOnDownloadFinishedCallback() {
         this.onFinishedCallback = null;
     }
 
-    /**
-     * Construct a MediaPlayer from the locally stored audio file.
-     * If not yet downloaded, return null.
-     */
+    // Construct a MediaPlayer from the locally stored audio file.
+    // If not yet downloaded, return null.
     MediaPlayer getMediaPlayer() {
         MediaPlayer mediaPlayer = null;
         if (isDownloaded && storedFile != null) {
@@ -98,9 +101,7 @@ class PlaylistItem {
         return this;
     }
 
-    /**
-     * Extract the YouTube download URL and then start an AsyncTask to download the file.
-     */
+    // Extract the YouTube download URL and then start an AsyncTask to download the file.
     void downloadInBackground() {
         Log.d(LOG_TAG, "starting background download");
         Log.d(LOG_TAG, "extracting: " + youTubeUrl);
@@ -120,5 +121,14 @@ class PlaylistItem {
             }
         };
         youTubeExtractor.extract(youTubeUrl, true, false);
+    }
+
+    JSONObject toJSON() throws JSONException {
+        JSONObject playlistItemJSON = new JSONObject();
+        playlistItemJSON.put("id", id);
+        playlistItemJSON.put("title", title);
+        playlistItemJSON.put("num_downvotes", title);
+        playlistItemJSON.put("youtube_url", youTubeUrl);
+        return playlistItemJSON;
     }
 }

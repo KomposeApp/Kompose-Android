@@ -2,7 +2,7 @@
 
 This specifies the JSON protocol used for the `Kompose` application.
 
-# Features
+## Features
 
 The following operations are supported:
 
@@ -14,13 +14,13 @@ The following operations are supported:
 - Downvote a song
 - Error message
 
-# Implementation
+## Implementation
 
 `Message.java` will be the Java implementation of such a message. It stores
 all necessary information and fields for this protocol. `Session.java` holds
 information about the current session, such as its name, the play queue, etc.
 
-# JSON
+## JSON
 
 `type` is one of following: 
 
@@ -113,3 +113,30 @@ Examples:
     session: {}
 }
 ```
+
+## Session table
+
+`sesion` looks like this:
+
+{
+    session_name: "great party",
+    host_username: "Big Shaq",
+    host_UUID: "24aa4a92-c9e2-11e7-86b4-f68673f17803",
+    playlist: [
+        {
+            id: 420,
+            title: "Shooting Stars",
+            num_downvotes: 0,
+            youtube_url: "https://www.youtube.com/watch?v=feA64wXhbjo"
+        },
+        {
+            id: 421,
+            title: "Ghostbusters",
+            num_downvotes: 12,
+            youtube_url: "https://www.youtube.com/watch?v=m9We2XsVZfc"
+        },
+        ...
+    ]
+}
+
+
