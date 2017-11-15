@@ -30,11 +30,13 @@ public class Message {
 
     public Message(MessageType type,
                    String userName,
+                   UUID uuid,
                    String body,
                    Session session,
                    PlaylistItem playlistItem) {
         this.type = type;
         this.userName = userName;
+        this.uuid = uuid;
         this.session = session;
         this.body = body;
         this.songDetails = playlistItem;
@@ -47,24 +49,32 @@ public class Message {
         if (msgType == null) {
             throw new MessageException("Invalid message type");
         }
-
+        this.type = msgType;
         this.userName = json.optString("username");
         this.uuid = UUID.fromString(json.optString("uuid"));
         this.body = json.optString("body");
 
         JSONObject sessionJSON = json.optJSONObject("session");
-        this.session = new Session(context, sessionJSON);
+        if (sessionJSON != null && sessionJSON.length() != 0) {
+            this.session = new Session(context, sessionJSON);
+        } else {
+            this.session = null;
+        }
 
         JSONObject songDetailsJSON = json.optJSONObject("song_details");
-        this.songDetails = new PlaylistItem(context, songDetailsJSON);
+        if (songDetailsJSON != null && songDetailsJSON.length() != 0) {
+            this.songDetails = new PlaylistItem(context, songDetailsJSON);
+        } else {
+            this.songDetails = null;
+        }
     }
 
-    // TODO
     // Serialize a message to JSON
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
-        json.put("type", type);
-        json.put("userName", userName);
+        json.put("type", type.name());
+        json.put("username", userName);
+        json.put("uuid", uuid);
         json.put("body", body);
         if (session != null) {
             json.put("session", session.toJSON());
