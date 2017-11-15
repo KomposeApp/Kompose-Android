@@ -225,28 +225,65 @@ are cached can be configured in the settings. This is of course handled asynchro
 the background.
 
 \section{Requirements}
-\begin{itemize}
-    \item {\bf Discovery service}: Android Network Service Discovery API \cite{nsd}
-    \item {\bf YouTube Downloads}: android-youtubeExtractor \cite{youtubeExtractor}
-\end{itemize}
+
+	\paragraph{Discovery service}
+	We will use the Android Network Service Discovery API \cite{nsd} as provided by android itself
+	to enable the client-server discovery in the network
+	
+	\paragraph{YouTube Downloads}
+	We will enable users to put videos from youtube inside the play queue. To fetch the audio
+	URLs from those videos we will rely on a library called android-youtubeExtractor \cite{youtubeExtractor}
 
 \section{Work Packages}
-\begin{itemize}
-    \item {\bf WP1}: Protocol specification
-    \item {\bf WP2}: Client/Server implementation
-    \item {\bf WP3}: User inteface design
-    \item {\bf WP4}: UI and implementation integration, testing
-\end{itemize}
+To work efficiently, and enable group members to work in their area of expertise
+we will divide the group coarsely into a technical and a design team.
+With this in mind, our work packages are split by technical and design aspects, but 
+the designers and the developers will stay in close contact throughout the whole process.
+
+\paragraph{WP1: Protocol specification}
+The technical group will firstly define a protocol to support all required functionalities.
+Much time will be spent on this. A well defined protocol will ease up development and
+help with further updates of the application. The target of this work package is the
+definition of a small but extensible protocol.
+
+\paragraph{WP2: Client/Server implementation}
+This work package includes the implementation of the defined protocol in \emph{WP1}
+with all functionality as defined in this document by the technical team. The target of this 
+work package is a fully functional prototype.
+
+\paragraph{WP3: User interface design}
+Parallel to WP1 and WP2 the design team will work on the interface look \& feel. 
+Besides the design, the group will focus on usability aspects, and will be in close
+contact to the development group. The target of the work package is a consistent 
+design of the various pages which fits to its target user group.
+
+\paragraph{WP4: UI implementation}
+After finishing the design it will be implemented using the prototype from \emph{WP3}.
+Target of this work package is the nearly finished application.
+
+\paragraph{WP5: Testing \& polish}
+For this last work package the design and technical team will work together
+on finalizing the functions and design of the application. Inputs from people from outside 
+the projects will also be evaluated. Target of this work package is to polish the design,
+and confirm that all functionality works as intended and as advertised in the UI.
 
 \section{Milestones}
-\subsection*{Work plan}
-\begin{itemize}
-    \item {\bf WP1/WP2:} 25.11.17 (lutobler, brotobia, bdino)
-    \item {\bf WP2:} 02.12.17 (moserfl, llendi, arnomark)
-    \item {\bf WP3:} 16.12.17 (bdino, moserfl, arnomark)
-\end{itemize}
 
-\subsection*{Deadlines}
+\subsection{Milestone technical}
+The technical milestone will include both \emph{WP1} and \emph{WP2} and will be done by our technical team,
+consisting of the members lutobler, brotobia and bdino.
+They have already started with their work packages, and will finish the milestone by 25.11.17 at latest.
+
+\subsection{Milestone design}
+The design milestone will include both \emph{WP3} and \emph{WP4} and will be completed by our design team, 
+consisting of moserfl, llendi and arnomark. While \emph{WP3} is already in progress, \emph{WP4} will start
+after \emph{Milestone technical} is completed. Both work packages will be done by 02.12.17
+
+\subsection{Milestone testing}
+After the completion of the first two milestones, all team members will come together to test and polish the application
+as described in \emph{WP5}. The testing phase will finish at 14.12.17 at latest, shortly after the application and 
+all additional material will be submitted. This will respect all of the fixed deadlines:
+
 \begin{itemize}
     \item {\bf 15.12.2017:} Presentation/Logo deadline
     \item {\bf 17.12.2017:} Code deadline
