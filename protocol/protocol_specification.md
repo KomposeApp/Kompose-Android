@@ -69,46 +69,46 @@ Full JSON example:
 
 ```
 {
-    type: "MESSAGE_TYPE",
-    error_message: "Playing Rick Astley is not supported",
-    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    sender_username: "Mario Huana",
-    session: {
-        uuid: "24aa4a92-c9e2-11e7-86b4-f68673f17803",
-        host_uuid: "24aa4a92-c9e2-11e7-86b4-f68673f17803",
-		session_name: "great party"
-        clients: [ 
+    "type": "MESSAGE_TYPE",
+    "error_message": "Playing Rick Astley is not supported",
+    "sender_uuid": "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
+    "sender_username": "Mario Huana",
+    "session": {
+        "uuid": "24aa4a92-c9e2-11e7-86b4-f68673f17803",
+        "host_uuid": "24aa4a92-c9e2-11e7-86b4-f68673f17803",
+		"session_name": "great party",
+        "clients": [ 
 			{
-				uuid: "019f9150-cac4-11e7-8bb4-8474e3e86aae"
-				name: "Jeb Bush",
-				is_active: true
+				"uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+				"name": "Jeb Bush",
+				"is_active": true
 			}
 		],
-        playlist: [
+        "playlist": [
             {
-                uuid: "019f9150-cac4-11e7-8bb4-8474e3e86a2e",
-                order: 1,
-                title: "Ghostbusters",
-				thumbnail_url: "https://www.youtube.com/thumbnail?v=m9We2XsVZfc",
-                download_url: "https://www.youtube.com/download?v=m9We2XsVZfc",
-                source_url: "https://www.youtube.com/watch?v=m9We2XsVZfc",
-				status: "SUBMITTED",
-                proposed_by: "019f9150-cac4-11e7-8bb4-8474e3e86aae",
-				downvotes: [
+                "uuid": "019f9150-cac4-11e7-8bb4-8474e3e86a2e",
+                "order": 1,
+                "title": "Ghostbusters",
+				"thumbnail_url": "https://www.youtube.com/thumbnail?v=m9We2XsVZfc",
+                "download_url": "https://www.youtube.com/download?v=m9We2XsVZfc",
+                "source_url": "https://www.youtube.com/watch?v=m9We2XsVZfc",
+				"status": "SUBMITTED",
+                "proposed_by": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+				"downvotes": [
 					{
-						uuid: "019f9150-cac4-11e7-8bb4-8474e3e86aae",
-						cast_time: "2005-08-15T15:52:01+0000"
+						"uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+						"cast_time": "2005-08-15T15:52:01+0000"
 					}
-                ],
+                ]
             }
         ]
-    }
-	song_details: {
-        item_uuid: "019f9150-cac4-11e7-8bb4-8474e3e86aae",
-        title: "Ghostbusters",
-        thumbnail_url: "https://www.youtube.com/thumbnail?v=m9We2XsVZfc",
-        download_url: "https://www.youtube.com/download?v=m9We2XsVZfc",
-        source_url: "https://www.youtube.com/watch?v=m9We2XsVZfc"
+    },
+	"song_details": {
+        "item_uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+        "title": "Ghostbusters",
+        "thumbnail_url": "https://www.youtube.com/thumbnail?v=m9We2XsVZfc",
+        "download_url": "https://www.youtube.com/download?v=m9We2XsVZfc",
+        "source_url": "https://www.youtube.com/watch?v=m9We2XsVZfc"
     }
 }
 ```
