@@ -16,15 +16,13 @@ import java.net.Socket;
 public class AndroidServerService extends Service {
 
     private static final String LOG_TAG = "## AndroidServerService";
+    private static final String SERVICE_NAME = "Kompose";
+    private static final String SERVICE_TYPE = "_kompose._tcp";
 
-    private Context context;
     private ServerSocket serverSocket;
+    private int localPort;
     private String serviceName;
     private NsdManager nsdManager;
-
-    public AndroidServerService(Context context) {
-        this.context = context;
-    }
 
     @Override
     public void onCreate() {
@@ -33,18 +31,24 @@ public class AndroidServerService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.d(LOG_TAG, "Service started");
         try {
             serverSocket = new ServerSocket(0);
-        } catch (IOException e) { }
+            localPort = serverSocket.getLocalPort();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         // register network service
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
-        serviceInfo.setServiceName("Kompose");
-        serviceInfo.setServiceType("Kompose._tcp");
-        serviceInfo.setPort(serverSocket.getLocalPort());
+        serviceInfo.setServiceName(SERVICE_NAME);
+        serviceInfo.setServiceType(SERVICE_TYPE);
+
+        Log.d(LOG_TAG, "Using port: " + localPort);
+        serviceInfo.setPort(localPort);
 
         NsdManager.RegistrationListener registrationListener = new ServerRegistrationListener();
-        nsdManager = (NsdManager) context.getSystemService(Context.NSD_SERVICE);
+        nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
         nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
 
         // start server task
