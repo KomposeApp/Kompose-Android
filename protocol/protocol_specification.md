@@ -39,22 +39,23 @@ JSON fields:
 - `username`: sender username (string)
 - `sender_uuid`: a standard uuid (string)
 - `session`: table that can be deserialized to a session object (JSON object)
-    - `session_name`: Name of the session
-    - `host_username`: Name of the host
-    - `host_uuid`: UUID of the host
-    - `clients`: JSON Object that maps UUIDs to user names
-    - `playlist`: JSON array with `PlaylistItem` objects
-- `song_details`: serialized `PlaylistItem` object
+    - `session_name`: Name of the session (string)
+    - `host_username`: Name of the host (string)
+    - `host_uuid`: UUID of the host (string)
+    - `clients`: JSON Object that maps UUIDs to user names (JSON array)
+    - `playlist`: JSON array with `PlaylistItem` objects (JSON array)
+- `song_details`: serialized `PlaylistItem` object (JSON object)
+- `error_message`: An error message (string)
 
 `PlaylistItem` objects:
 
-- `order`: sorted order of the item in the play queue
-- `item_uuid`: UUID of the item
-- `downvotes`: JSON Array with all UUIDs that downvoted the song
-- `title`: Song title
-- `proposed_by`: UUID of the client that originally requested the item
-- `download_url`: URL to download the audio file from
-- `source_url`: Original link, i.e. the youtube.com URL
+- `order`: sorted order of the item in the play queue (int)
+- `item_uuid`: UUID of the item (string)
+- `downvotes`: JSON Array with all UUIDs that downvoted the song (JSON object)
+- `title`: Song title (string)
+- `proposed_by`: UUID of the client that originally requested the item (string)
+- `download_url`: URL to download the audio file from (string)
+- `source_url`: Original link, i.e. the youtube.com URL (string)
 
 Examples:
 
