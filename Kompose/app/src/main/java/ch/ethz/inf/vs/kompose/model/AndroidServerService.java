@@ -87,8 +87,11 @@ public class AndroidServerService extends Service {
 
     private class ServerTask extends AsyncTask<Void,Void,Void> {
 
+        private static final String LOG_TAG = "## ServerTask";
+
         @Override
         protected Void doInBackground(Void... voids) {
+            Log.d(LOG_TAG, "Server ready to receive connections");
 
             while (!this.isCancelled()) {
                 try {
