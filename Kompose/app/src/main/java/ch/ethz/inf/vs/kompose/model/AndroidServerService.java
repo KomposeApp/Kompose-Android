@@ -7,12 +7,15 @@ import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
+import android.util.Log;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class AndroidServerService extends Service {
+
+    private static final String LOG_TAG = "## AndroidServerService";
 
     private Context context;
     private ServerSocket serverSocket;
@@ -61,10 +64,12 @@ public class AndroidServerService extends Service {
         @Override
         public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) {
             serviceName = NsdServiceInfo.getServiceName();
+            Log.d(LOG_TAG, "Service registered: " + serviceName);
         }
 
         @Override
         public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.d(LOG_TAG, "Service registration failed: " + errorCode);
         }
 
         @Override
