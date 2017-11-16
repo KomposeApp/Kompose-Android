@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.kompose;
+package ch.ethz.inf.vs.kompose.kompose.ch.ethz.inf.vs.kompose.kompose.archive;
 
 import android.content.Context;
 import android.util.Log;
@@ -9,6 +9,8 @@ import java.util.UUID;
 import at.huber.youtubeExtractor.VideoMeta;
 import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
+import ch.ethz.inf.vs.kompose.kompose.Message;
+import ch.ethz.inf.vs.kompose.kompose.PlaylistItem;
 
 public class Client {
 

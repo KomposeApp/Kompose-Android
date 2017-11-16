@@ -20,72 +20,74 @@ public class Message {
         ERROR
     }
 
-    // these correspond to the fields in the JSON protocol
-    private MessageType type;
-    private String userName;
-    private UUID uuid;
-    private String body;
-    private Session session;
-    private PlaylistItem songDetails;
+    public MessageType type;
+    public String userName;
+    public UUID senderUUID;
+    public Session session;
+    public PlaylistItem songDetails;
+    public String errorMessage;
 
     public Message(MessageType type,
                    String userName,
-                   UUID uuid,
-                   String body,
+                   UUID senderUUID,
                    Session session,
-                   PlaylistItem playlistItem) {
+                   PlaylistItem playlistItem,
+                   String errorMessage) {
         this.type = type;
         this.userName = userName;
-        this.uuid = uuid;
+        this.senderUUID = senderUUID;
         this.session = session;
-        this.body = body;
         this.songDetails = playlistItem;
+        this.errorMessage = errorMessage;
     }
 
-    // Construct a message from JSON
-    // Context is required for the Session field
-    public Message(Context context, JSONObject json) throws MessageException,JSONException {
+    public Message(JSONObject json) throws MessageException,JSONException {
         MessageType msgType = stringTypeToEnum(json.optString("type"));
         if (msgType == null) {
             throw new MessageException("Invalid message type");
         }
+
         this.type = msgType;
-        this.userName = json.optString("username");
-        this.uuid = UUID.fromString(json.optString("uuid"));
-        this.body = json.optString("body");
+        this.userName = json.optString("username", null);
+        this.errorMessage = json.optString("error_message", null);
+
+        String senderUUIDParse = json.optString("sender_uuid", null);
+        if (senderUUIDParse != null) {
+            this.senderUUID = UUID.fromString(senderUUIDParse);
+        } else {
+            this.senderUUID = null;
+        }
 
         JSONObject sessionJSON = json.optJSONObject("session");
-        if (sessionJSON != null && sessionJSON.length() != 0) {
-            this.session = new Session(context, sessionJSON);
+        if (sessionJSON != null) {
+            this.session = new Session(sessionJSON);
         } else {
             this.session = null;
         }
 
         JSONObject songDetailsJSON = json.optJSONObject("song_details");
-        if (songDetailsJSON != null && songDetailsJSON.length() != 0) {
-            this.songDetails = new PlaylistItem(context, songDetailsJSON);
+        if (songDetailsJSON != null) {
+            this.songDetails = new PlaylistItem(songDetailsJSON);
         } else {
             this.songDetails = null;
         }
     }
 
-    // Serialize a message to JSON
     public JSONObject toJSON() throws JSONException {
         JSONObject json = new JSONObject();
-        json.put("type", type.name());
-        json.put("username", userName);
-        json.put("uuid", uuid);
-        json.put("body", body);
+
+        json.putOpt("type", type.name());
+        json.putOpt("username", userName);
+        json.putOpt("sender_uuid", senderUUID);
+
         if (session != null) {
             json.put("session", session.toJSON());
-        } else {
-            json.put("sesion", new JSONObject());
         }
+
         if (songDetails != null) {
             json.put("song_details", songDetails.toJSON());
-        } else {
-            json.put("song_details", new JSONObject());
         }
+
         return json;
     }
 

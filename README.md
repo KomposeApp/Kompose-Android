@@ -25,3 +25,4 @@ Tobias Brodmann (brotobia) 15-934-565
 - YouTube file formats: 
     - https://github.com/HaarigerHarald/android-youtubeExtractor/blob/master/youtubeExtractor/src/main/java/at/huber/youtubeExtractor/YouTubeExtractor.java
     - https://github.com/rg3/youtube-dl/blob/f2332f18e66fc5255d11a2762bfaff02f8221251/youtube_dl/extractor/youtube.py
+- Message data = Converter.fromJsonString(jsonString);

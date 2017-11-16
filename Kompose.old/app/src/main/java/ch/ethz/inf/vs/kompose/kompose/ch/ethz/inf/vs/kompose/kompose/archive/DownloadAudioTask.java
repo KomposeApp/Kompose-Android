@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.kompose;
+package ch.ethz.inf.vs.kompose.kompose.ch.ethz.inf.vs.kompose.kompose.archive;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -10,6 +10,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+
+import ch.ethz.inf.vs.kompose.kompose.PlaylistItem;
 
 public class DownloadAudioTask extends AsyncTask<String, Void, Void> {
 

@@ -5,10 +5,15 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.List;
+import java.util.UUID;
+
+import ch.ethz.inf.vs.kompose.kompose.ch.ethz.inf.vs.kompose.kompose.archive.DownloadAudioTask;
 
 class PlaylistItem {
 
@@ -17,71 +22,46 @@ class PlaylistItem {
     private boolean isDownloaded = false;
     private File storedFile;
     private OnDownloadFinished onFinishedCallback;
-    private Context context;
 
-    private int id;
-    private int numDownvotes;
-    private String downloadUrl;
-    private String youTubeUrl;
-    private String title;
+    public int order;
+    public UUID itemUUID;
+    public List<UUID> downvotes;
+    public String title;
+    public UUID proposedBy;
+    public String downloadUrl;
+    public String sourceUrl;
 
-    PlaylistItem(Context context,
-                 int id,
-                 int numDownvotes,
+    PlaylistItem(int order,
+                 UUID itemUUID,
+                 List<UUID> downvotes,
                  String title,
+                 UUID proposedBy,
                  String downloadUrl,
-                 String youTubeUrl) {
-        this.context = context;
-        this.id = id;
-        this.numDownvotes = numDownvotes;
+                 String sourceUrl) {
+        this.order = order;
+        this.itemUUID = itemUUID;
         this.title = title;
+        this.proposedBy = proposedBy;
         this.downloadUrl = downloadUrl;
-        this.youTubeUrl = youTubeUrl;
+        this.sourceUrl = sourceUrl;
     }
 
-    PlaylistItem(Context context, JSONObject json) {
-        this.context = context;
-        this.id = json.optInt("id");
-        this.numDownvotes = json.optInt("num_downvotes");
-        this.title = json.optString("title");
-        this.downloadUrl = json.optString("download_url");
-        this.youTubeUrl = json.optString("youtube_url");
+    PlaylistItem(JSONObject json) {
+        this.order = json.optInt("order", 0);
+
+        String itemUUIDParse = json.optString("item_uuid", null);
+        if (itemUUIDParse != null)
+        this.itemUUID
+//        this.id = json.optInt("id");
+//        this.numDownvotes = json.optInt("num_downvotes");
+//        this.title = json.optString("title");
+//        this.downloadUrl = json.optString("download_url");
+//        this.youTubeUrl = json.optString("youtube_url");
     }
 
-    boolean getIsDownloaded() {
-        return isDownloaded;
-    }
-
-    File getStoredFile() {
-        return storedFile;
-    }
-
-    OnDownloadFinished getOnFinishedCallback() {
-        return onFinishedCallback;
-    }
-
-    Context getContext() {
-        return context;
-    }
-
-    String getDownloadUrl() {
-        return downloadUrl;
-    }
-
-    String getTitle() {
-        return title;
-    }
-
-    int getId() {
-        return id;
-    }
-
-    void setStoredFile(File file) {
-        storedFile = file;
-    }
-
-    void setIsDownloaded(boolean status) {
-        isDownloaded = status;
+    // TODO
+    private List<UUID> jsonToUUIDList(JSONArray json) {
+        return null;
     }
 
     // Store a callback that will be executed when the file download has completed.
@@ -96,7 +76,7 @@ class PlaylistItem {
 
     // Construct a MediaPlayer from the locally stored audio file.
     // If not yet downloaded, return null.
-    MediaPlayer getMediaPlayer() {
+    MediaPlayer getMediaPlayer(Context context) {
         MediaPlayer mediaPlayer = null;
         if (isDownloaded && storedFile != null) {
             mediaPlayer = MediaPlayer.create(context, Uri.fromFile(this.storedFile));
@@ -104,14 +84,10 @@ class PlaylistItem {
         return mediaPlayer;
     }
 
-    private PlaylistItem getThis() {
-        return this;
-    }
-
     // Extract the YouTube download URL and then start an AsyncTask to download the file.
-    void downloadInBackground() {
+    void downloadInBackground(Context context) {
         Log.d(LOG_TAG, "starting background download");
-        DownloadAudioTask dlTask = new DownloadAudioTask(getThis());
+        DownloadAudioTask dlTask = new DownloadAudioTask(this);
         dlTask.execute(downloadUrl);
     }
 
