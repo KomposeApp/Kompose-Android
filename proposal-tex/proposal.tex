@@ -62,6 +62,8 @@
 
 % consistent references: use these instead of \label and \ref
 
+\setlength{\parindent}{0pt}
+
 \newcommand{\lsec}[1]{\label{sec:#1}}
 \newcommand{\lssec}[1]{\label{ssec:#1}}
 \newcommand{\lfig}[1]{\label{fig:#1}}
@@ -77,7 +79,6 @@
 \title{Kompose\\
 \normalsize{A Distributed Playlist for Android}}
 \subtitle{subtitle}
-
 % Use the \alignauthor commands to handle the names
 % and affiliations for an 'aesthetic maximum' of six authors.
 
@@ -100,10 +101,10 @@
 
 \begin{abstract}
 \emph{Kompose} is an Android application that aims to allow multiple independent participants to form 
-a local party through which they share a music playlist and request songs to be played at social events.
-The songs will be downloaded from Youtube, and each participant will be able to share, synchronize and 
-vote on what song they want to be played next in a fully distributed fashion. One device will act as the host 
-which controls the playback of the queue, while the order of the songs will be agreed upon by all clients.
+local sessions through which they share a music playlist and request for songs to be played at social events.
+The songs will be downloaded/streamed from Youtube, and each participant will be able to share, synchronize and 
+vote on what song they want to be played next, in a fully distributed fashion. The host will hereby act as the 
+playback device, from which the songs will be played.
 
 \end{abstract}
 %
@@ -112,34 +113,28 @@ At social events, such as clubs or parties, we often face the problem of decidin
 in charge of the music being played. From our experience, many people often disagree with a particular 
 DJs taste in music, and are subsequently dissatisfied with the chosen playlist. And even if the DJ only takes
 suggestions from the participants themselves, there may often be fringe tastes that are only enjoyed by a 
-small minority while others are left completely alienated. The DJ may also be overwhelmed by requests, and
-would benefit greatly from a simple way for people to keep track of what has already been requested.\\\\
+small minority. The DJ may also be overwhelmed by requests, and would benefit greatly from a simple way for 
+people to keep track of what has already been requested.\\\\
 %
-\emph{Kompose} solves this problem by creating a distributed playlist that anyone
-can add songs to. 
-One device will start a session (the \emph{host}, usually connected
-to a stereo), and other devices on the local network can join in and start
-adding songs to the queue. Apart from choosing the name for the party and 
-being responsible for the playback, in terms of voting, the host will have 
-the same rights as the other clients in the system.
-Clients can \emph{downvote} a specific song, and once a majority of clients 
-downvoted a song, it will be removed from the queue.  
-Past sessions will be kept, so the users can review playlists at a later date.\\\\
+\emph{Kompose} solves this problem by creating a distributed playlist that anyone can add songs to. 
+One device will start a session (the \emph{host}, usually connected to a stereo), and other devices 
+on the local network can join in and start adding songs to the queue. Apart from choosing the name 
+for the party and being responsible for the playback, in terms of voting, the host will have 
+the same rights as the other clients in the system. Clients can \emph{downvote} a specific song, 
+and once a majority of clients downvoted a song, it will be removed from the queue.  
+Past sessions will be kept, so the users can review playlists at a later date. The primary source 
+of music will be YouTube. Clients send their song request in the form of a youtube URL to the host.\\\\
 %
-The primary source of music will be YouTube. Clients send their song request 
-in the form of a youtube URL to the host. The host will then download and cache the
-audio from YouTube one song ahead of time to allow continuous playback. This will allow
-us to keep a large playlist without having to store all songs at once.\\\\
-%
-The challenges in this project are as follows: 
+The challenges in this project are as follows:
 \begin{itemize}
 	\item Automatically announcing and finding other \emph{Kompose} services on the network.
 	\item Synchronizing the playlist state to all devices.
 	\item Keeping track of all clients that are still alive to allow the majority based voting.
-	\item Adding new songs to the playlist, and voting on skipping songs should be fair for all clients.
+	\item Adding new songs to the playlist, and voting on skipping songs, which should be consistent and fair for all clients.
+	\item Fault tolerance and error handling in case the host or a client in the network crashes.
 	\item Finally, a protocol that supports all these features must be devised.
 \end{itemize}
-
+\newpage
 \section{System Overview}
 \subsection{Client/Server architecture}
 
@@ -147,13 +142,14 @@ Each device running the app can choose to become host, at which point it will
 act as the server in our system. All communication is done over these hosts, 
 i.e. there is no peer-to-peer communication between other clients.
 To support this, we will define a custom application-level communication protocol 
-and will provide at least the following functionality:
+which will provide at least the following functionality:
 \begin{itemize}
-\item Sending client registration and deregistration messages
-\item Sending song requests and skip messages from clients to server.
-\item Aliveness messages for clients, to determine whether a participant and/or host is still active
-\item Sending playlist state (including all songs in the play queue, at the received downvotes for each of the songs) to the clients.
-\item Various error messages
+\item Client registration and deregistration messages
+\item Song requests (add song to playlist)
+\item "Vote-Skip" messages (downvotes)
+\item "Keep-Alive" messages, which are periodically sent to make sure participants are still active.
+\item Playlist state (includes all songs in the play queue, as well as the received downvotes for each of the songs)
+\item Error responses for invalid requests
 \end{itemize}
 %
 The messages of this protocol will be transported over TCP in the form of JSON.\\\\
@@ -162,57 +158,56 @@ Both client and server listen on the network for messages,
 the host for requests from the clients, and the clients for state updates
 from the host. To avoid manual IP/port configuration, \emph{Network Service Discovery}
 \cite{nsd} is used. This gives the clients the hosts' IP and port,
-to which they can send a \emph{register} messgage containing the IP and port they
+to which they can send a \emph{register} message containing the IP and port they
 will be listening on for state updates. \\\\
 %
 Once a client is connected to the host, he can start sending song request and vote messages.
-Song requests will cause the corresponding song to be added to the playlist unless
-it already exists in the queue. Vote-Skip messages help make the participants reach
-consensus over which songs they want to play. Once a song receives skip requests
+Song requests will cause the corresponding song to be added to the playlist, and \emph{Vote-Skip}
+messages help make the participants reach consensus over which songs they want to play. 
+Once a song receives skip requests
 from a majority of the clients, the song will be removed from the playlist.\\\\ 
 %
 To add some resilience against clients dropping off the network, clients periodically 
 send a keep-alive message to their host every few seconds, and vice-versa.
 If a client becomes unresponsive, he will be dropped from the party and the maximum number of votes
 necessary to remove a song from the playlist will decrease accordingly. This serves to
-ensure that the voting system does not become unresponsive should a majority of clients crash.\\\\
+ensure that the voting system does not become unresponsive.\\\\
 %
-In the case that the host crashes or become otherwise unreachable, then the party will be 
+In the case where the host crashes or become otherwise unreachable, the party will be 
 disolved gracefully. If time allows, we may also explore options to dynamically switch 
-the host to one of the party members.
+the host to one of the existing party members while reusing the existing playlist.
 %
 
 \subsection{User interface}
 The \emph{Kompose} app will consist of at least 6 different activities in total, 
-each serving a unique purpose, as well as several popup windows which will offer 
+each serving a unique purpose, as well as several dialogue messages which will offer 
 further options to the user. \\\\
 %
 Figure 1 shows a mockup of this user interface design. The start screen
 (top center) allows the user to either join a pre-existing party, or 
 create an entirely new one. When creating a new party, the host chooses 
-a new name which will be visible for all clients in the LAN, and then
-proceeds to the playlist itself. Here he will continuously listen for new
-connections and send out new discovery messages in periodic intervals. \\\\
+a new name which will be visible for all clients in the LAN. It then
+proceeds to setup the playlist and send out service discovery messages. 
+Here he will continuously listen for new connections, song requests and votes. \\\\
 %
-When choosing to join a party, the clients will be sent to a different
-activity that displays a list of all currently available parties.
+When choosing to join a party, the clients will be sent to a screen
+that displays a list of all currently available parties in the LAN. 
 If an announcement from a host is received, the party name shows up in 
 this list and can be joined. Once the choice is made, the client is sent
 to the main playlist interface. \\\\
 %
 In addition to these two options, there is also a third which will send 
-the user to the history of all playlists of previous sessions.
-Once a party is closed, the current playlist is saved on local storage,
-so that they can later be viewed by the user. This feature is non-critical 
-for the proper function of the app, but it is nonetheless a welcome service
-for the user. \\\\
+the user to the history of all playlists of previous sessions. This mainly 
+serves to help the user look up past songs that he may have forgotten the name of.
+This feature is non-critical for the primary function of the app, but it 
+is nonetheless a welcome service for the user. \\\\
 %
 The main playlist interface will display a list of all items currently in 
 the play queue. This queue is displayed in the order in which songs will be 
 played by the host, from first to last in line. Each list element will display 
 at least the title of the file, as well as the URL from where the audio has 
 been retrieved. Finally, each list item includes a designated downvote button,
-which serves to cause unpopular songs to be removed from the queue. As soon as 
+which serves to have unpopular songs be removed from the queue. As soon as 
 a majority of the clients deem a song bad, it will no longer appear in the queue. \\\\
 %
 The host will additionally have a play/pause button in the action bar.
@@ -222,51 +217,54 @@ Songs are fetched from YouTube by the host only, using a library \cite{youtubeEx
 to extract the URL for the audio file. Songs in the play queue are pre-fetched
 one song ahead of time to guarantee continuous playback. The number of items that 
 are cached can be configured in the settings. This is of course handled asynchronously in
-the background.
+the background. The playlist is stored as strings of text, which is also what will be 
+transported to the clients.
 
 \section{Requirements}
 
 	\paragraph{Discovery service}
-	We will use the Android Network Service Discovery API \cite{nsd} as provided by android itself
+	We will use the Android Network Service Discovery API \cite{nsd} as provided by Android itself
 	to enable the client-server discovery in the network
 	
 	\paragraph{YouTube Downloads}
 	We will enable users to put videos from youtube inside the play queue. To fetch the audio
 	URLs from those videos we will rely on a library called android-youtubeExtractor \cite{youtubeExtractor}
-
+\newpage
 \section{Work Packages}
 To work efficiently, and enable group members to work in their area of expertise
-we will divide the group coarsely into a technical and a design team.
+we will divide the group coarsely into two teams, which we will henceforth refer to 
+as the "technical team" and the "design team" respectively.
 With this in mind, our work packages are split by technical and design aspects, but 
 the designers and the developers will stay in close contact throughout the whole process.
 
-\paragraph{WP1: Protocol specification}
-The technical group will firstly define a protocol to support all required functionalities.
-Much time will be spent on this. A well defined protocol will ease up development and
-help with further updates of the application. The target of this work package is the
-definition of a small but extensible protocol.
+\paragraph{WP1: Protocol Specification}
+The technical group will first define a protocol to support all required functionalities.
+A significant amount of time will be spent on planning, because a well-defined protocol will 
+aid in creating a cleaner, more goal-oriented implementation that will be easier to update 
+further down the line. The target of this work package is the definition of a small but extensible protocol.
 
-\paragraph{WP2: Client/Server implementation}
+\paragraph{WP2: Client/Server Implementation}
 This work package includes the implementation of the defined protocol in \emph{WP1}
 with all functionality as defined in this document by the technical team. The target of this 
 work package is a fully functional prototype.
 
-\paragraph{WP3: User interface design}
-Parallel to WP1 and WP2 the design team will work on the interface look \& feel. 
+\paragraph{WP3: User Interface Design}
+Parallel to WP1 and WP2 the design team will work on the look and feel of the interface. 
 Besides the design, the group will focus on usability aspects, and will be in close
-contact to the development group. The target of the work package is a consistent 
-design of the various pages which fits to its target user group.
+contact to the development group to help with proper integration with the backend. 
+The target of the work package is a consistent design of the various pages which 
+fits to its target user group.
 
-\paragraph{WP4: UI implementation}
+\paragraph{WP4: UI Implementation}
 After finishing the design it will be implemented using the prototype from \emph{WP3}.
 Target of this work package is the nearly finished application.
 
-\paragraph{WP5: Testing \& polish}
+\paragraph{WP5: Testing \& Polish}
 For this last work package the design and technical team will work together
 on finalizing the functions and design of the application. Inputs from people from outside 
 the projects will also be evaluated. Target of this work package is to polish the design,
 and confirm that all functionality works as intended and as advertised in the UI.
-
+\newpage
 \section{Milestones}
 
 \subsection{Milestone technical}
