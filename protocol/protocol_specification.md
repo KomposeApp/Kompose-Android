@@ -33,30 +33,35 @@ information about the current session, such as its name, the play queue, etc.
 - KEEP_ALIVE,
 - ERROR
 
-An message for registering a client looks like this:
-
 JSON fields:
 
 - `type`: message type (string)
 - `username`: sender username (string)
-- `uuid`: a standard uuid (string)
-- `body`: message body, content depends on `type`. (string)
+- `sender_uuid`: a standard uuid (string)
 - `session`: table that can be deserialized to a session object (JSON object)
-- `song_details`: song request details, such as title and download url
+    - `session_name`: Name of the session
+    - `host_username`: Name of the host
+    - `host_uuid`: UUID of the host
+    - `clients`: JSON Object that maps UUIDs to user names
+    - `playlist`: JSON array with `PlaylistItem` objects
+- `song_details`: serialized `PlaylistItem` object
 
-`session.playlist` items and `song_details` are both serialized `PlaylistItem`
-objects.
+`PlaylistItem` objects:
+
+- `order`: sorted order of the item in the play queue
+- `item_uuid`: UUID of the item
+- `downvotes`: JSON Array with all UUIDs that downvoted the song
+- `title`: Song title
+- `proposed_by`: UUID of the client that originally requested the item
+- `download_url`: URL to download the audio file from
+- `source_url`: Original link, i.e. the youtube.com URL
 
 Examples:
 
 ```
 {
     type: "REQUEST_INFORMATION",
-    username: "Mario Huana",
-    uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: "",
-    session: {},
-    song_details: {}
+    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
 }
 ```
 
@@ -64,21 +69,14 @@ Examples:
 {
     type: "REGISTER_CLIENT",
     username: "Mario Huana",
-    uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: "",
-    session: {},
-    song_details: {}
+    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
 }
 ```
 
 ```
 {
     type: "UNREGISTER_CLIENT",
-    username: "Mario Huana",
-    uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: "",
-    session: {},
-    song_details: {}
+    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
 }
 ```
 
@@ -86,31 +84,41 @@ Examples:
 {
     type: "SESSION_UPDATE",
     username: "Mario Huana",
-    uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: ""
+    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
     session: {
         session_name: "great party",
         host_username: "Big Shaq",
         host_uuid: "24aa4a92-c9e2-11e7-86b4-f68673f17803",
+        clients: {
+            "019f9150-cac4-11e7-8bb4-8474e3e86aae": "Jeb Bush",
+            "0d56458e-cac4-11e7-9ffc-23156f95d8bf": "Ted Cruz"
+        },
         playlist: [
             {
-                id: 420,
-                num_downvotes: 0,
+                order: 1,
+                item_uuid: "...",
+                downvotes: [
+                    "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+                    "0d56458e-cac4-11e7-9ffc-23156f95d8bf"
+                ],
                 title: "Shooting Stars",
                 download_url: "...",
-                youtube_url: "https://www.youtube.com/watch?v=feA64wXhbjo"
+                source_url: "https://www.youtube.com/watch?v=feA64wXhbjo"
             },
             {
-                id: 421,
-                num_downvotes: 12,
+                order: 2,
+                item_uuid: "...",
+                downvotes: [
+                    "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+                    "0d56458e-cac4-11e7-9ffc-23156f95d8bf"
+                ],
                 title: "Ghostbusters",
                 download_url: "...",
-                youtube_url: "https://www.youtube.com/watch?v=m9We2XsVZfc"
+                source_url: "https://www.youtube.com/watch?v=m9We2XsVZfc"
             },
             ...
         ]
     },
-    song_details: {}
 }
 ```
 
@@ -118,15 +126,17 @@ Examples:
 {
     type: "REQUEST_SONG",
     username: "Mario Huana",
-    uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-    session: {},
+    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
     song_details: {
-        id: -1,
-        num_downvotes: -1,
+        order: 0,
+        item_uuid: "...",
+        downvotes: [
+            "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+            "0d56458e-cac4-11e7-9ffc-23156f95d8bf"
+        ],
         title: "Ghostbusters",
         download_url: "...",
-        youtube_url: "https://www.youtube.com/watch?v=m9We2XsVZfc"
+        source_url: "https://www.youtube.com/watch?v=m9We2XsVZfc"
     }
 }
 ```
@@ -135,10 +145,10 @@ Examples:
 {
     type: "VOTE_SKIP_SONG",
     username: "Mario Huana",
-    uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: "420",
-    session: {},
-    song_details: {}
+    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
+    song_details: {
+        item_uuid: "0d56458e-cac4-11e7-9ffc-23156f95d8bf",
+    }
 }
 ```
 
@@ -146,10 +156,8 @@ Examples:
 {
     type: "ERROR",
     username: "Mario Huana",
-    uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
-    body: "Playing Rick Astley is not supported",
-    session: {},
-    song_details: {}
+    sender_uuid: "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
+    error_message: "Playing Rick Astley is not supported",
 }
 ```
 
