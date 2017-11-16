@@ -102,7 +102,7 @@
 \begin{abstract}
 \emph{Kompose} is an Android application that aims to allow multiple independent participants to form 
 local sessions through which they share a music playlist and request for songs to be played at social events.
-The songs will be downloaded/streamed from Youtube, and each participant will be able to share, synchronize and 
+The songs will be downloaded from Youtube, and each participant will be able to share, synchronize and 
 vote on what song they want to be played next, in a fully distributed fashion. The host will hereby act as the 
 playback device, from which the songs will be played.
 
@@ -129,7 +129,7 @@ The challenges in this project are as follows:
 \begin{itemize}
 	\item Automatically announcing and finding other \emph{Kompose} services on the network.
 	\item Synchronizing the playlist state to all devices.
-	\item Keeping track of all clients that are still alive to allow the majority based voting.
+	\item Keeping track of all clients that are still alive to allow majority based voting.
 	\item Adding new songs to the playlist, and voting on skipping songs, which should be consistent and fair for all clients.
 	\item Fault tolerance and error handling in case the host or a client in the network crashes.
 	\item Finally, a protocol that supports all these features must be devised.
@@ -139,17 +139,17 @@ The challenges in this project are as follows:
 \subsection{Client/Server architecture}
 
 Each device running the app can choose to become host, at which point it will
-act as the server in our system. All communication is done over these hosts, 
+act as the server of a session. All communication is done over these hosts, 
 i.e. there is no peer-to-peer communication between other clients.
-To support this, we will define a custom application-level communication protocol 
-which will provide at least the following functionality:
+To support this, we define a custom application-level communication protocol 
+which provides at least the following functionality:
 \begin{itemize}
-\item Client registration and deregistration messages
-\item Song requests (add song to playlist)
-\item "Vote-Skip" messages (downvotes)
+\item Client registration and deregistration messages.
+\item Song requests
+\item "Vote-Skip" messages, in the form of downvotes.
 \item "Keep-Alive" messages, which are periodically sent to make sure participants are still active.
-\item Playlist state (includes all songs in the play queue, as well as the received downvotes for each of the songs)
-\item Error responses for invalid requests
+\item Playlist state, which includes all songs in the play queue, as well as the received downvotes for each of the songs
+\item Error responses for invalid requests.
 \end{itemize}
 %
 The messages of this protocol will be transported over TCP in the form of JSON.\\\\
@@ -251,7 +251,7 @@ work package is a fully functional prototype.
 \paragraph{WP3: User Interface Design}
 Parallel to WP1 and WP2 the design team will work on the look and feel of the interface. 
 Besides the design, the group will focus on usability aspects, and will be in close
-contact to the development group to help with proper integration with the backend. 
+contact to the technical team to help with proper backend integration. 
 The target of the work package is a consistent design of the various pages which 
 fits to its target user group.
 
@@ -279,7 +279,7 @@ after \emph{Milestone technical} is completed. Both work packages will be done b
 
 \subsection{Milestone testing}
 After the completion of the first two milestones, all team members will come together to test and polish the application
-as described in \emph{WP5}. The testing phase will finish at 14.12.17 at latest, shortly after the application and 
+as described in \emph{WP5}. The testing phase will finish on 14.12.17 at the latest. Shortly thereafter the application and 
 all additional material will be submitted. This will respect all of the fixed deadlines:
 
 \begin{itemize}
