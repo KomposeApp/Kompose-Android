@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.model;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
@@ -17,6 +18,7 @@ public class SongModel {
     private int order;
 
     private int downVoteCount;
+    private List<DownvoteModel> downVotes;
     private ClientModel proposedBy;
 
     private URI downloadUrl;
@@ -51,6 +53,18 @@ public class SongModel {
 
     public void setDownVoteCount(int downVoteCount) {
         this.downVoteCount = downVoteCount;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
+    }
+
+    public List<DownvoteModel> getDownVotes() {
+        return downVotes;
+    }
+
+    public void setDownVotes(List<DownvoteModel> downVotes) {
+        this.downVotes = downVotes;
     }
 
     public ClientModel getProposedBy() {
@@ -100,4 +114,5 @@ public class SongModel {
     public void setSecondsLength(int secondsLength) {
         this.secondsLength = secondsLength;
     }
+
 }
