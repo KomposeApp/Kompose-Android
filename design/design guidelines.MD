@@ -1,7 +1,7 @@
 # Design guidelines
 
 ## Colors
-red (accent color): FF3333 (235, 35, 38)  
+red (accent color): EE3A39 (238, 58, 57)  
 white (accent font color): FFFFFF
 
 ## Fonts
