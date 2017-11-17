@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import ch.ethz.inf.vs.kompose.model.ServerMessageHandler;
-
 /**
  * Android service that starts the server.
  * First the service is registered on the network, then an AsyncTask
