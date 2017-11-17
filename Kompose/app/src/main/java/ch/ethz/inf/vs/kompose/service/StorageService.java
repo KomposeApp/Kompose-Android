@@ -5,10 +5,6 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.UUID;
-
-import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.Session;
 
 /**
  * Service that handles loading/storing data to storage.

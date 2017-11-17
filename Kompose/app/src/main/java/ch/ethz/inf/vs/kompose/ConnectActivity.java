@@ -1,7 +1,7 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 public class ConnectActivity extends AppCompatActivity {

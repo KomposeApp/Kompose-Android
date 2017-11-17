@@ -4,13 +4,15 @@
  */
 package ch.ethz.inf.vs.kompose.data;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectReader;
+import com.fasterxml.jackson.databind.ObjectWriter;
+
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.fasterxml.jackson.databind.*;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 public class JsonConverter {
 

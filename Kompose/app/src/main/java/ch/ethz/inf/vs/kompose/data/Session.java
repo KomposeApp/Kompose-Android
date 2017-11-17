@@ -4,7 +4,7 @@
  */
 package ch.ethz.inf.vs.kompose.data;
 
-import com.fasterxml.jackson.annotation.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Session {
     private Client[] clients;
