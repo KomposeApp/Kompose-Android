@@ -1,11 +1,13 @@
 package ch.ethz.inf.vs.kompose.model;
 
 import java.io.IOException;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.data.Message;
 
+/**
+ * Asynchronous handler that handles a message the server received.
+ */
 public class ServerMessageHandler implements Runnable {
 
     private Socket socket;

@@ -7,8 +7,6 @@ import android.util.SparseArray;
 import java.net.InetAddress;
 import java.util.UUID;
 
-import javax.microedition.khronos.opengles.GL;
-
 import at.huber.youtubeExtractor.VideoMeta;
 import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
@@ -17,10 +15,13 @@ import ch.ethz.inf.vs.kompose.data.SongDetails;
 import ch.ethz.inf.vs.kompose.model.GlobalState;
 import ch.ethz.inf.vs.kompose.model.NetworkService;
 
+/**
+ * Application actions that can be triggered from the UI.
+ */
 public class UIActions {
 
     public static void requestSong(final String sourceUrl, Context context) {
-        YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
+        @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
             @Override
             protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
                 if (sparseArray != null) {
@@ -51,11 +52,11 @@ public class UIActions {
     }
 
     // TODO
-    public static void registerClient() {
+    public static void registerClient(UUID clientUUID, String userName) {
     }
 
     // TODO
-    public static void unregisterClient() {
+    public static void unregisterClient(UUID clientUUID) {
     }
 
     // TODO

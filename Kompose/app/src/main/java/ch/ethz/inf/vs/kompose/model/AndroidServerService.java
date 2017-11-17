@@ -13,6 +13,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+/**
+ * Android service that starts the server.
+ * First the service is registered on the network, then an AsyncTask
+ * that accepts connections is launched.
+ */
 public class AndroidServerService extends Service {
 
     private static final String LOG_TAG = "## AndroidServerService";

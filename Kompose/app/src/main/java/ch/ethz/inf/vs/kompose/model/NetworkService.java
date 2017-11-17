@@ -2,8 +2,6 @@ package ch.ethz.inf.vs.kompose.model;
 
 import android.os.AsyncTask;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -13,6 +11,9 @@ import java.net.Socket;
 import ch.ethz.inf.vs.kompose.data.Converter;
 import ch.ethz.inf.vs.kompose.data.Message;
 
+/**
+ * Service that provides various network functionality.
+ */
 public class NetworkService {
 
     public static Message readMessage(Socket connection) throws IOException {

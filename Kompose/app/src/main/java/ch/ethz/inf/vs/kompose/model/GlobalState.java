@@ -3,6 +3,9 @@ package ch.ethz.inf.vs.kompose.model;
 import java.net.InetAddress;
 import java.util.UUID;
 
+/**
+ * Singleton that stores global state.
+ */
 public class GlobalState {
 
     private static GlobalState instance = null;
