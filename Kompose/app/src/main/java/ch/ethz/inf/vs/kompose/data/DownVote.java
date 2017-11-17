@@ -4,10 +4,9 @@
  */
 package ch.ethz.inf.vs.kompose.data;
 
-import java.util.Map;
 import com.fasterxml.jackson.annotation.*;
 
-public class Downvote {
+public class DownVote {
     private String castTime;
     private String uuid;
 

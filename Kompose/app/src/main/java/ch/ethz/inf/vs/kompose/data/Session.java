@@ -4,13 +4,12 @@
  */
 package ch.ethz.inf.vs.kompose.data;
 
-import java.util.Map;
 import com.fasterxml.jackson.annotation.*;
 
 public class Session {
     private Client[] clients;
     private String hostUuid;
-    private Playlist[] playlist;
+    private Song[] playlist;
     private String sessionName;
     private String uuid;
 
@@ -24,10 +23,10 @@ public class Session {
     @JsonProperty("host_uuid")
     public void setHostUuid(String value) { this.hostUuid = value; }
 
-    @JsonProperty("playlist")
-    public Playlist[] getPlaylist() { return playlist; }
-    @JsonProperty("playlist")
-    public void setPlaylist(Playlist[] value) { this.playlist = value; }
+    @JsonProperty("songs")
+    public Song[] getPlaylist() { return playlist; }
+    @JsonProperty("songs")
+    public void setPlaylist(Song[] value) { this.playlist = value; }
 
     @JsonProperty("session_name")
     public String getSessionName() { return sessionName; }

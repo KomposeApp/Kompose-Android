@@ -4,18 +4,19 @@
  */
 package ch.ethz.inf.vs.kompose.data;
 
-import java.util.Map;
 import com.fasterxml.jackson.annotation.*;
 
-public class Playlist {
+public class Song {
+
     private String downloadUrl;
-    private Downvote[] downvotes;
+    private DownVote[] downVotes;
     private long order;
     private String proposedBy;
     private String sourceUrl;
     private String status;
     private String thumbnailUrl;
     private String title;
+    private int length;
     private String uuid;
 
     @JsonProperty("download_url")
@@ -23,10 +24,10 @@ public class Playlist {
     @JsonProperty("download_url")
     public void setDownloadUrl(String value) { this.downloadUrl = value; }
 
-    @JsonProperty("downvotes")
-    public Downvote[] getDownvotes() { return downvotes; }
-    @JsonProperty("downvotes")
-    public void setDownvotes(Downvote[] value) { this.downvotes = value; }
+    @JsonProperty("down_votes")
+    public DownVote[] getDownVotes() { return downVotes; }
+    @JsonProperty("down_votes")
+    public void setDownVotes(DownVote[] value) { this.downVotes = value; }
 
     @JsonProperty("order")
     public long getOrder() { return order; }
@@ -62,4 +63,9 @@ public class Playlist {
     public String getUuid() { return uuid; }
     @JsonProperty("uuid")
     public void setUuid(String value) { this.uuid = value; }
+
+    @JsonProperty("length")
+    public int getLength() { return length; }
+    @JsonProperty("length")
+    public void setLength(int length) { this.length = length;  }
 }

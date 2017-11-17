@@ -8,7 +8,7 @@ import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import ch.ethz.inf.vs.kompose.data.Converter;
+import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.Message;
 
 /**
@@ -16,7 +16,7 @@ import ch.ethz.inf.vs.kompose.data.Message;
  */
 public class NetworkService {
 
-    public static Message readMessage(Socket connection) throws IOException {
+    public Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder json = new StringBuilder();
 
@@ -27,10 +27,10 @@ public class NetworkService {
         }
 
         input.close();
-        return Converter.fromJsonString(json.toString());
+        return JsonConverter.fromMessageJsonString(json.toString());
     }
 
-    public static void sendMessage(Message msg, InetAddress hostIP, int hostPort) {
+    public void sendMessage(Message msg, InetAddress hostIP, int hostPort) {
         AsyncSender asyncSender = new AsyncSender(msg, hostIP, hostPort);
         asyncSender.execute();
     }

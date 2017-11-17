@@ -9,26 +9,26 @@ import java.util.TreeSet;
  * A playlist that can be observed, i.e. a listener can be registered
  * that is called whenever the playlist changes.
  */
-public class ObservablePlaylist extends Observable {
+public class PlayListModel extends Observable {
 
-    private SortedSet<PlaylistItem> playlistItems;
+    private SortedSet<SongModel> playlistItems;
 
-    public ObservablePlaylist() {
+    public PlayListModel() {
         playlistItems = new TreeSet<>(new PlaylistItemComparator());
     }
 
-    public SortedSet<PlaylistItem> getPlaylistItems() {
+    public SortedSet<SongModel> getPlaylistItems() {
         return playlistItems;
     }
 
-    public void setPlaylistItems(SortedSet<PlaylistItem> playlistItems) {
+    public void setPlaylistItems(SortedSet<SongModel> playlistItems) {
         this.playlistItems = playlistItems;
     }
 
-    private class PlaylistItemComparator implements Comparator<PlaylistItem> {
+    private class PlaylistItemComparator implements Comparator<SongModel> {
 
         @Override
-        public int compare(PlaylistItem p1, PlaylistItem p2) {
+        public int compare(SongModel p1, SongModel p2) {
             return p1.order < p2.order ? -1 : 1;
         }
     }

@@ -4,7 +4,6 @@
  */
 package ch.ethz.inf.vs.kompose.data;
 
-import java.util.Map;
 import com.fasterxml.jackson.annotation.*;
 
 public class Client {

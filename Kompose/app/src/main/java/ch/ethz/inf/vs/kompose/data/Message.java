@@ -4,7 +4,6 @@
  */
 package ch.ethz.inf.vs.kompose.data;
 
-import java.util.Map;
 import com.fasterxml.jackson.annotation.*;
 
 public class Message {
@@ -12,7 +11,7 @@ public class Message {
     private String senderUsername;
     private String senderUuid;
     private Session session;
-    private SongDetails songDetails;
+    private Song songDetails;
     private String type;
 
     @JsonProperty("error_message")
@@ -36,9 +35,9 @@ public class Message {
     public void setSession(Session value) { this.session = value; }
 
     @JsonProperty("song_details")
-    public SongDetails getSongDetails() { return songDetails; }
+    public Song getSongDetails() { return songDetails; }
     @JsonProperty("song_details")
-    public void setSongDetails(SongDetails value) { this.songDetails = value; }
+    public void setSongDetails(Song value) { this.songDetails = value; }
 
     @JsonProperty("type")
     public String getType() { return type; }
