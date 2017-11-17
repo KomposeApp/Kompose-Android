@@ -27,6 +27,15 @@ public class SessionRepository {
     }
 
     /**
+     * join one of the session previously retrieved by getActiveSessions
+     *
+     * @param userName the username the client wants to use
+     */
+    public static void joinSession(String userName) {
+        // TODO
+    }
+
+    /**
      * gets all sessions which are persisted on storage
      *
      * @return collection of all saves sessions
