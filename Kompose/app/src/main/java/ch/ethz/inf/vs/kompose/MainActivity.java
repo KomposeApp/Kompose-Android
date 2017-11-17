@@ -14,15 +14,19 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main_placeholder);
     }
 
-    public void joinPartyButton(View view) {
+    public void joinParty(View view) {
     }
 
-    public void createPartyButton(View view) {
+    public void createParty(View view) {
         Log.d(LOG_TAG, "Create party button pressed");
         AndroidServerService androidServerService = new AndroidServerService(this);
         androidServerService.startService(null);
+    }
+
+    public void viewHistoryFromTitle(View view){
+
     }
 }

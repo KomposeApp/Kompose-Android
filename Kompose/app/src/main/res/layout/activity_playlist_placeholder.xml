@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="ch.ethz.inf.vs.kompose.PlaylistActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DEBUG PLACEHOLDER"
+        android:textStyle="bold"
+        android:fontFamily="casual"
+        android:textSize="30sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.1"/>
+
+    <EditText android:id="@+id/tubelinktext"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:hint="YOUTUBE LINK HERE"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/tubebutton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.25"/>
+
+    <Button android:id="@+id/tubebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Submit Song"
+        android:onClick="requestSong"
+        app:layout_constraintLeft_toRightOf="@id/tubelinktext"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tubelinktext"
+        app:layout_constraintBottom_toBottomOf="@id/tubelinktext"/>
+
+    <EditText android:id="@+id/downvotetext"
+        android:layout_width="180dp"
+        android:layout_height="50dp"
+        android:hint="SONG ID HERE"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/downvotebutton"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.4"/>
+
+    <Button android:id="@+id/downvotebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DOWNVOTE"
+        android:onClick="downvoteItem"
+        app:layout_constraintLeft_toRightOf="@id/downvotetext"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="@id/downvotetext"
+        app:layout_constraintBottom_toBottomOf="@id/downvotetext"/>
+
+
+    <Button android:id="@+id/historyButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="VIEW PAST PLAYLISTS"
+        android:onClick="viewHistoryFromPlaylist"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.6"/>
+
+    <Button android:id="@+id/unregisterbutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Leave Party"
+        android:onClick="leaveParty"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias="0.75"/>
+
+
+
+</android.support.constraint.ConstraintLayout>
