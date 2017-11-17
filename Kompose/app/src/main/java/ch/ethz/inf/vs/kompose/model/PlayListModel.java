@@ -29,7 +29,7 @@ public class PlayListModel extends Observable {
 
         @Override
         public int compare(SongModel p1, SongModel p2) {
-            return p1.order < p2.order ? -1 : 1;
+            return p1.getOrder() < p2.getOrder() ? -1 : 1;
         }
     }
 }
