@@ -25,7 +25,6 @@ public class SongModel {
 
     private SongStatus status;
 
-
     public UUID getUuid() {
         return uuid;
     }
