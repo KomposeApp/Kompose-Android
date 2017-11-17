@@ -1,0 +1,19 @@
+\begin{thebibliography}{1}
+
+\bibitem{nsd}
+{Android API: Network Service Discovery}.
+\newblock
+  \url{https://developer.android.com/training/connect-devices-wirelessly/nsd.html}.
+\newblock Accessed on 13 Nov 2017.
+
+\bibitem{youtubeExtractor}
+{Android based YouTube URL extractor}.
+\newblock \url{https://github.com/HaarigerHarald/android-youtubeExtractor}.
+\newblock Accessed on 13 Nov 2017.
+
+\bibitem{balsamiq}
+{Balsamiq UI mockup desgin tool}.
+\newblock \url{https://balsamiq.com/}.
+\newblock Accessed on 13 Nov 2017.
+
+\end{thebibliography}
