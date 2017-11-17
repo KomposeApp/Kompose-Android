@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.model;
+package ch.ethz.inf.vs.kompose.service;
 
 import android.os.AsyncTask;
 
@@ -18,17 +18,16 @@ public class NetworkService {
 
     public static Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        String json = "";
+        StringBuilder json = new StringBuilder();
 
         char[] buffer = new char[1024];
         int bytesRead = 0;
         while ((bytesRead = input.read(buffer)) != -1) {
-            json += new String(buffer, 0, bytesRead);
+            json.append(new String(buffer, 0, bytesRead));
         }
 
         input.close();
-        Message msg = Converter.fromJsonString(json);
-        return msg;
+        return Converter.fromJsonString(json.toString());
     }
 
     public static void sendMessage(Message msg, InetAddress hostIP, int hostPort) {

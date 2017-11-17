@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.data.Message;
+import ch.ethz.inf.vs.kompose.service.NetworkService;
 
 /**
  * Asynchronous handler that handles a message the server received.

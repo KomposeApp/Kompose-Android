@@ -20,7 +20,7 @@
         </activity>
 
         <service
-            android:name=".model.AndroidServerService"
+            android:name=".service.AndroidServerService"
             android:enabled="true"
             android:exported="true" />
 

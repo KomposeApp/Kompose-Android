@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.model;
+package ch.ethz.inf.vs.kompose.service;
 
 import java.net.InetAddress;
 import java.util.UUID;
@@ -6,19 +6,19 @@ import java.util.UUID;
 /**
  * Singleton that stores global state.
  */
-public class GlobalState {
+public class StateService {
 
-    private static GlobalState instance = null;
+    private static StateService instance = null;
 
     public UUID deviceUUID;
     public InetAddress hostIP;
     public int hostPort;
 
-    private GlobalState() {}
+    private StateService() {}
 
-    public static synchronized GlobalState getInstance() {
+    public static synchronized StateService getInstance() {
         if (instance == null) {
-            instance = new GlobalState();
+            instance = new StateService();
         }
         return instance;
     }

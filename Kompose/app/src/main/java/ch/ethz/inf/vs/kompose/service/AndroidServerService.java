@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.model;
+package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
 import android.content.Context;
@@ -12,6 +12,8 @@ import android.util.Log;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import ch.ethz.inf.vs.kompose.model.ServerMessageHandler;
 
 /**
  * Android service that starts the server.

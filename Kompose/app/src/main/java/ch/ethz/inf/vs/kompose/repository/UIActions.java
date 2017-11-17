@@ -12,8 +12,8 @@ import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
 import ch.ethz.inf.vs.kompose.data.Message;
 import ch.ethz.inf.vs.kompose.data.SongDetails;
-import ch.ethz.inf.vs.kompose.model.GlobalState;
-import ch.ethz.inf.vs.kompose.model.NetworkService;
+import ch.ethz.inf.vs.kompose.service.StateService;
+import ch.ethz.inf.vs.kompose.service.NetworkService;
 
 /**
  * Application actions that can be triggered from the UI.
@@ -33,7 +33,7 @@ public class UIActions {
                     // build message
                     Message msg = new Message();
                     msg.setSenderUsername("fixme"); // TODO
-                    msg.setSenderUuid(GlobalState.getInstance().deviceUUID.toString());
+                    msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
 
                     SongDetails songDetails = new SongDetails();
                     songDetails.setDownloadUrl(downloadUrl);
@@ -42,8 +42,8 @@ public class UIActions {
                     songDetails.setItemUuid(UUID.randomUUID().toString());
 
                     msg.setSongDetails(songDetails);
-                    InetAddress hostIP = GlobalState.getInstance().hostIP;
-                    int hostPort = GlobalState.getInstance().hostPort;
+                    InetAddress hostIP = StateService.getInstance().hostIP;
+                    int hostPort = StateService.getInstance().hostPort;
                     NetworkService.sendMessage(msg, hostIP, hostPort);
                 }
             }

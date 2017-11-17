@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.model.AndroidServerService;
+import ch.ethz.inf.vs.kompose.service.AndroidServerService;
 
 public class MainActivity extends AppCompatActivity {
 
