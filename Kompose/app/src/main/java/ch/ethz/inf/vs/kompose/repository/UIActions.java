@@ -20,7 +20,7 @@ import ch.ethz.inf.vs.kompose.service.NetworkService;
  */
 public class UIActions {
 
-    public static void requestSong(final String sourceUrl, Context context) {
+    public static void requestSong(Context context, final String sourceUrl) {
         @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
             @Override
             protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
