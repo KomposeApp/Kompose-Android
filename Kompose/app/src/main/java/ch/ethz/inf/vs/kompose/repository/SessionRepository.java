@@ -6,12 +6,11 @@ import android.databinding.ObservableList;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 
 public class SessionRepository {
+
     /**
      * creates a new session and broadcasts it on the network
-     *
-     * @param userName the username the client wants to use
      */
-    public static SessionModel startSession(String userName) {
+    public SessionModel startSession() {
         // TODO
         return new SessionModel();
     }
@@ -21,7 +20,7 @@ public class SessionRepository {
      *
      * @return collection of all active sessions
      */
-    public static ObservableList<SessionModel> getActiveSessions() {
+    public ObservableList<SessionModel> getActiveSessions() {
         // TODO
         return new ObservableArrayList<>();
     }
@@ -29,9 +28,9 @@ public class SessionRepository {
     /**
      * join one of the session previously retrieved by getActiveSessions
      *
-     * @param userName the username the client wants to use
+     * @param session the session you want to join
      */
-    public static void joinSession(String userName) {
+    public void joinSession(SessionModel session) {
         // TODO
     }
 
@@ -40,7 +39,7 @@ public class SessionRepository {
      *
      * @return collection of all saves sessions
      */
-    public static ObservableList<SessionModel> getPastSessions() {
+    public ObservableList<SessionModel> getPastSessions() {
         // TODO
         return new ObservableArrayList<>();
     }
@@ -48,7 +47,7 @@ public class SessionRepository {
     /**
      * leaves the currently active session
      */
-    public static void leaveSession() {
+    public void leaveSession() {
         // TODO
     }
 }

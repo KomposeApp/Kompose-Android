@@ -9,12 +9,12 @@ import ch.ethz.inf.vs.kompose.service.StateService;
 
 public class SongRepository {
 
-    private StateService mStateService;
-    private NetworkService mNetworkService;
+    private StateService stateService;
+    private NetworkService networkService;
 
     public SongRepository(StateService stateService, NetworkService networkService) {
-        mStateService = stateService;
-        mNetworkService = networkService;
+        this.stateService = stateService;
+        this.networkService = networkService;
     }
 
     /**
@@ -24,11 +24,11 @@ public class SongRepository {
      */
     public void requestNewSong(SongModel item) {
         Message msg = new Message();
-        msg.setSenderUuid(mStateService.deviceUUID.toString());
+        msg.setSenderUuid(stateService.deviceUUID.toString());
         msg.setSongDetails(SongConverter.convert(item));
         msg.setType(MessageType.REQUEST_SONG.toString());
 
-        mNetworkService.sendMessage(msg, mStateService.hostIP, mStateService.hostPort);
+        networkService.sendMessage(msg, stateService.hostIP, stateService.hostPort);
     }
 
     /**
