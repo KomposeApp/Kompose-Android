@@ -1,15 +1,16 @@
 package ch.ethz.inf.vs.kompose;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.model.AndroidServerService;
+import ch.ethz.inf.vs.kompose.service.AndroidServerService;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "### Main Activity";
+    private static final String LOG_TAG = "## Main Activity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,8 +23,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void createParty(View view) {
         Log.d(LOG_TAG, "Create party button pressed");
-        AndroidServerService androidServerService = new AndroidServerService(this);
-        androidServerService.startService(null);
+
+        // start server service
+        Intent serviceIntent = new Intent(this, AndroidServerService.class);
+        startService(serviceIntent);
     }
 
     public void viewHistoryFromTitle(View view){

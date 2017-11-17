@@ -10,15 +10,17 @@
         android:id="@+id/button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="joinPartyButton"
         android:text="Join Party"
-        tools:layout_editor_absoluteX="108dp"
-        tools:layout_editor_absoluteY="53dp" />
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="16dp" />
 
     <Button
         android:id="@+id/button2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:onClick="createPartyButton"
         android:text="Create Party"
-        tools:layout_editor_absoluteX="108dp"
-        tools:layout_editor_absoluteY="119dp" />
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="64dp" />
 </android.support.constraint.ConstraintLayout>
