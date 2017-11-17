@@ -8,15 +8,15 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class DownVote {
     private String castTime;
-    private String uuid;
+    private String clientUuid;
 
     @JsonProperty("cast_time")
     public String getCastTime() { return castTime; }
     @JsonProperty("cast_time")
     public void setCastTime(String value) { this.castTime = value; }
 
-    @JsonProperty("uuid")
-    public String getUuid() { return uuid; }
-    @JsonProperty("uuid")
-    public void setUuid(String value) { this.uuid = value; }
+    @JsonProperty("client_uuid")
+    public String getClientUuid() { return clientUuid; }
+    @JsonProperty("client_uuid")
+    public void setClientUuid(String value) { this.clientUuid = value; }
 }

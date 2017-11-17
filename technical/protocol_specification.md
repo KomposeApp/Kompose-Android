@@ -22,7 +22,7 @@ information about the current session, such as its name, the play queue, etc.
 
 ## JSON
 
-`type` is one of the following: 
+`type` is one of the following (or more): 
 
 - REQUEST_INFORMATION,
 - REGISTER_CLIENT,
@@ -33,7 +33,7 @@ information about the current session, such as its name, the play queue, etc.
 - KEEP_ALIVE,
 - ERROR
 
-`status` is one of the following: 
+`status` is one of the following (or more): 
 
 - REQUESTED
 - IN_QUEUE,
@@ -41,41 +41,7 @@ information about the current session, such as its name, the play queue, etc.
 - DOWNLOAD_FAILED,
 - OTHER_ERROR
 
-JSON fields:
-    "session": {
-        "clients": [ 
-			{
-				"uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
-				"name": "Jeb Bush",
-				"is_active": true
-			}
-		],
-        "playlist": [
-            {
-                "uuid": "019f9150-cac4-11e7-8bb4-8474e3e86a2e",
-                "order": 1,
-                "title": "Ghostbusters",
-				"thumbnail_url": "https://www.youtube.com/thumbnail?v=m9We2XsVZfc",
-                "download_url": "https://www.youtube.com/download?v=m9We2XsVZfc",
-                "source_url": "https://www.youtube.com/watch?v=m9We2XsVZfc",
-				"status": "SUBMITTED",
-                "proposed_by": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
-				"downvotes": [
-					{
-						"uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
-						"cast_time": "2005-08-15T15:52:01+0000"
-					}
-                ]
-            }
-        ]
-    },
-	"song_details": {
-        "item_uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
-        "title": "Ghostbusters",
-        "thumbnail_url": "https://www.youtube.com/thumbnail?v=m9We2XsVZfc",
-        "download_url": "https://www.youtube.com/download?v=m9We2XsVZfc",
-        "source_url": "https://www.youtube.com/watch?v=m9We2XsVZfc"
-    }
+`Message` object contains:
 
 - `type`: message type (string)
 - `error_message`: the error message that occurred if message type is ERROR
@@ -86,19 +52,30 @@ JSON fields:
     - `host_uuid`: UUID of the host (string)
     - `session_name`: Name of the session (string)
     - `clients`: list of `Client` objects (array)
-    - `playlist`: list of `PlaylistItem` objects (array)
-- `song_details`: a `PlaylistItem` (object)
+    - `playlist`: list of `Song` objects (array)
+- `song_details`: a `Song` (object)
 
-`PlaylistItem` objects:
+`Song` object contains:
 
 - `order`: sorted order of the item in the play queue (int)
-- `item_uuid`: UUID of the item (string)
+- `uuid`: UUID of the item (string)
 - `downvotes`: JSON Array with all UUIDs that downvoted the song (JSON object)
 - `title`: Song title (string)
 - `proposed_by`: UUID of the client that originally requested the item (string)
 - `thumbnail_url`: URL to download the audio file from (string)
 - `download_url`: URL to download the audio file from (string)
 - `source_url`: Original link, i.e. the youtube.com URL (string)
+
+`Client` object contains:
+
+- `uuid`: UUID of the client (string)
+- `name`: the name of the client (string)
+- `is_active`: boolean indicating whether the client is active or not (string)
+
+`Downvote` object contains:
+
+- `client_uuid`: UUID of the client which cast the downvote (string)
+- `cast_time`: ISO time when the downvote was cast (string)
 
 Full JSON example:  
 
@@ -131,7 +108,7 @@ Full JSON example:
                 "proposed_by": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
 				"downvotes": [
 					{
-						"uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
+						"client_uuid": "019f9150-cac4-11e7-8bb4-8474e3e86aae",
 						"cast_time": "2005-08-15T15:52:01+0000"
 					}
                 ]
@@ -241,7 +218,17 @@ Example for each request "type":
 
 ```
 {
-    "type": "VOTE_SKIP_SONG",
+    "type": "CAST_SKIP_SONG_VOTE",
+    "sender_uuid": "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
+    "song_details": {
+        "uuid": "0d56458e-cac4-11e7-9ffc-23156f95d8bf",
+    }
+}
+```
+
+```
+{
+    "type": "REMOVE_SKIP_SONG_VOTE",
     "sender_uuid": "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
     "song_details": {
         "uuid": "0d56458e-cac4-11e7-9ffc-23156f95d8bf",
