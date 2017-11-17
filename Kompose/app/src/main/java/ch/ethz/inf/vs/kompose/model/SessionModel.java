@@ -8,6 +8,10 @@ import ch.ethz.inf.vs.kompose.data.Client;
 
 public class SessionModel {
 
+    public SessionModel(UUID uuid) {
+        this.uuid = uuid;
+    }
+
     private UUID uuid;
     private UUID hostUUID;
     private String sessionName;
