@@ -2,8 +2,6 @@
 
 this file describes the overall set up of the application. 
 
-## General architecture
-
 ## Description by folder
 `/`: all activities sit in the root of the src folder  
 `converter`: enables the conversion between `data` and `model` objects and vice versa  
