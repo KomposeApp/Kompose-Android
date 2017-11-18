@@ -26,10 +26,11 @@ public class YoutubeResolveService {
             protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
                 try {
                     if (sparseArray != null) {
-                        //magic number which resolved correct mp3 URL
+                        // magic number that selects m4a 128 bit
+                        // TODO: more intelligent selection
                         int iTag = 140;
 
-                        //get URI & title
+                        // get URI & title
                         String downloadUrl = sparseArray.get(iTag).getUrl();
                         String thumbnailUrl = videoMeta.getThumbUrl();
                         String title = videoMeta.getTitle();
@@ -43,7 +44,7 @@ public class YoutubeResolveService {
                         songDetails.setSourceUrl(URI.create(sourceUrl));
                         songDetails.setSecondsLength((int) length);
 
-                        //notify observer & terminate
+                        // notify observer & terminate
                         observer.notify(SONG_RESOLVED_SUCCESSFULLY, songDetails);
                         return;
                     }

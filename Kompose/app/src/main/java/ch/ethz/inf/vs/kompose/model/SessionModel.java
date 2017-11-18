@@ -4,7 +4,6 @@ package ch.ethz.inf.vs.kompose.model;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
-import java.util.List;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.Client;
