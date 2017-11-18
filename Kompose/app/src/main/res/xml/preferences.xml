@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/setting_category_host">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/preload_values"
+            android:entryValues="@array/preload_values"
+            android:key="key_preload"
+            android:title="@string/setting_preload" />
+
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/setting_category_client">
+
+        <EditTextPreference
+            android:defaultValue="John Doe"
+            android:key="key_username"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:title="@string/setting_username" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

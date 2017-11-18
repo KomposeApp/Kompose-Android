@@ -1,10 +1,16 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+
+import ch.ethz.inf.vs.kompose.settings.SettingsActivity;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_placeholder);
+
     }
 
     public void joinParty(View view) {
@@ -32,5 +39,31 @@ public class MainActivity extends AppCompatActivity {
         Log.d(LOG_TAG, "History button pressed");
         Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
         startActivity(historyIntent);
+    }
+
+    /**
+     * Create an inflatable options menu in the top right corner.
+     */
+    @Override
+    public boolean onCreateOptionsMenu(Menu m){
+        getMenuInflater().inflate(R.menu.menu_main, m);
+        return true;
+    }
+
+    /**
+     * Make the Settings tab call the Settings screen
+     */
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item){
+        switch(item.getItemId()){
+            case R.id.menu_settings:
+                Log.d(LOG_TAG,"Settings selected");
+
+                Intent settings = new Intent(this, SettingsActivity.class);
+                this.startActivity(settings);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
