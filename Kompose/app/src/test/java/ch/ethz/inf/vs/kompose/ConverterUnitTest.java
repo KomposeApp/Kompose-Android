@@ -57,6 +57,10 @@ public class ConverterUnitTest {
 
                 Type parameterType = method.getParameterTypes()[0];
                 try {
+                    if (!typeToValueDictionary.containsKey(parameterType)) {
+                        continue;
+                    }
+
                     if (parameterType.equals(String.class)) {
                         if (methodName.endsWith("DateTime")) {
                             method.invoke(obj, typeToValueDictionary.get(DateTime.class));
@@ -122,11 +126,17 @@ public class ConverterUnitTest {
     @Test
     public void songConverterTest() throws Exception {
         Song song = new Song();
+        song.setDownVotes(new DownVote[0]);
 
         fillObject(song);
 
         SongModel model = SongConverter.convert(song, sampleClients());
         Song newSong = SongConverter.convert(model);
+
+        //handle downvote array
+        Assert.assertTrue(newSong.getDownVotes().length == song.getDownVotes().length);
+        newSong.setDownVotes(null);
+        song.setDownVotes(null);
 
         verifyObject(song, newSong);
     }
