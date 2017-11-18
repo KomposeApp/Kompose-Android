@@ -1,24 +1,31 @@
 package ch.ethz.inf.vs.kompose.model;
 
-
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
+import java.net.InetAddress;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.Client;
 
 public class SessionModel {
 
-    public SessionModel(UUID uuid) {
+    public SessionModel(UUID uuid,
+                        InetAddress hostIP,
+                        int hostPort) {
         this.uuid = uuid;
+        this.hostIP = hostIP;
+        this.hostPort = hostPort;
     }
 
     private UUID uuid;
-    private UUID hostUUID;
     private String sessionName;
 
-    private final ObservableList<Client> clients = new ObservableArrayList<>();
+    private UUID hostUUID;
+    private InetAddress hostIP;
+    private int hostPort;
+
+    private final ObservableList<ClientModel> clients = new ObservableArrayList<>();
     private PlayListModel playlist;
 
     public UUID getUuid() {
@@ -45,7 +52,24 @@ public class SessionModel {
         this.sessionName = sessionName;
     }
 
-    public ObservableList<Client> getClients() {
+    public InetAddress getHostIP() {
+        return hostIP;
+    }
+
+    public void setHostIP(InetAddress hostIP) {
+        this.hostIP = hostIP;
+    }
+
+    public int getHostPort() {
+
+        return hostPort;
+    }
+
+    public void setHostPort(int hostPort) {
+        this.hostPort = hostPort;
+    }
+
+    public ObservableList<ClientModel> getClients() {
         return clients;
     }
 

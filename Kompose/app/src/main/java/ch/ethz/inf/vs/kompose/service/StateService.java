@@ -4,11 +4,11 @@ import java.net.InetAddress;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.model.PlayListModel;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
 
 public class StateService {
 
     public UUID deviceUUID;
-    public InetAddress hostIP;
-    public int hostPort;
-    public PlayListModel livePlaylist;
+    public String localUsername;
+    public SessionModel liveSession;
 }
