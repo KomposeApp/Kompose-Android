@@ -37,6 +37,25 @@ public class SongRepository {
      * @param item the song which is disliked
      */
     public void downVoteSong(SongModel item) {
-        // TODO
+        Message msg = new Message();
+        msg.setType(MessageType.CAST_SKIP_SONG_VOTE.toString());
+        msg.setSenderUuid(stateService.deviceUUID.toString());
+        msg.setSongDetails(SongConverter.convert(item));
+
+        networkService.sendMessage(msg, stateService.hostIP, stateService.hostPort);
+    }
+
+    /**
+     * Remove the downvote for a song
+     *
+     * @param item Song for which the downvote is revoked
+     */
+    public void removeDownVoteSong(SongModel item) {
+        Message msg = new Message();
+        msg.setType(MessageType.REMOVE_SKIP_SONG_VOTE.toString());
+        msg.setSenderUuid(stateService.deviceUUID.toString());
+        msg.setSongDetails(SongConverter.convert(item));
+
+        networkService.sendMessage(msg, stateService.hostIP, stateService.hostPort);
     }
 }
