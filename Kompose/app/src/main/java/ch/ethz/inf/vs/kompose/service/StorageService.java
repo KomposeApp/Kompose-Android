@@ -3,14 +3,21 @@ package ch.ethz.inf.vs.kompose.service;
 import android.content.Context;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Service that handles loading/storing data to storage.
  */
 public class StorageService {
-    private static String LOG_TAG = "StorageService";
+    private static String LOG_TAG = "## StorageService";
 
     private Context context;
 
@@ -19,32 +26,33 @@ public class StorageService {
     }
 
     /**
-     * persists the file to storage
+     * Persists the file to internal storage
      *
-     * @param fileName   the filename. file will be overwritten if found
-     * @param content    the content of the file
-     * @param folderName the folder. folder will be created if not found
+     * @param fileName  file will be overwritten if it already exists
+     * @param content   file content
+     * @param directory directory will be created if it doesn't exist
      * @return boolean indication whether the operation has succeeded or not
      */
-    public boolean persist(String fileName, String content, String folderName) {
+    public boolean persist(String directory, String fileName, String content) {
         try {
-            //create folder
-            File folder = new File(context.getFilesDir(), folderName);
-            if (!folder.exists()) {
-                if (!folder.mkdir()) {
-                    return false;
+            String child = fileName;
+
+            // create directory
+            if (directory != null && directory.length() > 0) {
+                File dir = new File(context.getFilesDir(), directory);
+                if (!dir.exists()) {
+                    if (!dir.mkdir()) {
+                        return false;
+                    }
                 }
+                child = directory + "/" + fileName;
             }
 
-            //create file
-            File file = new File(context.getFilesDir(), folderName + fileName);
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    return false;
-                }
-            }
+            // create file
+            Log.d(LOG_TAG, "writing file: " + child);
+            File file = new File(context.getFilesDir(), child);
 
-            //write to disk
+            // write to storage
             FileOutputStream outputStream = new FileOutputStream(file);
             outputStream.write(content.getBytes());
             outputStream.close();
@@ -56,26 +64,71 @@ public class StorageService {
         return false;
     }
 
+    private String readFile(File file) throws Exception {
+        FileInputStream input = new FileInputStream(file);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line = null;
+        while ((line = reader.readLine()) != null) {
+            stringBuilder.append(line).append("\n");
+        }
+        return stringBuilder.toString();
+    }
+
     /**
-     * returns an array with the content of all files in the folder
+     * returns an array with the content of all files in the directory
      *
-     * @param folderName the folder to be traversed
+     * @param directory the directory to be traversed
      * @return an array of strings with the file contents
      */
-    public String[] retrieveAllFiles(String folderName) {
-        //TODO
-        return new String[0];
+    public String[] retrieveAllFiles(String directory) {
+        File file = new File(context.getFilesDir(), directory);
+        if (!file.exists() || !file.isDirectory()) {
+            return null;
+        }
+
+        File[] children = file.listFiles();
+        List<File> regularFiles = new ArrayList<>();
+        int numFiles = 0;
+        for (File f : children) {
+            if (f.isFile()) {
+                regularFiles.add(f);
+                numFiles++;
+            }
+        }
+
+        String[] fileContents = new String[numFiles];
+        for (int i = 0; i < numFiles; i++) {
+            try {
+                fileContents[i] = readFile(regularFiles.get(i));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return fileContents;
     }
 
     /**
      * retrieves the file with the specified filename in the corresponding folder
      *
-     * @param fileName   the name of the requested file
-     * @param folderName the folder in which the requested file resides
+     * @param fileName  the name of the requested file
+     * @param directory the directory in which the requested file resides
      * @return a string with the file content
      */
-    public String retrieveFile(String fileName, String folderName) {
-        //TODO
-        return "";
+    public String retrieveFile(String directory, String fileName) {
+        String child = fileName;
+        if (directory != null && directory.length() > 0) {
+            child = directory + "/" + fileName;
+        }
+
+        File file = new File(context.getFilesDir(), child);
+        String content = null;
+        try {
+            content = readFile(file);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return content;
     }
 }
