@@ -57,14 +57,7 @@ public class SongConverter {
         DownVote[] downVotes = new DownVote[downvoteModels.size()];
         int i = 0;
         for (DownVoteModel dvm : downvoteModels) {
-            DownVote downVote = new DownVote();
-            downVote.setCastDateTime(dvm.getCastDateTime().toString());
-            downVote.setUuid(dvm.getUuid().toString());
-
-            if (dvm.getClientModel() != null) {
-                downVote.setClientUuid(dvm.getClientModel().getUuid().toString());
-            }
-            downVotes[i] = downVote;
+            downVotes[i] = DownVoteConverter.convert(dvm);
             i++;
         }
         song.setDownVotes(downVotes);
