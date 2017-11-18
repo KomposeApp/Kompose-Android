@@ -72,6 +72,7 @@ public class StorageService {
         while ((line = reader.readLine()) != null) {
             stringBuilder.append(line).append("\n");
         }
+        input.close();
         return stringBuilder.toString();
     }
 

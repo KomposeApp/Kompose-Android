@@ -5,8 +5,10 @@ import android.os.AsyncTask;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.URI;
 
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.Message;
@@ -15,6 +17,12 @@ import ch.ethz.inf.vs.kompose.data.Message;
  * Service that provides various network functionality.
  */
 public class NetworkService {
+
+    private StateService stateService;
+
+    public NetworkService(StateService stateService) {
+        this.stateService = stateService;
+    }
 
     public Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -49,6 +57,16 @@ public class NetworkService {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            try {
+                Socket socket = new Socket(hostIP, hostPort);
+                PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+                printWriter.print(JsonConverter.toJsonString(message));
+                printWriter.flush();
+                printWriter.close();
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             return null;
         }
     }

@@ -15,8 +15,8 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 
 public class YoutubeResolveService {
-    private static final int SONG_RESOLVED_SUCCESSFULLY = 0x1;
-    private static final int SONG_RESOLVING_ERROR = 0x2;
+    public static final int SONG_RESOLVED_SUCCESSFULLY = 0x1;
+    public static final int SONG_RESOLVING_ERROR = 0x2;
 
     private static String LOG_TAG = "##YoutubeResolveService";
 
