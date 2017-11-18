@@ -12,43 +12,37 @@ import ch.ethz.inf.vs.kompose.data.DownVote;
 import ch.ethz.inf.vs.kompose.data.Song;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.model.DownvoteModel;
+import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
 public class SongConverter {
 
-    public static SongModel convert(Song song) {
+    public static SongModel convert(Song song, ClientModel[] clientModels) {
         SongModel songModel = new SongModel(UUID.fromString(song.getUuid()));
         songModel.setTitle(song.getTitle());
         songModel.setSecondsLength(song.getLength());
         songModel.setOrder((int) song.getOrder());
-
-        // FIXME: check for UUID uniqueness?
         songModel.setDownVoteCount(song.getDownVotes().length);
 
-        List<DownvoteModel> downvoteModels = new ArrayList<>();
+        List<DownVoteModel> downVoteModels = new ArrayList<>();
         for (int i = 0; i < song.getDownVotes().length; i++) {
-            DownVote dv = song.getDownVotes()[i];
-            DownvoteModel dvm = new DownvoteModel();
-
-            // format DateTime as ISO 8601
-            DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
-
-            dvm.setCastTime(isoParser.parseDateTime(dv.getCastTime()));
-            dvm.setUuid(UUID.fromString(dv.getClientUuid()));
-
-            downvoteModels.add(dvm);
+            DownVoteModel model = DownVoteConverter.convert(song.getDownVotes()[i], clientModels);
+            downVoteModels.add(model);
         }
-        songModel.setDownVotes(downvoteModels);
+        songModel.setDownVotes(downVoteModels);
 
-        ClientModel proposedBy = new ClientModel(UUID.fromString(song.getProposedBy()));
-        songModel.setProposedBy(proposedBy);
+        UUID proposedUUID = UUID.fromString(song.getProposedBy());
+        for (ClientModel clientModel : clientModels) {
+            if (clientModel.getUuid().equals(proposedUUID)) {
+                songModel.setProposedBy(clientModel);
+            }
+        }
 
         songModel.setDownloadUrl(URI.create(song.getDownloadUrl()));
         songModel.setThumbnailUrl(URI.create(song.getThumbnailUrl()));
         songModel.setSourceUrl(URI.create(song.getSourceUrl()));
 
-        songModel.setStatus(SongStatus.fromString(song.getStatus()));
+        songModel.setStatus(SongStatus.valueOf(song.getStatus()));
 
         return songModel;
     }
@@ -58,10 +52,10 @@ public class SongConverter {
 
         song.setDownloadUrl(songModel.getDownloadUrl().toString());
 
-        List<DownvoteModel> downvoteModels = songModel.getDownVotes();
+        List<DownVoteModel> downvoteModels = songModel.getDownVotes();
         DownVote[] downVotes = new DownVote[downvoteModels.size()];
         int i = 0;
-        for (DownvoteModel dvm : downvoteModels) {
+        for (DownVoteModel dvm : downvoteModels) {
             DownVote downVote = new DownVote();
 
             // should output ISO 8601

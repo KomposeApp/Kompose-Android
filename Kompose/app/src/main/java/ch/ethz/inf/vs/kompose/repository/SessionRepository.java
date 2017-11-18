@@ -3,6 +3,8 @@ package ch.ethz.inf.vs.kompose.repository;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
+import java.util.UUID;
+
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 
 public class SessionRepository {
@@ -12,7 +14,7 @@ public class SessionRepository {
      */
     public SessionModel startSession() {
         // TODO
-        return new SessionModel();
+        return new SessionModel(UUID.randomUUID());
     }
 
     /**

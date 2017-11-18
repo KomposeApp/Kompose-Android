@@ -18,7 +18,7 @@ public class SongModel {
     private int order;
 
     private int downVoteCount;
-    private List<DownvoteModel> downVotes;
+    private List<DownVoteModel> downVotes;
     private ClientModel proposedBy;
 
     private URI downloadUrl;
@@ -59,11 +59,11 @@ public class SongModel {
         this.uuid = uuid;
     }
 
-    public List<DownvoteModel> getDownVotes() {
+    public List<DownVoteModel> getDownVotes() {
         return downVotes;
     }
 
-    public void setDownVotes(List<DownvoteModel> downVotes) {
+    public void setDownVotes(List<DownVoteModel> downVotes) {
         this.downVotes = downVotes;
     }
 

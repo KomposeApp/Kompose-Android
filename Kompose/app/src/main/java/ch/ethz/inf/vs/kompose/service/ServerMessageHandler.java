@@ -19,8 +19,10 @@ public class ServerMessageHandler implements Runnable {
     // TODO
     @Override
     public void run() {
+        /*
         try {
             Message msg = NetworkService.readMessage(socket);
         } catch (IOException e) { }
+        */
     }
 }
