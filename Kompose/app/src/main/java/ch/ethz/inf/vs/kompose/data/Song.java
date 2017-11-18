@@ -10,8 +10,8 @@ public class Song {
 
     private String downloadUrl;
     private DownVote[] downVotes;
-    private long order;
-    private String proposedBy;
+    private int order;
+    private String proposedByClientUuid;
     private String sourceUrl;
     private String status;
     private String thumbnailUrl;
@@ -30,14 +30,14 @@ public class Song {
     public void setDownVotes(DownVote[] value) { this.downVotes = value; }
 
     @JsonProperty("order")
-    public long getOrder() { return order; }
+    public int getOrder() { return order; }
     @JsonProperty("order")
-    public void setOrder(long value) { this.order = value; }
+    public void setOrder(int value) { this.order = value; }
 
-    @JsonProperty("proposed_by")
-    public String getProposedBy() { return proposedBy; }
-    @JsonProperty("proposed_by")
-    public void setProposedBy(String value) { this.proposedBy = value; }
+    @JsonProperty("proposed_by_client_uuid")
+    public String getProposedByClientUuid() { return proposedByClientUuid; }
+    @JsonProperty("proposed_by_client_uuid")
+    public void setProposedByClientUuid(String value) { this.proposedByClientUuid = value; }
 
     @JsonProperty("source_url")
     public String getSourceUrl() { return sourceUrl; }

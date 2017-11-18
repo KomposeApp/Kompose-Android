@@ -1,7 +1,9 @@
 package ch.ethz.inf.vs.kompose.model;
 
+import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
+
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
@@ -17,8 +19,8 @@ public class SongModel {
     private int secondsLength;
     private int order;
 
-    private int downVoteCount;
-    private List<DownVoteModel> downVotes;
+    private int validDownVoteCount;
+    private final ObservableList<DownVoteModel> downVotes = new ObservableArrayList<>();
     private ClientModel proposedBy;
 
     private URI downloadUrl;
@@ -47,24 +49,20 @@ public class SongModel {
         this.order = order;
     }
 
-    public int getDownVoteCount() {
-        return downVoteCount;
+    public int getValidDownVoteCount() {
+        return validDownVoteCount;
     }
 
-    public void setDownVoteCount(int downVoteCount) {
-        this.downVoteCount = downVoteCount;
+    public void setValidDownVoteCount(int validDownVoteCount) {
+        this.validDownVoteCount = validDownVoteCount;
     }
 
     public void setUuid(UUID uuid) {
         this.uuid = uuid;
     }
 
-    public List<DownVoteModel> getDownVotes() {
+    public ObservableList<DownVoteModel> getDownVotes() {
         return downVotes;
-    }
-
-    public void setDownVotes(List<DownVoteModel> downVotes) {
-        this.downVotes = downVotes;
     }
 
     public ClientModel getProposedBy() {

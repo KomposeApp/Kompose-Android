@@ -7,6 +7,7 @@ import org.junit.Test;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.Client;
 import ch.ethz.inf.vs.kompose.data.DownVote;
 import ch.ethz.inf.vs.kompose.data.Song;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
@@ -36,50 +38,60 @@ public class ConverterUnitTest {
         typeToValueDictionary.put(int.class, 1);
         typeToValueDictionary.put(Boolean.class, true);
         typeToValueDictionary.put(boolean.class, true);
-        typeToValueDictionary.put(DateTime.class, "2004-02-12T15:19:21+00:00");
+        typeToValueDictionary.put(DateTime.class, "2004-02-12T16:19:21.000+01:00");
         typeToValueDictionary.put(UUID.class, "fe567f0c-7f27-4b36-965d-a24071fd346e");
+        typeToValueDictionary.put(URI.class, "http://youtube.com");
+        typeToValueDictionary.put(SongStatus.class, SongStatus.EXCLUDED_BY_POPULAR_VOTE.toString());
     }
 
     private void fillObject(Object obj) {
-        try {
-            Class cls = obj.getClass();
-            Method[] methods = cls.getDeclaredMethods();
+        Class cls = obj.getClass();
+        Method[] methods = cls.getDeclaredMethods();
 
-            for (Method method : methods) {
-                if (method.getName().startsWith("set")) {
-                    Type parameterType = method.getParameterTypes()[0];
+        for (Method method : methods) {
+            String methodName = method.getName();
+            if (methodName.startsWith("set")) {
+                if (method.getParameterTypes().length != 1) {
+                    continue;
+                }
+
+                Type parameterType = method.getParameterTypes()[0];
+                try {
                     if (parameterType.equals(String.class)) {
-                        if (method.getName().endsWith("DateTime")) {
+                        if (methodName.endsWith("DateTime")) {
                             method.invoke(obj, typeToValueDictionary.get(DateTime.class));
-                        } else if (method.getName().endsWith("Uuid")) {
+                        } else if (methodName.endsWith("Uuid")) {
                             method.invoke(obj, typeToValueDictionary.get(UUID.class));
+                        } else if (methodName.endsWith("Url")) {
+                            method.invoke(obj, typeToValueDictionary.get(URI.class));
+                        } else if (methodName.endsWith("Status")) {
+                            method.invoke(obj, typeToValueDictionary.get(SongStatus.class));
                         } else {
                             method.invoke(obj, typeToValueDictionary.get(parameterType));
                         }
                     } else {
-
                         method.invoke(obj, typeToValueDictionary.get(parameterType));
                     }
 
+                } catch (Exception ex) {
+                    Assert.fail(ex.toString());
                 }
             }
-        } catch (Exception ex) {
-            Assert.fail(ex.toString());
         }
     }
 
     private <T> void verifyObject(T oldInstance, T newInstance) {
-        try {
-            Class cls = oldInstance.getClass();
-            Method[] methods = cls.getDeclaredMethods();
+        Class cls = oldInstance.getClass();
+        Method[] methods = cls.getDeclaredMethods();
 
-            for (Method method : methods) {
-                if (method.getName().startsWith("get")) {
+        for (Method method : methods) {
+            if (method.getName().startsWith("get")) {
+                try {
                     Assert.assertEquals(method.invoke(oldInstance), method.invoke(newInstance));
+                } catch (Exception ex) {
+                    Assert.fail(ex.toString());
                 }
             }
-        } catch (Exception ex) {
-            Assert.fail(ex.toString());
         }
     }
 

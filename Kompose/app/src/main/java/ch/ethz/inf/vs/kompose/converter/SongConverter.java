@@ -1,10 +1,6 @@
 package ch.ethz.inf.vs.kompose.converter;
 
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
-
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,28 +17,33 @@ public class SongConverter {
         SongModel songModel = new SongModel(UUID.fromString(song.getUuid()));
         songModel.setTitle(song.getTitle());
         songModel.setSecondsLength(song.getLength());
-        songModel.setOrder((int) song.getOrder());
-        songModel.setDownVoteCount(song.getDownVotes().length);
 
-        List<DownVoteModel> downVoteModels = new ArrayList<>();
-        for (int i = 0; i < song.getDownVotes().length; i++) {
-            DownVoteModel model = DownVoteConverter.convert(song.getDownVotes()[i], clientModels);
-            downVoteModels.add(model);
-        }
-        songModel.setDownVotes(downVoteModels);
-
-        UUID proposedUUID = UUID.fromString(song.getProposedBy());
-        for (ClientModel clientModel : clientModels) {
-            if (clientModel.getUuid().equals(proposedUUID)) {
-                songModel.setProposedBy(clientModel);
-            }
-        }
+        songModel.setOrder(song.getOrder());
+        songModel.setValidDownVoteCount(0);
 
         songModel.setDownloadUrl(URI.create(song.getDownloadUrl()));
         songModel.setThumbnailUrl(URI.create(song.getThumbnailUrl()));
         songModel.setSourceUrl(URI.create(song.getSourceUrl()));
 
         songModel.setStatus(SongStatus.valueOf(song.getStatus()));
+
+        if (song.getDownVotes() != null) {
+            for (int i = 0; i < song.getDownVotes().length; i++) {
+                DownVoteModel model = DownVoteConverter.convert(song.getDownVotes()[i], clientModels);
+                songModel.getDownVotes().add(model);
+                if (model.getClientModel() != null && model.getClientModel().isActive()) {
+                    songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() + 1);
+                }
+            }
+        }
+
+        UUID proposedUUID = UUID.fromString(song.getProposedByClientUuid());
+        for (ClientModel clientModel : clientModels) {
+            if (clientModel.getUuid().equals(proposedUUID)) {
+                songModel.setProposedBy(clientModel);
+            }
+        }
+
 
         return songModel;
     }
@@ -57,19 +58,19 @@ public class SongConverter {
         int i = 0;
         for (DownVoteModel dvm : downvoteModels) {
             DownVote downVote = new DownVote();
+            downVote.setCastDateTime(dvm.getCastDateTime().toString());
+            downVote.setUuid(dvm.getUuid().toString());
 
-            // should output ISO 8601
-            downVote.setCastTime(dvm.getCastTime().toString());
-
-            downVote.setClientUuid(dvm.getUuid().toString());
-            downVotes[i] = downVote;
+            if (dvm.getClientModel() != null) {
+                downVote.setClientUuid(dvm.getClientModel().getUuid().toString());
+            }
             downVotes[i] = downVote;
             i++;
         }
         song.setDownVotes(downVotes);
 
         song.setOrder(songModel.getOrder());
-        song.setProposedBy(songModel.getProposedBy().getUuid().toString());
+        song.setProposedByClientUuid(songModel.getProposedBy().getUuid().toString());
         song.setSourceUrl(songModel.getSourceUrl().toString());
         song.setStatus(songModel.getStatus().toString());
         song.setThumbnailUrl(songModel.getThumbnailUrl().toString());

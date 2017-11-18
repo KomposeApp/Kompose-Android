@@ -9,7 +9,7 @@ public class DownVoteModel {
         this.uuid = uuid;
     }
 
-    private DateTime castTime;
+    private DateTime castDateTime;
     private UUID uuid;
     private ClientModel clientModel;
 
@@ -17,12 +17,12 @@ public class DownVoteModel {
         return uuid;
     }
 
-    public DateTime getCastTime() {
-        return castTime;
+    public DateTime getCastDateTime() {
+        return castDateTime;
     }
 
     public void setCastDateTime(DateTime castTime) {
-        this.castTime = castTime;
+        this.castDateTime = castTime;
     }
 
     public ClientModel getClientModel() {

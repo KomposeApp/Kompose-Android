@@ -13,11 +13,13 @@ public class DownVoteConverter {
 
     public static DownVoteModel convert(DownVote downVote, ClientModel[] clientModels) {
         // format DateTime as ISO 8601
-        DateTimeFormatter isoParser = ISODateTimeFormat.dateTimeNoMillis();
+        DateTimeFormatter isoParser = ISODateTimeFormat.dateTime();
         DownVoteModel downVoteModel = new DownVoteModel(UUID.fromString(downVote.getUuid()));
         downVoteModel.setCastDateTime(isoParser.parseDateTime(downVote.getCastDateTime()));
+
+        UUID clientUUID = UUID.fromString(downVote.getClientUuid());
         for (ClientModel model : clientModels) {
-            if (model.getUuid().equals(downVote.getClientUuid())) {
+            if (model.getUuid().equals(clientUUID)) {
                 downVoteModel.setClientModel(model);
                 break;
             }
@@ -27,9 +29,10 @@ public class DownVoteConverter {
 
     public static DownVote convert(DownVoteModel downVoteModel) {
         DownVote downVote = new DownVote();
-        downVote.setCastTime(downVoteModel.getCastTime().toString());
-        downVote.setClientUuid(downVoteModel.getUuid().toString());
-        downVote.setClientUuid(downVoteModel.getClientModel().getUuid().toString());
+        downVote.setCastDateTime(downVoteModel.getCastDateTime().toString());
+        downVote.setUuid(downVoteModel.getUuid().toString());
+        if (downVoteModel.getClientModel() != null)
+            downVote.setClientUuid(downVoteModel.getClientModel().getUuid().toString());
         return downVote;
     }
 }

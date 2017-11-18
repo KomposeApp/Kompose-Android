@@ -1,6 +1,9 @@
 package ch.ethz.inf.vs.kompose.model;
 
 
+import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -16,7 +19,7 @@ public class SessionModel {
     private UUID hostUUID;
     private String sessionName;
 
-    private List<Client> clients;
+    private final ObservableList<Client> clients = new ObservableArrayList<>();
     private PlayListModel playlist;
 
     public UUID getUuid() {
@@ -43,12 +46,8 @@ public class SessionModel {
         this.sessionName = sessionName;
     }
 
-    public List<Client> getClients() {
+    public ObservableList<Client> getClients() {
         return clients;
-    }
-
-    public void setClients(List<Client> clients) {
-        this.clients = clients;
     }
 
     public PlayListModel getPlaylist() {

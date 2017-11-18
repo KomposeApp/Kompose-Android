@@ -8,6 +8,8 @@ import java.util.TreeSet;
 /**
  * A playlist that can be observed, i.e. a listener can be registered
  * that is called whenever the playlist changes.
+ *
+ * famoser: this will not work this way; switch to ObservableList and override add(), else all
  */
 public class PlayListModel extends Observable {
 

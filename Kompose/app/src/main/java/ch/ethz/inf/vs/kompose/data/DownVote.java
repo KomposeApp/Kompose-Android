@@ -17,7 +17,7 @@ public class DownVote {
     }
 
     @JsonProperty("cast_date_time")
-    public void setCastTime(String value) {
+    public void setCastDateTime(String value) {
         this.castDateTime = value;
     }
 
