@@ -5,6 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 
 public class HistoryDetailsActivity extends AppCompatActivity {
 
+    private static final String LOG_TAG = "## Details Activity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

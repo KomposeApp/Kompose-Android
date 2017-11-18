@@ -24,7 +24,7 @@
         <activity android:name=".ConnectActivity" />
         <activity android:name=".PlaylistActivity" />
         <activity android:name=".HistoryOverviewActivity" />
-        <activity android:name=".HistoryDetailsActivity"></activity>
+        <activity android:name=".HistoryDetailsActivity"/>
 
         <service
             android:name=".service.AndroidServerService"

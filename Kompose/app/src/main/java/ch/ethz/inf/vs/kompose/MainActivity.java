@@ -6,9 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.service.AndroidServerService;
-import ch.ethz.inf.vs.kompose.service.StorageService;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
@@ -20,17 +17,20 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void joinParty(View view) {
+        Log.d(LOG_TAG, "Join party button pressed");
+        Intent connectIntent = new Intent(this, ConnectActivity.class);
+        startActivity(connectIntent);
     }
 
     public void createParty(View view) {
         Log.d(LOG_TAG, "Create party button pressed");
-
-        // start server service
-        Intent serviceIntent = new Intent(this, AndroidServerService.class);
-        startService(serviceIntent);
+        Intent partyIntent = new Intent(this, PartyCreationActivity.class);
+        startActivity(partyIntent);
     }
 
     public void viewHistoryFromTitle(View view) {
-
+        Log.d(LOG_TAG, "History button pressed");
+        Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
+        startActivity(historyIntent);
     }
 }
