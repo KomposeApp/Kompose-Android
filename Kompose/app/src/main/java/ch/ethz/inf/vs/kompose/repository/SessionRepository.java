@@ -72,7 +72,7 @@ public class SessionRepository {
         msg.setSenderUsername(StateService.getInstance().localUsername);
         msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
 
-        networkService.sendMessage(msg, session.getHostIP(), session.getHostPort());
+        networkService.sendMessage(msg, session.getHostIP(), session.getHostPort(), null);
     }
 
     /**
@@ -85,7 +85,7 @@ public class SessionRepository {
         msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
 
         networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
-                StateService.getInstance().liveSession.getHostPort());
+                StateService.getInstance().liveSession.getHostPort(), null);
     }
 
     /**
