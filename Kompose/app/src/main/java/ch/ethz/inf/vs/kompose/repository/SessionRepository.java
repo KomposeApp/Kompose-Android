@@ -11,6 +11,7 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.Message;
+import ch.ethz.inf.vs.kompose.data.Session;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.PlayListModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -30,21 +31,33 @@ public class SessionRepository {
         this.networkService = networkService;
     }
 
+    public void startSeverService() {
+        if (StateService.getInstance().deviceIsHost)  {
+            Intent serviceIntent = new Intent(context, AndroidServerService.class);
+            context.startService(serviceIntent);
+        }
+    }
+
+    public void stopServerService() {
+        if (StateService.getInstance().deviceIsHost) {
+            Intent serviceIntent = new Intent(context, AndroidServerService.class);
+            context.stopService(serviceIntent);
+        }
+    }
+
     /**
      * creates a new session and register the host service on the network
      */
     public SessionModel startSession(String sessionName) {
-        // start server service
-        Intent serviceIntent = new Intent(context, AndroidServerService.class);
-        context.startService(serviceIntent);
-
         SessionModel sessionModel = new SessionModel(UUID.randomUUID(),null, 0);
         sessionModel.setHostUUID(StateService.getInstance().deviceUUID);
         sessionModel.setSessionName(sessionName);
         sessionModel.setPlaylist(new PlayListModel());
 
         StateService.getInstance().liveSession = sessionModel;
+        StateService.getInstance().deviceIsHost = true;
 
+        startSeverService();
         return sessionModel;
     }
 
