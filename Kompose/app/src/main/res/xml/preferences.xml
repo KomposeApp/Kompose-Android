@@ -17,7 +17,7 @@
             android:key="key_username"
             android:selectAllOnFocus="true"
             android:singleLine="true"
-            android:title="@string/setting_username" />
+            android:title="@string/setting_username"/>
     </PreferenceCategory>
 
 </PreferenceScreen>

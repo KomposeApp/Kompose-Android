@@ -5,6 +5,7 @@
     <string name="settings_menu">Settings</string>
     <string name="setting_category_host">Host Settings</string>
     <string name="setting_category_client">Client Settings</string>
-    <string name="setting_preload">Number of songs to preload</string>
-    <string name="setting_username">Username</string>
+    <string name="setting_preload">Number of songs to preload:</string>
+    <string name="setting_username">Username:</string>
+    <string name="settings_confirm">Confirm Changes</string>
 </resources>
