@@ -24,11 +24,13 @@ public class AndroidServerService extends Service {
     private static final String SERVICE_NAME = "Kompose";
     private static final String SERVICE_TYPE = "_kompose._tcp";
 
+    private NetworkService networkService;
     private ServerSocket serverSocket;
     private int localPort;
     private String serviceName;
     private NsdManager nsdManager;
-    private NetworkService networkService;
+    private NsdManager.RegistrationListener nsdRegistrationListener;
+    private ServerTask serverTask;
 
     @Override
     public void onCreate() {
@@ -54,15 +56,21 @@ public class AndroidServerService extends Service {
         Log.d(LOG_TAG, "Using port: " + localPort);
         serviceInfo.setPort(localPort);
 
-        NsdManager.RegistrationListener registrationListener = new ServerRegistrationListener();
+        nsdRegistrationListener = new ServerRegistrationListener();
         nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
-        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
+        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
 
         // start server task
-        ServerTask serverTask = new ServerTask();
+        serverTask = new ServerTask();
         serverTask.execute();
 
         return START_NOT_STICKY;
+    }
+
+    @Override
+    public void onDestroy() {
+        nsdManager.unregisterService(nsdRegistrationListener);
+        serverTask.cancel(true);
     }
 
     @Override
@@ -85,10 +93,12 @@ public class AndroidServerService extends Service {
 
         @Override
         public void onServiceUnregistered(NsdServiceInfo arg0) {
+            Log.d(LOG_TAG, "Service unregistered: " + serviceName);
         }
 
         @Override
         public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.d(LOG_TAG, "Service unregistration failed: " + errorCode);
         }
     }
 

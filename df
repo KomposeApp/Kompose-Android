@@ -1,0 +1,77 @@
+diff --git a/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/AndroidServerService.java b/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/AndroidServerService.java
+index 9c392db..36f02c3 100644
+--- a/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/AndroidServerService.java
++++ b/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/AndroidServerService.java
+@@ -28,6 +28,8 @@ public class AndroidServerService extends Service {
+     private int localPort;
+     private String serviceName;
+     private NsdManager nsdManager;
++    private NsdManager.RegistrationListener nsdRegistrationListener;
++    private ServerTask serverTask;
+ 
+     @Override
+     public void onCreate() {
+@@ -52,17 +54,23 @@ public class AndroidServerService extends Service {
+         Log.d(LOG_TAG, "Using port: " + localPort);
+         serviceInfo.setPort(localPort);
+ 
+-        NsdManager.RegistrationListener registrationListener = new ServerRegistrationListener();
++        nsdRegistrationListener = new ServerRegistrationListener();
+         nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
+-        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, registrationListener);
++        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
+ 
+         // start server task
+-        ServerTask serverTask = new ServerTask();
++        serverTask = new ServerTask();
+         serverTask.execute();
+ 
+         return START_NOT_STICKY;
+     }
+ 
++    @Override
++    public void onDestroy() {
++        nsdManager.unregisterService(nsdRegistrationListener);
++        serverTask.cancel(true);
++    }
++
+     @Override
+     public IBinder onBind(Intent intent) {
+         return null;
+@@ -83,10 +91,12 @@ public class AndroidServerService extends Service {
+ 
+         @Override
+         public void onServiceUnregistered(NsdServiceInfo arg0) {
++            Log.d(LOG_TAG, "Service unregistered: " + serviceName);
+         }
+ 
+         @Override
+         public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
++            Log.d(LOG_TAG, "Service unregistration failed: " + errorCode);
+         }
+     }
+ 
+diff --git a/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/NetworkService.java b/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/NetworkService.java
+index 21e430c..88fc8bf 100644
+--- a/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/NetworkService.java
++++ b/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/NetworkService.java
+@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
+ import java.io.PrintWriter;
+ import java.net.InetAddress;
+ import java.net.Socket;
+-import java.net.URI;
+ 
+ import ch.ethz.inf.vs.kompose.data.JsonConverter;
+ import ch.ethz.inf.vs.kompose.data.Message;
+diff --git a/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/StateService.java b/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/StateService.java
+index 20c3882..3bfb932 100644
+--- a/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/StateService.java
++++ b/Kompose/app/src/main/java/ch/ethz/inf/vs/kompose/service/StateService.java
+@@ -9,6 +9,7 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
+ public class StateService {
+ 
+     public UUID deviceUUID;
++    public boolean deviceIsHost;
+     public String localUsername;
+     public SessionModel liveSession;
+ }
