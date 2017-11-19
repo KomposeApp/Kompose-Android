@@ -36,5 +36,5 @@ SessionRepository: `getActiveSessions` (-> Service discovery in NetworkService) 
 SessionRepository: `getPastSessions` should probably be asynchronous | - | TODO
 Unit test for `SessionConverter` | - | TODO
 Unit test for `ObservableSortedList` | - | TODO
-Settings: display selected username? | - | TODO
+Settings: display selected username? | Dino | TODO
 Deal with App lifecylce: onPause etc. must disable NSD broadcasts | - | TODO
