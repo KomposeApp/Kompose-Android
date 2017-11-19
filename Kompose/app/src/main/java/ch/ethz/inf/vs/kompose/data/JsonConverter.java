@@ -35,20 +35,20 @@ public class JsonConverter {
     private static Map<Type, ObjectReader> _readers = new HashMap<>();
     private static Map<Type, ObjectWriter> _writers = new HashMap<>();
 
-    private static void instantiateMapper(Type type) {
+    private static void instantiateMapper(Class type) {
         if (!_readers.containsKey(type)) {
             ObjectMapper mapper = new ObjectMapper();
-            _readers.put(type, mapper.readerFor(type.getClass()));
-            _writers.put(type, mapper.writerFor(type.getClass()));
+            _readers.put(type, mapper.readerFor(type));
+            _writers.put(type, mapper.writerFor(type));
         }
     }
 
-    private static ObjectReader getObjectReader(Type type) {
+    private static ObjectReader getObjectReader(Class type) {
         instantiateMapper(type);
         return _readers.get(type);
     }
 
-    private static ObjectWriter getObjectWriter(Type type) {
+    private static ObjectWriter getObjectWriter(Class type) {
         instantiateMapper(type);
         return _writers.get(type);
     }
