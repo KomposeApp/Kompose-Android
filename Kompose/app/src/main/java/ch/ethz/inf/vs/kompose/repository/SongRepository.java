@@ -28,7 +28,8 @@ public class SongRepository {
         msg.setSongDetails(SongConverter.convert(item));
         msg.setType(MessageType.REQUEST_SONG.toString());
 
-        networkService.sendMessage(msg, stateService.hostIP, stateService.hostPort);
+        networkService.sendMessage(msg, stateService.liveSession.getHostIP(),
+                stateService.liveSession.getHostPort());
     }
 
     /**
@@ -42,7 +43,8 @@ public class SongRepository {
         msg.setSenderUuid(stateService.deviceUUID.toString());
         msg.setSongDetails(SongConverter.convert(item));
 
-        networkService.sendMessage(msg, stateService.hostIP, stateService.hostPort);
+        networkService.sendMessage(msg, stateService.liveSession.getHostIP(),
+                stateService.liveSession.getHostPort());
     }
 
     /**
@@ -56,6 +58,7 @@ public class SongRepository {
         msg.setSenderUuid(stateService.deviceUUID.toString());
         msg.setSongDetails(SongConverter.convert(item));
 
-        networkService.sendMessage(msg, stateService.hostIP, stateService.hostPort);
+        networkService.sendMessage(msg, stateService.liveSession.getHostIP(),
+                stateService.liveSession.getHostPort());
     }
 }

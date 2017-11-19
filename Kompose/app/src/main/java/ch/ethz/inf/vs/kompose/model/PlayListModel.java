@@ -1,37 +1,27 @@
 package ch.ethz.inf.vs.kompose.model;
 
+import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
+
 import java.util.Comparator;
 import java.util.Observable;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-/**
- * A playlist that can be observed, i.e. a listener can be registered
- * that is called whenever the playlist changes.
- *
- * famoser: this will not work this way; switch to ObservableList and override add(), else all
- */
-public class PlayListModel extends Observable {
+public class PlayListModel {
 
-    private SortedSet<SongModel> playlistItems;
+    private final ObservableList<SongModel> playlistItems = new ObservableSortedList<>(
+            new SongComparator());
 
-    public PlayListModel() {
-        playlistItems = new TreeSet<>(new PlaylistItemComparator());
-    }
-
-    public SortedSet<SongModel> getPlaylistItems() {
+    public ObservableList<SongModel> getPlaylistItems() {
         return playlistItems;
     }
 
-    public void setPlaylistItems(SortedSet<SongModel> playlistItems) {
-        this.playlistItems = playlistItems;
-    }
-
-    private class PlaylistItemComparator implements Comparator<SongModel> {
-
+    private class SongComparator implements Comparator<SongModel> {
         @Override
-        public int compare(SongModel p1, SongModel p2) {
-            return p1.getOrder() < p2.getOrder() ? -1 : 1;
+        public int compare(SongModel s1, SongModel s2) {
+            return s1.getOrder() < s2.getOrder() ? -1 : 1;
         }
     }
+
 }
