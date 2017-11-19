@@ -37,6 +37,6 @@ SessionRepository: `getPastSessions` should probably be asynchronous | - | TODO
 Unit test for `SessionConverter` | - | TODO
 Unit test for `ObservableSortedList` | - | TODO
 Settings: display selected username? | Dino | DONE
-Deal with App lifecylce: onPause etc. must disable NSD broadcasts | - | TODO
+Deal with App lifecylce: onPause etc. must disable NSD broadcasts | Lukas | TODO
 Design: Replace the placeholder layouts with actual designs based on the mockup | - | TODO
 Design: Figure out how to dynamically add Fragments that include a downvote button & text into a listview | - | TODO
