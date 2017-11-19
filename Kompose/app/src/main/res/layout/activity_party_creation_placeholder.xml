@@ -19,6 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.2"/>
     <EditText
+        android:id="@+id/party_name_text_entry"
         android:layout_width="match_parent"
         android:layout_height="70dp"
         android:background="@color/colorAccent"
