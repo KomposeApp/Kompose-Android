@@ -9,6 +9,7 @@ public class StateService {
     public UUID deviceUUID;
     public String localUsername;
     public SessionModel liveSession;
+    public boolean deviceIsHost;
 
     private StateService() {}
 
