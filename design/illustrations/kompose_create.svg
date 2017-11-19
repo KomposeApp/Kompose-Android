@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.3, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 width="393.167px" height="365.333px" viewBox="0 0 393.167 365.333" enable-background="new 0 0 393.167 365.333"
+	 xml:space="preserve">
+<rect y="0.667" fill="#EF3B39" width="393.167" height="364.667"/>
+<rect x="1276.321" y="107.548" fill="none" width="98.934" height="259.847"/>
+<g>
+	<g>
+		<defs>
+			<rect id="SVGID_1_" x="145.896" y="80.698" width="210.632" height="210.631"/>
+		</defs>
+		<clipPath id="SVGID_2_">
+			<use xlink:href="#SVGID_1_"  overflow="visible"/>
+		</clipPath>
+		<rect x="145.896" y="80.698" clip-path="url(#SVGID_2_)" fill="#EF3B39" width="210.632" height="210.631"/>
+		<polygon clip-path="url(#SVGID_2_)" fill="#FFFFFF" points="236.786,222.393 218.076,222.393 218.076,149.634 236.786,149.634 
+			236.786,178.218 246.141,178.218 262.355,149.634 282.104,149.634 261.731,185.495 282,222.393 262.251,222.393 246.141,192.77 
+			236.786,192.77 		"/>
+		<path clip-path="url(#SVGID_2_)" fill="#FFFFFF" d="M278.357,115.573h-17.961h-81.923v140.88h81.923h17.961h40.996v-140.88
+			H278.357z M301.022,239.364h-22.665h-17.961h-61.727V132.662h61.727h17.961h22.665V239.364z"/>
+	</g>
+</g>
+<g>
+	<path fill="#FFFFFF" d="M114.662,174.499h26.171v21.553h-26.171v26.171H93.109v-26.171h-26.17v-21.553h26.17v-26.17h21.553V174.499
+		z"/>
+</g>
+</svg>

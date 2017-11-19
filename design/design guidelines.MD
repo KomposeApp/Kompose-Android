@@ -6,4 +6,8 @@ white (accent font color): FFFFFF
 
 ## Fonts
 Russo One: Title / Logo font  
-Open Sans: Text font (prefare regular weight)
+Open Sans: Text font (prefare regular weight)  
+
+## Font sizes
+36px for primary text  
+20px for secondary text  
