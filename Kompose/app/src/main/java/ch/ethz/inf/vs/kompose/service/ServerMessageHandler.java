@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.net.Socket;
 
@@ -10,19 +12,26 @@ import ch.ethz.inf.vs.kompose.data.Message;
  */
 public class ServerMessageHandler implements Runnable {
 
-    private Socket socket;
+    private static final String LOG_TAG = "## ServerMessageHandler";
 
-    public ServerMessageHandler(Socket socket) {
+    private Socket socket;
+    private NetworkService networkService;
+
+    public ServerMessageHandler(Socket socket, NetworkService networkService) {
         this.socket = socket;
+        this.networkService = networkService;
     }
 
     // TODO
     @Override
     public void run() {
-        /*
         try {
-            Message msg = NetworkService.readMessage(socket);
-        } catch (IOException e) { }
-        */
+            Log.d(LOG_TAG, "Thread dispatched");
+            Message msg = networkService.readMessage(socket);
+            Log.d(LOG_TAG, "Message received (" + msg.getType() + ")");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

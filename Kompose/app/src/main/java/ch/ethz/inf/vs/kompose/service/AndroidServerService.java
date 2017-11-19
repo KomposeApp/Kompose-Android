@@ -28,10 +28,12 @@ public class AndroidServerService extends Service {
     private int localPort;
     private String serviceName;
     private NsdManager nsdManager;
+    private NetworkService networkService;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        networkService = new NetworkService();
     }
 
     @Override
@@ -101,7 +103,9 @@ public class AndroidServerService extends Service {
             while (!this.isCancelled()) {
                 try {
                     Socket connection = serverSocket.accept();
-                    ServerMessageHandler severMessageHandler = new ServerMessageHandler(connection);
+                    Log.d(LOG_TAG, "message received");
+                    ServerMessageHandler severMessageHandler = new ServerMessageHandler(connection,
+                            networkService);
                     Thread msgHandler = new Thread(severMessageHandler);
                     msgHandler.start();
                 } catch (Exception e) {

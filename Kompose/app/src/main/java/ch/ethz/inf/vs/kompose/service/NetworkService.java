@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,24 +19,22 @@ import ch.ethz.inf.vs.kompose.data.Message;
  */
 public class NetworkService {
 
-    private StateService stateService;
-
-    public NetworkService(StateService stateService) {
-        this.stateService = stateService;
-    }
+    public NetworkService() { }
 
     public Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder json = new StringBuilder();
 
         char[] buffer = new char[1024];
-        int bytesRead = 0;
+        int bytesRead;
         while ((bytesRead = input.read(buffer)) != -1) {
             json.append(new String(buffer, 0, bytesRead));
         }
+        Log.d("## NetworkService", "message read from stream: " + json.toString());
 
+        Message message = JsonConverter.fromMessageJsonString(json.toString());
         input.close();
-        return JsonConverter.fromMessageJsonString(json.toString());
+        return message;
     }
 
     public void sendMessage(Message msg, InetAddress hostIP, int hostPort) {

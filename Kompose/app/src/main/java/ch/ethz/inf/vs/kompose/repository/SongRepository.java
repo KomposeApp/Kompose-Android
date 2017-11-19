@@ -9,11 +9,9 @@ import ch.ethz.inf.vs.kompose.service.StateService;
 
 public class SongRepository {
 
-    private StateService stateService;
     private NetworkService networkService;
 
-    public SongRepository(StateService stateService, NetworkService networkService) {
-        this.stateService = stateService;
+    public SongRepository(NetworkService networkService) {
         this.networkService = networkService;
     }
 
@@ -24,12 +22,12 @@ public class SongRepository {
      */
     public void requestNewSong(SongModel item) {
         Message msg = new Message();
-        msg.setSenderUuid(stateService.deviceUUID.toString());
+        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
         msg.setSongDetails(SongConverter.convert(item));
         msg.setType(MessageType.REQUEST_SONG.toString());
 
-        networkService.sendMessage(msg, stateService.liveSession.getHostIP(),
-                stateService.liveSession.getHostPort());
+        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
+                StateService.getInstance().liveSession.getHostPort());
     }
 
     /**
@@ -40,11 +38,11 @@ public class SongRepository {
     public void downVoteSong(SongModel item) {
         Message msg = new Message();
         msg.setType(MessageType.CAST_SKIP_SONG_VOTE.toString());
-        msg.setSenderUuid(stateService.deviceUUID.toString());
+        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
         msg.setSongDetails(SongConverter.convert(item));
 
-        networkService.sendMessage(msg, stateService.liveSession.getHostIP(),
-                stateService.liveSession.getHostPort());
+        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
+                StateService.getInstance().liveSession.getHostPort());
     }
 
     /**
@@ -55,10 +53,10 @@ public class SongRepository {
     public void removeDownVoteSong(SongModel item) {
         Message msg = new Message();
         msg.setType(MessageType.REMOVE_SKIP_SONG_VOTE.toString());
-        msg.setSenderUuid(stateService.deviceUUID.toString());
+        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
         msg.setSongDetails(SongConverter.convert(item));
 
-        networkService.sendMessage(msg, stateService.liveSession.getHostIP(),
-                stateService.liveSession.getHostPort());
+        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
+                StateService.getInstance().liveSession.getHostPort());
     }
 }

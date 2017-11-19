@@ -22,14 +22,11 @@ import ch.ethz.inf.vs.kompose.service.StorageService;
 public class SessionRepository {
 
     private Context context;
-    private StateService stateService;
     private NetworkService networkService;
 
     public SessionRepository(Context context,
-                             StateService stateService,
                              NetworkService networkService) {
         this.context = context;
-        this.stateService = stateService;
         this.networkService = networkService;
     }
 
@@ -42,11 +39,11 @@ public class SessionRepository {
         context.startService(serviceIntent);
 
         SessionModel sessionModel = new SessionModel(UUID.randomUUID(),null, 0);
-        sessionModel.setHostUUID(stateService.deviceUUID);
+        sessionModel.setHostUUID(StateService.getInstance().deviceUUID);
         sessionModel.setSessionName(sessionName);
         sessionModel.setPlaylist(new PlayListModel());
 
-        stateService.liveSession = sessionModel;
+        StateService.getInstance().liveSession = sessionModel;
 
         return sessionModel;
     }
@@ -59,8 +56,8 @@ public class SessionRepository {
     public void joinSession(SessionModel session) {
         Message msg = new Message();
         msg.setType(MessageType.REGISTER_CLIENT.toString());
-        msg.setSenderUsername(stateService.localUsername);
-        msg.setSenderUuid(stateService.deviceUUID.toString());
+        msg.setSenderUsername(StateService.getInstance().localUsername);
+        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
 
         networkService.sendMessage(msg, session.getHostIP(), session.getHostPort());
     }
@@ -71,11 +68,11 @@ public class SessionRepository {
     public void leaveSession() {
         Message msg = new Message();
         msg.setType(MessageType.UNREGISTER_CLIENT.toString());
-        msg.setSenderUsername(stateService.localUsername);
-        msg.setSenderUuid(stateService.deviceUUID.toString());
+        msg.setSenderUsername(StateService.getInstance().localUsername);
+        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
 
-        networkService.sendMessage(msg, stateService.liveSession.getHostIP(),
-                stateService.liveSession.getHostPort());
+        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
+                StateService.getInstance().liveSession.getHostPort());
     }
 
     /**
