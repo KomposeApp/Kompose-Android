@@ -20,12 +20,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PartyCreationActivity" android:label="Create your own Party"/>
-        <activity android:name=".ConnectActivity" android:label="Choose a Party"/>
-        <activity android:name=".PlaylistActivity" android:label="Playlist"/>
-        <activity android:name=".HistoryOverviewActivity" android:label="Overview of past Playlists"/>
-        <activity android:name=".HistoryDetailsActivity" android:label="Playlist History"/>
-        <activity android:name=".SettingsActivity" android:label="Settings"/>
+        <activity
+            android:name=".PartyCreationActivity"
+            android:label="Create your own Party" />
+        <activity
+            android:name=".ConnectActivity"
+            android:label="Choose a Party" />
+        <activity
+            android:name=".PlaylistActivity"
+            android:label="Playlist" />
+        <activity
+            android:name=".HistoryOverviewActivity"
+            android:label="Overview of past Playlists" />
+        <activity
+            android:name=".HistoryDetailsActivity"
+            android:label="Playlist History" />
+        <activity
+            android:name=".SettingsActivity"
+            android:label="Settings" />
 
         <service
             android:name=".service.AndroidServerService"

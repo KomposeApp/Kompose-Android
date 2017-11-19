@@ -13,7 +13,11 @@ import ch.ethz.inf.vs.kompose.service.StorageService;
 
 /*
  * This fails because of "permission denied" in the test environment.
- * However it seems to work on the real app.
+ *
+ * Setting permissions for tests does not work like described on the web or
+ * in the documentation, at this point I assume the whole androidTest permission
+ * is completley fucked. No matter where or how you add the permissions, they don't get
+ * merged in the final Manifest file.
  */
 
 @RunWith(AndroidJUnit4.class)
