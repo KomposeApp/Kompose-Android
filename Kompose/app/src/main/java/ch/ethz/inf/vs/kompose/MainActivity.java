@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
      * Create an inflatable options menu in the top right corner.
      */
     @Override
-    public boolean onCreateOptionsMenu(Menu m){
+    public boolean onCreateOptionsMenu(Menu m) {
         getMenuInflater().inflate(R.menu.menu_main, m);
         return true;
     }
@@ -50,10 +50,10 @@ public class MainActivity extends AppCompatActivity {
      * Make the Settings tab call the Settings screen
      */
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.menu_settings:
-                Log.d(LOG_TAG,"Settings selected");
+                Log.d(LOG_TAG, "Settings selected");
 
                 Intent settings = new Intent(this, SettingsActivity.class);
                 this.startActivity(settings);

@@ -25,7 +25,7 @@ public class PartyCreationActivity extends AppCompatActivity {
         //TODO: Add party creation process before starting next activity
         Log.d(LOG_TAG, "Confirmation button pressed");
 
-        RepositoryFactory factory = new RepositoryFactory(this);
+        RepositoryFactory factory = new RepositoryFactory();
         SessionRepository repository = factory.getSessionRepository();
 
         // start a session as host

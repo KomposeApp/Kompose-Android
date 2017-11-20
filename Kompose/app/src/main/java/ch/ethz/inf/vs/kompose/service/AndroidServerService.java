@@ -10,15 +10,20 @@ import android.os.IBinder;
 import android.util.Log;
 
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+
+import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.enums.MessageType;
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 /**
  * Android service that starts the server.
  * First the service is registered on the network, then an AsyncTask
  * that accepts connections is launched.
  */
-public class AndroidServerService extends Service {
+public class AndroidServerService extends BaseService {
 
     private static final String LOG_TAG = "## AndroidServerService";
     private static final String SERVICE_NAME = "Kompose";
@@ -101,7 +106,7 @@ public class AndroidServerService extends Service {
         }
     }
 
-    private class ServerTask extends AsyncTask<Void,Void,Void> {
+    private class ServerTask extends AsyncTask<Void, Void, Void> {
 
         private static final String LOG_TAG = "## ServerTask";
 
@@ -111,13 +116,52 @@ public class AndroidServerService extends Service {
 
             while (!this.isCancelled()) {
                 try {
-                    Socket connection = serverSocket.accept();
+                    final Socket socket = serverSocket.accept();
                     Log.d(LOG_TAG, "message received");
-                    ServerMessageHandler severMessageHandler = new ServerMessageHandler(connection,
-                            networkService);
-                    Thread msgHandler = new Thread(severMessageHandler);
+
+                    Thread msgHandler = new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+
+                            try {
+                                Log.d(LOG_TAG, "Thread dispatched");
+                                Message msg = networkService.readMessage(socket);
+                                Log.d(LOG_TAG, "Message received (" + msg.getType() + ")");
+
+                                // TODO
+
+                                MessageType messageType = MessageType.valueOf(msg.getType());
+                                switch (messageType) {
+                                    case REGISTER_CLIENT:
+                                        break;
+                                    case UNREGISTER_CLIENT:
+                                        break;
+                                    case SESSION_UPDATE:
+                                        OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
+                                        //send stuff
+                                        break;
+                                    case REQUEST_SONG:
+                                        break;
+                                    case CAST_SKIP_SONG_VOTE:
+                                        break;
+                                    case REMOVE_SKIP_SONG_VOTE:
+                                        break;
+                                    case KEEP_ALIVE:
+                                        break;
+                                    case FINISH_SESSION:
+                                        break;
+                                    case ERROR:
+                                        break;
+                                }
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
                     msgHandler.start();
                 } catch (Exception e) {
+                    Log.d(LOG_TAG, "could not process message; exception occurred! " + e.toString());
                 }
             }
 

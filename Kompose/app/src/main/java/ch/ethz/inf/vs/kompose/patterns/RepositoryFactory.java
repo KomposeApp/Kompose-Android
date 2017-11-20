@@ -11,12 +11,6 @@ import ch.ethz.inf.vs.kompose.service.StateService;
 import ch.ethz.inf.vs.kompose.service.StorageService;
 
 public class RepositoryFactory {
-    private Context context;
-
-    public RepositoryFactory(Context context) {
-
-    }
-
     private NetworkService getNetworkService() {
         return new NetworkService(getStateService());
     }

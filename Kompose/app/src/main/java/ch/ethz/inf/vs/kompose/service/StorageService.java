@@ -16,10 +16,12 @@ import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
+
 /**
  * Service that handles loading/storing data to storage.
  */
-public class StorageService extends Service {
+public class StorageService extends BaseService {
     private static String LOG_TAG = "## StorageService";
 
     /**

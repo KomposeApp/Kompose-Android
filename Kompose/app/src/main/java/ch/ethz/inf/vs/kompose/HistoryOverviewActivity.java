@@ -15,7 +15,7 @@ public class HistoryOverviewActivity extends AppCompatActivity {
         setContentView(R.layout.activity_history_overview_placeholder);
     }
 
-    public void examineHistoryItem(){
+    public void examineHistoryItem() {
         //TODO: Select the correct item to examine out of the listview
         Log.d(LOG_TAG, "Item selected");
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);

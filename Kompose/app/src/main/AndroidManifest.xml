@@ -43,6 +43,11 @@
             android:name=".service.AndroidServerService"
             android:enabled="true"
             android:exported="true" />
+        <service android:name=".service.YoutubeService" />
+        <service android:name=".service.StorageService" />
+        <service android:name=".service.StateService" />
+        <service android:name=".service.NetworkService" />
+        <service android:name=".service.DownloadService" />
 
     </application>
 

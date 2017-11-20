@@ -10,8 +10,9 @@ import java.net.InetAddress;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class StateService extends Service {
+public class StateService extends BaseService {
     private final String DEVICE_UUID = "device_uuid";
     private final String SETTING_KEY = "kompose";
 

@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.kompose.service;
 import android.content.Context;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -13,32 +14,28 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 /*
  * Service to download a song to the file system an creating a media player.
  */
-public class SongService {
+public class DownloadService extends BaseService {
 
-    private static final String LOG_TAG = "## SongService";
-
-    public static final int DOWNLOAD_SUCCESSFUL = 0x1;
-    public static final int DOWNLOAD_FAILED = 0x2;
+    private static final String LOG_TAG = "## DownloadService";
 
     /**
      * Download the file from the specified URL and notify observers when done.
      * The notifier will carry a MediaPlayer that can be used to play the file.
      */
-    public void downloadSong(Context context,
-                             String downloadUrl,
-                             String fileName,
-                             SimpleObserver observer) {
+    public void downloadSong(String downloadUrl,
+                             String fileName) {
         try {
             URL url = new URL(downloadUrl);
             URLConnection connection = url.openConnection();
             connection.connect();
 
             InputStream input = new BufferedInputStream(connection.getInputStream());
-            File storedFile = new File(context.getCacheDir(), fileName);
+            File storedFile = new File(getCacheDir(), fileName);
             OutputStream output = new FileOutputStream(storedFile);
 
             byte[] buffer = new byte[1024];
@@ -50,11 +47,11 @@ public class SongService {
             input.close();
             output.close();
 
-            MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.fromFile(storedFile));
-            observer.notify(DOWNLOAD_SUCCESSFUL, mediaPlayer);
+            // MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.fromFile(storedFile));
+
 
         } catch (Exception e) {
-            observer.notify(DOWNLOAD_FAILED, null);
+            Log.e(LOG_TAG, "exception occured " + e);
         }
     }
 }

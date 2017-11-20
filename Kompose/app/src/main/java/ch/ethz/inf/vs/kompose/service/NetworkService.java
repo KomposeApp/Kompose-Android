@@ -19,11 +19,12 @@ import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 /**
  * Service that provides various network functionality.
  */
-public class NetworkService {
+public class NetworkService extends BaseService {
 
     public static int RESPONSE_RECEIVED = 0x1;
     public static int RESPONSE_FAILURE = 0x2;
@@ -89,7 +90,6 @@ public class NetworkService {
 
         sendMessage(msg, connectionInformation, simpleObserver);
     }
-
 
     public void sendUnRegisterClient(ConnectionDetails connectionInformation, SimpleObserver simpleObserver) {
         Message msg = getMessage(MessageType.UNREGISTER_CLIENT);
