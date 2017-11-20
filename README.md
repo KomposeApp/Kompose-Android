@@ -34,6 +34,7 @@ Task | Assigned | Status
 ServerMessageHandler | - | TODO
 SessionRepository: `getActiveSessions` (-> Service discovery in NetworkService) | - | TODO
 SessionRepository: `getPastSessions` should probably be asynchronous | - | TODO
+Implement a way for clients to listen for session updates | - | TODO
 Unit test for `SessionConverter` | Flo | *DONE*
 Unit test for `ObservableSortedList` | Lukas | *DONE*
 Settings: display selected username? | Dino | *DONE*
