@@ -11,6 +11,7 @@ import java.util.UUID;
 import at.huber.youtubeExtractor.VideoMeta;
 import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 
@@ -20,7 +21,7 @@ public class YoutubeResolveService {
 
     private static String LOG_TAG = "##YoutubeResolveService";
 
-    public void resolveSong(Context context, final String sourceUrl, final SimpleObserver observer) {
+    public void resolveSong(Context context, final String sourceUrl, final ClientModel clientModel, final SimpleObserver observer) {
         @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
             @Override
             protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
@@ -37,7 +38,7 @@ public class YoutubeResolveService {
                         long length = videoMeta.getVideoLength();
 
                         // construct song model
-                        SongModel songDetails = new SongModel(UUID.randomUUID());
+                        SongModel songDetails = new SongModel(UUID.randomUUID(), clientModel, clientModel.getPartOfSession());
                         songDetails.setTitle(title);
                         songDetails.setDownloadUrl(URI.create(downloadUrl));
                         songDetails.setThumbnailUrl(URI.create(thumbnailUrl));

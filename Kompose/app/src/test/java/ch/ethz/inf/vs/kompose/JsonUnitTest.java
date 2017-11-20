@@ -6,6 +6,7 @@ import org.junit.Test;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.base.ReflectionUnitTest;
 import ch.ethz.inf.vs.kompose.converter.ClientConverter;
 import ch.ethz.inf.vs.kompose.data.Client;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
@@ -18,7 +19,7 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
  * Created by git@famoser.ch on 19/11/2017.
  */
 
-public class JsonUnitTest {
+public class JsonUnitTest extends ReflectionUnitTest {
 
     @Test
     public void messageTest() throws Exception {
@@ -63,21 +64,5 @@ public class JsonUnitTest {
         Message actual = JsonConverter.fromMessageJsonString(challenge);
 
         verifyObject(expected, actual);
-    }
-
-
-    private <T> void verifyObject(T oldInstance, T newInstance) {
-        Class cls = oldInstance.getClass();
-        Method[] methods = cls.getDeclaredMethods();
-
-        for (Method method : methods) {
-            if (method.getName().startsWith("get")) {
-                try {
-                    Assert.assertEquals(method.invoke(oldInstance), method.invoke(newInstance));
-                } catch (Exception ex) {
-                    Assert.fail(ex.toString());
-                }
-            }
-        }
     }
 }

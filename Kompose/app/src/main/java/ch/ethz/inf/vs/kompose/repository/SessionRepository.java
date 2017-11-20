@@ -32,7 +32,7 @@ public class SessionRepository {
     }
 
     public void startSeverService() {
-        if (StateService.getInstance().deviceIsHost)  {
+        if (StateService.getInstance().deviceIsHost) {
             Intent serviceIntent = new Intent(context, AndroidServerService.class);
             context.startService(serviceIntent);
         }
@@ -49,10 +49,8 @@ public class SessionRepository {
      * creates a new session and register the host service on the network
      */
     public SessionModel startSession(String sessionName) {
-        SessionModel sessionModel = new SessionModel(UUID.randomUUID(),null, 0);
-        sessionModel.setHostUUID(StateService.getInstance().deviceUUID);
+        SessionModel sessionModel = new SessionModel(UUID.randomUUID(), StateService.getInstance().deviceUUID, null, 0);
         sessionModel.setSessionName(sessionName);
-        sessionModel.setPlaylist(new PlayListModel());
 
         StateService.getInstance().liveSession = sessionModel;
         StateService.getInstance().deviceIsHost = true;
@@ -110,10 +108,13 @@ public class SessionRepository {
         ObservableList<SessionModel> sessions = new ObservableArrayList<>();
         for (int i = 0; i < pastSessionStrings.length; i++) {
             try {
-                SessionModel sessionModel = SessionConverter.convert(
-                        JsonConverter.fromSessionJsonString(pastSessionStrings[i]));
+                SessionConverter sessionConverter = new SessionConverter();
+                SessionModel sessionModel = sessionConverter.convert(
+                        JsonConverter.fromSessionJsonString(pastSessionStrings[i])
+                );
                 sessions.add(sessionModel);
-            } catch (IOException e) { }
+            } catch (IOException e) {
+            }
         }
         return sessions;
     }

@@ -34,13 +34,15 @@ public class ServerMessageHandler implements Runnable {
             Log.d(LOG_TAG, "Message received (" + msg.getType() + ")");
 
             // TODO
+
             MessageType messageType = MessageType.valueOf(msg.getType());
             switch (messageType) {
                 case REQUEST_INFORMATION:
                     OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
                     Message response = new Message();
                     response.setType(MessageType.SESSION_UPDATE.toString());
-                    response.setSession(SessionConverter.convert(StateService.getInstance().liveSession));
+                    SessionConverter sessionConverter = new SessionConverter();
+                    response.setSession(sessionConverter.convert(StateService.getInstance().liveSession));
                     break;
                 case REGISTER_CLIENT:
                     break;

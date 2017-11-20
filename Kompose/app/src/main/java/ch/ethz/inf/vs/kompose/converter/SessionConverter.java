@@ -8,54 +8,54 @@ import ch.ethz.inf.vs.kompose.data.Client;
 import ch.ethz.inf.vs.kompose.data.Session;
 import ch.ethz.inf.vs.kompose.data.Song;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.model.PlayListModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
-public class SessionConverter {
+public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
-    public static SessionModel convert(Session session) {
+    public SessionModel convert(Session session) {
+
         SessionModel sessionModel = new SessionModel(
                 UUID.fromString(session.getUuid()),
+                UUID.fromString(session.getHostUuid()),
                 null, 0);
-
-        sessionModel.setUuid(UUID.fromString(session.getUuid()));
         sessionModel.setSessionName(session.getSessionName());
-        sessionModel.setHostUUID(UUID.fromString(session.getHostUuid()));
 
-        ObservableList<ClientModel> clients = sessionModel.getClients();
-        Client[] clientArray = session.getClients();
-        for (int i = 0; i < clientArray.length; i++) {
-            clients.add(ClientConverter.convert(clientArray[i]));
+        //convert clients
+        if (session.getClients() != null) {
+            ClientConverter clientConverter = new ClientConverter(sessionModel);
+            for (Client client : session.getClients()) {
+                sessionModel.getClients().add(clientConverter.convert(client));
+            }
         }
 
-        PlayListModel playListModel = new PlayListModel();
-        Song[] songs = session.getPlaylist();
-        ObservableList<SongModel> songModels = playListModel.getPlaylistItems();
-        for (int i = 0; i < songs.length; i++) {
-            songModels.add(SongConverter.convert(songs[i], (ClientModel[]) clients.toArray()));
+        //convert songs
+        if (session.getSongs() != null) {
+            SongConverter songConverter = new SongConverter(sessionModel.getClients());
+            for (Song song : session.getSongs()) {
+                sessionModel.getSongs().add(songConverter.convert(song));
+            }
         }
-        sessionModel.setPlaylist(playListModel);
 
-        return  sessionModel;
+        return sessionModel;
     }
 
-    public static Session convert(SessionModel sessionModel) {
+    public Session convert(SessionModel sessionModel) {
         Session session = new Session();
 
+        ClientConverter clientConverter = new ClientConverter(sessionModel);
         ObservableList<ClientModel> clientModels = sessionModel.getClients();
-        Client[] clients = new Client[clientModels.size()];
+        session.setClients(new Client[clientModels.size()]);
         for (int i = 0; i < clientModels.size(); i++) {
-            clients[i] = ClientConverter.convert(clientModels.get(i));
+            session.getClients()[i] = clientConverter.convert(clientModels.get(i));
         }
-        session.setClients(clients);
 
-        ObservableList<SongModel> songModels = sessionModel.getPlaylist().getPlaylistItems();
-        Song[] songs = new Song[songModels.size()];
+        SongConverter songConverter = new SongConverter(clientModels);
+        ObservableList<SongModel> songModels = sessionModel.getSongs();
+        session.setSongs(new Song[songModels.size()]);
         for (int i = 0; i < songModels.size(); i++) {
-            songs[i] = SongConverter.convert(songModels.get(i));
+            session.getSongs()[i] = songConverter.convert(songModels.get(i));
         }
-        session.setPlaylist(songs);
 
         session.setHostUuid(sessionModel.getHostUUID().toString());
         session.setSessionName(sessionModel.getSessionName());

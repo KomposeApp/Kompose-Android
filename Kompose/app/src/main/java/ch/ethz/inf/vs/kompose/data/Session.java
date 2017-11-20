@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class Session {
     private Client[] clients;
     private String hostUuid;
-    private Song[] playlist;
+    private Song[] songs;
     private String sessionName;
     private String uuid;
 
@@ -24,9 +24,9 @@ public class Session {
     public void setHostUuid(String value) { this.hostUuid = value; }
 
     @JsonProperty("songs")
-    public Song[] getPlaylist() { return playlist; }
+    public Song[] getSongs() { return songs; }
     @JsonProperty("songs")
-    public void setPlaylist(Song[] value) { this.playlist = value; }
+    public void setSongs(Song[] value) { this.songs = value; }
 
     @JsonProperty("session_name")
     public String getSessionName() { return sessionName; }

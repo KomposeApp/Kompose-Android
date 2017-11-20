@@ -1,20 +1,52 @@
 package ch.ethz.inf.vs.kompose.converter;
 
+import android.databinding.ObservableList;
+
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.data.Client;
 import ch.ethz.inf.vs.kompose.data.DownVote;
+import ch.ethz.inf.vs.kompose.data.Session;
 import ch.ethz.inf.vs.kompose.data.Song;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
-public class SongConverter {
+public class SongConverter implements IBaseConverter<SongModel, Song> {
 
-    public static SongModel convert(Song song, ClientModel[] clientModels) {
-        SongModel songModel = new SongModel(UUID.fromString(song.getUuid()));
+    private ClientModel[] clientModels;
+
+    public SongConverter(ClientModel[] clientModels) {
+        this.clientModels = clientModels;
+    }
+
+    public SongConverter(ObservableList<ClientModel> clientModels) {
+        if (clientModels.size() == 0) {
+            this.clientModels = new ClientModel[0];
+        } else {
+            this.clientModels = (ClientModel[]) clientModels.toArray();
+        }
+    }
+
+    public SongModel convert(Song song) {
+
+        //resolve client / session
+        ClientModel proposedBy = null;
+        SessionModel sessionModel = null;
+        UUID proposedUUID = UUID.fromString(song.getProposedByClientUuid());
+        for (ClientModel clientModel : clientModels) {
+            if (clientModel.getUuid().equals(proposedUUID)) {
+                proposedBy = clientModel;
+                sessionModel = clientModel.getPartOfSession();
+            }
+        }
+
+        //create song model
+        SongModel songModel = new SongModel(UUID.fromString(song.getUuid()), proposedBy, sessionModel);
         songModel.setTitle(song.getTitle());
         songModel.setSecondsLength(song.getLength());
 
@@ -27,49 +59,48 @@ public class SongConverter {
 
         songModel.setStatus(SongStatus.valueOf(song.getStatus()));
 
+        //create downVotes
         if (song.getDownVotes() != null) {
-            for (int i = 0; i < song.getDownVotes().length; i++) {
-                DownVoteModel model = DownVoteConverter.convert(song.getDownVotes()[i], clientModels);
-                songModel.getDownVotes().add(model);
-                if (model.getClientModel() != null && model.getClientModel().isActive()) {
-                    songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() + 1);
+            DownVoteConverter downVoteConverter = new DownVoteConverter(clientModels, songModel);
+            if (song.getDownVotes() != null) {
+                for (int i = 0; i < song.getDownVotes().length; i++) {
+                    DownVoteModel model = downVoteConverter.convert(song.getDownVotes()[i]);
+                    songModel.getDownVotes().add(model);
+                    if (model.getClientModel() != null && model.getClientModel().getIsActive()) {
+                        songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() + 1);
+                    }
                 }
             }
         }
 
-        UUID proposedUUID = UUID.fromString(song.getProposedByClientUuid());
-        for (ClientModel clientModel : clientModels) {
-            if (clientModel.getUuid().equals(proposedUUID)) {
-                songModel.setProposedBy(clientModel);
-            }
-        }
-
-
         return songModel;
     }
 
-    public static Song convert(SongModel songModel) {
+    public Song convert(SongModel songModel) {
         Song song = new Song();
 
-        song.setDownloadUrl(songModel.getDownloadUrl().toString());
+        song.setUuid(songModel.getUuid().toString());
+        song.setOrder(songModel.getOrder());
+        song.setTitle(songModel.getTitle());
+        song.setLength(songModel.getSecondsLength());
 
-        List<DownVoteModel> downvoteModels = songModel.getDownVotes();
-        DownVote[] downVotes = new DownVote[downvoteModels.size()];
+        song.setDownloadUrl(songModel.getDownloadUrl().toString());
+        song.setSourceUrl(songModel.getSourceUrl().toString());
+        song.setThumbnailUrl(songModel.getThumbnailUrl().toString());
+
+        song.setStatus(songModel.getStatus().toString());
+        song.setProposedByClientUuid(songModel.getProposedBy().getUuid().toString());
+
+        DownVoteConverter downVoteConverter = new DownVoteConverter(clientModels, songModel);
+        List<DownVoteModel> downVoteModels = songModel.getDownVotes();
+        DownVote[] downVotes = new DownVote[downVoteModels.size()];
         int i = 0;
-        for (DownVoteModel dvm : downvoteModels) {
-            downVotes[i] = DownVoteConverter.convert(dvm);
+        for (DownVoteModel dvm : downVoteModels) {
+            downVotes[i] = downVoteConverter.convert(dvm);
             i++;
         }
         song.setDownVotes(downVotes);
 
-        song.setOrder(songModel.getOrder());
-        song.setProposedByClientUuid(songModel.getProposedBy().getUuid().toString());
-        song.setSourceUrl(songModel.getSourceUrl().toString());
-        song.setStatus(songModel.getStatus().toString());
-        song.setThumbnailUrl(songModel.getThumbnailUrl().toString());
-        song.setTitle(songModel.getTitle());
-        song.setLength(songModel.getSecondsLength());
-        song.setUuid(songModel.getUuid().toString());
 
         return song;
     }
