@@ -13,7 +13,7 @@ public class ObservableSortedList<T> extends ObservableArrayList<T> {
 
     private Comparator<T> comparator;
 
-    ObservableSortedList(Comparator<T> comparator) {
+    public ObservableSortedList(Comparator<T> comparator) {
         this.comparator = comparator;
     }
 
@@ -23,7 +23,7 @@ public class ObservableSortedList<T> extends ObservableArrayList<T> {
         Iterator<T> it = super.iterator();
         int i = 0;
         while (it.hasNext()) {
-            if (comparator.compare(object, it.next()) == -1) {
+            if (comparator.compare(object, it.next()) < 0) {
                 break;
             }
             i++;
