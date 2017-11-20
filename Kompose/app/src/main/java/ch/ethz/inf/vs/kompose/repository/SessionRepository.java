@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.kompose.repository;
 
-import android.app.admin.DevicePolicyManager;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
@@ -9,17 +8,13 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Message;
-import ch.ethz.inf.vs.kompose.data.json.Session;
-import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.StateService;
 import ch.ethz.inf.vs.kompose.service.StorageService;
 
-public class SessionRepository implements SimpleObserver {
+public class SessionRepository {
 
     private NetworkService networkService;
     private StorageService storageService;
@@ -55,7 +50,7 @@ public class SessionRepository implements SimpleObserver {
      */
     public void joinSession(SessionModel session, String deviceName) {
         stateService.setLiveSession(session);
-        networkService.sendRegisterClient(session.getConnectionDetails(), deviceName, this);
+        networkService.sendRegisterClient(session.getConnectionDetails(), deviceName);
     }
 
     /**
@@ -94,15 +89,5 @@ public class SessionRepository implements SimpleObserver {
             }
         }
         return sessions;
-    }
-
-    @Override
-    public void notify(int message, Object payload) {
-
-    }
-
-    @Override
-    public void notify(int message) {
-
     }
 }

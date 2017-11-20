@@ -1,8 +1,5 @@
 package ch.ethz.inf.vs.kompose.service;
 
-import android.content.Context;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -13,7 +10,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 /*

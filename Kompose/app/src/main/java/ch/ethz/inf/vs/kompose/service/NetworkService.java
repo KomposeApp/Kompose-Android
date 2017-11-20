@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -9,16 +10,13 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Observer;
 
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 /**
@@ -26,8 +24,9 @@ import ch.ethz.inf.vs.kompose.service.base.BaseService;
  */
 public class NetworkService extends BaseService {
 
-    public static int RESPONSE_RECEIVED = 0x1;
-    public static int RESPONSE_FAILURE = 0x2;
+    private final String LOG_TAG = "## NetworkService";
+    public static final String RESPONSE_RECEIVED = "NetworkService.RESPONSE_RECEIVED";
+    public static final String RESPONSE_FAILURE = "NetworkService.RESPONSE_FAILURE";
     private StateService stateService;
 
     public NetworkService(StateService stateService) {
@@ -57,97 +56,96 @@ public class NetworkService extends BaseService {
         return msg;
     }
 
-    public void sendRegisterClient(ConnectionDetails connectionInformation, String username, SimpleObserver simpleObserver) {
+    public void sendRegisterClient(ConnectionDetails connectionInformation, String username) {
         Message msg = getMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendCastSkipSongVote(ConnectionDetails connectionInformation, Song song, SimpleObserver simpleObserver) {
+    public void sendCastSkipSongVote(ConnectionDetails connectionInformation, Song song) {
         Message msg = getMessage(MessageType.CAST_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendRemoveSkipSongVote(ConnectionDetails connectionInformation, Song song, SimpleObserver simpleObserver) {
+    public void sendRemoveSkipSongVote(ConnectionDetails connectionInformation, Song song) {
         Message msg = getMessage(MessageType.REMOVE_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendKeepAlive(ConnectionDetails connectionInformation, SimpleObserver simpleObserver) {
+    public void sendKeepAlive(ConnectionDetails connectionInformation) {
         Message msg = getMessage(MessageType.KEEP_ALIVE);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendRequestSong(ConnectionDetails connectionInformation, Song song, SimpleObserver simpleObserver) {
+    public void sendRequestSong(ConnectionDetails connectionInformation, Song song) {
         Message msg = getMessage(MessageType.REQUEST_SONG);
         msg.setSongDetails(song);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendUnRegisterClient(ConnectionDetails connectionInformation, SimpleObserver simpleObserver) {
+    public void sendUnRegisterClient(ConnectionDetails connectionInformation) {
         Message msg = getMessage(MessageType.UNREGISTER_CLIENT);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendSessionUpdate(ConnectionDetails connectionInformation, Session session, SimpleObserver simpleObserver) {
+    public void sendSessionUpdate(ConnectionDetails connectionInformation, Session session) {
         Message msg = getMessage(MessageType.SESSION_UPDATE);
         msg.setSession(session);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendError(ConnectionDetails connectionInformation, String error, SimpleObserver simpleObserver) {
+    public void sendError(ConnectionDetails connectionInformation, String error) {
         Message msg = getMessage(MessageType.ERROR);
         msg.setErrorMessage(error);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
-    public void sendFinishSession(ConnectionDetails connectionInformation, SimpleObserver simpleObserver) {
+    public void sendFinishSession(ConnectionDetails connectionInformation) {
         Message msg = getMessage(MessageType.FINISH_SESSION);
 
-        sendMessage(msg, connectionInformation, simpleObserver);
+        sendMessage(msg, connectionInformation);
     }
 
     /**
      * Send a message to a host.
      *
-     * @param msg              The message to be sent.
-     * @param preview          The connection info about the session
-     * @param responseObserver An observer that will get notified when a response is received.
-     *                         If null, no response is expected.
+     * @param msg     The message to be sent.
+     * @param preview The connection info about the session
+     *                If null, no response is expected.
      */
     private void sendMessage(Message msg,
-                             ConnectionDetails preview,
-                             SimpleObserver responseObserver) {
-        AsyncSender asyncSender = new AsyncSender(msg, preview.getHostIP(), preview.getHostPort(), responseObserver);
+                             ConnectionDetails preview) {
+        AsyncSender asyncSender = new AsyncSender(msg, preview.getHostIP(), preview.getHostPort());
         asyncSender.execute();
     }
 
-    private static class AsyncSender extends AsyncTask<Void, Void, Void> {
+    private class AsyncSender extends AsyncTask<Void, Void, Void> {
+
+        private final String LOG_TAG = "## AsyncSender";
 
         InetAddress hostIP;
         int hostPort;
         Message message;
-        SimpleObserver responseObserver;
 
-        public AsyncSender(Message msg, InetAddress ip, int port, SimpleObserver responseObserver) {
+        public AsyncSender(Message msg, InetAddress ip, int port) {
             this.message = msg;
             this.hostIP = ip;
             this.hostPort = port;
-            this.responseObserver = responseObserver;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
+            Intent intent = null;
             try {
                 Socket socket = new Socket(hostIP, hostPort);
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
@@ -160,26 +158,32 @@ public class NetworkService extends BaseService {
                 printWriter.close();
 
                 // await response
-                if (responseObserver != null) {
-                    socket.setSoTimeout(2000);
-                    StringBuilder json = new StringBuilder();
-                    char[] buffer = new char[1024];
-                    int bytesRead;
-                    while ((bytesRead = input.read(buffer)) != -1) {
-                        json.append(new String(buffer, 0, bytesRead));
-                    }
-                    Log.d("## NetworkService", "response from host: " + json.toString());
-                    Message response = JsonConverter.fromMessageJsonString(json.toString());
-                    responseObserver.notify(RESPONSE_RECEIVED, response);
+
+                socket.setSoTimeout(2000);
+                StringBuilder json = new StringBuilder();
+                char[] buffer = new char[1024];
+                int bytesRead;
+                while ((bytesRead = input.read(buffer)) != -1) {
+                    json.append(new String(buffer, 0, bytesRead));
                 }
+                Log.d(LOG_TAG, "response from host: " + json.toString());
+
+                intent = new Intent(NetworkService.RESPONSE_RECEIVED);
+                intent.putExtra("json", json.toString());
+
 
                 input.close();
                 socket.close();
             } catch (IOException e) {
-                if (responseObserver != null) {
-                    responseObserver.notify(RESPONSE_FAILURE, null);
+                Log.d(LOG_TAG, "exception occurred " + e.toString());
+            } finally {
+                if (intent == null) {
+                    intent = new Intent(NetworkService.RESPONSE_FAILURE);
                 }
             }
+
+            sendBroadcast(intent);
+
             return null;
         }
     }

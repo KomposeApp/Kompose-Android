@@ -1,15 +1,12 @@
 package ch.ethz.inf.vs.kompose.repository;
 
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
-import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.StateService;
 
-public class SongRepository implements SimpleObserver {
+public class SongRepository {
 
     private NetworkService networkService;
     private StateService stateService;
@@ -27,7 +24,7 @@ public class SongRepository implements SimpleObserver {
     public void requestNewSong(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        networkService.sendRequestSong(stateService.getLiveSession().getConnectionDetails(), song, this);
+        networkService.sendRequestSong(stateService.getLiveSession().getConnectionDetails(), song);
     }
 
     /**
@@ -38,7 +35,7 @@ public class SongRepository implements SimpleObserver {
     public void castSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        networkService.sendCastSkipSongVote(stateService.getLiveSession().getConnectionDetails(), song, this);
+        networkService.sendCastSkipSongVote(stateService.getLiveSession().getConnectionDetails(), song);
     }
 
     /**
@@ -49,16 +46,6 @@ public class SongRepository implements SimpleObserver {
     public void removeSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        networkService.sendRemoveSkipSongVote(stateService.getLiveSession().getConnectionDetails(), song, this);
-    }
-
-    @Override
-    public void notify(int message, Object payload) {
-
-    }
-
-    @Override
-    public void notify(int message) {
-
+        networkService.sendRemoveSkipSongVote(stateService.getLiveSession().getConnectionDetails(), song);
     }
 }
