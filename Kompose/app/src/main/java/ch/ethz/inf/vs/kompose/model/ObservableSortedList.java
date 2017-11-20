@@ -31,4 +31,9 @@ public class ObservableSortedList<T> extends ObservableArrayList<T> {
         super.add(i, object);
         return true;
     }
+
+    @Override
+    public void add(int index, T object) {
+        add(object);
+    }
 }
