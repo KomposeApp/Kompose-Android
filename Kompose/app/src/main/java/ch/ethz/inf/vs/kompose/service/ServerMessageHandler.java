@@ -3,7 +3,6 @@ package ch.ethz.inf.vs.kompose.service;
 import android.util.Log;
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 

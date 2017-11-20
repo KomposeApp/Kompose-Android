@@ -3,8 +3,6 @@ package ch.ethz.inf.vs.kompose.repository;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.Message;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.StateService;

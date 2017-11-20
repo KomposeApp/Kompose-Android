@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
-import android.net.Network;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -10,7 +9,6 @@ import android.widget.EditText;
 
 import ch.ethz.inf.vs.kompose.repository.SessionRepository;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
-import ch.ethz.inf.vs.kompose.service.StateService;
 
 public class PartyCreationActivity extends AppCompatActivity {
 

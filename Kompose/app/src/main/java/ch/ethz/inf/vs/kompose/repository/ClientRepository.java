@@ -1,24 +1,12 @@
 package ch.ethz.inf.vs.kompose.repository;
 
-import android.content.Context;
-import android.content.Intent;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
-import java.io.IOException;
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.converter.SessionConverter;
-import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.Message;
-import ch.ethz.inf.vs.kompose.data.Session;
-import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.AndroidServerService;
-import ch.ethz.inf.vs.kompose.service.NetworkService;
-import ch.ethz.inf.vs.kompose.service.StateService;
-import ch.ethz.inf.vs.kompose.service.StorageService;
 
 public class ClientRepository {
     /**
