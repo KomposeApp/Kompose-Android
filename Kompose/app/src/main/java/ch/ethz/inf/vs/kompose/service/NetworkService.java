@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -10,6 +11,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
@@ -27,31 +29,15 @@ public class NetworkService extends BaseService {
     private final String LOG_TAG = "## NetworkService";
     public static final String RESPONSE_RECEIVED = "NetworkService.RESPONSE_RECEIVED";
     public static final String RESPONSE_FAILURE = "NetworkService.RESPONSE_FAILURE";
-    private StateService stateService;
 
-    public NetworkService(StateService stateService) {
-        this.stateService = stateService;
-    }
+    private final String DEVICE_UUID = "device_uuid";
+    private final String SETTING_KEY = "kompose";
 
-    public Message readMessage(Socket connection) throws IOException {
-        BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder json = new StringBuilder();
 
-        char[] buffer = new char[1024];
-        int bytesRead;
-        while ((bytesRead = input.read(buffer)) != -1) {
-            json.append(new String(buffer, 0, bytesRead));
-        }
-        Log.d("## NetworkService", "message read from stream: " + json.toString());
-
-        Message message = JsonConverter.fromMessageJsonString(json.toString());
-        input.close();
-        return message;
-    }
 
     private Message getMessage(MessageType type) {
         Message msg = new Message();
-        msg.setSenderUuid(stateService.getDeviceUUID().toString());
+        msg.setSenderUuid(getDeviceUUID());
         msg.setType(type.toString());
         return msg;
     }
@@ -123,8 +109,7 @@ public class NetworkService extends BaseService {
      * @param preview The connection info about the session
      *                If null, no response is expected.
      */
-    private void sendMessage(Message msg,
-                             ConnectionDetails preview) {
+    private void sendMessage(Message msg, ConnectionDetails preview) {
         AsyncSender asyncSender = new AsyncSender(msg, preview.getHostIP(), preview.getHostPort());
         asyncSender.execute();
     }
@@ -171,7 +156,6 @@ public class NetworkService extends BaseService {
                 intent = new Intent(NetworkService.RESPONSE_RECEIVED);
                 intent.putExtra("json", json.toString());
 
-
                 input.close();
                 socket.close();
             } catch (IOException e) {
@@ -186,5 +170,32 @@ public class NetworkService extends BaseService {
 
             return null;
         }
+    }
+
+
+    private String deviceUUID;
+
+    public String getDeviceUUID() {
+        boolean newDeviceUUID = false;
+
+        synchronized (this) {
+            if (deviceUUID == null) {
+                SharedPreferences preferences = getSharedPreferences(SETTING_KEY, MODE_PRIVATE);
+                if (!preferences.contains(DEVICE_UUID)) {
+                    deviceUUID = UUID.randomUUID().toString();
+                    newDeviceUUID = true;
+                } else {
+                    deviceUUID = preferences.getString(DEVICE_UUID, null);
+                }
+            }
+        }
+
+        if (newDeviceUUID) {
+            SharedPreferences.Editor editor = getSharedPreferences(SETTING_KEY, MODE_PRIVATE).edit();
+            editor.putString(DEVICE_UUID, deviceUUID);
+            editor.apply();
+        }
+
+        return deviceUUID;
     }
 }

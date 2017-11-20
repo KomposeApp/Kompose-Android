@@ -13,10 +13,6 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class StateService extends BaseService {
-    private final String DEVICE_UUID = "device_uuid";
-    private final String SETTING_KEY = "kompose";
-
-    private UUID deviceUUID;
 
     private SessionModel liveSession;
 
@@ -26,38 +22,5 @@ public class StateService extends BaseService {
 
     public void setLiveSession(SessionModel liveSession) {
         this.liveSession = liveSession;
-    }
-
-    private SharedPreferences getPreferences() {
-        return getSharedPreferences(SETTING_KEY, MODE_PRIVATE);
-    }
-
-    public UUID getDeviceUUID() {
-        boolean newDeviceUUID = false;
-
-        synchronized (this) {
-            if (deviceUUID == null) {
-                if (!getPreferences().contains(DEVICE_UUID)) {
-                    deviceUUID = UUID.randomUUID();
-                    newDeviceUUID = true;
-                } else {
-                    deviceUUID = UUID.fromString(getPreferences().getString(DEVICE_UUID, null));
-                }
-            }
-        }
-
-        if (newDeviceUUID) {
-            SharedPreferences.Editor editor = getPreferences().edit();
-            editor.putString(DEVICE_UUID, deviceUUID.toString());
-            editor.apply();
-        }
-
-        return deviceUUID;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 }

@@ -22,8 +22,7 @@ public class Song implements Parcelable {
     private int lengthInSeconds;
     private String uuid;
 
-    public Song() {
-    }
+    public Song() {}
 
     public Song(Parcel in) {
         downloadUrl = in.readString();
@@ -35,6 +34,24 @@ public class Song implements Parcelable {
         title = in.readString();
         lengthInSeconds = in.readInt();
         uuid = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(downloadUrl);
+        dest.writeInt(order);
+        dest.writeString(proposedByClientUuid);
+        dest.writeString(sourceUrl);
+        dest.writeString(status);
+        dest.writeString(thumbnailUrl);
+        dest.writeString(title);
+        dest.writeInt(lengthInSeconds);
+        dest.writeString(uuid);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<Song> CREATOR = new Creator<Song>() {
@@ -147,23 +164,5 @@ public class Song implements Parcelable {
     @JsonProperty("length_in_seconds")
     public void setLengthInSeconds(int lengthInSeconds) {
         this.lengthInSeconds = lengthInSeconds;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(downloadUrl);
-        dest.writeInt(order);
-        dest.writeString(proposedByClientUuid);
-        dest.writeString(sourceUrl);
-        dest.writeString(status);
-        dest.writeString(thumbnailUrl);
-        dest.writeString(title);
-        dest.writeInt(lengthInSeconds);
-        dest.writeString(uuid);
     }
 }

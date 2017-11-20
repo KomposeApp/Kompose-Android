@@ -8,4 +8,5 @@
     <string name="setting_preload">Number of songs to preload:</string>
     <string name="setting_username">Username:</string>
     <string name="settings_confirm">Confirm Changes</string>
+    <string name="youtube_service.download_failed">could not resolve the song details :(</string>
 </resources>

@@ -23,8 +23,8 @@ public class DownloadService extends BaseService {
      * Download the file from the specified URL and notify observers when done.
      * The notifier will carry a MediaPlayer that can be used to play the file.
      */
-    public void downloadSong(String downloadUrl,
-                             String fileName) {
+    public boolean downloadSong(String downloadUrl,
+                                String fileName) {
         try {
             URL url = new URL(downloadUrl);
             URLConnection connection = url.openConnection();
@@ -45,9 +45,10 @@ public class DownloadService extends BaseService {
 
             // MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.fromFile(storedFile));
 
-
+            return true;
         } catch (Exception e) {
             Log.e(LOG_TAG, "exception occured " + e);
         }
+        return false;
     }
 }

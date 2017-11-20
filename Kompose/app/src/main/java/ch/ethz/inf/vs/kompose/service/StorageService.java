@@ -63,16 +63,21 @@ public class StorageService extends BaseService {
         return false;
     }
 
-    private String readFile(File file) throws Exception {
-        FileInputStream input = new FileInputStream(file);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-        StringBuilder stringBuilder = new StringBuilder();
-        String line = null;
-        while ((line = reader.readLine()) != null) {
-            stringBuilder.append(line).append("\n");
+    private String readFile(File file) {
+        try {
+            FileInputStream input = new FileInputStream(file);
+            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+            StringBuilder stringBuilder = new StringBuilder();
+            String line = null;
+            while ((line = reader.readLine()) != null) {
+                stringBuilder.append(line).append("\n");
+            }
+            input.close();
+            return stringBuilder.toString();
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.toString());
         }
-        input.close();
-        return stringBuilder.toString();
+        return null;
     }
 
     /**
@@ -117,24 +122,17 @@ public class StorageService extends BaseService {
      * @return a string with the file content
      */
     public String retrieveFile(String directory, String fileName) {
-        String child = fileName;
-        if (directory != null && directory.length() > 0) {
-            child = directory + "/" + fileName;
-        }
-
-        File file = new File(getFilesDir(), child);
-        String content = null;
         try {
-            content = readFile(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return content;
-    }
+            String child = fileName;
+            if (directory != null && directory.length() > 0) {
+                child = directory + "/" + fileName;
+            }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
+            File file = new File(getFilesDir(), child);
+            return readFile(file);
+        } catch (Exception e) {
+            Log.e(LOG_TAG, e.toString());
+        }
         return null;
     }
 }

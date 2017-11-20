@@ -9,12 +9,16 @@ import android.os.AsyncTask;
 import android.os.IBinder;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
@@ -29,7 +33,8 @@ public class AndroidServerService extends BaseService {
     private static final String SERVICE_NAME = "Kompose";
     private static final String SERVICE_TYPE = "_http._tcp";
 
-    private NetworkService networkService;
+    public static final String FOUND_SERVICE = "AndroidServerService.FOUND_SERVICE";
+
     private ServerSocket serverSocket;
     private int localPort;
     private String serviceName;
@@ -77,16 +82,16 @@ public class AndroidServerService extends BaseService {
         serverTask.cancel(true);
     }
 
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
     private class ServerRegistrationListener implements NsdManager.RegistrationListener {
 
         @Override
         public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) {
             serviceName = NsdServiceInfo.getServiceName();
+
+            Intent intent = new Intent(FOUND_SERVICE);
+            intent.putExtra("info", NsdServiceInfo);
+            sendBroadcast(intent);
+
             Log.d(LOG_TAG, "Service registered: " + serviceName);
         }
 
@@ -110,6 +115,22 @@ public class AndroidServerService extends BaseService {
 
         private static final String LOG_TAG = "## ServerTask";
 
+        private Message readMessage(Socket connection) throws IOException {
+            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder json = new StringBuilder();
+
+            char[] buffer = new char[1024];
+            int bytesRead;
+            while ((bytesRead = input.read(buffer)) != -1) {
+                json.append(new String(buffer, 0, bytesRead));
+            }
+            Log.d(LOG_TAG, "message read from stream: " + json.toString());
+
+            Message message = JsonConverter.fromMessageJsonString(json.toString());
+            input.close();
+            return message;
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
             Log.d(LOG_TAG, "Server ready to receive connections");
@@ -125,7 +146,7 @@ public class AndroidServerService extends BaseService {
 
                             try {
                                 Log.d(LOG_TAG, "Thread dispatched");
-                                Message msg = networkService.readMessage(socket);
+                                Message msg = readMessage(socket);
                                 Log.d(LOG_TAG, "Message received (" + msg.getType() + ")");
 
                                 // TODO

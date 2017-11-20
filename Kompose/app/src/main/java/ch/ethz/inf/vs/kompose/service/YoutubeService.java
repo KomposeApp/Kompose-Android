@@ -9,14 +9,13 @@ import at.huber.youtubeExtractor.VideoMeta;
 import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
 import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class YoutubeService extends BaseService {
 
     //intent events
-    public final static String DOWNLOAD_FINISHED =
-            "YoutubeService.DOWNLOAD_FINISHED";
+    public final static String DOWNLOAD_SUCCESSFUL =
+            "YoutubeService.DOWNLOAD_SUCCESSFUL";
     public final static String DOWNLOAD_FAILED =
             "YoutubeService.DOWNLOAD_FAILED";
 
@@ -48,7 +47,7 @@ public class YoutubeService extends BaseService {
                         song.setLengthInSeconds((int) length);
 
                         // notify observer & terminate
-                        intent = new Intent(DOWNLOAD_FINISHED);
+                        intent = new Intent(DOWNLOAD_SUCCESSFUL);
                         intent.putExtra("songDetails", song);
                     }
                 } catch (Exception ex) {
