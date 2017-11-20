@@ -1,18 +1,22 @@
 package ch.ethz.inf.vs.kompose.repository;
 
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
-import ch.ethz.inf.vs.kompose.data.Message;
+import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.StateService;
 
-public class SongRepository {
+public class SongRepository implements SimpleObserver {
 
     private NetworkService networkService;
+    private StateService stateService;
 
-    public SongRepository(NetworkService networkService) {
+    public SongRepository(NetworkService networkService, StateService stateService) {
         this.networkService = networkService;
+        this.stateService = stateService;
     }
 
     /**
@@ -21,14 +25,9 @@ public class SongRepository {
      * @param songModel the new song which should be included in the playlist
      */
     public void requestNewSong(SongModel songModel) {
-        Message msg = new Message();
-        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
-        msg.setSongDetails(songConverter.convert(songModel));
-        msg.setType(MessageType.REQUEST_SONG.toString());
-
-        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
-                StateService.getInstance().liveSession.getHostPort(), null);
+        Song song = songConverter.convert(songModel);
+        networkService.sendRequestSong(stateService.getLiveSession().getConnectionDetails(), song, this);
     }
 
     /**
@@ -36,15 +35,10 @@ public class SongRepository {
      *
      * @param songModel the song which is disliked
      */
-    public void downVoteSong(SongModel songModel) {
-        Message msg = new Message();
-        msg.setType(MessageType.CAST_SKIP_SONG_VOTE.toString());
-        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
+    public void castSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
-        msg.setSongDetails(songConverter.convert(songModel));
-
-        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
-                StateService.getInstance().liveSession.getHostPort(), null);
+        Song song = songConverter.convert(songModel);
+        networkService.sendCastSkipSongVote(stateService.getLiveSession().getConnectionDetails(), song, this);
     }
 
     /**
@@ -52,14 +46,19 @@ public class SongRepository {
      *
      * @param songModel Song for which the downvote is revoked
      */
-    public void removeDownVoteSong(SongModel songModel) {
-        Message msg = new Message();
-        msg.setType(MessageType.REMOVE_SKIP_SONG_VOTE.toString());
-        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
+    public void removeSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
-        msg.setSongDetails(songConverter.convert(songModel));
+        Song song = songConverter.convert(songModel);
+        networkService.sendRemoveSkipSongVote(stateService.getLiveSession().getConnectionDetails(), song, this);
+    }
 
-        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
-                StateService.getInstance().liveSession.getHostPort(), null);
+    @Override
+    public void notify(int message, Object payload) {
+
+    }
+
+    @Override
+    public void notify(int message) {
+
     }
 }

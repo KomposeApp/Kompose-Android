@@ -2,27 +2,17 @@ package ch.ethz.inf.vs.kompose;
 
 import android.databinding.BaseObservable;
 
-import org.joda.time.DateTime;
-import org.junit.Assert;
 import org.junit.Test;
-
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.converter.ClientConverter;
 import ch.ethz.inf.vs.kompose.converter.DownVoteConverter;
 import ch.ethz.inf.vs.kompose.converter.IBaseConverter;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
-import ch.ethz.inf.vs.kompose.data.Client;
-import ch.ethz.inf.vs.kompose.data.DownVote;
-import ch.ethz.inf.vs.kompose.data.Session;
-import ch.ethz.inf.vs.kompose.data.Song;
-import ch.ethz.inf.vs.kompose.enums.SongStatus;
+import ch.ethz.inf.vs.kompose.data.json.Client;
+import ch.ethz.inf.vs.kompose.data.json.DownVote;
+import ch.ethz.inf.vs.kompose.data.json.Session;
+import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.base.ReflectionUnitTest;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -46,7 +36,7 @@ public class ConverterUnitTest extends ReflectionUnitTest {
 
     @Test
     public void testConverters() throws Exception {
-        SessionModel sessionModel = new SessionModel(sampleUUID, sampleUUID, null, 0);
+        SessionModel sessionModel = new SessionModel(sampleUUID, sampleUUID);
         ClientModel clientModel = new ClientModel(sampleUUID, sessionModel);
         ClientModel[] clientModels = new ClientModel[]{clientModel};
         SongModel songModel = new SongModel(sampleUUID, clientModel, sessionModel);

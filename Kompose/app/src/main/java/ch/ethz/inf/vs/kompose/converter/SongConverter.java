@@ -6,8 +6,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.data.DownVote;
-import ch.ethz.inf.vs.kompose.data.Song;
+import ch.ethz.inf.vs.kompose.data.json.DownVote;
+import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;

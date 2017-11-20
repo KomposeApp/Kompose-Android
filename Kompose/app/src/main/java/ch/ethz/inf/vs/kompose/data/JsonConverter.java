@@ -14,6 +14,9 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 
+import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.data.json.Session;
+
 public class JsonConverter {
 
     public static Message fromMessageJsonString(String json) throws IOException {

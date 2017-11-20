@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.repository;
 
-import android.content.Context;
-import android.content.Intent;
+import android.app.admin.DevicePolicyManager;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
@@ -10,50 +9,42 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.Message;
+import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.AndroidServerService;
+import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.StateService;
 import ch.ethz.inf.vs.kompose.service.StorageService;
 
-public class SessionRepository {
+public class SessionRepository implements SimpleObserver {
 
-    private Context context;
     private NetworkService networkService;
+    private StorageService storageService;
+    private StateService stateService;
 
-    public SessionRepository(Context context,
-                             NetworkService networkService) {
-        this.context = context;
+    public SessionRepository(NetworkService networkService, StorageService storageService, StateService stateService) {
         this.networkService = networkService;
-    }
-
-    public void startSeverService() {
-        if (StateService.getInstance().deviceIsHost) {
-            Intent serviceIntent = new Intent(context, AndroidServerService.class);
-            context.startService(serviceIntent);
-        }
-    }
-
-    public void stopServerService() {
-        if (StateService.getInstance().deviceIsHost) {
-            Intent serviceIntent = new Intent(context, AndroidServerService.class);
-            context.stopService(serviceIntent);
-        }
+        this.storageService = storageService;
+        this.stateService = stateService;
     }
 
     /**
      * creates a new session and register the host service on the network
      */
-    public SessionModel startSession(String sessionName) {
-        SessionModel sessionModel = new SessionModel(UUID.randomUUID(), StateService.getInstance().deviceUUID, null, 0);
+    public SessionModel startSession(String sessionName, String clientName) {
+        SessionModel sessionModel = new SessionModel(UUID.randomUUID(), stateService.getDeviceUUID());
         sessionModel.setSessionName(sessionName);
 
-        StateService.getInstance().liveSession = sessionModel;
-        StateService.getInstance().deviceIsHost = true;
+        ClientModel clientModel = new ClientModel(stateService.getDeviceUUID(), sessionModel);
+        clientModel.setName(clientName);
+        clientModel.setIsActive(true);
 
-        startSeverService();
+        sessionModel.getClients().add(clientModel);
+
+        //todo: start session
         return sessionModel;
     }
 
@@ -62,26 +53,16 @@ public class SessionRepository {
      *
      * @param session the session you want to join
      */
-    public void joinSession(SessionModel session) {
-        Message msg = new Message();
-        msg.setType(MessageType.REGISTER_CLIENT.toString());
-        msg.setSenderUsername(StateService.getInstance().localUsername);
-        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
-
-        networkService.sendMessage(msg, session.getHostIP(), session.getHostPort(), null);
+    public void joinSession(SessionModel session, String deviceName) {
+        stateService.setLiveSession(session);
+        networkService.sendRegisterClient(session.getConnectionDetails(), deviceName, this);
     }
 
     /**
      * leaves the currently active session
      */
-    public void leaveSession() {
-        Message msg = new Message();
-        msg.setType(MessageType.UNREGISTER_CLIENT.toString());
-        msg.setSenderUsername(StateService.getInstance().localUsername);
-        msg.setSenderUuid(StateService.getInstance().deviceUUID.toString());
+    public void leaveSession(SessionModel sessionModel) {
 
-        networkService.sendMessage(msg, StateService.getInstance().liveSession.getHostIP(),
-                StateService.getInstance().liveSession.getHostPort(), null);
     }
 
     /**
@@ -100,8 +81,6 @@ public class SessionRepository {
      * @return collection of all saves sessions
      */
     public ObservableList<SessionModel> getPastSessions() {
-        // TODO: is this fast enough?
-        StorageService storageService = new StorageService(context);
         String[] pastSessionStrings = storageService.retrieveAllFiles("session_archive");
         ObservableList<SessionModel> sessions = new ObservableArrayList<>();
         for (int i = 0; i < pastSessionStrings.length; i++) {
@@ -115,5 +94,15 @@ public class SessionRepository {
             }
         }
         return sessions;
+    }
+
+    @Override
+    public void notify(int message, Object payload) {
+
+    }
+
+    @Override
+    public void notify(int message) {
+
     }
 }

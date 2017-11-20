@@ -1,7 +1,11 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.annotation.SuppressLint;
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -15,14 +19,14 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 
-public class YoutubeService {
+public class YoutubeService extends Service {
     public static final int SONG_RESOLVED_SUCCESSFULLY = 0x1;
     public static final int SONG_RESOLVING_ERROR = 0x2;
 
     private static String LOG_TAG = "##YoutubeService";
 
-    public void resolveSong(Context context, final String sourceUrl, final ClientModel clientModel, final SimpleObserver observer) {
-        @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
+    public void resolveSong(final String sourceUrl, final ClientModel clientModel, final SimpleObserver observer) {
+        @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(this) {
             @Override
             protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
                 try {
@@ -57,5 +61,11 @@ public class YoutubeService {
             }
         };
         youTubeExtractor.extract(sourceUrl, true, false);
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

@@ -5,7 +5,7 @@ import org.joda.time.format.ISODateTimeFormat;
 
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.data.DownVote;
+import ch.ethz.inf.vs.kompose.data.json.DownVote;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;

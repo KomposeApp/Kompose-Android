@@ -4,30 +4,26 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
+import android.net.wifi.p2p.WifiP2pManager;
 
 import java.net.InetAddress;
 import java.util.Comparator;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 
 public class SessionModel extends BaseObservable {
 
-    public SessionModel(UUID uuid, UUID hostUUID,
-                        InetAddress hostIP,
-                        int hostPort) {
+    public SessionModel(UUID uuid, UUID hostUUID) {
         this.uuid = uuid;
         this.hostUUID = hostUUID;
-        this.hostIP = hostIP;
-        this.hostPort = hostPort;
     }
 
     private UUID uuid;
     private String sessionName;
-
     private UUID hostUUID;
-    private InetAddress hostIP;
-    private int hostPort;
+    private ConnectionDetails connectionDetails;
 
     private final ObservableList<ClientModel> clients = new ObservableArrayList<>();
 
@@ -36,6 +32,14 @@ public class SessionModel extends BaseObservable {
 
     public ObservableList<SongModel> getSongs() {
         return songs;
+    }
+
+    public ConnectionDetails getConnectionDetails() {
+        return connectionDetails;
+    }
+
+    public void setConnectionDetails(ConnectionDetails connectionDetails) {
+        this.connectionDetails = connectionDetails;
     }
 
     private class SongComparator implements Comparator<SongModel> {
@@ -65,14 +69,5 @@ public class SessionModel extends BaseObservable {
 
     public ObservableList<ClientModel> getClients() {
         return clients;
-    }
-
-    public InetAddress getHostIP() {
-        return hostIP;
-    }
-
-    public int getHostPort() {
-
-        return hostPort;
     }
 }

@@ -1,6 +1,10 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.app.Service;
 import android.content.Context;
+import android.content.Intent;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -8,20 +12,15 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * Service that handles loading/storing data to storage.
  */
-public class StorageService {
+public class StorageService extends Service {
     private static String LOG_TAG = "## StorageService";
-
-    private Context context;
-
-    public StorageService(Context context) {
-        this.context = context;
-    }
 
     /**
      * Persists the file to internal storage
@@ -37,7 +36,7 @@ public class StorageService {
 
             // create directory
             if (directory != null && directory.length() > 0) {
-                File dir = new File(context.getFilesDir(), directory);
+                File dir = new File(getFilesDir(), directory);
                 if (!dir.exists()) {
                     if (!dir.mkdir()) {
                         return false;
@@ -48,7 +47,7 @@ public class StorageService {
 
             // create file
             Log.d(LOG_TAG, "writing file: " + child);
-            File file = new File(context.getFilesDir(), child);
+            File file = new File(getFilesDir(), child);
 
             // write to storage
             FileOutputStream outputStream = new FileOutputStream(file);
@@ -81,7 +80,7 @@ public class StorageService {
      * @return an array of strings with the file contents
      */
     public String[] retrieveAllFiles(String directory) {
-        File file = new File(context.getFilesDir(), directory);
+        File file = new File(getFilesDir(), directory);
         if (!file.exists() || !file.isDirectory()) {
             return null;
         }
@@ -121,7 +120,7 @@ public class StorageService {
             child = directory + "/" + fileName;
         }
 
-        File file = new File(context.getFilesDir(), child);
+        File file = new File(getFilesDir(), child);
         String content = null;
         try {
             content = readFile(file);
@@ -129,5 +128,11 @@ public class StorageService {
             e.printStackTrace();
         }
         return content;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

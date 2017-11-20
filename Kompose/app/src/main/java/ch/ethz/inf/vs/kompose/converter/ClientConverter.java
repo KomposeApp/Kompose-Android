@@ -2,7 +2,7 @@ package ch.ethz.inf.vs.kompose.converter;
 
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.data.Client;
+import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 

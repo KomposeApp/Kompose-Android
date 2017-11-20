@@ -1,19 +1,14 @@
 package ch.ethz.inf.vs.kompose;
 
-import org.junit.Assert;
 import org.junit.Test;
 
-import java.lang.reflect.Method;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.base.ReflectionUnitTest;
-import ch.ethz.inf.vs.kompose.converter.ClientConverter;
-import ch.ethz.inf.vs.kompose.data.Client;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.Message;
-import ch.ethz.inf.vs.kompose.data.Session;
+import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
 
 /**
  * Created by git@famoser.ch on 19/11/2017.

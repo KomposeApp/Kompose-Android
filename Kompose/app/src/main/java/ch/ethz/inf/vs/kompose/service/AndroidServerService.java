@@ -22,7 +22,7 @@ public class AndroidServerService extends Service {
 
     private static final String LOG_TAG = "## AndroidServerService";
     private static final String SERVICE_NAME = "Kompose";
-    private static final String SERVICE_TYPE = "_kompose._tcp";
+    private static final String SERVICE_TYPE = "_http._tcp";
 
     private NetworkService networkService;
     private ServerSocket serverSocket;
@@ -35,7 +35,6 @@ public class AndroidServerService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-        networkService = new NetworkService();
     }
 
     @Override

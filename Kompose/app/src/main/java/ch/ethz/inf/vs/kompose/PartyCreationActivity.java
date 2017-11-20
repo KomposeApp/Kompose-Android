@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import ch.ethz.inf.vs.kompose.patterns.RepositoryFactory;
 import ch.ethz.inf.vs.kompose.repository.SessionRepository;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 
@@ -20,16 +21,17 @@ public class PartyCreationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_party_creation_placeholder);
     }
 
-    public void confirmParty(View v){
+    public void confirmParty(View v) {
         //TODO: Add party creation process before starting next activity
         Log.d(LOG_TAG, "Confirmation button pressed");
 
+        RepositoryFactory factory = new RepositoryFactory(this);
+        SessionRepository repository = factory.getSessionRepository();
+
         // start a session as host
-        SessionRepository sessionRepository = new SessionRepository(this,
-                new NetworkService());
         EditText editText = (EditText) findViewById(R.id.party_name_text_entry);
         String partyName = editText.getText().toString();
-        sessionRepository.startSession(partyName);
+        repository.startSession(partyName, partyName);
 
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);

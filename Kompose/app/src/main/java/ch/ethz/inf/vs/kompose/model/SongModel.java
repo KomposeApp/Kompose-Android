@@ -33,6 +33,8 @@ public class SongModel extends BaseObservable {
     private URI thumbnailUrl;
     private URI sourceUrl;
 
+    private boolean skipVoteCasted;
+
     private SongStatus status;
 
     public UUID getUuid() {
@@ -57,6 +59,16 @@ public class SongModel extends BaseObservable {
     public void setOrder(int order) {
         this.order = order;
         notifyPropertyChanged(BR.order);
+    }
+
+    @Bindable
+    public boolean getSkipVoteCasted() {
+        return skipVoteCasted;
+    }
+
+    public void setSkipVoteCasted(boolean skipVoteCasted) {
+        this.skipVoteCasted = skipVoteCasted;
+        notifyPropertyChanged(BR.skipVoteCasted);
     }
 
     @Bindable

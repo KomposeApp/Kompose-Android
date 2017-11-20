@@ -7,7 +7,7 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
-import ch.ethz.inf.vs.kompose.data.Message;
+import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 
 /**
@@ -36,18 +36,13 @@ public class ServerMessageHandler implements Runnable {
 
             MessageType messageType = MessageType.valueOf(msg.getType());
             switch (messageType) {
-                case REQUEST_INFORMATION:
-                    OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
-                    Message response = new Message();
-                    response.setType(MessageType.SESSION_UPDATE.toString());
-                    SessionConverter sessionConverter = new SessionConverter();
-                    response.setSession(sessionConverter.convert(StateService.getInstance().liveSession));
-                    break;
                 case REGISTER_CLIENT:
                     break;
                 case UNREGISTER_CLIENT:
                     break;
                 case SESSION_UPDATE:
+                    OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
+                    //send stuff
                     break;
                 case REQUEST_SONG:
                     break;

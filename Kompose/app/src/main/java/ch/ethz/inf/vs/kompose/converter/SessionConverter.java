@@ -4,9 +4,9 @@ import android.databinding.ObservableList;
 
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.data.Client;
-import ch.ethz.inf.vs.kompose.data.Session;
-import ch.ethz.inf.vs.kompose.data.Song;
+import ch.ethz.inf.vs.kompose.data.json.Client;
+import ch.ethz.inf.vs.kompose.data.json.Session;
+import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
@@ -17,8 +17,8 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
         SessionModel sessionModel = new SessionModel(
                 UUID.fromString(session.getUuid()),
-                UUID.fromString(session.getHostUuid()),
-                null, 0);
+                UUID.fromString(session.getHostUuid())
+        );
         sessionModel.setSessionName(session.getSessionName());
 
         //convert clients
