@@ -15,11 +15,11 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.patterns.SimpleObserver;
 
-public class YoutubeResolveService {
+public class YoutubeService {
     public static final int SONG_RESOLVED_SUCCESSFULLY = 0x1;
     public static final int SONG_RESOLVING_ERROR = 0x2;
 
-    private static String LOG_TAG = "##YoutubeResolveService";
+    private static String LOG_TAG = "##YoutubeService";
 
     public void resolveSong(Context context, final String sourceUrl, final ClientModel clientModel, final SimpleObserver observer) {
         @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
