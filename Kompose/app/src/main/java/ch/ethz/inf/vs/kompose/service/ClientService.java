@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.repository;
+package ch.ethz.inf.vs.kompose.service;
 
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
@@ -7,8 +7,9 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class ClientRepository {
+public class ClientService extends BaseService {
     /**
      * get the client model associated to this device from the specific session
      *

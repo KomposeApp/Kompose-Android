@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -27,6 +28,11 @@ public class NetworkService extends BasePreferencesService {
     private final String LOG_TAG = "## NetworkService";
     public static final String RESPONSE_RECEIVED = "NetworkService.RESPONSE_RECEIVED";
     public static final String RESPONSE_FAILURE = "NetworkService.RESPONSE_FAILURE";
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+    }
 
     private Message getMessage(MessageType type) {
         Message msg = new Message();
@@ -110,6 +116,11 @@ public class NetworkService extends BasePreferencesService {
         }
     }
 
+    private ConnectionDetails getActiveConnection()
+    {
+        return null;
+    }
+
     private class AsyncSender extends AsyncTask<Void, Void, Void> {
 
         private final String LOG_TAG = "## AsyncSender";
@@ -167,4 +178,6 @@ public class NetworkService extends BasePreferencesService {
             return null;
         }
     }
+
+
 }

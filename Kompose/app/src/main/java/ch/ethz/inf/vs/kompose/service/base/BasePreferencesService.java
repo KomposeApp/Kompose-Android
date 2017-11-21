@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service.base;
 
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.util.UUID;
 
@@ -12,13 +13,9 @@ import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 
 public abstract class BasePreferencesService extends BaseService {
 
-    public BasePreferencesService() {
-        //TODO: receive session broadcast and change connectionDetails accordingly
-    }
-
-
-    private final String DEVICE_UUID = "device_uuid";
-    private final String SETTING_KEY = "kompose";
+    public static final String DEVICE_UUID = "device_uuid";
+    public static final String KEY_PRELOAD = "k_preload";
+    public static final String KEY_USERNAME = "k_user";
 
     private String deviceUUIDString;
     private UUID deviceUUID;
@@ -60,14 +57,6 @@ public abstract class BasePreferencesService extends BaseService {
     }
 
     private SharedPreferences getSharedPreferences() {
-        return getSharedPreferences(SETTING_KEY, MODE_PRIVATE);
-    }
-
-    private ConnectionDetails connectionDetails;
-
-    public ConnectionDetails getActiveConnection() {
-        return connectionDetails;
-
-
+        return PreferenceManager.getDefaultSharedPreferences(this);
     }
 }

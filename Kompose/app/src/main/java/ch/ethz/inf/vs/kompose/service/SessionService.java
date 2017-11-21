@@ -19,11 +19,14 @@ import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 
 public class SessionService extends BasePreferencesService {
-    public SessionService() {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
         bindService(NetworkService.class);
         bindService(StorageService.class);
     }
-
+    
     public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
 
     private SessionModel activeSession;

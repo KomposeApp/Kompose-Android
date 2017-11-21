@@ -78,6 +78,7 @@ public class AndroidServerService extends BaseService {
 
     @Override
     public void onDestroy() {
+        super.onDestroy();
         nsdManager.unregisterService(nsdRegistrationListener);
         serverTask.cancel(true);
     }

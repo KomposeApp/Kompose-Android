@@ -25,45 +25,11 @@ public class SongService extends BaseService {
 
     private static final String LOG_TAG = "## Song Service";
 
-    public void onCreate() {
-
-        Intent gattServiceIntent = new Intent(this, NetworkService.class);
-        boolean isBound = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-
-        Log.d(LOG_TAG, "finished creation, bound service: " + isBound);
-    }
-
-
-    NetworkService networkService;
-
-    //service connection
-    private final ServiceConnection mServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            networkService = (NetworkService) ((BaseService.LocalBinder) service).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-            networkService = null;
-        }
-    };
-
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        unbindService(mServiceConnection);
+    public void onCreate() {
+        super.onCreate();
+        bindService(NetworkService.class);
     }
-
-    //the receiver
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-        }
-    };
-
 
     /**
      * sends the requested song to the server and puts it into the playlist
@@ -74,7 +40,7 @@ public class SongService extends BaseService {
         //todo: connect with session service, send song
         SongConverter songConverter = new SongConverter(new ClientModel[0]);
         SongModel songModel = songConverter.convert(song);
-        networkService.sendRequestSong(song);
+        getNetworkService().sendRequestSong(song);
     }
 
     /**
@@ -85,7 +51,7 @@ public class SongService extends BaseService {
     public void castSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        networkService.sendCastSkipSongVote(song);
+        getNetworkService().sendCastSkipSongVote(song);
     }
 
     /**
@@ -96,7 +62,7 @@ public class SongService extends BaseService {
     public void removeSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        networkService.sendRemoveSkipSongVote(song);
+        getNetworkService().sendRemoveSkipSongVote(song);
     }
 
 }
