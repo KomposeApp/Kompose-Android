@@ -2,6 +2,9 @@ package ch.ethz.inf.vs.kompose.converter;
 
 import android.databinding.ObservableList;
 
+import org.joda.time.format.DateTimeFormatter;
+import org.joda.time.format.ISODateTimeFormat;
+
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.json.Client;
@@ -20,6 +23,10 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
                 UUID.fromString(session.getHostUuid())
         );
         sessionModel.setSessionName(session.getSessionName());
+
+        // format DateTime as ISO 8601
+        DateTimeFormatter isoParser = ISODateTimeFormat.dateTime();
+        sessionModel.setCreationDateTime(isoParser.parseDateTime(session.getCreationDateTime()));
 
         //convert clients
         if (session.getClients() != null) {
@@ -60,6 +67,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         session.setHostUuid(sessionModel.getHostUUID().toString());
         session.setSessionName(sessionModel.getSessionName());
         session.setUuid(sessionModel.getUuid().toString());
+        session.setCreationDateTime(sessionModel.getCreationDateTime().toString());
 
         return session;
     }

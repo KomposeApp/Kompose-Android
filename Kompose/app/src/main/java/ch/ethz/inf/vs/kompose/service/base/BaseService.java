@@ -11,9 +11,11 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
+import ch.ethz.inf.vs.kompose.service.ClientService;
 import ch.ethz.inf.vs.kompose.service.DownloadService;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SessionService;
+import ch.ethz.inf.vs.kompose.service.SongService;
 import ch.ethz.inf.vs.kompose.service.StorageService;
 
 /**
@@ -37,6 +39,14 @@ public abstract class BaseService extends Service {
 
     protected SessionService getSessionService() {
         return sessionService;
+    }
+
+    protected ClientService getClientService() {
+        return clientService;
+    }
+
+    protected SongService getSongService() {
+        return songService;
     }
 
 
@@ -81,6 +91,8 @@ public abstract class BaseService extends Service {
     private StorageService storageService;
     private DownloadService downloadService;
     private SessionService sessionService;
+    private ClientService clientService;
+    private SongService songService;
 
     //service connection
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -96,6 +108,10 @@ public abstract class BaseService extends Service {
                 downloadService = (DownloadService) baseService;
             } else if (baseService instanceof SessionService) {
                 sessionService = (SessionService) baseService;
+            } else if (baseService instanceof ClientService) {
+                clientService = (ClientService) baseService;
+            } else if (baseService instanceof SongService) {
+                songService = (SongService) baseService;
             }
         }
 

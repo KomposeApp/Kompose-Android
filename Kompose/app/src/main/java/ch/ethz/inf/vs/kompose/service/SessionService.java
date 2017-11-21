@@ -26,7 +26,7 @@ public class SessionService extends BasePreferencesService {
         bindService(NetworkService.class);
         bindService(StorageService.class);
     }
-    
+
     public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
 
     private SessionModel activeSession;
@@ -57,6 +57,7 @@ public class SessionService extends BasePreferencesService {
      * inform all other services that the connection has changed
      */
     private void broadcastConnectionChanged() {
+        //todo: is this needed
         Intent intent = new Intent(CONNECTION_CHANGED_EVENT);
         if (activeSession == null) {
             intent.putExtra("is_active", false);

@@ -29,6 +29,8 @@ public class SongService extends BaseService {
     public void onCreate() {
         super.onCreate();
         bindService(NetworkService.class);
+        bindService(SessionService.class);
+        bindService(ClientService.class);
     }
 
     /**
@@ -37,7 +39,8 @@ public class SongService extends BaseService {
      * @param song the new song which should be included in the playlist
      */
     public void requestNewSong(Song song) {
-        //todo: connect with session service, send song
+
+
         SongConverter songConverter = new SongConverter(new ClientModel[0]);
         SongModel songModel = songConverter.convert(song);
         getNetworkService().sendRequestSong(song);

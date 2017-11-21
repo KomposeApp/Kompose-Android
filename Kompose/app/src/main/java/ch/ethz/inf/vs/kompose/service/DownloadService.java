@@ -23,8 +23,7 @@ public class DownloadService extends BaseService {
      * Download the file from the specified URL and notify observers when done.
      * The notifier will carry a MediaPlayer that can be used to play the file.
      */
-    public boolean downloadSong(String downloadUrl,
-                                String fileName) {
+    public boolean downloadSong(String downloadUrl, String fileName) {
         try {
             URL url = new URL(downloadUrl);
             URLConnection connection = url.openConnection();
