@@ -1,16 +1,5 @@
 package ch.ethz.inf.vs.kompose.service;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
-import android.os.Bundle;
-import android.os.IBinder;
-import android.util.Log;
-
-import ch.ethz.inf.vs.kompose.R;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
@@ -28,9 +17,9 @@ public class SongService extends BaseService {
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService(NetworkService.class);
-        bindService(SessionService.class);
-        bindService(ClientService.class);
+        bindBaseService(NetworkService.class);
+        bindBaseService(SessionService.class);
+        bindBaseService(ClientService.class);
     }
 
     /**

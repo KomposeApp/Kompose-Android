@@ -18,7 +18,7 @@ import ch.ethz.inf.vs.kompose.service.SongService;
 import ch.ethz.inf.vs.kompose.service.YoutubeService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class PlaylistActivity extends AppCompatActivity {
+public class PlaylistActivity extends BaseServiceActivity implements BaseServiceActivity.IntentActionCallbackReceiver {
 
     private static final String LOG_TAG = "## Playlist Activity";
 
@@ -27,17 +27,16 @@ public class PlaylistActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist_placeholder);
 
-        Intent youtubeServiceIntent = new Intent(this, YoutubeService.class);
-        boolean isBound = bindService(youtubeServiceIntent, serviceConnection, BIND_AUTO_CREATE);
-        Log.d(LOG_TAG, "bound youtube service: " + isBound);
+        bindBaseService(YoutubeService.class);
+        bindBaseService(SongService.class);
 
-        Intent songServiceIntent = new Intent(this, SongService.class);
-        isBound = bindService(songServiceIntent, serviceConnection, BIND_AUTO_CREATE);
-        Log.d(LOG_TAG, "bound song service: " + isBound);
+        subscribeToIntentActions(new String[]{
+                YoutubeService.DOWNLOAD_FAILED, YoutubeService.DOWNLOAD_SUCCESSFUL
+        }, this);
     }
 
     public void requestSong(View v) {
-        youtubeService.resolveSong("https://www.youtube.com/watch?v=-Fz85FE0KtQ");
+        getYoutubeService().resolveSong("https://www.youtube.com/watch?v=-Fz85FE0KtQ");
     }
 
     public void downvoteItem(View v) {
@@ -55,66 +54,12 @@ public class PlaylistActivity extends AppCompatActivity {
         this.finish();
     }
 
-
-    YoutubeService youtubeService;
-    SongService songService;
-
-    //service connection
-    private final ServiceConnection serviceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder service) {
-            BaseService baseService = ((BaseService.LocalBinder) service).getService();
-            if (baseService instanceof YoutubeService) {
-                youtubeService = (YoutubeService) baseService;
-            } else if (baseService instanceof SongService) {
-                songService = (SongService) baseService;
-            }
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
-
-
     @Override
-    protected void onResume() {
-        super.onResume();
-
-        //register for events
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(YoutubeService.DOWNLOAD_FAILED);
-        intentFilter.addAction(YoutubeService.DOWNLOAD_SUCCESSFUL);
-        registerReceiver(broadcastReceiver, intentFilter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(broadcastReceiver);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        unbindService(serviceConnection);
-    }
-
-    //the receiver
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (YoutubeService.DOWNLOAD_SUCCESSFUL.equals(action)) {
-                if (songService != null) {
-                    songService.requestNewSong(intent.<Song>getParcelableExtra("songDetails"));
-                }
-            } else if (YoutubeService.DOWNLOAD_FAILED.equals(action)) {
-                Toast.makeText(PlaylistActivity.this, R.string.youtube_service_download_failed, Toast.LENGTH_LONG).show();
-            }
+    public void intentActionReceived(String action, Intent intent) {
+        if (YoutubeService.DOWNLOAD_SUCCESSFUL.equals(action)) {
+            getSongService().requestNewSong(intent.<Song>getParcelableExtra("songDetails"));
+        } else if (YoutubeService.DOWNLOAD_FAILED.equals(action)) {
+            Toast.makeText(PlaylistActivity.this, R.string.youtube_service_download_failed, Toast.LENGTH_LONG).show();
         }
-    };
-
+    }
 }

@@ -23,8 +23,8 @@ public class SessionService extends BasePreferencesService {
     @Override
     public void onCreate() {
         super.onCreate();
-        bindService(NetworkService.class);
-        bindService(StorageService.class);
+        bindBaseService(NetworkService.class);
+        bindBaseService(StorageService.class);
     }
 
     public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
