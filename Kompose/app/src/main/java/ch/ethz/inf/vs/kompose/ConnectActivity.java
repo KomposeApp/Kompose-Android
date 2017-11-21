@@ -1,24 +1,11 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.bluetooth.BluetoothGattService;
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 
-import java.util.List;
-import java.util.UUID;
-
-import ch.ethz.inf.vs.kompose.service.AndroidServerService;
-import ch.ethz.inf.vs.kompose.service.SessionService;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class ConnectActivity extends AppCompatActivity {
 

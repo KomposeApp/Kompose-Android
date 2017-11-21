@@ -8,8 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.service.SessionService;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
@@ -21,18 +19,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_placeholder);
     }
 
-    public void joinParty(View view) {
+    /**
+     * Navigation to the ConnectActivity, where clients join existing parties
+     */
+    public void callConnectActivity(View view) {
         Log.d(LOG_TAG, "Join party button pressed");
         Intent connectIntent = new Intent(this, ConnectActivity.class);
         startActivity(connectIntent);
     }
 
-    public void createParty(View view) {
+    /**
+     * Navigation to PartyCreationActivity, where hosts create new parties
+     */
+    public void callCreationActivity(View view) {
         Log.d(LOG_TAG, "Create party button pressed");
         Intent partyIntent = new Intent(this, PartyCreationActivity.class);
         startActivity(partyIntent);
     }
 
+    /**
+     * Navigation to the History Activity
+     */
     public void viewHistoryFromTitle(View view) {
         Log.d(LOG_TAG, "History button pressed");
         Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
