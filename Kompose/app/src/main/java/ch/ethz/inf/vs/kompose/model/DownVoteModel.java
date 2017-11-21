@@ -16,23 +16,12 @@ public class DownVoteModel extends BaseObservable {
         this.downVoteFor = downVoteFor;
     }
 
-    private DateTime castDateTime;
     private UUID uuid;
     private ClientModel clientModel;
     private SongModel downVoteFor;
 
     public UUID getUuid() {
         return uuid;
-    }
-
-    @Bindable
-    public DateTime getCastDateTime() {
-        return castDateTime;
-    }
-
-    public void setCastDateTime(DateTime castTime) {
-        this.castDateTime = castTime;
-        notifyPropertyChanged(BR.castDateTime);
     }
 
     @Bindable

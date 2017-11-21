@@ -12,6 +12,7 @@ import ch.ethz.inf.vs.kompose.converter.ClientConverter;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Client;
+import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -29,8 +30,9 @@ public class SessionService extends BasePreferencesService {
 
     public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
 
-    private SessionModel activeSession;
+    private SessionModel activeSessionModel;
     private ClientModel activeClient;
+    private Session activeSession;
     private ObservableList<SessionModel> pastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
         @Override
         public int compare(SessionModel o1, SessionModel o2) {
@@ -46,35 +48,14 @@ public class SessionService extends BasePreferencesService {
      * @param clientName the name to use
      */
     private void joinActiveSession(String clientName) {
-        activeClient = new ClientModel(getDeviceUUID(), activeSession);
+        activeClient = new ClientModel(getDeviceUUID(), activeSessionModel);
         activeClient.setName(clientName);
         activeClient.setIsActive(true);
 
-        activeSession.getClients().add(activeClient);
-    }
+        activeSessionModel.getClients().add(activeClient);
 
-    /**
-     * inform all other services that the connection has changed
-     */
-    private void broadcastConnectionChanged() {
-        //todo: is this needed
-        Intent intent = new Intent(CONNECTION_CHANGED_EVENT);
-        if (activeSession == null) {
-            intent.putExtra("is_active", false);
-        } else {
-            intent.putExtra("is_active", true);
-
-            ClientConverter converter = new ClientConverter(activeSession);
-            Client client = converter.convert(activeClient);
-
-            ConnectionDetails connectionDetails = activeSession.getConnectionDetails();
-
-            intent.putExtra("active_client", client);
-            intent.putExtra("is_host", isHost);
-            intent.putExtra("connection_details", connectionDetails);
-        }
-
-        sendBroadcast(intent);
+        SessionConverter sessionConverter = new SessionConverter();
+        activeSession = sessionConverter.convert(activeSessionModel);
     }
 
     /**
@@ -83,13 +64,11 @@ public class SessionService extends BasePreferencesService {
     public SessionModel startSession(String sessionName, String clientName) {
         isHost = true;
 
-        activeSession = new SessionModel(UUID.randomUUID(), getDeviceUUID());
-        activeSession.setSessionName(sessionName);
+        activeSessionModel = new SessionModel(UUID.randomUUID(), getDeviceUUID());
+        activeSessionModel.setSessionName(sessionName);
         joinActiveSession(clientName);
 
-        broadcastConnectionChanged();
-
-        return activeSession;
+        return activeSessionModel;
     }
 
     /**
@@ -100,10 +79,8 @@ public class SessionService extends BasePreferencesService {
     public void joinSession(SessionModel session, String clientName) {
         isHost = false;
 
-        activeSession = session;
+        activeSessionModel = session;
         joinActiveSession(clientName);
-
-        broadcastConnectionChanged();
 
         getNetworkService().sendRegisterClient(clientName);
     }
@@ -119,9 +96,8 @@ public class SessionService extends BasePreferencesService {
         }
 
         isHost = false;
-        activeSession = null;
+        activeSessionModel = null;
         activeClient = null;
-        broadcastConnectionChanged();
     }
 
     /**
@@ -152,5 +128,21 @@ public class SessionService extends BasePreferencesService {
             }
         }
         return pastSessions;
+    }
+
+    public Session getActiveSession() {
+        return activeSession;
+    }
+
+    public SessionModel getActiveSessionModel() {
+        return activeSessionModel;
+    }
+
+    public ClientModel getActiveClient() {
+        return activeClient;
+    }
+
+    public boolean isHost() {
+        return isHost;
     }
 }

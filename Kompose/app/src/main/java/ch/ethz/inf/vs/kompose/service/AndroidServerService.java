@@ -21,6 +21,7 @@ import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
+import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
  * Android service that starts the server.
@@ -45,11 +46,14 @@ public class AndroidServerService extends BaseService {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        Log.d(LOG_TAG, "created");
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "Service started");
+        Log.d(LOG_TAG, "started");
+
         try {
             serverSocket = new ServerSocket(0);
             localPort = serverSocket.getLocalPort();
@@ -116,21 +120,6 @@ public class AndroidServerService extends BaseService {
 
         private static final String LOG_TAG = "## ServerTask";
 
-        private Message readMessage(Socket connection) throws IOException {
-            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder json = new StringBuilder();
-
-            char[] buffer = new char[1024];
-            int bytesRead;
-            while ((bytesRead = input.read(buffer)) != -1) {
-                json.append(new String(buffer, 0, bytesRead));
-            }
-            Log.d(LOG_TAG, "message read from stream: " + json.toString());
-
-            Message message = JsonConverter.fromMessageJsonString(json.toString());
-            input.close();
-            return message;
-        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -141,46 +130,8 @@ public class AndroidServerService extends BaseService {
                     final Socket socket = serverSocket.accept();
                     Log.d(LOG_TAG, "message received");
 
-                    Thread msgHandler = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-
-                            try {
-                                Log.d(LOG_TAG, "Thread dispatched");
-                                Message msg = readMessage(socket);
-                                Log.d(LOG_TAG, "Message received (" + msg.getType() + ")");
-
-                                // TODO
-
-                                MessageType messageType = MessageType.valueOf(msg.getType());
-                                switch (messageType) {
-                                    case REGISTER_CLIENT:
-                                        break;
-                                    case UNREGISTER_CLIENT:
-                                        break;
-                                    case SESSION_UPDATE:
-                                        OutputStreamWriter output = new OutputStreamWriter(socket.getOutputStream());
-                                        //send stuff
-                                        break;
-                                    case REQUEST_SONG:
-                                        break;
-                                    case CAST_SKIP_SONG_VOTE:
-                                        break;
-                                    case REMOVE_SKIP_SONG_VOTE:
-                                        break;
-                                    case KEEP_ALIVE:
-                                        break;
-                                    case FINISH_SESSION:
-                                        break;
-                                    case ERROR:
-                                        break;
-                                }
-
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+                    MessageHandler messageHandler = new MessageHandler(getSessionService(), socket);
+                    Thread msgHandler = new Thread(messageHandler);
                     msgHandler.start();
                 } catch (Exception e) {
                     Log.d(LOG_TAG, "could not process message; exception occurred! " + e.toString());

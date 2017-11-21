@@ -22,10 +22,12 @@ public class Song implements Parcelable {
     private int lengthInSeconds;
     private String uuid;
 
-    public Song() {}
+    public Song() {
+    }
 
-    public Song(Parcel in) {
+    protected Song(Parcel in) {
         downloadUrl = in.readString();
+        downVotes = in.createTypedArray(DownVote.CREATOR);
         order = in.readInt();
         proposedByClientUuid = in.readString();
         sourceUrl = in.readString();
@@ -39,6 +41,7 @@ public class Song implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(downloadUrl);
+        dest.writeTypedArray(downVotes, flags);
         dest.writeInt(order);
         dest.writeString(proposedByClientUuid);
         dest.writeString(sourceUrl);

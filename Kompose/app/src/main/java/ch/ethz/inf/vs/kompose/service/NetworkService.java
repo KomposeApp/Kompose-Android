@@ -20,6 +20,7 @@ import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
+import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
  * Service that provides various network functionality.
@@ -122,14 +123,17 @@ public class NetworkService extends BasePreferencesService implements BaseServic
     /**
      * Send a message to a host.
      *
-     * @param msg The message to be sent.
+     * @param message The message to be sent.
      */
-    private void sendMessage(Message msg) {
+    private void sendMessage(Message message) {
+        Thread handler = new Thread(new MessageHandler(getSessionService(), message));
+        handler.start();
+
         ConnectionDetails connectionDetails = getActiveConnection();
         if (connectionDetails == null) {
             Log.d(LOG_TAG, "tried to send message but no active connection");
         } else {
-            AsyncSender asyncSender = new AsyncSender(msg, connectionDetails.getHostIP(), connectionDetails.getHostPort());
+            AsyncSender asyncSender = new AsyncSender(message, connectionDetails.getHostIP(), connectionDetails.getHostPort());
             asyncSender.execute();
         }
     }

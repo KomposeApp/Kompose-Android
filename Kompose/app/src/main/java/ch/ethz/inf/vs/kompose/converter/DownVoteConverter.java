@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.kompose.converter;
 
+import android.databinding.ObservableList;
+
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -20,6 +22,15 @@ public class DownVoteConverter implements IBaseConverter<DownVoteModel, DownVote
         this.downVoteFor = downVoteFor;
     }
 
+    public DownVoteConverter(ObservableList<ClientModel> clientModels, SongModel downVoteFor) {
+        if (clientModels.size() == 0) {
+            this.clientModels = new ClientModel[0];
+        } else {
+            this.clientModels = (ClientModel[]) clientModels.toArray();
+        }
+        this.downVoteFor = downVoteFor;
+    }
+
     public DownVoteModel convert(DownVote downVote) {
 
         UUID clientUUID = UUID.fromString(downVote.getClientUuid());
@@ -32,18 +43,11 @@ public class DownVoteConverter implements IBaseConverter<DownVoteModel, DownVote
         }
 
 
-        DownVoteModel downVoteModel = new DownVoteModel(UUID.fromString(downVote.getUuid()), clientModel, downVoteFor);
-
-        // format DateTime as ISO 8601
-        DateTimeFormatter isoParser = ISODateTimeFormat.dateTime();
-        downVoteModel.setCastDateTime(isoParser.parseDateTime(downVote.getCastDateTime()));
-
-        return downVoteModel;
+        return new DownVoteModel(UUID.fromString(downVote.getUuid()), clientModel, downVoteFor);
     }
 
     public DownVote convert(DownVoteModel downVoteModel) {
         DownVote downVote = new DownVote();
-        downVote.setCastDateTime(downVoteModel.getCastDateTime().toString());
         downVote.setUuid(downVoteModel.getUuid().toString());
         if (downVoteModel.getClientModel() != null)
             downVote.setClientUuid(downVoteModel.getClientModel().getUuid().toString());

@@ -1,8 +1,12 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import java.util.UUID;
+
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.json.Song;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
@@ -28,10 +32,7 @@ public class SongService extends BaseService {
      * @param song the new song which should be included in the playlist
      */
     public void requestNewSong(Song song) {
-
-
-        SongConverter songConverter = new SongConverter(new ClientModel[0]);
-        SongModel songModel = songConverter.convert(song);
+        song.setUuid(UUID.randomUUID().toString());
         getNetworkService().sendRequestSong(song);
     }
 
