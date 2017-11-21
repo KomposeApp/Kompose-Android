@@ -32,7 +32,8 @@ public class PlaylistActivity extends BaseServiceActivity implements BaseService
     }
 
     public void downvoteItem(View v) {
-        //TODO: Downvote stuff
+        //todo: resolve song model from view
+        getSongService().castSkipVote(null);
     }
 
     public void viewHistoryFromPlaylist(View v) {
@@ -43,6 +44,7 @@ public class PlaylistActivity extends BaseServiceActivity implements BaseService
 
     public void leaveParty(View v) {
         Log.d(LOG_TAG, "Left the party by pressing the button");
+        getSessionService().leaveSession();
         this.finish();
     }
 

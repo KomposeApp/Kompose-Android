@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import ch.ethz.inf.vs.kompose.service.ClientService;
+import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.SessionService;
 import ch.ethz.inf.vs.kompose.service.SongService;
 import ch.ethz.inf.vs.kompose.service.YoutubeService;
@@ -37,6 +38,10 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
         return youtubeService;
     }
 
+    protected SampleService getSampleService() {
+        return sampleService;
+    }
+
     protected void bindBaseService(Class service) {
         Intent gattServiceIntent = new Intent(this, service);
         boolean isBound = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -49,6 +54,7 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
         }
     }
 
+    private SampleService sampleService;
     private SessionService sessionService;
     private YoutubeService youtubeService;
     private ClientService clientService;
@@ -68,7 +74,12 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
                 songService = (SongService) baseService;
             } else if (baseService instanceof YoutubeService) {
                 youtubeService = (YoutubeService) baseService;
+            } else if (baseService instanceof SampleService) {
+                sampleService = (SampleService) baseService;
+            } else {
+                Log.d(LOG_TAG, "attempted to bind unknown service " + baseService.getClass().getName());
             }
+            serviceBoundCallback(baseService);
         }
 
         @Override
@@ -131,5 +142,9 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
 
     public interface IntentActionCallbackReceiver {
         void intentActionReceived(String action, Intent intent);
+    }
+
+    protected void serviceBoundCallback(BaseService boundService) {
+        //override if needed
     }
 }

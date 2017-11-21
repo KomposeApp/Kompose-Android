@@ -16,4 +16,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="KomposeTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="KomposeTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="KomposeTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>

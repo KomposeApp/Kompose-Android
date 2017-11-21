@@ -10,4 +10,5 @@
     <string name="setting_username">Username:</string>
     <string name="settings_confirm">Confirm Changes</string>
     <string name="youtube_service.download_failed">could not resolve the song details :(</string>
+    <string name="title_activity_test_frontend">TestFrontendActivity</string>
 </resources>

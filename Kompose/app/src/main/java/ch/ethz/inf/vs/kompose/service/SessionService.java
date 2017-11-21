@@ -68,7 +68,7 @@ public class SessionService extends BasePreferencesService {
         activeSessionModel = new SessionModel(UUID.randomUUID(), getDeviceUUID());
         activeSessionModel.setSessionName(sessionName);
         joinActiveSession(clientName);
-        
+
         Intent serverIntent = new Intent(this, AndroidServerService.class);
         startService(serverIntent);
 
@@ -92,7 +92,7 @@ public class SessionService extends BasePreferencesService {
     /**
      * leaves the currently active session
      */
-    public void leaveSession(SessionModel sessionModel) {
+    public void leaveSession() {
         if (isHost) {
             getNetworkService().sendFinishSession();
         } else {

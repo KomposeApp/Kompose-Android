@@ -318,6 +318,6 @@ public class MessageHandler implements Runnable {
         activeSession.setHostUuid(receivedSession.getHostUuid());
 
 
-        //todo: perform IN MEMORY update of current session (no replacing references!)
+        //todo BROT: perform IN MEMORY update of current session (no replacing references!)
     }
 }
