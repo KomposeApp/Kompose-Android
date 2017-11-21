@@ -19,11 +19,12 @@ import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 /**
  * Service that provides various network functionality.
  */
-public class NetworkService extends BasePreferencesService {
+public class NetworkService extends BasePreferencesService implements BaseService.IntentActionCallbackReceiver {
 
     private final String LOG_TAG = "## NetworkService";
     public static final String RESPONSE_RECEIVED = "NetworkService.RESPONSE_RECEIVED";
@@ -32,6 +33,23 @@ public class NetworkService extends BasePreferencesService {
     @Override
     public void onCreate() {
         super.onCreate();
+        subscribeToIntentActions(new String[]{SessionService.CONNECTION_CHANGED_EVENT}, this);
+    }
+
+    @Override
+    public void intentActionReceived(String action, Intent intent) {
+        if (action.equals(SessionService.CONNECTION_CHANGED_EVENT)) {
+            Log.d(LOG_TAG, "intent received with action = " + action);
+            this.connectionDetails = intent.getParcelableExtra("connection_details");
+        } else {
+            Log.e(LOG_TAG, "unknown intent received with action = " + action);
+        }
+    }
+
+    private ConnectionDetails connectionDetails;
+
+    private ConnectionDetails getActiveConnection() {
+        return connectionDetails;
     }
 
     private Message getMessage(MessageType type) {
@@ -114,11 +132,6 @@ public class NetworkService extends BasePreferencesService {
             AsyncSender asyncSender = new AsyncSender(msg, connectionDetails.getHostIP(), connectionDetails.getHostPort());
             asyncSender.execute();
         }
-    }
-
-    private ConnectionDetails getActiveConnection()
-    {
-        return null;
     }
 
     private class AsyncSender extends AsyncTask<Void, Void, Void> {

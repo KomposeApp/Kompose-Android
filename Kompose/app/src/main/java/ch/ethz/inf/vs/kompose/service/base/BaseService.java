@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.kompose.service.base;
 
-import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -8,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.net.Network;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -56,12 +54,26 @@ public abstract class BaseService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-
     public void bindService(Class service) {
         Intent gattServiceIntent = new Intent(this, service);
         boolean isBound = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
         Log.d(LOG_TAG, "finished creation, bound service: " + isBound);
+    }
+
+    private boolean registeredReceiver = false;
+    private IntentActionCallbackReceiver callbackReceiver;
+
+    protected void subscribeToIntentActions(String[] intentActions, IntentActionCallbackReceiver callbackReceiver) {
+        this.callbackReceiver = callbackReceiver;
+
+        //register for events
+        final IntentFilter intentFilter = new IntentFilter();
+        for (String action : intentActions) {
+            intentFilter.addAction(action);
+        }
+        registerReceiver(broadcastReceiver, intentFilter);
+        registeredReceiver = true;
     }
 
 
@@ -96,6 +108,9 @@ public abstract class BaseService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        if (registeredReceiver) {
+            unregisterReceiver(broadcastReceiver);
+        }
         unbindService(mServiceConnection);
     }
 
@@ -103,7 +118,11 @@ public abstract class BaseService extends Service {
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
+            callbackReceiver.intentActionReceived(intent.getAction(), intent);
         }
     };
+
+    public interface IntentActionCallbackReceiver {
+        void intentActionReceived(String action, Intent intent);
+    }
 }
