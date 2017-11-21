@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import ch.ethz.inf.vs.kompose.service.SessionService;
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
@@ -17,8 +19,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_placeholder);
-
-
     }
 
     public void joinParty(View view) {

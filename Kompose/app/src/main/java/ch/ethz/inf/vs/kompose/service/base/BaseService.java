@@ -64,7 +64,7 @@ public abstract class BaseService extends Service {
 
     private final IBinder mBinder = new LocalBinder();
 
-    public void bindService(Class service) {
+    protected void bindService(Class service) {
         Intent gattServiceIntent = new Intent(this, service);
         boolean isBound = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
 
