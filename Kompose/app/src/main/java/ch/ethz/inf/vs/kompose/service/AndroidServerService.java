@@ -31,7 +31,7 @@ public class AndroidServerService extends BaseService {
 
     private static final String LOG_TAG = "## AndroidServerService";
     private static final String SERVICE_NAME = "Kompose";
-    private static final String SERVICE_TYPE = "_http._tcp";
+    private static final String SERVICE_TYPE = "_kompose._tcp";
 
     public static final String FOUND_SERVICE = "AndroidServerService.FOUND_SERVICE";
 

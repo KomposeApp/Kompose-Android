@@ -87,6 +87,10 @@ public class SessionService extends BasePreferencesService {
         activeSession.setSessionName(sessionName);
         joinActiveSession(clientName);
 
+        bindBaseService(AndroidServerService.class);
+        Intent serverIntent = new Intent(this, AndroidServerService.class);
+        startService(serverIntent);
+
         broadcastConnectionChanged();
 
         return activeSession;
