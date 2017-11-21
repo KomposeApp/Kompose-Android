@@ -1,20 +1,12 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
 import ch.ethz.inf.vs.kompose.service.SessionService;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class PartyCreationActivity extends BaseServiceActivity {
 
@@ -32,8 +24,7 @@ public class PartyCreationActivity extends BaseServiceActivity {
         //TODO: Add party creation process before starting next activity
         Log.d(LOG_TAG, "Confirmation button pressed");
 
-
-        EditText editText = findViewById(R.id.party_name_text_entry);
+        EditText editText = findViewById(R.id.entry_creation);
         String partyName = editText.getText().toString();
         getSessionService().startSession(partyName, partyName);
 

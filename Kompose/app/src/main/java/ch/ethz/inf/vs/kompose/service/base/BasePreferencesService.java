@@ -16,6 +16,7 @@ public abstract class BasePreferencesService extends BaseService {
     public static final String DEVICE_UUID = "device_uuid";
     public static final String KEY_PRELOAD = "k_preload";
     public static final String KEY_USERNAME = "k_user";
+    public static final String KEY_PORT = "k_port";
 
     private String deviceUUIDString;
     private UUID deviceUUID;

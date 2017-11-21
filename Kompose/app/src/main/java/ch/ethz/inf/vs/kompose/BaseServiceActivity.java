@@ -6,25 +6,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.os.Binder;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import ch.ethz.inf.vs.kompose.service.ClientService;
-import ch.ethz.inf.vs.kompose.service.DownloadService;
-import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SessionService;
 import ch.ethz.inf.vs.kompose.service.SongService;
-import ch.ethz.inf.vs.kompose.service.StorageService;
 import ch.ethz.inf.vs.kompose.service.YoutubeService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-/**
- * Created by git@famoser.ch on 21/11/2017.
- */
 
 public abstract class BaseServiceActivity extends AppCompatActivity {
+
     private final static String LOG_TAG = "## BaseServiceActivity ";
 
     protected SessionService getSessionService() {
@@ -55,7 +49,6 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
         }
     }
 
-
     private SessionService sessionService;
     private YoutubeService youtubeService;
     private ClientService clientService;
@@ -83,7 +76,6 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
 
         }
     };
-
 
     private boolean registeredReceiver = false;
     private BaseServiceActivity.IntentActionCallbackReceiver callbackReceiver;

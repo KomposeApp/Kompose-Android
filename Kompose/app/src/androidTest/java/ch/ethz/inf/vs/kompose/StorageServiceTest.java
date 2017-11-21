@@ -34,11 +34,12 @@ public class StorageServiceTest {
 
     @Test
     public void retrieveFileTest() {
-        Context context = InstrumentationRegistry.getContext();
-        StorageService storageService = new StorageService(context);
-        storageService.persist(null, "testfile", testFile);
-        String readBack = storageService.retrieveFile(null, "testfile");
-        Assert.assertEquals(testFile, readBack);
+//        Context context = InstrumentationRegistry.getContext();
+//        StorageService storageService = new StorageService(context);
+//        storageService.persist(null, "testfile", testFile);
+//        String readBack = storageService.retrieveFile(null, "testfile");
+        //Assert.assertEquals(testFile, readBack);
+        Assert.assertTrue(false);
     }
 
     @Test

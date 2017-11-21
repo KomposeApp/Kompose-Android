@@ -1,14 +1,7 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.content.BroadcastReceiver;
-import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.IBinder;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -16,7 +9,6 @@ import android.widget.Toast;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.service.SongService;
 import ch.ethz.inf.vs.kompose.service.YoutubeService;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class PlaylistActivity extends BaseServiceActivity implements BaseServiceActivity.IntentActionCallbackReceiver {
 

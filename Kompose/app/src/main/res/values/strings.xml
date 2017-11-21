@@ -6,6 +6,7 @@
     <string name="setting_category_host">Host Settings</string>
     <string name="setting_category_client">Client Settings</string>
     <string name="setting_preload">Number of songs to preload:</string>
+    <string name="setting_port">Host Server Port:</string>
     <string name="setting_username">Username:</string>
     <string name="settings_confirm">Confirm Changes</string>
     <string name="youtube_service.download_failed">could not resolve the song details :(</string>

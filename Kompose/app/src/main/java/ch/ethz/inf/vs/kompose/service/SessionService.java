@@ -26,6 +26,7 @@ public class SessionService extends BasePreferencesService {
         super.onCreate();
         bindBaseService(NetworkService.class);
         bindBaseService(StorageService.class);
+        bindBaseService(ClientNetworkService.class);
     }
 
     public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
@@ -67,6 +68,9 @@ public class SessionService extends BasePreferencesService {
         activeSessionModel = new SessionModel(UUID.randomUUID(), getDeviceUUID());
         activeSessionModel.setSessionName(sessionName);
         joinActiveSession(clientName);
+        
+        Intent serverIntent = new Intent(this, AndroidServerService.class);
+        startService(serverIntent);
 
         return activeSessionModel;
     }
@@ -106,8 +110,9 @@ public class SessionService extends BasePreferencesService {
      * @return collection of all active sessions
      */
     public ObservableList<SessionModel> getActiveSessions() {
-        // TODO
-        return new ObservableArrayList<>();
+        ObservableArrayList<SessionModel> observableArrayList = new ObservableArrayList<>();
+        getClientNetworkService().findNetworkServices(observableArrayList);
+        return observableArrayList;
     }
 
     /**
