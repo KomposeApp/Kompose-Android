@@ -50,6 +50,7 @@
         <service android:name=".service.NetworkService" />
         <service android:name=".service.DownloadService" />
         <service android:name=".service.SongService" />
+        <service android:name=".service.SessionService" />
 
     </application>
 

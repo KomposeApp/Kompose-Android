@@ -6,22 +6,18 @@ import android.databinding.Bindable;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
 
-public class ClientModel extends BaseObservable {
+public class ClientModel extends UniqueModel {
 
     public ClientModel(UUID uuid, SessionModel partOfSession) {
-        this.uuid = uuid;
+        super(uuid);
         this.partOfSession = partOfSession;
     }
 
-    private UUID uuid;
     private String name;
     private boolean isActive;
     private SessionModel partOfSession;
-
-    public UUID getUuid() {
-        return uuid;
-    }
 
     @Bindable
     public String getName() {

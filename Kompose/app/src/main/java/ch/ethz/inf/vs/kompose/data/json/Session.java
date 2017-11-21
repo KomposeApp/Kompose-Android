@@ -11,6 +11,7 @@ public class Session {
     private String hostUuid;
     private Song[] songs;
     private String sessionName;
+    private String creationDateTime;
     private String uuid;
 
     @JsonProperty("clients")
@@ -32,6 +33,15 @@ public class Session {
     public String getSessionName() { return sessionName; }
     @JsonProperty("session_name")
     public void setSessionName(String value) { this.sessionName = value; }
+
+    @JsonProperty("creation_date_time")
+    public String getCreationDateTime() {
+        return creationDateTime;
+    }
+    @JsonProperty("creation_date_time")
+    public void setCreationDateTime(String value) {
+        this.creationDateTime = value;
+    }
 
     @JsonProperty("uuid")
     public String getUuid() { return uuid; }

@@ -6,54 +6,60 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
+import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.model.ObservableSortedList;
+import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
 public class ObservableArrayListTest {
     @Test
     public void addTest() {
-        ObservableList<Integer> list = getListInstance();
+        ObservableList<SongModel> list = getListInstance();
 
-        list.add(0);
-        list.add(-10);
-        list.add(420);
-        list.add(420);
-        list.add(421);
-        list.add(-3);
-        list.add(-8);
-        list.add(14);
-        list.add(12);
-        list.add(-100);
-        list.add(-100);
+        list.add(getSongModel(1));
+        list.add(getSongModel(4));
+        list.add(getSongModel(0));
 
         checkSorted(list);
     }
 
     @Test
     public void addAllTest() {
-        ObservableList<Integer> list = getListInstance();
+        ObservableList<SongModel> list = getListInstance();
 
-        list.add(-10);
-        list.add(0, 1);
+        List<SongModel> arrayList = new ArrayList<>();
+
+        arrayList.add(getSongModel(1));
+        arrayList.add(getSongModel(1));
+        arrayList.add(getSongModel(2));
+        arrayList.add(getSongModel(0));
+
+        list.addAll(arrayList);
 
         checkSorted(list);
     }
 
-    private ObservableList<Integer> getListInstance()
-    {
-        Comparator<Integer> integerComparator = new Comparator<Integer>() {
-            @Override
-            public int compare(Integer o1, Integer o2) {
-                return o1 - o2;
-            }
-        };
-        return new ObservableSortedList<>(integerComparator);
+    private SongModel getSongModel(int order) {
+        SongModel songModel = new SongModel(UUID.randomUUID(), null, null);
+        songModel.setOrder(order);
+        return songModel;
     }
 
-    private void checkSorted(ObservableList<Integer> list) {
+    private ObservableList<SongModel> getListInstance() {
+        return new ObservableUniqueSortedList<>(new Comparator<SongModel>() {
+            @Override
+            public int compare(SongModel o1, SongModel o2) {
+                return o1.getOrder() < o2.getOrder() ? -1 : 1;
+            }
+        });
+    }
+
+    private void checkSorted(ObservableList<SongModel> list) {
         for (int i = 0; i < list.size() - 1; i++) {
-            if (list.get(i) > list.get(i + 1)) {
+            if (list.get(i).getOrder() >= list.get(i + 1).getOrder()) {
                 Assert.fail("not sorted");
             }
         }

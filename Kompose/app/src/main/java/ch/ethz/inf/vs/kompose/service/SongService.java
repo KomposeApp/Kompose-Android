@@ -74,7 +74,7 @@ public class SongService extends BaseService {
         //todo: connect with session service, send song
         SongConverter songConverter = new SongConverter(new ClientModel[0]);
         SongModel songModel = songConverter.convert(song);
-        networkService.sendRequestSong(null, song);
+        networkService.sendRequestSong(song);
     }
 
     /**
@@ -85,7 +85,7 @@ public class SongService extends BaseService {
     public void castSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        networkService.sendCastSkipSongVote(songModel.getPartOfSession().getConnectionDetails(), song);
+        networkService.sendCastSkipSongVote(song);
     }
 
     /**
@@ -96,7 +96,7 @@ public class SongService extends BaseService {
     public void removeSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        networkService.sendRemoveSkipSongVote(songModel.getPartOfSession().getConnectionDetails(), song);
+        networkService.sendRemoveSkipSongVote(song);
     }
 
 }

@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -11,7 +10,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
@@ -19,99 +17,97 @@ import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
+import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 
 /**
  * Service that provides various network functionality.
  */
-public class NetworkService extends BaseService {
+public class NetworkService extends BasePreferencesService {
 
     private final String LOG_TAG = "## NetworkService";
     public static final String RESPONSE_RECEIVED = "NetworkService.RESPONSE_RECEIVED";
     public static final String RESPONSE_FAILURE = "NetworkService.RESPONSE_FAILURE";
 
-    private final String DEVICE_UUID = "device_uuid";
-    private final String SETTING_KEY = "kompose";
-
-
-
     private Message getMessage(MessageType type) {
         Message msg = new Message();
-        msg.setSenderUuid(getDeviceUUID());
+        msg.setSenderUuid(getDeviceUUIDString());
         msg.setType(type.toString());
         return msg;
     }
 
-    public void sendRegisterClient(ConnectionDetails connectionInformation, String username) {
+    public void sendRegisterClient(String username) {
         Message msg = getMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendCastSkipSongVote(ConnectionDetails connectionInformation, Song song) {
+    public void sendCastSkipSongVote(Song song) {
         Message msg = getMessage(MessageType.CAST_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendRemoveSkipSongVote(ConnectionDetails connectionInformation, Song song) {
+    public void sendRemoveSkipSongVote(Song song) {
         Message msg = getMessage(MessageType.REMOVE_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendKeepAlive(ConnectionDetails connectionInformation) {
+    public void sendKeepAlive() {
         Message msg = getMessage(MessageType.KEEP_ALIVE);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendRequestSong(ConnectionDetails connectionInformation, Song song) {
+    public void sendRequestSong(Song song) {
         Message msg = getMessage(MessageType.REQUEST_SONG);
         msg.setSongDetails(song);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendUnRegisterClient(ConnectionDetails connectionInformation) {
+    public void sendUnRegisterClient() {
         Message msg = getMessage(MessageType.UNREGISTER_CLIENT);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendSessionUpdate(ConnectionDetails connectionInformation, Session session) {
+    public void sendSessionUpdate(Session session) {
         Message msg = getMessage(MessageType.SESSION_UPDATE);
         msg.setSession(session);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendError(ConnectionDetails connectionInformation, String error) {
+    public void sendError(String error) {
         Message msg = getMessage(MessageType.ERROR);
         msg.setErrorMessage(error);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
-    public void sendFinishSession(ConnectionDetails connectionInformation) {
+    public void sendFinishSession() {
         Message msg = getMessage(MessageType.FINISH_SESSION);
 
-        sendMessage(msg, connectionInformation);
+        sendMessage(msg);
     }
 
     /**
      * Send a message to a host.
      *
-     * @param msg     The message to be sent.
-     * @param preview The connection info about the session
-     *                If null, no response is expected.
+     * @param msg The message to be sent.
      */
-    private void sendMessage(Message msg, ConnectionDetails preview) {
-        AsyncSender asyncSender = new AsyncSender(msg, preview.getHostIP(), preview.getHostPort());
-        asyncSender.execute();
+    private void sendMessage(Message msg) {
+        ConnectionDetails connectionDetails = getActiveConnection();
+        if (connectionDetails == null) {
+            Log.d(LOG_TAG, "tried to send message but no active connection");
+        } else {
+            AsyncSender asyncSender = new AsyncSender(msg, connectionDetails.getHostIP(), connectionDetails.getHostPort());
+            asyncSender.execute();
+        }
     }
 
     private class AsyncSender extends AsyncTask<Void, Void, Void> {
@@ -170,32 +166,5 @@ public class NetworkService extends BaseService {
 
             return null;
         }
-    }
-
-
-    private String deviceUUID;
-
-    public String getDeviceUUID() {
-        boolean newDeviceUUID = false;
-
-        synchronized (this) {
-            if (deviceUUID == null) {
-                SharedPreferences preferences = getSharedPreferences(SETTING_KEY, MODE_PRIVATE);
-                if (!preferences.contains(DEVICE_UUID)) {
-                    deviceUUID = UUID.randomUUID().toString();
-                    newDeviceUUID = true;
-                } else {
-                    deviceUUID = preferences.getString(DEVICE_UUID, null);
-                }
-            }
-        }
-
-        if (newDeviceUUID) {
-            SharedPreferences.Editor editor = getSharedPreferences(SETTING_KEY, MODE_PRIVATE).edit();
-            editor.putString(DEVICE_UUID, deviceUUID);
-            editor.apply();
-        }
-
-        return deviceUUID;
     }
 }

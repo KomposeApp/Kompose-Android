@@ -5,20 +5,21 @@ import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
+import org.joda.time.DateTime;
+
 import java.net.URI;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
+import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
 
-public class SongModel extends BaseObservable {
+public class SongModel extends UniqueModel {
     public SongModel(UUID uuid, ClientModel proposedBy, SessionModel partOfSession) {
-        this.uuid = uuid;
+        super(uuid);
         this.proposedBy = proposedBy;
         this.partOfSession = partOfSession;
     }
-
-    private UUID uuid;
 
     private String title;
     private int secondsLength;
@@ -34,12 +35,9 @@ public class SongModel extends BaseObservable {
     private URI sourceUrl;
 
     private boolean skipVoteCasted;
+    private DateTime creationDateTime;
 
     private SongStatus status;
-
-    public UUID getUuid() {
-        return uuid;
-    }
 
     @Bindable
     public String getTitle() {
@@ -141,5 +139,15 @@ public class SongModel extends BaseObservable {
 
     public SessionModel getPartOfSession() {
         return partOfSession;
+    }
+
+    @Bindable
+    public DateTime getCreationDateTime() {
+        return creationDateTime;
+    }
+
+    public void setCreationDateTime(DateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
+        notifyPropertyChanged(BR.creationDateTime);
     }
 }

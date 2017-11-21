@@ -1,33 +1,34 @@
 package ch.ethz.inf.vs.kompose.model;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
-import android.net.wifi.p2p.WifiP2pManager;
 
-import java.net.InetAddress;
+import org.joda.time.DateTime;
+
 import java.util.Comparator;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
+import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
+import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
-public class SessionModel extends BaseObservable {
+public class SessionModel extends UniqueModel {
 
     public SessionModel(UUID uuid, UUID hostUUID) {
-        this.uuid = uuid;
+        super(uuid);
         this.hostUUID = hostUUID;
     }
 
-    private UUID uuid;
     private String sessionName;
     private UUID hostUUID;
+    private DateTime creationDateTime;
     private ConnectionDetails connectionDetails;
 
     private final ObservableList<ClientModel> clients = new ObservableArrayList<>();
 
-    private final ObservableList<SongModel> songs = new ObservableSortedList<>(
+    private final ObservableList<SongModel> songs = new ObservableUniqueSortedList<>(
             new SongComparator());
 
     public ObservableList<SongModel> getSongs() {
@@ -42,6 +43,16 @@ public class SessionModel extends BaseObservable {
         this.connectionDetails = connectionDetails;
     }
 
+    @Bindable
+    public DateTime getCreationDateTime() {
+        return creationDateTime;
+    }
+
+    public void setCreationDateTime(DateTime creationDateTime) {
+        this.creationDateTime = creationDateTime;
+        notifyPropertyChanged(BR.creationDateTime);
+    }
+
     private class SongComparator implements Comparator<SongModel> {
         @Override
         public int compare(SongModel s1, SongModel s2) {
@@ -49,9 +60,6 @@ public class SessionModel extends BaseObservable {
         }
     }
 
-    public UUID getUuid() {
-        return uuid;
-    }
 
     public UUID getHostUUID() {
         return hostUUID;
