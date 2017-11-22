@@ -11,9 +11,7 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.converter.ClientConverter;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.data.json.Session;
-import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
@@ -44,6 +42,15 @@ public class SessionService extends BasePreferencesService {
     private boolean isHost = false;
 
     /**
+     * inform all other services that the connection has changed
+     */
+    private void broadcastConnectionChanged() {
+        Intent intent = new Intent(CONNECTION_CHANGED_EVENT);
+        sendBroadcast(intent);
+    }
+
+
+    /**
      * join the active session as a client with the specified name
      *
      * @param clientName the name to use
@@ -57,6 +64,8 @@ public class SessionService extends BasePreferencesService {
 
         SessionConverter sessionConverter = new SessionConverter();
         activeSession = sessionConverter.convert(activeSessionModel);
+
+        broadcastConnectionChanged();
     }
 
     /**
@@ -102,6 +111,14 @@ public class SessionService extends BasePreferencesService {
         isHost = false;
         activeSessionModel = null;
         activeClient = null;
+
+        broadcastConnectionChanged();
+    }
+
+    public void sessionChanged() {
+        if (isHost) {
+            getNetworkService().sendSessionUpdate(activeSession);
+        }
     }
 
     /**

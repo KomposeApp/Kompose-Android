@@ -2,7 +2,6 @@ package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -16,7 +15,7 @@ import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
+import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
@@ -41,16 +40,16 @@ public class NetworkService extends BasePreferencesService implements BaseServic
     public void intentActionReceived(String action, Intent intent) {
         if (action.equals(SessionService.CONNECTION_CHANGED_EVENT)) {
             Log.d(LOG_TAG, "intent received with action = " + action);
-            this.connectionDetails = intent.getParcelableExtra("connection_details");
+            this.activeConnection = intent.getParcelableExtra("connection_details");
         } else {
             Log.e(LOG_TAG, "unknown intent received with action = " + action);
         }
     }
 
-    private ConnectionDetails connectionDetails;
+    private ServerConnectionDetails activeConnection;
 
-    private ConnectionDetails getActiveConnection() {
-        return connectionDetails;
+    private ServerConnectionDetails getActiveConnection() {
+        return activeConnection;
     }
 
     private Message getMessage(MessageType type) {
@@ -129,7 +128,7 @@ public class NetworkService extends BasePreferencesService implements BaseServic
         Thread handler = new Thread(new MessageHandler(getSessionService(), message));
         handler.start();
 
-        ConnectionDetails connectionDetails = getActiveConnection();
+        ServerConnectionDetails connectionDetails = getActiveConnection();
         if (connectionDetails == null) {
             Log.d(LOG_TAG, "tried to send message but no active connection");
         } else {

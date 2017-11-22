@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
 import org.joda.time.DateTime;
@@ -19,7 +20,7 @@ import ch.ethz.inf.vs.kompose.service.base.BaseService;
  */
 
 public class SampleService extends BaseService {
-    ObservableList<ClientModel> clientModelObservableList = new ObservableUniqueSortedList<>(new Comparator<ClientModel>() {
+    ObservableArrayList<ClientModel> clientModelObservableList = new ObservableUniqueSortedList<>(new Comparator<ClientModel>() {
         @Override
         public int compare(ClientModel o1, ClientModel o2) {
             return 0;
@@ -42,7 +43,7 @@ public class SampleService extends BaseService {
         return clientModel;
     }
 
-    public ObservableList<ClientModel> getClients() {
+    public ObservableArrayList<ClientModel> getClients() {
         SessionModel sessionModel = getSampleSession("client session");
 
         clientModelObservableList.add(getSampleClient(sessionModel, "Sandro"));

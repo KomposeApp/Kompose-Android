@@ -5,15 +5,13 @@ import android.os.Parcelable;
 
 import java.net.InetAddress;
 
-import ch.ethz.inf.vs.kompose.data.json.Song;
-
 /**
  * Created by git@famoser.ch on 20/11/2017.
  */
 
-public class ConnectionDetails implements Parcelable {
+public class ServerConnectionDetails implements Parcelable {
 
-    public ConnectionDetails(InetAddress hostIP, int hostPort) {
+    public ServerConnectionDetails(InetAddress hostIP, int hostPort) {
         this.hostIP = hostIP;
         this.hostPort = hostPort;
     }
@@ -22,7 +20,7 @@ public class ConnectionDetails implements Parcelable {
     private int hostPort;
 
 
-    protected ConnectionDetails(Parcel in) {
+    protected ServerConnectionDetails(Parcel in) {
         hostPort = in.readInt();
     }
 
@@ -36,15 +34,15 @@ public class ConnectionDetails implements Parcelable {
         return 0;
     }
 
-    public static final Creator<ConnectionDetails> CREATOR = new Creator<ConnectionDetails>() {
+    public static final Creator<ServerConnectionDetails> CREATOR = new Creator<ServerConnectionDetails>() {
         @Override
-        public ConnectionDetails createFromParcel(Parcel in) {
-            return new ConnectionDetails(in);
+        public ServerConnectionDetails createFromParcel(Parcel in) {
+            return new ServerConnectionDetails(in);
         }
 
         @Override
-        public ConnectionDetails[] newArray(int size) {
-            return new ConnectionDetails[size];
+        public ServerConnectionDetails[] newArray(int size) {
+            return new ServerConnectionDetails[size];
         }
     };
 

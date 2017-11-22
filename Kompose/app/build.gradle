@@ -34,7 +34,6 @@ dependencies {
             [group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.0'],
             [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.0']
     )
-
     compile 'com.github.evgenyneu:js-evaluator-for-android:v3.0.0'
     compile 'com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT'
 

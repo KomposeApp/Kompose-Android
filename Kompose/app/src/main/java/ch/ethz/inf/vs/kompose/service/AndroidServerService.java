@@ -1,25 +1,16 @@
 package ch.ethz.inf.vs.kompose.service;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
-import android.os.IBinder;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Message;
-import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
-import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 

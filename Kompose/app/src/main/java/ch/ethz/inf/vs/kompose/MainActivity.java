@@ -8,9 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
-import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class MainActivity extends BaseServiceActivity {
 
@@ -49,6 +46,15 @@ public class MainActivity extends BaseServiceActivity {
         Log.d(LOG_TAG, "History button pressed");
         Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
         startActivity(historyIntent);
+    }
+
+    /**
+     * Navigation to the Design Activity
+     */
+    public void viewDesignFromTitle(View view) {
+        Log.d(LOG_TAG, "Design button pressed");
+        Intent desingIntent = new Intent(this, DesignActivity.class);
+        startActivity(desingIntent);
     }
 
     /**

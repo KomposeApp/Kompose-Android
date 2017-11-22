@@ -6,6 +6,7 @@ import android.databinding.Bindable;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.data.network.ClientConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
 
 public class ClientModel extends UniqueModel {
@@ -18,6 +19,8 @@ public class ClientModel extends UniqueModel {
     private String name;
     private boolean isActive;
     private SessionModel partOfSession;
+    private ClientConnectionDetails clientConnectionDetails;
+
 
     @Bindable
     public String getName() {
@@ -41,5 +44,13 @@ public class ClientModel extends UniqueModel {
 
     public SessionModel getPartOfSession() {
         return partOfSession;
+    }
+
+    public ClientConnectionDetails getClientConnectionDetails() {
+        return clientConnectionDetails;
+    }
+
+    public void setClientConnectionDetails(ClientConnectionDetails clientConnectionDetails) {
+        this.clientConnectionDetails = clientConnectionDetails;
     }
 }

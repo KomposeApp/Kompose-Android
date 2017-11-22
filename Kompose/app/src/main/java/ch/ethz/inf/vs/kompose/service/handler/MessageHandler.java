@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.Log;
 
+import org.joda.time.DateTime;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -22,6 +24,7 @@ import ch.ethz.inf.vs.kompose.data.json.DownVote;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
+import ch.ethz.inf.vs.kompose.data.network.ClientConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
@@ -75,38 +78,54 @@ public class MessageHandler implements Runnable {
                 return;
             }
 
-            MessageType messageType = MessageType.valueOf(message.getType());
-            Log.d(LOG_TAG, "Message processing (" + messageType + ")");
-
-
             Session activeSession = sessionService.getActiveSession();
             SessionModel activeSessionModel = sessionService.getActiveSessionModel();
 
+            MessageType messageType = MessageType.valueOf(message.getType());
+            Log.d(LOG_TAG, "Message processing (" + messageType + ")");
+
+            ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel);
+            if (clientModel != null && clientModel.getClientConnectionDetails() != null) {
+                clientModel.getClientConnectionDetails().setLastRequestReceived(DateTime.now());
+            }
+
+            if (clientModel == null && messageType != MessageType.REGISTER_CLIENT) {
+                //client unknown; therefore not allows to do request
+                return;
+            }
+
+            boolean sessionHasChanged = false;
             switch (messageType) {
                 case REGISTER_CLIENT:
-                    registerClient(message, activeSession, activeSessionModel);
+                    sessionHasChanged = registerClient(message, activeSession, activeSessionModel);
                     break;
                 case UNREGISTER_CLIENT:
-                    unregisterClient(message, activeSession, activeSessionModel);
+                    sessionHasChanged = unregisterClient(message, activeSession, activeSessionModel);
                     break;
                 case SESSION_UPDATE:
                     sessionUpdate(message, activeSession, activeSessionModel);
                     break;
                 case REQUEST_SONG:
-                    requestSong(message, activeSession, activeSessionModel);
+                    sessionHasChanged = requestSong(message, activeSession, activeSessionModel);
                     break;
                 case CAST_SKIP_SONG_VOTE:
-                    castSkipSongVote(message, activeSession, activeSessionModel);
+                    sessionHasChanged = castSkipSongVote(message, activeSession, activeSessionModel);
                     break;
                 case REMOVE_SKIP_SONG_VOTE:
-                    removeSkipSongVote(message, activeSession, activeSessionModel);
+                    sessionHasChanged = removeSkipSongVote(message, activeSession, activeSessionModel);
                     break;
                 case KEEP_ALIVE:
+                    //already handled by refreshClientTimeout before
                     break;
                 case FINISH_SESSION:
+                    finishSession();
                     break;
                 case ERROR:
+                    //not used so far
                     break;
+            }
+            if (sessionHasChanged) {
+                sessionService.sessionChanged();
             }
 
         } catch (IOException e) {
@@ -114,11 +133,11 @@ public class MessageHandler implements Runnable {
         }
     }
 
-    private void broadcastNewSession() {
-
+    private void finishSession() {
+        sessionService.leaveSession();
     }
 
-    private void registerClient(Message message, Session session, SessionModel sessionModel) {
+    private boolean registerClient(Message message, Session session, SessionModel sessionModel) {
         Client client = new Client();
         client.setIsActive(true);
         client.setName(message.getSenderUsername());
@@ -132,11 +151,16 @@ public class MessageHandler implements Runnable {
         ClientConverter clientConverter = new ClientConverter(sessionModel);
         ClientModel clientModel = clientConverter.convert(client);
 
+        if (socket != null) {
+            ClientConnectionDetails connectionDetails = new ClientConnectionDetails(socket, DateTime.now());
+            clientModel.setClientConnectionDetails(connectionDetails);
+        }
+
         sessionModel.getClients().add(clientModel);
-        broadcastNewSession();
+        return true;
     }
 
-    private void unregisterClient(Message message, Session session, SessionModel sessionModel) {
+    private boolean unregisterClient(Message message, Session session, SessionModel sessionModel) {
         Client foundClient = null;
         for (Client client :
                 session.getClients()) {
@@ -147,36 +171,40 @@ public class MessageHandler implements Runnable {
         }
 
         if (foundClient == null) {
-            return;
+            return false;
         }
-
 
         foundClient.setIsActive(false);
+
         UUID clientUUID = UUID.fromString(foundClient.getUuid());
-        for (ClientModel client :
-                sessionModel.getClients()) {
-            if (client.getUuid().equals(clientUUID)) {
-                client.setIsActive(false);
+        ClientModel clientModel = getClientModel(clientUUID, sessionModel);
+        if (clientModel != null) {
+            clientModel.setIsActive(false);
 
-                //remove downvote validity
-                for (SongModel songModel : sessionModel.getSongs()) {
-                    for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
-                        if (downVoteModel.getUuid().equals(clientUUID)) {
-                            songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
-                            checkDownVoteCount(sessionModel, songModel);
-                            break;
-                        }
-                    }
-
+            if (clientModel.getClientConnectionDetails() != null) {
+                try {
+                    clientModel.getClientConnectionDetails().getSocket().close();
+                } catch (IOException e) {
+                    Log.d(LOG_TAG, "socket could not be closed");
                 }
-                break;
+                clientModel.setClientConnectionDetails(null);
+            }
+
+            //remove downvote validity
+            for (SongModel songModel : sessionModel.getSongs()) {
+                for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
+                    if (downVoteModel.getUuid().equals(clientUUID)) {
+                        songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
+                        checkDownVoteCount(sessionModel, songModel);
+                        break;
+                    }
+                }
             }
         }
-
-        broadcastNewSession();
+        return true;
     }
 
-    private void requestSong(Message message, Session session, SessionModel sessionModel) {
+    private boolean requestSong(Message message, Session session, SessionModel sessionModel) {
         Song song = message.getSongDetails();
         song.setProposedByClientUuid(message.getSenderUuid());
 
@@ -191,17 +219,17 @@ public class MessageHandler implements Runnable {
         songModel.setOrder(sessionModel.getSongs().size() + 1);
 
         sessionModel.getSongs().add(songModel);
-        broadcastNewSession();
+        return true;
     }
 
-    private void castSkipSongVote(Message message, Session activeSession, SessionModel activeSessionModel) {
+    private boolean castSkipSongVote(Message message, Session activeSession, SessionModel activeSessionModel) {
         Song downVoteTarget = null;
         for (Song song : activeSession.getSongs()) {
             if (message.getSongDetails().getUuid().equals(song.getUuid())) {
                 for (DownVote downVote : song.getDownVotes()) {
                     if (downVote.getClientUuid().equals(message.getSenderUuid())) {
                         //already cast the vote, liar liar chickeneier
-                        return;
+                        return false;
                     }
                 }
                 downVoteTarget = song;
@@ -210,7 +238,7 @@ public class MessageHandler implements Runnable {
         }
 
         if (downVoteTarget == null) {
-            return;
+            return false;
         }
 
         DownVote downVote = new DownVote();
@@ -228,7 +256,7 @@ public class MessageHandler implements Runnable {
                 for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
                     if (downVoteModel.getClientModel().getUuid().equals(clientUUID)) {
                         //ehm wat? this should have failed in the Session object.
-                        return;
+                        return false;
                     }
                 }
                 DownVoteConverter downVoteConverter = new DownVoteConverter(activeSessionModel.getClients(), songModel);
@@ -237,14 +265,14 @@ public class MessageHandler implements Runnable {
                 songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() + 1);
 
                 checkDownVoteCount(activeSessionModel, songModel);
+                return true;
             }
         }
-
-        broadcastNewSession();
+        return false;
     }
 
 
-    private void removeSkipSongVote(Message message, Session activeSession, SessionModel activeSessionModel) {
+    private boolean removeSkipSongVote(Message message, Session activeSession, SessionModel activeSessionModel) {
         Song downVoteTarget = null;
         DownVote downVote = null;
         for (Song song : activeSession.getSongs()) {
@@ -266,7 +294,7 @@ public class MessageHandler implements Runnable {
         }
 
         if (downVoteTarget == null) {
-            return;
+            return false;
         }
 
         UUID songUUID = UUID.fromString(downVoteTarget.getUuid());
@@ -278,16 +306,40 @@ public class MessageHandler implements Runnable {
                     if (songModel.getDownVotes().get(i).getUuid().equals(downVoteUUID)) {
                         songModel.getDownVotes().remove(i);
                         checkDownVoteCount(activeSessionModel, songModel);
-                        return;
+                        return true;
                     }
                 }
                 //ehm wat? this should have failed in the Session object.
-                return;
+                break;
             }
         }
+        return false;
+    }
 
-        broadcastNewSession();
+    private void sessionUpdate(Message message, Session activeSession, SessionModel activeSessionModel) {
+        Session receivedSession = message.getSession();
 
+        activeSession.setSessionName(receivedSession.getSessionName());
+        activeSession.setCreationDateTime(receivedSession.getCreationDateTime());
+        activeSession.setHostUuid(receivedSession.getHostUuid());
+
+
+        //this method receives the SESSION_UPDATE command from the server
+        //the SESSION_UPDATE command contains the server approved session (in the message object)
+        //use this server approved message now to update the activeSession object and the activeSessionModel
+        //the hard part: do not replace ANY references. if the object already exists (identified with the UUID) you can not create a new one, but rather have to replace the content of the fields.
+        //see the other implemenentations for reference
+    }
+
+
+    private ClientModel getClientModel(UUID clientUUID, SessionModel sessionModel) {
+        for (ClientModel client :
+                sessionModel.getClients()) {
+            if (client.getUuid().equals(clientUUID)) {
+                return client;
+            }
+        }
+        return null;
     }
 
     private void checkDownVoteCount(SessionModel sessionModel, SongModel songModel) {
@@ -308,16 +360,5 @@ public class MessageHandler implements Runnable {
         } else {
             songModel.setStatus(SongStatus.IN_QUEUE);
         }
-    }
-
-    private void sessionUpdate(Message message, Session activeSession, SessionModel activeSessionModel) {
-        Session receivedSession = message.getSession();
-
-        activeSession.setSessionName(receivedSession.getSessionName());
-        activeSession.setCreationDateTime(receivedSession.getCreationDateTime());
-        activeSession.setHostUuid(receivedSession.getHostUuid());
-
-
-        //todo BROT: perform IN MEMORY update of current session (no replacing references!)
     }
 }

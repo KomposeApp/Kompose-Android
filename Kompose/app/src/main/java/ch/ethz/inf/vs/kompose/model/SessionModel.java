@@ -10,7 +10,7 @@ import java.util.Comparator;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
-import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
+import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
@@ -24,7 +24,7 @@ public class SessionModel extends UniqueModel {
     private String sessionName;
     private UUID hostUUID;
     private DateTime creationDateTime;
-    private ConnectionDetails connectionDetails;
+    private ServerConnectionDetails connectionDetails;
 
     private final ObservableList<ClientModel> clients = new ObservableArrayList<>();
 
@@ -35,11 +35,11 @@ public class SessionModel extends UniqueModel {
         return songs;
     }
 
-    public ConnectionDetails getConnectionDetails() {
+    public ServerConnectionDetails getConnectionDetails() {
         return connectionDetails;
     }
 
-    public void setConnectionDetails(ConnectionDetails connectionDetails) {
+    public void setConnectionDetails(ServerConnectionDetails connectionDetails) {
         this.connectionDetails = connectionDetails;
     }
 
