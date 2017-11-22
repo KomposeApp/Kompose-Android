@@ -53,7 +53,6 @@ public class AndroidServerService extends BasePreferencesService {
             e.printStackTrace();
         }
 
-
         return START_STICKY;
     }
 
@@ -70,9 +69,9 @@ public class AndroidServerService extends BasePreferencesService {
             String uuid = getSessionService().getActiveSessionModel().getUuid().toString();
             String hostUuid = getSessionService().getActiveSessionModel().getHostUUID().toString();
 
-            sessionName = sessionName.substring(0, 255);
-            uuid = uuid.substring(0, 255);
-            hostUuid = hostUuid.substring(0, 255);
+            sessionName = sessionName.substring(0, Math.min(255, sessionName.length()));
+            uuid = uuid.substring(0, Math.min(255, uuid.length()));
+            hostUuid = hostUuid.substring(0, Math.min(255, hostUuid.length()));
 
             serviceInfo.setAttribute("session", sessionName);
             serviceInfo.setAttribute("uuid", uuid);
