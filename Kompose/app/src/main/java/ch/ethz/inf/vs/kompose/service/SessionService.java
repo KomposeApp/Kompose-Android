@@ -8,12 +8,9 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.converter.ClientConverter;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.data.json.Session;
-import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;

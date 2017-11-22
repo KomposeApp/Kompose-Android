@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.databinding.ObservableArrayList;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -8,6 +10,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.Map;
+import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
@@ -18,9 +22,12 @@ import ch.ethz.inf.vs.kompose.service.base.BaseService;
 public class ClientNetworkService extends BaseService{
 
     private static final String LOG_TAG = "## ClientNetworkService";
+    private static final String SERVICE_TYPE = "_kompose._tcp";
 
-    // TODO
     public void findNetworkServices(ObservableArrayList<SessionModel> list) {
+        NsdManager nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
+        ClientServiceListener clientServiceListener = new ClientServiceListener(list);
+        nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, clientServiceListener);
     }
 
     public void startClientSocketListener(Socket socket) {
@@ -28,7 +35,7 @@ public class ClientNetworkService extends BaseService{
         clientListenerTask.execute();
     }
 
-    public static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
+    private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
 
         private Socket socket;
         private static final String LOG_TAG = "## ClientListenerTask";
@@ -49,7 +56,7 @@ public class ClientNetworkService extends BaseService{
             return message;
         }
 
-        public ClientListenerTask(Socket socket) {
+        ClientListenerTask(Socket socket) {
             this.socket = socket;
         }
 
@@ -69,6 +76,55 @@ public class ClientNetworkService extends BaseService{
             }
 
             return null;
+        }
+    }
+
+    private class ClientServiceListener implements NsdManager.DiscoveryListener {
+
+        private ObservableArrayList<SessionModel> sessionList;
+
+        ClientServiceListener(ObservableArrayList<SessionModel> sessionList) {
+            this.sessionList = sessionList;
+        }
+
+        @Override
+        public void onStartDiscoveryFailed(String serviceType, int errorCode) {
+            Log.d(LOG_TAG, "starting service discovery failed");
+        }
+
+        @Override
+        public void onStopDiscoveryFailed(String serviceType, int errorCode) {
+            Log.d(LOG_TAG, "stopping service discovery failed");
+        }
+
+        @Override
+        public void onDiscoveryStarted(String serviceType) {
+            Log.d(LOG_TAG, "service discovery started");
+        }
+
+        @Override
+        public void onDiscoveryStopped(String serviceType) {
+            Log.d(LOG_TAG, "service discovery stopped");
+        }
+
+        @Override
+        public void onServiceFound(NsdServiceInfo serviceInfo) {
+            Log.d(LOG_TAG, "service found: "
+                    + serviceInfo.getServiceName() + " ("
+                    + serviceInfo.getHost() + ","
+                    + serviceInfo.getPort() + ")");
+            Map<String,byte[]> attributes = serviceInfo.getAttributes();
+            SessionModel sessionModel = new SessionModel(
+                    UUID.fromString(new String(attributes.get("uuid"))),
+                    UUID.fromString(new String(attributes.get("host_uuid")))
+            );
+            sessionModel.setSessionName(new String(attributes.get("session")));
+            sessionList.add(sessionModel);
+        }
+
+        @Override
+        public void onServiceLost(NsdServiceInfo serviceInfo) {
+            Log.d(LOG_TAG, "service lost: " + serviceInfo.getServiceName());
         }
     }
 }
