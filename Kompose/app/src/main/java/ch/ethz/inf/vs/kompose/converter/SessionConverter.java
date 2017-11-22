@@ -74,7 +74,10 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         session.setHostUuid(sessionModel.getHostUUID().toString());
         session.setSessionName(sessionModel.getSessionName());
         session.setUuid(sessionModel.getUuid().toString());
-        session.setCreationDateTime(sessionModel.getCreationDateTime().toString());
+
+        if (sessionModel.getCreationDateTime() != null) {
+            session.setCreationDateTime(sessionModel.getCreationDateTime().toString());
+        }
 
         return session;
     }
