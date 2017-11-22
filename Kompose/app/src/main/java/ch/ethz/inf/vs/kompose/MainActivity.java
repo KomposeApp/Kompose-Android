@@ -1,16 +1,11 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-
-import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
-import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class MainActivity extends BaseServiceActivity {
 

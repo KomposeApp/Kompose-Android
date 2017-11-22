@@ -14,8 +14,11 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
+/** Convert Session data representation to model representation, and vice-versa. **/
+
 public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
+    /** Data --> Model **/
     public SessionModel convert(Session session) {
 
         SessionModel sessionModel = new SessionModel(
@@ -28,7 +31,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         DateTimeFormatter isoParser = ISODateTimeFormat.dateTime();
         sessionModel.setCreationDateTime(isoParser.parseDateTime(session.getCreationDateTime()));
 
-        //convert clients
+        //convert clients (also converts all contained clients to models)
         if (session.getClients() != null) {
             ClientConverter clientConverter = new ClientConverter(sessionModel);
             for (Client client : session.getClients()) {
@@ -36,7 +39,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
             }
         }
 
-        //convert songs
+        //convert songs (also converts all contained songs to models)
         if (session.getSongs() != null) {
             SongConverter songConverter = new SongConverter(sessionModel.getClients());
             for (Song song : session.getSongs()) {
@@ -47,9 +50,11 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         return sessionModel;
     }
 
+    /** Model --> Data **/
     public Session convert(SessionModel sessionModel) {
         Session session = new Session();
 
+        //Convert client models to data
         ClientConverter clientConverter = new ClientConverter(sessionModel);
         ObservableList<ClientModel> clientModels = sessionModel.getClients();
         session.setClients(new Client[clientModels.size()]);
@@ -57,6 +62,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
             session.getClients()[i] = clientConverter.convert(clientModels.get(i));
         }
 
+        //convert song models to data
         SongConverter songConverter = new SongConverter(clientModels);
         ObservableList<SongModel> songModels = sessionModel.getSongs();
         session.setSongs(new Song[songModels.size()]);
@@ -64,6 +70,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
             session.getSongs()[i] = songConverter.convert(songModels.get(i));
         }
 
+        //set remaining contents
         session.setHostUuid(sessionModel.getHostUUID().toString());
         session.setSessionName(sessionModel.getSessionName());
         session.setUuid(sessionModel.getUuid().toString());

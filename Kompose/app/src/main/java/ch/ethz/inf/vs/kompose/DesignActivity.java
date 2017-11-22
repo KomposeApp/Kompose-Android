@@ -1,12 +1,6 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.databinding.DataBindingUtil;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-
-import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
-import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class DesignActivity extends BaseServiceActivity {
 

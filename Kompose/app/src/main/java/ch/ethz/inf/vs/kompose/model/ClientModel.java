@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.kompose.model;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
 import java.util.UUID;
@@ -10,14 +9,14 @@ import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
 
 public class ClientModel extends UniqueModel {
 
+    private String name;
+    private boolean isActive;
+    private SessionModel partOfSession;
+
     public ClientModel(UUID uuid, SessionModel partOfSession) {
         super(uuid);
         this.partOfSession = partOfSession;
     }
-
-    private String name;
-    private boolean isActive;
-    private SessionModel partOfSession;
 
     @Bindable
     public String getName() {

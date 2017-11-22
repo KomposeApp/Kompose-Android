@@ -3,11 +3,7 @@ package ch.ethz.inf.vs.kompose.model;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 
-import org.joda.time.DateTime;
-
 import java.util.UUID;
-
-import ch.ethz.inf.vs.kompose.BR;
 
 public class DownVoteModel extends BaseObservable {
     public DownVoteModel(UUID uuid, ClientModel clientModel, SongModel downVoteFor) {

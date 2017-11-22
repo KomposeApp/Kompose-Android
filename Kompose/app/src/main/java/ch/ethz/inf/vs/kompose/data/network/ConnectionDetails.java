@@ -5,12 +5,6 @@ import android.os.Parcelable;
 
 import java.net.InetAddress;
 
-import ch.ethz.inf.vs.kompose.data.json.Song;
-
-/**
- * Created by git@famoser.ch on 20/11/2017.
- */
-
 public class ConnectionDetails implements Parcelable {
 
     public ConnectionDetails(InetAddress hostIP, int hostPort) {
@@ -18,13 +12,12 @@ public class ConnectionDetails implements Parcelable {
         this.hostPort = hostPort;
     }
 
-    private InetAddress hostIP;
-    private int hostPort;
-
-
-    protected ConnectionDetails(Parcel in) {
+    private ConnectionDetails(Parcel in) {
         hostPort = in.readInt();
     }
+
+    private InetAddress hostIP;
+    private int hostPort;
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {

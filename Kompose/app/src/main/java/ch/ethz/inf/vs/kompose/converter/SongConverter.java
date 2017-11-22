@@ -14,14 +14,19 @@ import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
+/** Convert Session data representation to model representation, and vice-versa. **/
+
 public class SongConverter implements IBaseConverter<SongModel, Song> {
 
+    //Client pool used to determine who the song was proposed by.
     private ClientModel[] clientModels;
 
+    //Constructor for standard arrays (no transformation needed)
     public SongConverter(ClientModel[] clientModels) {
         this.clientModels = clientModels;
     }
 
+    //Constructor for observable list
     public SongConverter(ObservableList<ClientModel> clientModels) {
         if (clientModels.size() == 0) {
             this.clientModels = new ClientModel[0];
@@ -30,6 +35,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         }
     }
 
+    /** Data --> Model **/
     public SongModel convert(Song song) {
 
         //resolve client / session

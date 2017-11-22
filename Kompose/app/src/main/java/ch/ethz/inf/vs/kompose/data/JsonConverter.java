@@ -1,7 +1,3 @@
-/*
- * This is auto-generated code. Do not change!
- * Source: https://quicktype.io/
- */
 package ch.ethz.inf.vs.kompose.data;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,18 +15,22 @@ import ch.ethz.inf.vs.kompose.data.json.Session;
 
 public class JsonConverter {
 
+    /** JSON --> Message **/
     public static Message fromMessageJsonString(String json) throws IOException {
         return getObjectReader(Message.class).readValue(json);
     }
 
+    /** JSON --> Session **/
     public static Session fromSessionJsonString(String json) throws IOException {
         return getObjectReader(Session.class).readValue(json);
     }
 
+    /** Message --> JSON String **/
     public static String toJsonString(Message obj) throws JsonProcessingException {
         return getObjectWriter(Message.class).writeValueAsString(obj);
     }
 
+    /** Session --> JSON String **/
     public static String toJsonString(Session obj) throws JsonProcessingException {
         return getObjectWriter(Session.class).writeValueAsString(obj);
     }

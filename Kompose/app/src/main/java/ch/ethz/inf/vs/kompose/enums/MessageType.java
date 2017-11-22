@@ -9,5 +9,5 @@ public enum MessageType {
     REMOVE_SKIP_SONG_VOTE,
     KEEP_ALIVE,
     FINISH_SESSION,
-    ERROR;
+    ERROR
 }

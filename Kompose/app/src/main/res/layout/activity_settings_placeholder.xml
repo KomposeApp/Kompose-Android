@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="30dp"
-        android:layout_above="@id/button_settings_confirm">
+        android:layout_above="@id/textview_settings_error">
         <android.support.constraint.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
@@ -128,4 +128,20 @@
         android:layout_alignParentEnd="true"
         android:onClick="confirmSettings"
         android:text="@string/settings_confirm"/>
+
+    <TextView android:id="@+id/textview_settings_error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@id/button_settings_confirm"
+        android:text=""
+        android:textColor="@color/colorAccent"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="-20dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:fontFamily="sans-serif-smallcaps"
+        android:textAlignment="center"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentEnd="true"/>
 </android.widget.RelativeLayout>

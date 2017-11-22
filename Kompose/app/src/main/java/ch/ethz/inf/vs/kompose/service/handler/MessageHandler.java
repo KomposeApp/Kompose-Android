@@ -1,13 +1,10 @@
 package ch.ethz.inf.vs.kompose.service.handler;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
@@ -29,7 +26,6 @@ import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SessionService;
-import ch.ethz.inf.vs.kompose.service.SongService;
 
 public class MessageHandler implements Runnable {
     private static final String LOG_TAG = "## MessageHandler";
@@ -318,6 +314,6 @@ public class MessageHandler implements Runnable {
         activeSession.setHostUuid(receivedSession.getHostUuid());
 
 
-        //todo BROT: perform IN MEMORY update of current session (no replacing references!)
+        //todo BRO: perform IN MEMORY update of current session (no replacing references!)
     }
 }

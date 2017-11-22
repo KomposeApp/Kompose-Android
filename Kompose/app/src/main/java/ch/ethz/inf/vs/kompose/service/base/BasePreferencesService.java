@@ -5,12 +5,6 @@ import android.preference.PreferenceManager;
 
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
-
-/**
- * Created by git@famoser.ch on 21/11/2017.
- */
-
 public abstract class BasePreferencesService extends BaseService {
 
     public static final String DEVICE_UUID = "device_uuid";
