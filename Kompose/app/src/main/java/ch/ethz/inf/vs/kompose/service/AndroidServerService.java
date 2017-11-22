@@ -37,8 +37,8 @@ public class AndroidServerService extends BasePreferencesService {
     @Override
     public void onCreate() {
         super.onCreate();
-
         Log.d(LOG_TAG, "created");
+        bindBaseService(SessionService.class);
     }
 
     @Override
@@ -56,6 +56,18 @@ public class AndroidServerService extends BasePreferencesService {
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
         serviceInfo.setServiceName(SERVICE_NAME);
         serviceInfo.setServiceType(SERVICE_TYPE);
+
+        String sessionName = getSessionService().getActiveSessionModel().getSessionName();
+        String uuid = getSessionService().getActiveSessionModel().getUuid().toString();
+        String hostUuid = getSessionService().getActiveSessionModel().getHostUUID().toString();
+
+        sessionName = sessionName.substring(0, 255);
+        uuid = uuid.substring(0, 255);
+        hostUuid = hostUuid.substring(0, 255);
+
+        serviceInfo.setAttribute("session", sessionName);
+        serviceInfo.setAttribute("uuid", uuid);
+        serviceInfo.setAttribute("host_uuid", hostUuid);
 
         Log.d(LOG_TAG, "Using port: " + localPort);
         serviceInfo.setPort(localPort);
