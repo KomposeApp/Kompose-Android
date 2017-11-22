@@ -33,9 +33,9 @@ public class SettingsActivity extends AppCompatActivity {
         port_input = findViewById(R.id.edittext_setting_port);
 
         sPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int preload = sPrefs.getInt(BasePreferencesService.KEY_PRELOAD, 1);
-        String username = sPrefs.getString(BasePreferencesService.KEY_USERNAME, "");
-        int port = sPrefs.getInt(BasePreferencesService.KEY_PORT, 0);
+        int preload = sPrefs.getInt(BasePreferencesService.KEY_PRELOAD, BasePreferencesService.DEFAULT_PRELOAD);
+        String username = sPrefs.getString(BasePreferencesService.KEY_USERNAME, BasePreferencesService.DEFAULT_USERNAME);
+        int port = sPrefs.getInt(BasePreferencesService.KEY_PORT, BasePreferencesService.DEFAULT_PORT);
 
         preload_input.setText(String.valueOf(preload));
         username_input.setText(username);

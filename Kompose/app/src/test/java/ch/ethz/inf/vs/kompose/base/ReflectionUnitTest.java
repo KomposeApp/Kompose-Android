@@ -13,9 +13,6 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 
-/**
- * Created by git@famoser.ch on 20/11/2017.
- */
 
 public class ReflectionUnitTest {
 

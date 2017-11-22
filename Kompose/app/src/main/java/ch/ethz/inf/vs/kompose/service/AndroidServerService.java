@@ -11,7 +11,7 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
+import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
@@ -19,7 +19,7 @@ import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
  * First the service is registered on the network, then an AsyncTask
  * that accepts connections is launched.
  */
-public class AndroidServerService extends BaseService {
+public class AndroidServerService extends BasePreferencesService {
 
     private static final String LOG_TAG = "## AndroidServerService";
 
@@ -46,7 +46,7 @@ public class AndroidServerService extends BaseService {
         Log.d(LOG_TAG, "started");
 
         try {
-            serverSocket = new ServerSocket(0);
+            serverSocket = new ServerSocket(getCurrentPort());
             localPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
@@ -68,7 +68,7 @@ public class AndroidServerService extends BaseService {
         serverTask = new ServerTask();
         serverTask.execute();
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -111,17 +111,17 @@ public class AndroidServerService extends BaseService {
 
         private static final String LOG_TAG = "## ServerTask";
 
-
         @Override
         protected Void doInBackground(Void... voids) {
             Log.d(LOG_TAG, "Server ready to receive connections");
 
             while (!this.isCancelled()) {
                 try {
-                    final Socket socket = serverSocket.accept();
+                    final Socket connection = serverSocket.accept();
+
                     Log.d(LOG_TAG, "message received");
 
-                    MessageHandler messageHandler = new MessageHandler(getSessionService(), socket);
+                    MessageHandler messageHandler = new MessageHandler(getSessionService(), connection);
                     Thread msgHandler = new Thread(messageHandler);
                     msgHandler.start();
                 } catch (Exception e) {

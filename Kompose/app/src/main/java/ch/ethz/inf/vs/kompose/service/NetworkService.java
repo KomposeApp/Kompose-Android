@@ -2,7 +2,6 @@ package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Intent;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -120,11 +119,7 @@ public class NetworkService extends BasePreferencesService implements BaseServic
         sendMessage(msg);
     }
 
-    /**
-     * Send a message to a host.
-     *
-     * @param message The message to be sent.
-     */
+
     private void sendMessage(Message message) {
         Thread handler = new Thread(new MessageHandler(getSessionService(), message));
         handler.start();

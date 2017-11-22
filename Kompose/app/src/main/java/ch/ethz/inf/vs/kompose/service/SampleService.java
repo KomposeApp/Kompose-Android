@@ -7,16 +7,11 @@ import org.joda.time.DateTime;
 import java.util.Comparator;
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.data.json.Client;
-import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-/**
- * Created by git@famoser.ch on 21/11/2017.
- */
 
 public class SampleService extends BaseService {
     ObservableList<ClientModel> clientModelObservableList = new ObservableUniqueSortedList<>(new Comparator<ClientModel>() {

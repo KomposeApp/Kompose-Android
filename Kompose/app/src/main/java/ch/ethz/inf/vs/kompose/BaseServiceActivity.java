@@ -100,7 +100,7 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
     }
 
     protected void refreshIntentActions() {
-        if (intentActions != null && callbackReceiver != null) {
+        if (intentActions != null && callbackReceiver != null && registeredReceiver == false) {
             //register for events
             final IntentFilter intentFilter = new IntentFilter();
             for (String action : intentActions) {
@@ -129,6 +129,7 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
         super.onPause();
         if (registeredReceiver) {
             unregisterReceiver(broadcastReceiver);
+            registeredReceiver = false;
         }
     }
 

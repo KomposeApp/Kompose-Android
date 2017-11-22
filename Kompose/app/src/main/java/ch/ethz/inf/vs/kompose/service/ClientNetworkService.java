@@ -20,6 +20,11 @@ public class ClientNetworkService extends BaseService{
     private static final String LOG_TAG = "## ClientNetworkService";
 
     // TODO
+
+    /**
+     * Add Network services to the provided ObservableArrayList
+     * @param list List which the NetworkServices are to be added to
+     */
     public void findNetworkServices(ObservableArrayList<SessionModel> list) {
     }
 

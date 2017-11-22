@@ -7,10 +7,15 @@ import java.util.UUID;
 
 public abstract class BasePreferencesService extends BaseService {
 
-    public static final String DEVICE_UUID = "device_uuid";
+    public static final String KEY_DEVICE_UUID = "device_uuid";
     public static final String KEY_PRELOAD = "k_preload";
     public static final String KEY_USERNAME = "k_user";
     public static final String KEY_PORT = "k_port";
+
+    public static final String DEFAULT_UUID = null;
+    public static final int DEFAULT_PORT = 0;
+    public static final String DEFAULT_USERNAME = "John Doe";
+    public static final int DEFAULT_PRELOAD = 3;
 
     private String deviceUUIDString;
     private UUID deviceUUID;
@@ -21,12 +26,12 @@ public abstract class BasePreferencesService extends BaseService {
         synchronized (this) {
             if (deviceUUIDString == null) {
                 SharedPreferences preferences = getSharedPreferences();
-                if (!preferences.contains(DEVICE_UUID)) {
+                if (!preferences.contains(KEY_DEVICE_UUID)) {
                     deviceUUID = UUID.randomUUID();
                     deviceUUIDString = deviceUUID.toString();
                     newDeviceUUID = true;
                 } else {
-                    deviceUUIDString = preferences.getString(DEVICE_UUID, null);
+                    deviceUUIDString = preferences.getString(KEY_DEVICE_UUID, DEFAULT_UUID);
                     deviceUUID = UUID.fromString(deviceUUIDString);
                 }
             }
@@ -34,7 +39,7 @@ public abstract class BasePreferencesService extends BaseService {
 
         if (newDeviceUUID) {
             SharedPreferences.Editor editor = getSharedPreferences().edit();
-            editor.putString(DEVICE_UUID, deviceUUIDString);
+            editor.putString(KEY_DEVICE_UUID, deviceUUIDString);
             editor.apply();
         }
     }
@@ -49,6 +54,18 @@ public abstract class BasePreferencesService extends BaseService {
         ensureDeviceUUIDSet();
 
         return deviceUUID;
+    }
+
+    public String getCurrentUsername(){
+        return getSharedPreferences().getString(KEY_USERNAME, DEFAULT_USERNAME);
+    }
+
+    public int getCurrentPort(){
+        return getSharedPreferences().getInt(KEY_PORT, DEFAULT_PORT);
+    }
+
+    public int getCurrentPreload(){
+        return getSharedPreferences().getInt(KEY_PRELOAD, DEFAULT_PRELOAD);
     }
 
     private SharedPreferences getSharedPreferences() {

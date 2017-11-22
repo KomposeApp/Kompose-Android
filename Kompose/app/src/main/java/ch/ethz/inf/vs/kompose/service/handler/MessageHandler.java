@@ -44,6 +44,12 @@ public class MessageHandler implements Runnable {
         this.message = message;
     }
 
+    /**
+     * Read raw String input and transform it to a JSON Message
+     * @param connection Socket to read the String from
+     * @return JSON Message
+     * @throws IOException Occurs in anything goes wrong when reading the input.
+     */
     private Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder json = new StringBuilder();
@@ -62,51 +68,51 @@ public class MessageHandler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            Log.d(LOG_TAG, "Thread dispatched");
-            if (socket != null) {
+        Log.d(LOG_TAG, "Thread dispatched");
+        if (socket != null) {
+            try {
                 message = readMessage(socket);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            if (message == null) {
-                return;
-            }
+        }
+        // Can be non-null if initialized with the second constructor
+        if (message == null) {
+            return;
+        }
 
-            MessageType messageType = MessageType.valueOf(message.getType());
-            Log.d(LOG_TAG, "Message processing (" + messageType + ")");
+        // Determine message type.
+        MessageType messageType = MessageType.valueOf(message.getType());
+        Log.d(LOG_TAG, "Message processing (" + messageType + ")");
 
+        Session activeSession = sessionService.getActiveSession();
+        SessionModel activeSessionModel = sessionService.getActiveSessionModel();
 
-            Session activeSession = sessionService.getActiveSession();
-            SessionModel activeSessionModel = sessionService.getActiveSessionModel();
-
-            switch (messageType) {
-                case REGISTER_CLIENT:
-                    registerClient(message, activeSession, activeSessionModel);
-                    break;
-                case UNREGISTER_CLIENT:
-                    unregisterClient(message, activeSession, activeSessionModel);
-                    break;
-                case SESSION_UPDATE:
-                    sessionUpdate(message, activeSession, activeSessionModel);
-                    break;
-                case REQUEST_SONG:
-                    requestSong(message, activeSession, activeSessionModel);
-                    break;
-                case CAST_SKIP_SONG_VOTE:
-                    castSkipSongVote(message, activeSession, activeSessionModel);
-                    break;
-                case REMOVE_SKIP_SONG_VOTE:
-                    removeSkipSongVote(message, activeSession, activeSessionModel);
-                    break;
-                case KEEP_ALIVE:
-                    break;
-                case FINISH_SESSION:
-                    break;
-                case ERROR:
-                    break;
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
+        switch (messageType) {
+            case REGISTER_CLIENT:
+                registerClient(message, activeSession, activeSessionModel);
+                break;
+            case UNREGISTER_CLIENT:
+                unregisterClient(message, activeSession, activeSessionModel);
+                break;
+            case SESSION_UPDATE:
+                sessionUpdate(message, activeSession, activeSessionModel);
+                break;
+            case REQUEST_SONG:
+                requestSong(message, activeSession, activeSessionModel);
+                break;
+            case CAST_SKIP_SONG_VOTE:
+                castSkipSongVote(message, activeSession, activeSessionModel);
+                break;
+            case REMOVE_SKIP_SONG_VOTE:
+                removeSkipSongVote(message, activeSession, activeSessionModel);
+                break;
+            case KEEP_ALIVE:
+                break;
+            case FINISH_SESSION:
+                break;
+            case ERROR:
+                break;
         }
     }
 

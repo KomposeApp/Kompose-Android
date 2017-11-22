@@ -4,15 +4,8 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.enums.SongStatus;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
-
-/**
- * Created by git@famoser.ch on 20/11/2017.
- */
 
 public class SongService extends BaseService {
 
@@ -27,7 +20,7 @@ public class SongService extends BaseService {
     }
 
     /**
-     * sends the requested song to the server and puts it into the playlist
+     * sends the requested song to the server
      *
      * @param song the new song which should be included in the playlist
      */
@@ -37,7 +30,7 @@ public class SongService extends BaseService {
     }
 
     /**
-     * down votes this song, possibly removing it from the play queue
+     * down votes given song
      *
      * @param songModel the song which is disliked
      */

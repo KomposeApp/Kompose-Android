@@ -8,18 +8,34 @@ import java.io.IOException;
 import java.util.Comparator;
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.converter.ClientConverter;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.data.json.Session;
-import ch.ethz.inf.vs.kompose.data.network.ConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 
 public class SessionService extends BasePreferencesService {
+
+    public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
+    private static final String DIRECTORY_ARCHIVE = "session_archive";
+
+    private SessionModel activeSessionModel;
+
+    private ClientModel activeClient;
+
+    private Session activeSession;
+
+    private boolean isHost = false;
+
+    /** Sessions are sorted by date first created **/
+    private ObservableList<SessionModel> pastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
+        @Override
+        public int compare(SessionModel o1, SessionModel o2) {
+            return o1.getCreationDateTime().compareTo(o2.getCreationDateTime());
+        }
+    });
 
     @Override
     public void onCreate() {
@@ -28,20 +44,6 @@ public class SessionService extends BasePreferencesService {
         bindBaseService(StorageService.class);
         bindBaseService(ClientNetworkService.class);
     }
-
-    public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
-
-    private SessionModel activeSessionModel;
-    private ClientModel activeClient;
-    private Session activeSession;
-    private ObservableList<SessionModel> pastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
-        @Override
-        public int compare(SessionModel o1, SessionModel o2) {
-            return o1.getCreationDateTime().compareTo(o2.getCreationDateTime());
-        }
-    });
-
-    private boolean isHost = false;
 
     /**
      * join the active session as a client with the specified name
@@ -121,12 +123,12 @@ public class SessionService extends BasePreferencesService {
      * @return collection of all saves sessions
      */
     public ObservableList<SessionModel> getPastSessions() {
-        String[] pastSessionStrings = getStorageService().retrieveAllFiles("session_archive");
-        for (int i = 0; i < pastSessionStrings.length; i++) {
+        String[] pastSessionStrings = getStorageService().retrieveAllFiles(DIRECTORY_ARCHIVE);
+        for (String pastSession : pastSessionStrings) {
             try {
                 SessionConverter sessionConverter = new SessionConverter();
                 SessionModel sessionModel = sessionConverter.convert(
-                        JsonConverter.fromSessionJsonString(pastSessionStrings[i])
+                        JsonConverter.fromSessionJsonString(pastSession)
                 );
                 pastSessions.add(sessionModel);
             } catch (IOException e) {

@@ -4,6 +4,7 @@ import android.databinding.BaseObservable;
 
 import org.junit.Test;
 
+import ch.ethz.inf.vs.kompose.base.ReflectionUnitTest;
 import ch.ethz.inf.vs.kompose.converter.ClientConverter;
 import ch.ethz.inf.vs.kompose.converter.DownVoteConverter;
 import ch.ethz.inf.vs.kompose.converter.IBaseConverter;
@@ -13,16 +14,10 @@ import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.data.json.DownVote;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.base.ReflectionUnitTest;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
-import static org.junit.Assert.assertEquals;
-
-/**
- * Created by git@famoser.ch on 18/11/2017.
- */
 
 public class ConverterUnitTest extends ReflectionUnitTest {
     private <TModel extends BaseObservable, TEntity> void TestSingleConverter(IBaseConverter<TModel, TEntity> converter, TEntity entity) {
