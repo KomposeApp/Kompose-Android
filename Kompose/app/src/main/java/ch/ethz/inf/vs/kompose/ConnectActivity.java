@@ -8,6 +8,7 @@ import android.view.View;
 
 import ch.ethz.inf.vs.kompose.service.SessionService;
 import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
+import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 
 public class ConnectActivity extends BaseServiceActivity {
@@ -22,7 +23,16 @@ public class ConnectActivity extends BaseServiceActivity {
         bindBaseService(SessionService.class);
     }
 
+    @Override
+    protected void serviceBoundCallback(BaseService boundService) {
+        if (boundService instanceof SessionService) {
+            //todo: bind this to view
+            getSessionService().getActiveSessions();
+        }
+    }
+
     public void connect(View v) {
+
         //TODO: resolve pressed session and set client name
         String username = PreferenceManager.getDefaultSharedPreferences(this)
                 .getString(BasePreferencesService.KEY_USERNAME, BasePreferencesService.DEFAULT_USERNAME);

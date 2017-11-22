@@ -51,6 +51,7 @@
         <service android:name=".service.SessionService" />
         <service android:name=".service.ClientService" />
         <service android:name=".service.SampleService" />
+        <service android:name=".service.PreferencesService" />
 
         <activity android:name=".DesignActivity"></activity>
     </application>

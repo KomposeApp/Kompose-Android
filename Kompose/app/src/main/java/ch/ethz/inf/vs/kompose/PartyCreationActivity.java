@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import ch.ethz.inf.vs.kompose.service.PreferencesService;
 import ch.ethz.inf.vs.kompose.service.SessionService;
 
 public class PartyCreationActivity extends BaseServiceActivity {
@@ -18,6 +19,7 @@ public class PartyCreationActivity extends BaseServiceActivity {
         setContentView(R.layout.activity_party_creation_placeholder);
 
         bindBaseService(SessionService.class);
+        bindBaseService(PreferencesService.class);
     }
 
     public void confirmParty(View v) {
@@ -26,7 +28,7 @@ public class PartyCreationActivity extends BaseServiceActivity {
 
         EditText editText = findViewById(R.id.entry_creation);
         String partyName = editText.getText().toString();
-        getSessionService().startSession(partyName, partyName);
+        getSessionService().startSession(partyName, getPreferenceService().getCurrentUsername());
 
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);

@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import ch.ethz.inf.vs.kompose.service.ClientService;
+import ch.ethz.inf.vs.kompose.service.PreferencesService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.SessionService;
 import ch.ethz.inf.vs.kompose.service.SongService;
@@ -42,6 +43,10 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
         return sampleService;
     }
 
+    protected PreferencesService getPreferenceService() {
+        return preferenceService;
+    }
+
     protected void bindBaseService(Class service) {
         Intent gattServiceIntent = new Intent(this, service);
         boolean isBound = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -59,6 +64,7 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
     private YoutubeService youtubeService;
     private ClientService clientService;
     private SongService songService;
+    private PreferencesService preferenceService;
 
     //service connection
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
@@ -76,6 +82,8 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
                 youtubeService = (YoutubeService) baseService;
             } else if (baseService instanceof SampleService) {
                 sampleService = (SampleService) baseService;
+            } else if (baseService instanceof PreferencesService) {
+                preferenceService = (PreferencesService) baseService;
             } else {
                 Log.d(LOG_TAG, "attempted to bind unknown service " + baseService.getClass().getName());
             }
