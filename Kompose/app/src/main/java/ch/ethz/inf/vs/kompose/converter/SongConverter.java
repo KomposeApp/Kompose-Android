@@ -31,7 +31,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         if (clientModels.size() == 0) {
             this.clientModels = new ClientModel[0];
         } else {
-            this.clientModels = (ClientModel[]) clientModels.toArray();
+            this.clientModels = clientModels.toArray(new ClientModel[0]);
         }
     }
 
