@@ -35,6 +35,7 @@ public class ClientService extends BaseService {
      * @return collection of clients
      */
     public ObservableList<ClientModel> getClientModels(SessionModel sessionModel) {
+        //TODO
         return new ObservableArrayList<>();
     }
 }

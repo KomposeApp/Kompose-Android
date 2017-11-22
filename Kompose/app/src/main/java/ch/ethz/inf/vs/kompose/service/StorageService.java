@@ -1,10 +1,5 @@
 package ch.ethz.inf.vs.kompose.service;
 
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -12,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.net.ServerSocket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -75,7 +69,7 @@ public class StorageService extends BaseService {
             input.close();
             return stringBuilder.toString();
         } catch (Exception e) {
-            Log.e(LOG_TAG, e.toString());
+            Log.e(LOG_TAG, e.getMessage());
         }
         return null;
     }

@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.kompose.model;
 
-import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;

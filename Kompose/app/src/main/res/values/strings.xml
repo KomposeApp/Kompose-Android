@@ -11,4 +11,8 @@
     <string name="settings_confirm">Confirm Changes</string>
     <string name="youtube_service.download_failed">could not resolve the song details :(</string>
     <string name="title_activity_test_frontend">TestFrontendActivity</string>
+    <!-- Error Strings -->
+    <string name="setting_error_preload">Maximum preload count is 10</string>
+    <string name="setting_error_username">Username may not be empty</string>
+    <string name="setting_error_port">Port may not be greater than 65535</string>
 </resources>

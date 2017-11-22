@@ -19,12 +19,12 @@ import ch.ethz.inf.vs.kompose.service.SessionService;
 import ch.ethz.inf.vs.kompose.service.SongService;
 import ch.ethz.inf.vs.kompose.service.StorageService;
 
-/**
- * Created by git@famoser.ch on 20/11/2017.
- */
 
 public abstract class BaseService extends Service {
+
     private final static String LOG_TAG = "## BaseService";
+
+    /** Getters for each service type **/
 
     protected NetworkService getNetworkService() {
         return networkService;
@@ -54,21 +54,25 @@ public abstract class BaseService extends Service {
         return clientNetworkService;
     }
 
-
+    /** Local Binder class **/
+    /** Used to have mServiceConnection be able to determine what kind of service it is running in **/
     public class LocalBinder extends Binder {
         public BaseService getService() {
             return BaseService.this;
         }
     }
 
+    private final IBinder mBinder = new LocalBinder();
+
     @Override
     public IBinder onBind(Intent intent) {
         return mBinder;
     }
 
-
-    private final IBinder mBinder = new LocalBinder();
-
+    /**
+     * Binds a service to the Service Connection. The service is recreated as long as the binding exists.
+     * @param service Service we intend to bind to mServiceConnection.
+     */
     protected void bindBaseService(Class service) {
         Intent gattServiceIntent = new Intent(this, service);
         boolean isBound = bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
@@ -84,6 +88,12 @@ public abstract class BaseService extends Service {
     private boolean registeredReceiver = false;
     private IntentActionCallbackReceiver callbackReceiver;
 
+    /**
+     * Registers a broadcast receiver which runs in the main activity thread.
+     * The broadcastReceiver will be called for any broadcast intent that matches those contained in intentActions.
+     * @param intentActions Intents the receiver will react to.
+     * @param callbackReceiver Callback receiver to react to the intents.
+     */
     protected void subscribeToIntentActions(String[] intentActions, IntentActionCallbackReceiver callbackReceiver) {
         this.callbackReceiver = callbackReceiver;
 
@@ -141,7 +151,7 @@ public abstract class BaseService extends Service {
         unbindService(mServiceConnection);
     }
 
-    //the receiver
+    //the broadcast receiver, which in turn executes the callback receiver
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {

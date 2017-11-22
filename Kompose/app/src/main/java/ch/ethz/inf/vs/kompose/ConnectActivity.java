@@ -2,11 +2,12 @@ package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.service.SessionService;
+import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 
 
 public class ConnectActivity extends BaseServiceActivity {
@@ -23,7 +24,9 @@ public class ConnectActivity extends BaseServiceActivity {
 
     public void connect(View v) {
         //TODO: resolve pressed session and set client name
-        getSessionService().joinSession(null, "clientName");
+        String username = PreferenceManager.getDefaultSharedPreferences(this)
+                .getString(BasePreferencesService.KEY_USERNAME, BasePreferencesService.DEFAULT_USERNAME);
+        getSessionService().joinSession(null, username);
 
         Log.d(LOG_TAG, "Connect button pressed");
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);

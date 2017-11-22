@@ -1,7 +1,5 @@
 package ch.ethz.inf.vs.kompose.service.handler;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import org.joda.time.DateTime;
@@ -9,7 +7,6 @@ import org.joda.time.DateTime;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +29,6 @@ import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SessionService;
-import ch.ethz.inf.vs.kompose.service.SongService;
 
 public class MessageHandler implements Runnable {
     private static final String LOG_TAG = "## MessageHandler";
@@ -51,6 +47,13 @@ public class MessageHandler implements Runnable {
         this.message = message;
     }
 
+    /**
+     * Read raw String input and transform it to a JSON Message
+     *
+     * @param connection Socket to read the String from
+     * @return JSON Message
+     * @throws IOException Occurs in anything goes wrong when reading the input.
+     */
     private Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder json = new StringBuilder();
@@ -69,68 +72,69 @@ public class MessageHandler implements Runnable {
 
     @Override
     public void run() {
-        try {
-            Log.d(LOG_TAG, "Thread dispatched");
-            if (socket != null) {
+        Log.d(LOG_TAG, "Thread dispatched");
+        if (socket != null) {
+            try {
                 message = readMessage(socket);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-            if (message == null) {
-                return;
-            }
-
-            Session activeSession = sessionService.getActiveSession();
-            SessionModel activeSessionModel = sessionService.getActiveSessionModel();
-
-            MessageType messageType = MessageType.valueOf(message.getType());
-            Log.d(LOG_TAG, "Message processing (" + messageType + ")");
-
-            ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel);
-            if (clientModel != null && clientModel.getClientConnectionDetails() != null) {
-                clientModel.getClientConnectionDetails().setLastRequestReceived(DateTime.now());
-            }
-
-            if (clientModel == null && messageType != MessageType.REGISTER_CLIENT) {
-                //client unknown; therefore not allows to do request
-                return;
-            }
-
-            boolean sessionHasChanged = false;
-            switch (messageType) {
-                case REGISTER_CLIENT:
-                    sessionHasChanged = registerClient(message, activeSession, activeSessionModel);
-                    break;
-                case UNREGISTER_CLIENT:
-                    sessionHasChanged = unregisterClient(message, activeSession, activeSessionModel);
-                    break;
-                case SESSION_UPDATE:
-                    sessionUpdate(message, activeSession, activeSessionModel);
-                    break;
-                case REQUEST_SONG:
-                    sessionHasChanged = requestSong(message, activeSession, activeSessionModel);
-                    break;
-                case CAST_SKIP_SONG_VOTE:
-                    sessionHasChanged = castSkipSongVote(message, activeSession, activeSessionModel);
-                    break;
-                case REMOVE_SKIP_SONG_VOTE:
-                    sessionHasChanged = removeSkipSongVote(message, activeSession, activeSessionModel);
-                    break;
-                case KEEP_ALIVE:
-                    //already handled by refreshClientTimeout before
-                    break;
-                case FINISH_SESSION:
-                    finishSession();
-                    break;
-                case ERROR:
-                    //not used so far
-                    break;
-            }
-            if (sessionHasChanged) {
-                sessionService.sessionChanged();
-            }
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+        // Can be non-null if initialized with the second constructor
+        if (message == null) {
+            return;
+        }
+
+        Session activeSession = sessionService.getActiveSession();
+        SessionModel activeSessionModel = sessionService.getActiveSessionModel();
+
+        MessageType messageType = MessageType.valueOf(message.getType());
+        Log.d(LOG_TAG, "Message processing (" + messageType + ")");
+
+        ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel);
+        if (clientModel != null && clientModel.getClientConnectionDetails() != null) {
+            clientModel.getClientConnectionDetails().setLastRequestReceived(DateTime.now());
+        }
+
+        if (clientModel == null && messageType != MessageType.REGISTER_CLIENT) {
+            //client unknown; therefore not allows to do request
+            return;
+        }
+
+        boolean sessionHasChanged = false;
+        switch (messageType) {
+            case REGISTER_CLIENT:
+                sessionHasChanged = registerClient(message, activeSession, activeSessionModel);
+                break;
+            case UNREGISTER_CLIENT:
+                sessionHasChanged = unregisterClient(message, activeSession, activeSessionModel);
+                break;
+            case SESSION_UPDATE:
+                sessionUpdate(message, activeSession, activeSessionModel);
+                break;
+            case REQUEST_SONG:
+                sessionHasChanged = requestSong(message, activeSession, activeSessionModel);
+                break;
+            case CAST_SKIP_SONG_VOTE:
+                sessionHasChanged = castSkipSongVote(message, activeSession, activeSessionModel);
+                break;
+            case REMOVE_SKIP_SONG_VOTE:
+                sessionHasChanged = removeSkipSongVote(message, activeSession, activeSessionModel);
+                break;
+            case KEEP_ALIVE:
+                //already handled by refreshClientTimeout before
+                break;
+            case FINISH_SESSION:
+                finishSession();
+                break;
+            case ERROR:
+                //not used so far
+                break;
+        }
+        if (sessionHasChanged) {
+            sessionService.sessionChanged();
+        }
+
     }
 
     private void finishSession() {

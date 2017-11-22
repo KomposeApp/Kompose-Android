@@ -12,6 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
+import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
@@ -19,13 +20,13 @@ import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
  * First the service is registered on the network, then an AsyncTask
  * that accepts connections is launched.
  */
-public class AndroidServerService extends BaseService {
+public class AndroidServerService extends BasePreferencesService {
 
     private static final String LOG_TAG = "## AndroidServerService";
-    private static final String SERVICE_NAME = "Kompose";
-    private static final String SERVICE_TYPE = "_kompose._tcp";
 
     public static final String FOUND_SERVICE = "AndroidServerService.FOUND_SERVICE";
+    private static final String SERVICE_NAME = "Kompose";
+    private static final String SERVICE_TYPE = "_kompose._tcp";
 
     private ServerSocket serverSocket;
     private int localPort;
@@ -37,8 +38,8 @@ public class AndroidServerService extends BaseService {
     @Override
     public void onCreate() {
         super.onCreate();
-
         Log.d(LOG_TAG, "created");
+        bindBaseService(SessionService.class);
     }
 
     @Override
@@ -46,7 +47,7 @@ public class AndroidServerService extends BaseService {
         Log.d(LOG_TAG, "started");
 
         try {
-            serverSocket = new ServerSocket(0);
+            serverSocket = new ServerSocket(getCurrentPort());
             localPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,6 +57,18 @@ public class AndroidServerService extends BaseService {
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
         serviceInfo.setServiceName(SERVICE_NAME);
         serviceInfo.setServiceType(SERVICE_TYPE);
+
+        String sessionName = getSessionService().getActiveSessionModel().getSessionName();
+        String uuid = getSessionService().getActiveSessionModel().getUuid().toString();
+        String hostUuid = getSessionService().getActiveSessionModel().getHostUUID().toString();
+
+        sessionName = sessionName.substring(0, 255);
+        uuid = uuid.substring(0, 255);
+        hostUuid = hostUuid.substring(0, 255);
+
+        serviceInfo.setAttribute("session", sessionName);
+        serviceInfo.setAttribute("uuid", uuid);
+        serviceInfo.setAttribute("host_uuid", hostUuid);
 
         Log.d(LOG_TAG, "Using port: " + localPort);
         serviceInfo.setPort(localPort);
@@ -68,7 +81,7 @@ public class AndroidServerService extends BaseService {
         serverTask = new ServerTask();
         serverTask.execute();
 
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
@@ -111,17 +124,17 @@ public class AndroidServerService extends BaseService {
 
         private static final String LOG_TAG = "## ServerTask";
 
-
         @Override
         protected Void doInBackground(Void... voids) {
             Log.d(LOG_TAG, "Server ready to receive connections");
 
             while (!this.isCancelled()) {
                 try {
-                    final Socket socket = serverSocket.accept();
+                    final Socket connection = serverSocket.accept();
+
                     Log.d(LOG_TAG, "message received");
 
-                    MessageHandler messageHandler = new MessageHandler(getSessionService(), socket);
+                    MessageHandler messageHandler = new MessageHandler(getSessionService(), connection);
                     Thread msgHandler = new Thread(messageHandler);
                     msgHandler.start();
                 } catch (Exception e) {

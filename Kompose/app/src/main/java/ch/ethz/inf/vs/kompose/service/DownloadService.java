@@ -46,7 +46,7 @@ public class DownloadService extends BaseService {
 
             return true;
         } catch (Exception e) {
-            Log.e(LOG_TAG, "exception occured " + e);
+            Log.e(LOG_TAG, "exception occured " + e.getMessage());
         }
         return false;
     }

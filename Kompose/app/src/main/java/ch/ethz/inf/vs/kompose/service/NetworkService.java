@@ -119,11 +119,7 @@ public class NetworkService extends BasePreferencesService implements BaseServic
         sendMessage(msg);
     }
 
-    /**
-     * Send a message to a host.
-     *
-     * @param message The message to be sent.
-     */
+
     private void sendMessage(Message message) {
         Thread handler = new Thread(new MessageHandler(getSessionService(), message));
         handler.start();

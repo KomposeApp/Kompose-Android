@@ -1,15 +1,11 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
 import junit.framework.Assert;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
-import ch.ethz.inf.vs.kompose.service.StorageService;
 
 /*
  * This fails because of "permission denied" in the test environment.
