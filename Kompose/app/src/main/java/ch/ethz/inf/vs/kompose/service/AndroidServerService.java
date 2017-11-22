@@ -53,35 +53,42 @@ public class AndroidServerService extends BasePreferencesService {
             e.printStackTrace();
         }
 
-        // register network service
-        NsdServiceInfo serviceInfo = new NsdServiceInfo();
-        serviceInfo.setServiceName(SERVICE_NAME);
-        serviceInfo.setServiceType(SERVICE_TYPE);
-
-        String sessionName = getSessionService().getActiveSessionModel().getSessionName();
-        String uuid = getSessionService().getActiveSessionModel().getUuid().toString();
-        String hostUuid = getSessionService().getActiveSessionModel().getHostUUID().toString();
-
-        sessionName = sessionName.substring(0, 255);
-        uuid = uuid.substring(0, 255);
-        hostUuid = hostUuid.substring(0, 255);
-
-        serviceInfo.setAttribute("session", sessionName);
-        serviceInfo.setAttribute("uuid", uuid);
-        serviceInfo.setAttribute("host_uuid", hostUuid);
-
-        Log.d(LOG_TAG, "Using port: " + localPort);
-        serviceInfo.setPort(localPort);
-
-        nsdRegistrationListener = new ServerRegistrationListener();
-        nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
-        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
-
-        // start server task
-        serverTask = new ServerTask();
-        serverTask.execute();
 
         return START_STICKY;
+    }
+
+
+    @Override
+    protected void serviceBoundCallback(BaseService boundService) {
+        if (boundService instanceof SessionService) {
+            // register network service
+            NsdServiceInfo serviceInfo = new NsdServiceInfo();
+            serviceInfo.setServiceName(SERVICE_NAME);
+            serviceInfo.setServiceType(SERVICE_TYPE);
+
+            String sessionName = getSessionService().getActiveSessionModel().getSessionName();
+            String uuid = getSessionService().getActiveSessionModel().getUuid().toString();
+            String hostUuid = getSessionService().getActiveSessionModel().getHostUUID().toString();
+
+            sessionName = sessionName.substring(0, 255);
+            uuid = uuid.substring(0, 255);
+            hostUuid = hostUuid.substring(0, 255);
+
+            serviceInfo.setAttribute("session", sessionName);
+            serviceInfo.setAttribute("uuid", uuid);
+            serviceInfo.setAttribute("host_uuid", hostUuid);
+
+            Log.d(LOG_TAG, "Using port: " + localPort);
+            serviceInfo.setPort(localPort);
+
+            nsdRegistrationListener = new ServerRegistrationListener();
+            nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
+            nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
+
+            // start server task
+            serverTask = new ServerTask();
+            serverTask.execute();
+        }
     }
 
     @Override

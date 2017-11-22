@@ -24,7 +24,9 @@ public abstract class BaseService extends Service {
 
     private final static String LOG_TAG = "## BaseService";
 
-    /** Getters for each service type **/
+    /**
+     * Getters for each service type
+     **/
 
     protected NetworkService getNetworkService() {
         return networkService;
@@ -55,7 +57,9 @@ public abstract class BaseService extends Service {
     }
 
     /** Local Binder class **/
-    /** Used to have mServiceConnection be able to determine what kind of service it is running in **/
+    /**
+     * Used to have mServiceConnection be able to determine what kind of service it is running in
+     **/
     public class LocalBinder extends Binder {
         public BaseService getService() {
             return BaseService.this;
@@ -71,6 +75,7 @@ public abstract class BaseService extends Service {
 
     /**
      * Binds a service to the Service Connection. The service is recreated as long as the binding exists.
+     *
      * @param service Service we intend to bind to mServiceConnection.
      */
     protected void bindBaseService(Class service) {
@@ -91,7 +96,8 @@ public abstract class BaseService extends Service {
     /**
      * Registers a broadcast receiver which runs in the main activity thread.
      * The broadcastReceiver will be called for any broadcast intent that matches those contained in intentActions.
-     * @param intentActions Intents the receiver will react to.
+     *
+     * @param intentActions    Intents the receiver will react to.
      * @param callbackReceiver Callback receiver to react to the intents.
      */
     protected void subscribeToIntentActions(String[] intentActions, IntentActionCallbackReceiver callbackReceiver) {
@@ -133,7 +139,10 @@ public abstract class BaseService extends Service {
                 clientService = (ClientService) baseService;
             } else if (baseService instanceof SongService) {
                 songService = (SongService) baseService;
+            } else {
+                Log.d(LOG_TAG, "attempted to bind unknown service " + baseService.getClass().getName());
             }
+            serviceBoundCallback(baseService);
         }
 
         @Override
@@ -161,5 +170,9 @@ public abstract class BaseService extends Service {
 
     public interface IntentActionCallbackReceiver {
         void intentActionReceived(String action, Intent intent);
+    }
+
+    protected void serviceBoundCallback(BaseService boundService) {
+        //override if needed
     }
 }
