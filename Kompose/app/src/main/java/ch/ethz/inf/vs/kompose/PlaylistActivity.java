@@ -24,9 +24,13 @@ public class PlaylistActivity extends AppCompatActivity {
     }
 
     public void requestSong(View v) {
+
+        // TODO
+        // get youtube url from view
+        String youtubeUrl = "https://www.youtube.com/watch?v=-Fz85FE0KtQ";
+
         YoutubeService youtubeService = new YoutubeService();
-        youtubeService.resolveSong(this,
-                "https://www.youtube.com/watch?v=-Fz85FE0KtQ",
+        youtubeService.resolveSong(this, youtubeUrl,
                 new SimpleListener() {
                     @Override
                     public void onEvent(int status) {}
