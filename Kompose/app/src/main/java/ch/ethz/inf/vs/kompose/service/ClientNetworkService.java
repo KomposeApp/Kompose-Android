@@ -1,9 +1,13 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.app.Service;
+import android.content.Intent;
 import android.databinding.ObservableArrayList;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -17,14 +21,11 @@ import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class ClientNetworkService extends BaseService{
+public class ClientNetworkService extends Service {
 
     private static final String LOG_TAG = "## ClientNetworkService";
     private static final String SERVICE_TYPE = "_kompose._tcp";
-
-    // TODO
 
     /**
      * Add Network services to the provided ObservableArrayList
@@ -39,6 +40,12 @@ public class ClientNetworkService extends BaseService{
     public void startClientSocketListener(Socket socket) {
         ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
         clientListenerTask.execute();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {

@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.content.Context;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -15,8 +16,14 @@ import ch.ethz.inf.vs.kompose.service.base.BaseService;
 /**
  * Service that handles loading/storing data to storage.
  */
-public class StorageService extends BaseService {
-    private static String LOG_TAG = "## StorageService";
+public class StorageService {
+
+    private static final String LOG_TAG = "## StorageService";
+    private Context context;
+
+    public StorageService(Context context) {
+        this.context = context;
+    }
 
     /**
      * Persists the file to internal storage
@@ -32,7 +39,7 @@ public class StorageService extends BaseService {
 
             // create directory
             if (directory != null && directory.length() > 0) {
-                File dir = new File(getFilesDir(), directory);
+                File dir = new File(context.getFilesDir(), directory);
                 if (!dir.exists()) {
                     if (!dir.mkdir()) {
                         return false;
@@ -43,7 +50,7 @@ public class StorageService extends BaseService {
 
             // create file
             Log.d(LOG_TAG, "writing file: " + child);
-            File file = new File(getFilesDir(), child);
+            File file = new File(context.getFilesDir(), child);
 
             // write to storage
             FileOutputStream outputStream = new FileOutputStream(file);
@@ -81,7 +88,7 @@ public class StorageService extends BaseService {
      * @return an array of strings with the file contents
      */
     public String[] retrieveAllFiles(String directory) {
-        File file = new File(getFilesDir(), directory);
+        File file = new File(context.getFilesDir(), directory);
         if (!file.exists() || !file.isDirectory()) {
             return null;
         }
@@ -122,10 +129,10 @@ public class StorageService extends BaseService {
                 child = directory + "/" + fileName;
             }
 
-            File file = new File(getFilesDir(), child);
+            File file = new File(context.getFilesDir(), child);
             return readFile(file);
         } catch (Exception e) {
-            Log.e(LOG_TAG, e.toString());
+            e.printStackTrace();
         }
         return null;
     }

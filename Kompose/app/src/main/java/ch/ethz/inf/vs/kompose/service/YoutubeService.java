@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 import android.util.SparseArray;
@@ -9,20 +10,15 @@ import at.huber.youtubeExtractor.VideoMeta;
 import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
 import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class YoutubeService extends BaseService {
+public class YoutubeService {
 
-    //intent events
-    public final static String DOWNLOAD_SUCCESSFUL =
-            "YoutubeService.DOWNLOAD_SUCCESSFUL";
-    public final static String DOWNLOAD_FAILED =
-            "YoutubeService.DOWNLOAD_FAILED";
+    private static final String LOG_TAG = "##YoutubeService";
+    private static final int RESOLVE_SUCCESS = 0x1;
+    private static final int RESOLVE_FAILED = 0x2;
 
-    private static String LOG_TAG = "##YoutubeService";
-
-    public void resolveSong(final String sourceUrl) {
-        @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(this) {
+    public void resolveSong(Context context, final String sourceUrl, final SimpleListener listener) {
+        @SuppressLint("StaticFieldLeak") YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
             @Override
             protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
                 Intent intent = null;
@@ -46,21 +42,12 @@ public class YoutubeService extends BaseService {
                         song.setSourceUrl(sourceUrl);
                         song.setLengthInSeconds((int) length);
 
-                        // notify observer & terminate
-                        intent = new Intent(DOWNLOAD_SUCCESSFUL);
-                        intent.putExtra("songDetails", song);
+                        // notify listener
+                        listener.onEvent(RESOLVE_SUCCESS, song);
                     }
-                } catch (Exception ex) {
-                    // "error handling"
-                    Log.e(LOG_TAG, ex.toString());
-                } finally {
-                    if (intent == null) {
-                        intent = new Intent(DOWNLOAD_FAILED);
-                    }
+                } catch (Exception e) {
+                    listener.onEvent(RESOLVE_FAILED, null);
                 }
-
-                intent.putExtra("sourceUrl", sourceUrl);
-                sendBroadcast(intent);
             }
         };
         youTubeExtractor.extract(sourceUrl, true, false);
