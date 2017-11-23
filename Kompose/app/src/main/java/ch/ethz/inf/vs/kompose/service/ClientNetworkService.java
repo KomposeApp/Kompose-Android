@@ -6,6 +6,7 @@ import android.databinding.ObservableArrayList;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -27,6 +28,8 @@ public class ClientNetworkService extends Service {
     private static final String LOG_TAG = "## ClientNetworkService";
     private static final String SERVICE_TYPE = "_kompose._tcp";
 
+    private IBinder binder = new LocalBinder();
+
     /**
      * Add Network services to the provided ObservableArrayList
      * @param list List which the NetworkServices are to be added to
@@ -45,7 +48,13 @@ public class ClientNetworkService extends Service {
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
+    }
+
+    public class LocalBinder extends Binder {
+        public ClientNetworkService getService() {
+            return ClientNetworkService.this;
+        }
     }
 
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
