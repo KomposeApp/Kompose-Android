@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.ClientBindableAdapter;
