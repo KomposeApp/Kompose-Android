@@ -5,19 +5,10 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class SongService extends BaseService {
+public class SongService {
 
     private static final String LOG_TAG = "## Song Service";
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        bindBaseService(NetworkService.class);
-        bindBaseService(SessionService.class);
-        bindBaseService(ClientService.class);
-    }
 
     /**
      * sends the requested song to the server

@@ -11,8 +11,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
-
 /**
  * Service that handles loading/storing data to storage.
  */

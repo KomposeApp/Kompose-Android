@@ -11,8 +11,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import ch.ethz.inf.vs.kompose.service.ClientService;
-import ch.ethz.inf.vs.kompose.service.PreferencesService;
-import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.SessionService;
 import ch.ethz.inf.vs.kompose.service.SongService;
 import ch.ethz.inf.vs.kompose.service.YoutubeService;

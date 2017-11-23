@@ -16,7 +16,7 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 import ch.ethz.inf.vs.kompose.preferences.BasePreferencesService;
 
-public class SessionService extends BasePreferencesService {
+public class SessionService {
 
     public static final String CONNECTION_CHANGED_EVENT = "SessionService.CONNECTION_CHANGED_EVENT";
     private static final String DIRECTORY_ARCHIVE = "session_archive";
@@ -36,23 +36,6 @@ public class SessionService extends BasePreferencesService {
             return o1.getCreationDateTime().compareTo(o2.getCreationDateTime());
         }
     });
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        bindBaseService(NetworkService.class);
-        bindBaseService(StorageService.class);
-        bindBaseService(ClientNetworkService.class);
-    }
-
-    /**
-     * inform all other services that the connection has changed
-     */
-    private void broadcastConnectionChanged() {
-        Intent intent = new Intent(CONNECTION_CHANGED_EVENT);
-        sendBroadcast(intent);
-    }
-
 
     /**
      * join the active session as a client with the specified name

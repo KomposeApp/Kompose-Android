@@ -7,9 +7,8 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class ClientService extends BaseService {
+public class ClientService {
     /**
      * get the client model associated to this device from the specific session
      *

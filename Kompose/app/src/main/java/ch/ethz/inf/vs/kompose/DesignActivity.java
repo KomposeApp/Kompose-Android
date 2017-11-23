@@ -2,14 +2,8 @@ package ch.ethz.inf.vs.kompose;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.view.ViewGroup;
 
-import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 public class DesignActivity extends BaseServiceActivity {

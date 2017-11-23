@@ -10,12 +10,10 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
-
 /*
  * Service to download a song to the file system an creating a media player.
  */
-public class DownloadService extends BaseService {
+public class DownloadService {
 
     private static final String LOG_TAG = "## DownloadService";
 
