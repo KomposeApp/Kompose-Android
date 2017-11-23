@@ -14,8 +14,8 @@ import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 
-public class SampleService extends BaseService {
-    ObservableArrayList<ClientModel> clientModelObservableList = new ObservableUniqueSortedList<>(new Comparator<ClientModel>() {
+public class SampleService {
+    ObservableList<ClientModel> clientModelObservableList = new ObservableUniqueSortedList<>(new Comparator<ClientModel>() {
         @Override
         public int compare(ClientModel o1, ClientModel o2) {
             return 0;
@@ -38,7 +38,7 @@ public class SampleService extends BaseService {
         return clientModel;
     }
 
-    public ObservableArrayList<ClientModel> getClients() {
+    public ObservableList<ClientModel> getClients() {
         SessionModel sessionModel = getSampleSession("client session");
 
         clientModelObservableList.add(getSampleClient(sessionModel, "Sandro"));
@@ -46,5 +46,12 @@ public class SampleService extends BaseService {
         clientModelObservableList.add(getSampleClient(sessionModel, "Phillipe"));
 
         return clientModelObservableList;
+    }
+
+    public void addMoreClients() {
+        SessionModel sessionModel = clientModelObservableList.get(0).getPartOfSession();
+        clientModelObservableList.add(getSampleClient(sessionModel, "new added client"));
+        clientModelObservableList.add(getSampleClient(sessionModel, "new added client 2"));
+        clientModelObservableList.add(getSampleClient(sessionModel, "new added client 3"));
     }
 }

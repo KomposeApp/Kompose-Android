@@ -40,7 +40,7 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
     }
 
     protected SampleService getSampleService() {
-        return sampleService;
+        return new SampleService();
     }
 
     protected PreferencesService getPreferenceService() {
@@ -80,8 +80,6 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
                 songService = (SongService) baseService;
             } else if (baseService instanceof YoutubeService) {
                 youtubeService = (YoutubeService) baseService;
-            } else if (baseService instanceof SampleService) {
-                sampleService = (SampleService) baseService;
             } else if (baseService instanceof PreferencesService) {
                 preferenceService = (PreferencesService) baseService;
             } else {

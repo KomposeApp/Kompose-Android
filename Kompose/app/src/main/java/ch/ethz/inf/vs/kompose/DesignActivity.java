@@ -4,38 +4,63 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
 import android.view.ViewGroup;
 
-import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
+import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableViewHolder;
+import ch.ethz.inf.vs.kompose.view.adapter.ClientAdapter;
+import ch.ethz.inf.vs.kompose.view.viewmodel.DesignViewModel;
+import ch.ethz.inf.vs.kompose.view.viewmodel.ClientViewHolder;
 
 public class DesignActivity extends BaseServiceActivity {
+
+    private static final String LOG_TAG = "## Design Acitivty";
+
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+
+    private SampleService sampleService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_design);
+        mRecyclerView = findViewById(R.id.my_recycler);
+        sampleService = getSampleService();
 
-        bindBaseService(SampleService.class);
+        final DesignViewModel designViewModel = new DesignViewModel(sampleService.getClients());
 
-        thread = new Thread() {
+        binding.myRecycler.setLayoutManager(new LinearLayoutManager(this));
+        BindableAdapter<ClientModel> adapter = new BindableAdapter<>(designViewModel.getClients(), new BindableAdapter.ViewHolderFactory<ClientModel>() {
             @Override
-            public void run() {
-                try {
-                    synchronized (this) {
-                        wait(3000);
-                    }
-                } catch (InterruptedException ex) {
-                }
-
-                getSampleService().getClients().get(0).setName("my new bound name");
+            public BindableViewHolder<ClientModel> create(ViewGroup viewGroup) {
+                return new ClientViewHolder(ClientViewBinding.inflate(getLayoutInflater(), viewGroup, false), designViewModel);
             }
-        };
+        });
 
-        thread.start();
+        Log.d(LOG_TAG, "setting adapter");
+        mRecyclerView.setAdapter(adapter);
+        Log.d(LOG_TAG, "set adapter");
+
+
+        Log.d(LOG_TAG, "setting data");
+        binding.setDesignViewModel(designViewModel);
+        Log.d(LOG_TAG, "set data");
+
+
+        sampleService.getClients().get(0).setName("my new bound name");
+    }
+
+    public void onClickFriend(View view) {
+        sampleService.addMoreClients();
     }
 
     private Thread thread;
@@ -43,15 +68,4 @@ public class DesignActivity extends BaseServiceActivity {
     private ActivityDesignBinding binding;
 
 
-    @Override
-    protected void serviceBoundCallback(BaseService boundService) {
-        if (boundService instanceof SampleService) {
-            binding.setClient(getSampleService().getClients().get(0));
-
-
-            synchronized (thread) {
-                thread.notifyAll();
-            }
-        }
-    }
 }
