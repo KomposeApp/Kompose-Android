@@ -5,21 +5,22 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import ch.ethz.inf.vs.kompose.data.json.Song;
+import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
-import ch.ethz.inf.vs.kompose.service.SongService;
 import ch.ethz.inf.vs.kompose.service.YoutubeService;
 
 public class PlaylistActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Playlist Activity";
+    private NetworkService networkService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist_placeholder);
+        networkService = new NetworkService(this);
     }
 
     public void requestSong(View v) {
@@ -33,14 +34,18 @@ public class PlaylistActivity extends AppCompatActivity {
                     @Override
                     public void onEvent(int status, Object object) {
                         Song song = (Song) object;
-                        // TODO
-                        // send song request
+                        networkService.sendRequestSong(song);
                     }
                 });
     }
 
     public void downvoteItem(View v) {
+        // get song from view
         // TODO
+        Song song = new Song();
+
+        // send downvote request
+        networkService.sendCastSkipSongVote(song);
     }
 
     public void viewHistoryFromPlaylist(View v) {
@@ -51,7 +56,13 @@ public class PlaylistActivity extends AppCompatActivity {
 
     public void leaveParty(View v) {
         Log.d(LOG_TAG, "Left the party by pressing the button");
+
+        // update state
         // TODO
+
+        // unregister the client
+        networkService.sendUnRegisterClient();
+
         this.finish();
     }
 }
