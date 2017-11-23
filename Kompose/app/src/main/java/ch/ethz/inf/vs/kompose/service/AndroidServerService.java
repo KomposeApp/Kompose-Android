@@ -12,7 +12,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
-import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
+import ch.ethz.inf.vs.kompose.preferences.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**

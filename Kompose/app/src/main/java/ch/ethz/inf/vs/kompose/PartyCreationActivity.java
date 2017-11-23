@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.PreferencesService;
 import ch.ethz.inf.vs.kompose.service.SessionService;
 
@@ -28,7 +29,7 @@ public class PartyCreationActivity extends BaseServiceActivity {
 
         EditText editText = findViewById(R.id.entry_creation);
         String partyName = editText.getText().toString();
-        getSessionService().startSession(partyName, getPreferenceService().getCurrentUsername());
+        getSessionService().startSession(partyName, PreferenceUtility.getCurrentUsername(this));
 
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);

@@ -82,8 +82,6 @@ public abstract class BaseServiceActivity extends AppCompatActivity {
                 youtubeService = (YoutubeService) baseService;
             } else if (baseService instanceof SampleService) {
                 sampleService = (SampleService) baseService;
-            } else if (baseService instanceof PreferencesService) {
-                preferenceService = (PreferencesService) baseService;
             } else {
                 Log.d(LOG_TAG, "attempted to bind unknown service " + baseService.getClass().getName());
             }

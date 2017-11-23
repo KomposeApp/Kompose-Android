@@ -7,7 +7,7 @@ import android.util.Log;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.service.SessionService;
-import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
+import ch.ethz.inf.vs.kompose.preferences.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
 

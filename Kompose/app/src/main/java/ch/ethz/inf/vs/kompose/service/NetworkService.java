@@ -17,7 +17,7 @@ import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
+import ch.ethz.inf.vs.kompose.preferences.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.service.base.BaseService;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 

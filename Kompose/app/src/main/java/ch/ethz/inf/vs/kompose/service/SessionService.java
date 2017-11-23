@@ -14,7 +14,7 @@ import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
-import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
+import ch.ethz.inf.vs.kompose.preferences.BasePreferencesService;
 
 public class SessionService extends BasePreferencesService {
 

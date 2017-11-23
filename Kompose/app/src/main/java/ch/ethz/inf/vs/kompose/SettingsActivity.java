@@ -1,14 +1,12 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import ch.ethz.inf.vs.kompose.service.base.BasePreferencesService;
+import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -19,27 +17,24 @@ public class SettingsActivity extends AppCompatActivity {
     private EditText username_input;
     private EditText port_input;
 
-    private SharedPreferences sPrefs;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings_placeholder);
 
+        //Retrieve error text display
         error_display = findViewById(R.id.textview_settings_error);
 
-        preload_input = findViewById(R.id.edittext_setting_preload);
+        //Retrieve input fields
         username_input = findViewById(R.id.edittext_setting_username);
         port_input = findViewById(R.id.edittext_setting_port);
+        preload_input = findViewById(R.id.edittext_setting_preload);
 
-        sPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-        int preload = sPrefs.getInt(BasePreferencesService.KEY_PRELOAD, BasePreferencesService.DEFAULT_PRELOAD);
-        String username = sPrefs.getString(BasePreferencesService.KEY_USERNAME, BasePreferencesService.DEFAULT_USERNAME);
-        int port = sPrefs.getInt(BasePreferencesService.KEY_PORT, BasePreferencesService.DEFAULT_PORT);
+        // Display current values
+        username_input.setText(PreferenceUtility.getCurrentUsername(this));
+        port_input.setText(String.valueOf(PreferenceUtility.getCurrentPort(this)));
+        preload_input.setText(String.valueOf(PreferenceUtility.getCurrentPreload(this)));
 
-        preload_input.setText(String.valueOf(preload));
-        username_input.setText(username);
-        port_input.setText(String.valueOf(port));
     }
 
     /**
@@ -88,12 +83,9 @@ public class SettingsActivity extends AppCompatActivity {
         /* END Invalid input check */
 
         if (commitChanges) {
-            SharedPreferences.Editor editor = sPrefs.edit();
-            editor.putInt(BasePreferencesService.KEY_PRELOAD, Integer.valueOf(preload_text));
-            editor.putString(BasePreferencesService.KEY_USERNAME, username_text);
-            editor.putInt(BasePreferencesService.KEY_PORT, Integer.valueOf(port_text));
-
-            editor.apply();
+            PreferenceUtility.setCurrentUsername(this, username_text);
+            PreferenceUtility.setCurrentPort(this, Integer.valueOf(port_text));
+            PreferenceUtility.setCurrentPreload(this, Integer.valueOf(preload_text));
             finish();
         }
     }
