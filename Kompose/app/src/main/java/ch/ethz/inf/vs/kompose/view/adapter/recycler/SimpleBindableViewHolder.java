@@ -16,6 +16,7 @@
 package ch.ethz.inf.vs.kompose.view.adapter.recycler;
 
 import android.databinding.ViewDataBinding;
+import android.view.View;
 
 public class SimpleBindableViewHolder<B extends ViewDataBinding, T> extends BindableViewHolder<T> {
 
@@ -53,5 +54,10 @@ public class SimpleBindableViewHolder<B extends ViewDataBinding, T> extends Bind
 
     public T getItem() {
         return item;
+    }
+
+    @Override
+    public void onClick(View v) {
+        //do nothing
     }
 }

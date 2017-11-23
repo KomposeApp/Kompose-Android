@@ -24,12 +24,21 @@ import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BaseBindableViewHolder;
 import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.RecyclerViewClickListener;
 
 public class ClientViewHolder extends BaseBindableViewHolder<ClientViewBinding, ClientModel> {
     private final DesignViewModel viewModel;
+    private RecyclerViewClickListener clickListener;
 
-    public ClientViewHolder(ClientViewBinding binding, DesignViewModel viewModel) {
+    public ClientViewHolder(ClientViewBinding binding, DesignViewModel viewModel, RecyclerViewClickListener clickListener) {
         super(binding, BR.clientViewHolder);
         this.viewModel = viewModel;
+        this.clickListener = clickListener;
+    }
+
+    @Override
+    public void onClick(View v) {
+        int pos = this.getAdapterPosition();
+        clickListener.recyclerViewListClicked(v, pos);
     }
 }

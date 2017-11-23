@@ -18,7 +18,7 @@ package ch.ethz.inf.vs.kompose.view.adapter.recycler;
 import android.databinding.ObservableField;
 import android.databinding.ViewDataBinding;
 
-public class BaseBindableViewHolder<B extends ViewDataBinding, T> extends BindableViewHolder<T> {
+public abstract class BaseBindableViewHolder<B extends ViewDataBinding, T> extends BindableViewHolder<T> {
 
     protected final B binding;
 
@@ -28,6 +28,7 @@ public class BaseBindableViewHolder<B extends ViewDataBinding, T> extends Bindab
         super(binding.getRoot());
         this.binding = binding;
         binding.setVariable(variableId, this);
+
     }
 
     public void bind(T item) {

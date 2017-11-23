@@ -22,10 +22,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public abstract class BindableViewHolder<T> extends RecyclerView.ViewHolder {
+public abstract class BindableViewHolder<T> extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     public BindableViewHolder(View itemView) {
+
         super(itemView);
+        itemView.setOnClickListener(this);
     }
 
     public static <B extends ViewDataBinding, T> BindableViewHolder<T> create(B binding, Binder<B, T> binder) {

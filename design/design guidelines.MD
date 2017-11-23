@@ -2,7 +2,7 @@
 
 ## Colors
 red (accent color): EE3A39 (238, 58, 57)  
-white (accent font color): FFFFFF
+white (accent font color): FFFFFF (255, 255, 255)
 
 ## Fonts
 Russo One: Title / Logo font  

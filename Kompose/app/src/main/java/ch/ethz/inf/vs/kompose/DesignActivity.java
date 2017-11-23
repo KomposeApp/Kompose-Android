@@ -12,10 +12,9 @@ import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
 import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableViewHolder;
-import ch.ethz.inf.vs.kompose.view.adapter.ClientAdapter;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.RecyclerViewClickListener;
 import ch.ethz.inf.vs.kompose.view.viewmodel.DesignViewModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.ClientViewHolder;
 
@@ -32,7 +31,7 @@ public class DesignActivity extends BaseServiceActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_design);
+        ActivityDesignBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_design);
         mRecyclerView = findViewById(R.id.my_recycler);
         sampleService = getSampleService();
 
@@ -42,7 +41,12 @@ public class DesignActivity extends BaseServiceActivity {
         BindableAdapter<ClientModel> adapter = new BindableAdapter<>(designViewModel.getClients(), new BindableAdapter.ViewHolderFactory<ClientModel>() {
             @Override
             public BindableViewHolder<ClientModel> create(ViewGroup viewGroup) {
-                return new ClientViewHolder(ClientViewBinding.inflate(getLayoutInflater(), viewGroup, false), designViewModel);
+                return new ClientViewHolder(ClientViewBinding.inflate(getLayoutInflater(), viewGroup, false), designViewModel, new RecyclerViewClickListener() {
+                    @Override
+                    public void recyclerViewListClicked(View v, int position) {
+                        Log.d(LOG_TAG, "pressed item number " + position);
+                    }
+                });
             }
         });
 
@@ -62,10 +66,4 @@ public class DesignActivity extends BaseServiceActivity {
     public void onClickFriend(View view) {
         sampleService.addMoreClients();
     }
-
-    private Thread thread;
-
-    private ActivityDesignBinding binding;
-
-
 }
