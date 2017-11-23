@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.ethz.inf.vs.kompose.view.adapter.recycler;
+package ch.ethz.inf.vs.kompose.view.viewholder.base;
 
 import android.databinding.ViewDataBinding;
 import android.support.annotation.NonNull;
@@ -22,27 +22,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public abstract class BindableViewHolder<T> extends RecyclerView.ViewHolder implements View.OnClickListener {
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 
-    public BindableViewHolder(View itemView) {
+public abstract class AbstractViewHolder<T> extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+    public AbstractViewHolder(View itemView) {
         super(itemView);
         itemView.setOnClickListener(this);
     }
 
-    public static <B extends ViewDataBinding, T> BindableViewHolder<T> create(B binding, Binder<B, T> binder) {
-        return new SimpleBindableViewHolder<>(binding, binder);
+    public static <B extends ViewDataBinding, T> AbstractViewHolder<T> create(B binding, Binder<B, T> binder) {
+        return new BindableViewHolder<>(binding, binder);
     }
 
-    public static <B extends ViewDataBinding, T> BindableViewHolder<T> create(B binding, int variableId) {
-        return new SimpleBindableViewHolder<>(binding, variableId);
+    public static <B extends ViewDataBinding, T> AbstractViewHolder<T> create(B binding, int variableId) {
+        return new BindableViewHolder<>(binding, variableId);
     }
 
     @NonNull public static <T> BindableAdapter.ViewHolderFactory<T> factory(
             final LayoutInflater layoutInflater, final int variableId, final BindingInflater bindingInflater) {
         return new BindableAdapter.ViewHolderFactory<T>() {
-            @Override public BindableViewHolder<T> create(ViewGroup viewGroup) {
-                return BindableViewHolder.create(bindingInflater.inflate(layoutInflater, viewGroup, false), variableId);
+            @Override public AbstractViewHolder<T> create(ViewGroup viewGroup) {
+                return AbstractViewHolder.create(bindingInflater.inflate(layoutInflater, viewGroup, false), variableId);
             }
         };
     }

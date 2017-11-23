@@ -6,17 +6,14 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
-import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableViewHolder;
+import ch.ethz.inf.vs.kompose.view.adapter.ClientBindableAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.RecyclerViewClickListener;
 import ch.ethz.inf.vs.kompose.view.viewmodel.DesignViewModel;
-import ch.ethz.inf.vs.kompose.view.viewmodel.ClientViewHolder;
 
 public class DesignActivity extends BaseServiceActivity {
 
@@ -38,30 +35,18 @@ public class DesignActivity extends BaseServiceActivity {
         final DesignViewModel designViewModel = new DesignViewModel(sampleService.getClients());
 
         binding.myRecycler.setLayoutManager(new LinearLayoutManager(this));
-        BindableAdapter<ClientModel> adapter = new BindableAdapter<>(designViewModel.getClients(), new BindableAdapter.ViewHolderFactory<ClientModel>() {
-            @Override
-            public BindableViewHolder<ClientModel> create(ViewGroup viewGroup) {
-                return new ClientViewHolder(ClientViewBinding.inflate(getLayoutInflater(), viewGroup, false), designViewModel, new RecyclerViewClickListener() {
-                    @Override
-                    public void recyclerViewListClicked(View v, int position) {
-                        Log.d(LOG_TAG, "pressed item number " + position);
-                    }
-                });
-            }
-        });
-
-        Log.d(LOG_TAG, "setting adapter");
-        mRecyclerView.setAdapter(adapter);
-        Log.d(LOG_TAG, "set adapter");
-
-
-        Log.d(LOG_TAG, "setting data");
-        binding.setDesignViewModel(designViewModel);
-        Log.d(LOG_TAG, "set data");
-
+        BindableAdapter adapter = new ClientBindableAdapter(designViewModel.getClients(), getLayoutInflater(), listener);
+        binding.myRecycler.setAdapter(adapter);
 
         sampleService.getClients().get(0).setName("my new bound name");
     }
+
+    RecyclerViewClickListener listener = new RecyclerViewClickListener() {
+        @Override
+        public void recyclerViewListClicked(View v, int position) {
+            Log.d(LOG_TAG, "pressed item number " + position);
+        }
+    };
 
     public void onClickFriend(View view) {
         sampleService.addMoreClients();

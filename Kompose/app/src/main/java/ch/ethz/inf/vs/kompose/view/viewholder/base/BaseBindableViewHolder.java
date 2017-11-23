@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.ethz.inf.vs.kompose.view.adapter.recycler;
+package ch.ethz.inf.vs.kompose.view.viewholder.base;
 
 import android.databinding.ObservableField;
 import android.databinding.ViewDataBinding;
 
-public abstract class BaseBindableViewHolder<B extends ViewDataBinding, T> extends BindableViewHolder<T> {
+public abstract class BaseBindableViewHolder<B extends ViewDataBinding, T> extends AbstractViewHolder<T> {
 
     protected final B binding;
 

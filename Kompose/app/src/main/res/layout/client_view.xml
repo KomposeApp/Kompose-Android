@@ -6,25 +6,18 @@
 
         <variable
             name="clientViewHolder"
-            type="ch.ethz.inf.vs.kompose.view.viewmodel.ClientViewHolder" />
+            type="ch.ethz.inf.vs.kompose.view.viewholder.ClickableItemViewHolder" />
     </data>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        >
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{clientViewHolder.item.name}"
-            />
-
-        <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="open detail"/>
+            android:text="@{clientViewHolder.item.name}" />
 
     </LinearLayout>
 </layout>

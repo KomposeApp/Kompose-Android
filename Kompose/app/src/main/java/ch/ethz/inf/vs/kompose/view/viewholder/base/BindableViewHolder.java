@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.ethz.inf.vs.kompose.view.adapter.recycler;
+package ch.ethz.inf.vs.kompose.view.viewholder.base;
 
 import android.databinding.ViewDataBinding;
 import android.view.View;
 
-public class SimpleBindableViewHolder<B extends ViewDataBinding, T> extends BindableViewHolder<T> {
+import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
+
+public class BindableViewHolder<B extends ViewDataBinding, T> extends AbstractViewHolder<T> {
 
     protected final B binding;
 
@@ -28,14 +30,14 @@ public class SimpleBindableViewHolder<B extends ViewDataBinding, T> extends Bind
 
     protected T item;
 
-    protected SimpleBindableViewHolder(B binding, Binder<B, T> binder) {
+    protected BindableViewHolder(B binding, Binder<B, T> binder) {
         super(binding.getRoot());
         this.binding = binding;
         this.binder = binder;
         variableId = 0;
     }
 
-    protected SimpleBindableViewHolder(B binding, int variableId) {
+    protected BindableViewHolder(B binding, int variableId) {
         super(binding.getRoot());
         this.binding = binding;
         this.variableId = variableId;

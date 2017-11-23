@@ -13,32 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ch.ethz.inf.vs.kompose.view.viewmodel;
+package ch.ethz.inf.vs.kompose.view.viewholder;
 
-import android.support.annotation.NonNull;
-import android.util.Log;
+import android.databinding.ViewDataBinding;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
-import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.BaseBindableViewHolder;
-import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.RecyclerViewClickListener;
 
-public class ClientViewHolder extends BaseBindableViewHolder<ClientViewBinding, ClientModel> {
-    private final DesignViewModel viewModel;
+public class ClickableItemViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, ClientModel> {
     private RecyclerViewClickListener clickListener;
 
-    public ClientViewHolder(ClientViewBinding binding, DesignViewModel viewModel, RecyclerViewClickListener clickListener) {
-        super(binding, BR.clientViewHolder);
-        this.viewModel = viewModel;
+    public ClickableItemViewHolder(TModelViewBinding binding, int resourceId, RecyclerViewClickListener clickListener) {
+        super(binding, resourceId);
         this.clickListener = clickListener;
+    }
+
+    public ClickableItemViewHolder(TModelViewBinding binding, int resourceId) {
+        super(binding, resourceId);
     }
 
     @Override
     public void onClick(View v) {
         int pos = this.getAdapterPosition();
-        clickListener.recyclerViewListClicked(v, pos);
+        if (clickListener != null) {
+            clickListener.recyclerViewListClicked(v, pos);
+        }
     }
 }

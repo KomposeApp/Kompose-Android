@@ -22,7 +22,10 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BindableAdapter<T> extends RecyclerView.Adapter<BindableViewHolder<T>> {
+import ch.ethz.inf.vs.kompose.view.adapter.AdapterOnListChangedCallback;
+import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
+
+public class BindableAdapter<T> extends RecyclerView.Adapter<AbstractViewHolder<T>> {
 
     private final ObservableList.OnListChangedCallback<ObservableList<T>> onListChangedCallback;
 
@@ -75,17 +78,17 @@ public class BindableAdapter<T> extends RecyclerView.Adapter<BindableViewHolder<
         return -1;
     }
 
-    @Override public BindableViewHolder<T> onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+    @Override public AbstractViewHolder<T> onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         ViewHolderFactory<? extends T> factory;
         if (viewType != -1) {
             factory = viewHolderFactories.get(viewType);
         } else {
             factory = defaultViewHolderFactory;
         }
-        return (BindableViewHolder) factory.create(viewGroup);
+        return (AbstractViewHolder) factory.create(viewGroup);
     }
 
-    @Override public void onBindViewHolder(BindableViewHolder<T> viewHolder, int position) {
+    @Override public void onBindViewHolder(AbstractViewHolder<T> viewHolder, int position) {
         viewHolder.bind(items.get(position));
         if (onBindListener != null) {
             onBindListener.call(viewHolder, position);
@@ -101,7 +104,7 @@ public class BindableAdapter<T> extends RecyclerView.Adapter<BindableViewHolder<
     }
 
     public interface ViewHolderFactory<T> {
-        BindableViewHolder<T> create(ViewGroup viewGroup);
+        AbstractViewHolder<T> create(ViewGroup viewGroup);
     }
 
     public interface ViewTypeSelector {
@@ -109,7 +112,7 @@ public class BindableAdapter<T> extends RecyclerView.Adapter<BindableViewHolder<
     }
 
     public interface BindListener<T> {
-        void call(BindableViewHolder<T> viewHolder, Integer position);
+        void call(AbstractViewHolder<T> viewHolder, Integer position);
     }
 
     private class ClassViewTypeSelector<I> implements ViewTypeSelector {
