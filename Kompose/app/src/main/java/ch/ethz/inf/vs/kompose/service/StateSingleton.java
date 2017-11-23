@@ -19,9 +19,9 @@ public class StateSingleton {
     private final String DIRECTORY_ARCHIVE = "session_archive";
 
     // Client specific fields
-    private SessionModel activeSession;
-    private UUID deviceUUID;
-    private ObservableList<SessionModel> pastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
+    public SessionModel activeSession;
+    public UUID deviceUUID;
+    public ObservableList<SessionModel> orderedPastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
         @Override
         public int compare(SessionModel o1, SessionModel o2) {
             return o1.getCreationDateTime().compareTo(o2.getCreationDateTime());
