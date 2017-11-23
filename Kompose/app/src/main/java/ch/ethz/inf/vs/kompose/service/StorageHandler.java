@@ -1,12 +1,15 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,69 +17,83 @@ import java.util.List;
 /**
  * Service that handles loading/storing data to storage.
  */
-public class StorageService {
+public class StorageHandler {
 
-    private static final String LOG_TAG = "## StorageService";
+    private static final String LOG_TAG = "## StorageHandler";
     private Context context;
 
-    public StorageService(Context context) {
+    public StorageHandler(Context context) {
         this.context = context;
     }
 
     /**
      * Persists the file to internal storage
      *
-     * @param fileName  file will be overwritten if it already exists
+     * @param fileName  name of the file (will be overwritten if already exists)
      * @param content   file content
-     * @param directory directory will be created if it doesn't exist
+     * @param directory where the file is stored relative to the app path (automatic creation)
      * @return boolean indication whether the operation has succeeded or not
      */
     public boolean persist(String directory, String fileName, String content) {
-        try {
-            String child = fileName;
+        String child = fileName;
 
-            // create directory
-            if (directory != null && directory.length() > 0) {
-                File dir = new File(context.getFilesDir(), directory);
-                if (!dir.exists()) {
-                    if (!dir.mkdir()) {
-                        return false;
-                    }
+        // create directory
+        if (directory != null && directory.length() > 0) {
+            File dir = new File(context.getFilesDir(), directory);
+            if (!dir.exists()) {
+                if (!dir.mkdir()) {
+                    return false;
                 }
-                child = directory + "/" + fileName;
             }
+            child = directory + "/" + fileName;
+        }
 
-            // create file
-            Log.d(LOG_TAG, "writing file: " + child);
-            File file = new File(context.getFilesDir(), child);
+        // create file
+        Log.d(LOG_TAG, "writing file: " + child);
+        File file = new File(context.getFilesDir(), child);
 
+        try {
             // write to storage
             FileOutputStream outputStream = new FileOutputStream(file);
             outputStream.write(content.getBytes());
             outputStream.close();
-
-            return true;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, e.toString());
+        } catch (IOException io) {
+            // failure case
+            Log.e(LOG_TAG, io.getMessage());
+            return false;
         }
-        return false;
+
+        return true;
     }
 
+    @Nullable
     private String readFile(File file) {
+
+        FileInputStream input;
+        // Load file into inputstream
+        try{
+            input = new FileInputStream(file);
+        } catch(FileNotFoundException fnf){
+            Log.e(LOG_TAG, "Malformed file passed to method.", fnf);
+            return null;
+        }
+
+        BufferedReader reader = new BufferedReader(new InputStreamReader(input));
+        StringBuilder stringBuilder = new StringBuilder();
+        String line = null;
+
+        //Try reading from InputStream
         try {
-            FileInputStream input = new FileInputStream(file);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(input));
-            StringBuilder stringBuilder = new StringBuilder();
-            String line = null;
             while ((line = reader.readLine()) != null) {
                 stringBuilder.append(line).append("\n");
             }
             input.close();
-            return stringBuilder.toString();
-        } catch (Exception e) {
-            Log.e(LOG_TAG, e.getMessage());
+        }catch(IOException io){
+            Log.e(LOG_TAG, "Reading from InputStream failed.", io);
+            return null;
         }
-        return null;
+
+        return stringBuilder.toString();
     }
 
     /**

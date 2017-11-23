@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.IBinder;
@@ -20,21 +21,26 @@ import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.preferences.BasePreferencesService;
 import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
  * Service that provides various network functionality.
  */
-public class NetworkService extends Service {
+public class NetworkService {
 
     private final String LOG_TAG = "## NetworkService";
+
     public static final String RESPONSE_RECEIVED = "NetworkService.RESPONSE_RECEIVED";
     public static final String RESPONSE_FAILURE = "NetworkService.RESPONSE_FAILURE";
 
+    private Context context;
     private ServerConnectionDetails activeConnection;
+
+
+    public NetworkService(Context ctx){
+        context = ctx;
+    }
 
     private ServerConnectionDetails getActiveConnection() {
         return activeConnection;
@@ -42,7 +48,7 @@ public class NetworkService extends Service {
 
     private Message getMessage(MessageType type) {
         Message msg = new Message();
-        msg.setSenderUuid(PreferenceUtility.retrieveDeviceUUIDString(this));
+        msg.setSenderUuid(PreferenceUtility.retrieveDeviceUUIDString(context));
         msg.setType(type.toString());
         return msg;
     }
@@ -119,12 +125,6 @@ public class NetworkService extends Service {
             AsyncSender asyncSender = new AsyncSender(message, connectionDetails.getHostIP(), connectionDetails.getHostPort());
             asyncSender.execute();
         }
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 
     private class AsyncSender extends AsyncTask<Void, Void, Void> {

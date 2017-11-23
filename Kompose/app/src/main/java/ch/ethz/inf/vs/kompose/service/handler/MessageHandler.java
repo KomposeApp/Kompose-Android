@@ -85,7 +85,6 @@ public class MessageHandler implements Runnable {
             return;
         }
 
-        Session activeSession = sessionService.getActiveSession();
         SessionModel activeSessionModel = sessionService.getActiveSessionModel();
 
         MessageType messageType = MessageType.valueOf(message.getType());

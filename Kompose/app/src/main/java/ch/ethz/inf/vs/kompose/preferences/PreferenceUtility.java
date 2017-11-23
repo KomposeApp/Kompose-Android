@@ -27,8 +27,13 @@ public abstract class PreferenceUtility {
     @SuppressLint("ApplySharedPref")
     public static void generateAndSet_DeviceUUID(Context ctx){
         SharedPreferences sPrefs = PreferenceManager.getDefaultSharedPreferences(ctx);
-        SharedPreferences.Editor editor = sPrefs.edit();
 
+        if (sPrefs.contains(KEY_DEVICE_UUID)){
+            Log.d(LOG_TAG, "Device UUID already exists, skipping...");
+            return;
+        }
+
+        SharedPreferences.Editor editor = sPrefs.edit();
         editor.putString(KEY_DEVICE_UUID, UUID.randomUUID().toString());
         editor.commit(); //Using commit here to avoid issues with asynchronous code.
     }
