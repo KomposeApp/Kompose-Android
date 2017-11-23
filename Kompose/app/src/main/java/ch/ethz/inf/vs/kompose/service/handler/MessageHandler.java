@@ -28,7 +28,6 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.SessionService;
 
 public class MessageHandler implements Runnable {
     private static final String LOG_TAG = "## MessageHandler";

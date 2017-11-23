@@ -8,6 +8,11 @@ import android.widget.TextView;
 
 import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 
+/**
+ * DONE
+ * (unless more settings are required)
+ */
+
 public class SettingsActivity extends AppCompatActivity {
 
     // View elements that matter to us

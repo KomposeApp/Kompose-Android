@@ -48,7 +48,9 @@ public class NetworkService {
 
     private Message getMessage(MessageType type) {
         Message msg = new Message();
-        msg.setSenderUuid(PreferenceUtility.retrieveDeviceUUIDString(context));
+
+        String uuid = StateSingleton.getInstance().retrieveDeviceUUID(context).toString();
+        msg.setSenderUuid(uuid);
         msg.setType(type.toString());
         return msg;
     }

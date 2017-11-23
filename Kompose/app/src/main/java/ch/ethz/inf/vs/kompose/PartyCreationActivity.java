@@ -43,4 +43,22 @@ public class PartyCreationActivity extends AppCompatActivity {
         startActivity(playlistIntent);
         this.finish();
     }
+
+
+
+    /**
+     * creates a new session and register the host service on the network
+     */
+    public SessionModel startSession(String sessionName, String clientName) {
+        isHost = true;
+
+        activeSessionModel = new SessionModel(UUID.randomUUID(), getDeviceUUID());
+        activeSessionModel.setSessionName(sessionName);
+        joinActiveSession(clientName);
+
+        Intent serverIntent = new Intent(this, AndroidServerService.class);
+        startService(serverIntent);
+
+        return activeSessionModel;
+    }
 }

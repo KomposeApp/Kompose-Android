@@ -4,11 +4,14 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import ch.ethz.inf.vs.kompose.converter.SessionConverter;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
 
@@ -51,6 +54,51 @@ public class ConnectActivity extends AppCompatActivity {
             clientNetworkServiceBound = false;
         }
     };
+
+
+
+    /**
+     * join the active session as a client with the specified name
+     *
+     * @param clientName the name to use
+     */
+    private void joinActiveSession(String clientName) {
+        activeClient = new ClientModel(getDeviceUUID(), activeSessionModel);
+        activeClient.setName(clientName);
+        activeClient.setIsActive(true);
+
+        activeSessionModel.getClients().add(activeClient);
+
+        SessionConverter sessionConverter = new SessionConverter();
+        activeSession = sessionConverter.convert(activeSessionModel);
+
+        broadcastConnectionChanged();
+    }
+
+    /**
+     * gets all currently active sessions in the network
+     *
+     * @return collection of all active sessions
+     */
+    public ObservableList<SessionModel> getActiveSessions() {
+        ObservableArrayList<SessionModel> observableArrayList = new ObservableArrayList<>();
+        getClientNetworkService().findNetworkServices(observableArrayList);
+        return observableArrayList;
+    }
+
+    /**
+     * join one of the session previously retrieved by getActiveSessions
+     *
+     * @param session the session you want to join
+     */
+    public void joinSession(SessionModel session, String clientName) {
+        isHost = false;
+
+        activeSessionModel = session;
+        joinActiveSession(clientName);
+
+        getNetworkService().sendRegisterClient(clientName);
+    }
 
     public void connect(View v) {
 

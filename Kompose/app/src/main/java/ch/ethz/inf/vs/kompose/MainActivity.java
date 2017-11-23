@@ -8,10 +8,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+/**
+ * DONE
+ */
+
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
