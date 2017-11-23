@@ -9,6 +9,7 @@ import android.view.View;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
+import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
 
 public class PlaylistActivity extends AppCompatActivity {
 
@@ -28,9 +29,8 @@ public class PlaylistActivity extends AppCompatActivity {
         // get youtube url from view
         String youtubeUrl = "https://www.youtube.com/watch?v=-Fz85FE0KtQ";
 
-        YoutubeUtility youtubeService = new YoutubeUtility();
-        youtubeService.resolveSong(this, youtubeUrl,
-                new SimpleListener() {
+        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
+        youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
                     @Override
                     public void onEvent(int status) {}
 
@@ -72,19 +72,18 @@ public class PlaylistActivity extends AppCompatActivity {
     /**
      * leaves the currently active session
      */
-    public void leaveSession() {
-        if (isHost) {
-            getNetworkService().sendFinishSession();
-        } else {
-            getNetworkService().sendUnRegisterClient();
-        }
-
-        isHost = false;
-        activeSessionModel = null;
-        activeClient = null;
-
-        broadcastConnectionChanged();
-    }
-
+//    public void leaveSession() {
+//        if (isHost) {
+//            getNetworkService().sendFinishSession();
+//        } else {
+//            getNetworkService().sendUnRegisterClient();
+//        }
+//
+//        isHost = false;
+//        activeSessionModel = null;
+//        activeClient = null;
+//
+//        broadcastConnectionChanged();
+//    }
 
 }

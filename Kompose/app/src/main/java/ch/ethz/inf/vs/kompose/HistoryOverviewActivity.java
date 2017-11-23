@@ -35,18 +35,18 @@ public class HistoryOverviewActivity extends AppCompatActivity {
      *
      * @return collection of all saves sessions
      */
-    public ObservableList<SessionModel> getPastSessions() {
-        String[] pastSessionStrings = getStorageService().retrieveAllFiles(DIRECTORY_ARCHIVE);
-        for (String pastSession : pastSessionStrings) {
-            try {
-                SessionConverter sessionConverter = new SessionConverter();
-                SessionModel sessionModel = sessionConverter.convert(
-                        JsonConverter.fromSessionJsonString(pastSession)
-                );
-                pastSessions.add(sessionModel);
-            } catch (IOException e) {
-            }
-        }
-        return pastSessions;
-    }
+//    public ObservableList<SessionModel> getPastSessions() {
+//        String[] pastSessionStrings = getStorageService().retrieveAllFiles(DIRECTORY_ARCHIVE);
+//        for (String pastSession : pastSessionStrings) {
+//            try {
+//                SessionConverter sessionConverter = new SessionConverter();
+//                SessionModel sessionModel = sessionConverter.convert(
+//                        JsonConverter.fromSessionJsonString(pastSession)
+//                );
+//                pastSessions.add(sessionModel);
+//            } catch (IOException e) {
+//            }
+//        }
+//        return pastSessions;
+//    }
 }
