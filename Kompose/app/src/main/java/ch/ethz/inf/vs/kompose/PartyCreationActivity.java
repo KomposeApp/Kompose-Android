@@ -44,8 +44,6 @@ public class PartyCreationActivity extends AppCompatActivity {
         this.finish();
     }
 
-
-
     /**
      * creates a new session and register the host service on the network
      */

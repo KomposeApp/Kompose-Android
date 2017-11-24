@@ -12,8 +12,6 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Client;
-import ch.ethz.inf.vs.kompose.data.json.DownVote;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ClientConnectionDetails;
@@ -81,7 +79,7 @@ public class MessageHandler implements Runnable {
             return;
         }
 
-        SessionModel activeSessionModel = StateSingleton.getInstance().getActiveSession();
+        SessionModel activeSessionModel = StateSingleton.getInstance().activeSession;
 
         MessageType messageType = MessageType.valueOf(message.getType());
         Log.d(LOG_TAG, "Message processing (" + messageType + ")");
@@ -133,7 +131,7 @@ public class MessageHandler implements Runnable {
     }
 
     private void finishSession() {
-        sessionService.leaveSession();
+        // TODO
     }
 
     private boolean registerClient(Message message, SessionModel sessionModel) {
@@ -313,6 +311,7 @@ public class MessageHandler implements Runnable {
 //            }
 //        }
 //        return false;
+        return false;
     }
 
 
@@ -358,6 +357,7 @@ public class MessageHandler implements Runnable {
 //            }
 //        }
 //        return false;
+        return false;
     }
 
     private void sessionUpdate(Message message, SessionModel activeSessionModel) {
@@ -384,6 +384,7 @@ public class MessageHandler implements Runnable {
 //            }
 //        }
 //        return null;
+        return null;
     }
 
     private void checkDownVoteCount(SessionModel sessionModel, SongModel songModel) {

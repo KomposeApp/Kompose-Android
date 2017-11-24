@@ -9,6 +9,11 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
 public class SongService {
 
     private static final String LOG_TAG = "## Song Service";
+    private NetworkService networkService;
+
+    public SongService(NetworkService networkService) {
+        this.networkService = networkService;
+    }
 
     /**
      * sends the requested song to the server
@@ -17,7 +22,7 @@ public class SongService {
      */
     public void requestNewSong(Song song) {
         song.setUuid(UUID.randomUUID().toString());
-        getNetworkService().sendRequestSong(song);
+        networkService.sendRequestSong(song);
     }
 
     /**
@@ -28,7 +33,7 @@ public class SongService {
     public void castSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        getNetworkService().sendCastSkipSongVote(song);
+        networkService.sendCastSkipSongVote(song);
     }
 
     /**
@@ -39,7 +44,6 @@ public class SongService {
     public void removeSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        getNetworkService().sendRemoveSkipSongVote(song);
+        networkService.sendRemoveSkipSongVote(song);
     }
-
 }

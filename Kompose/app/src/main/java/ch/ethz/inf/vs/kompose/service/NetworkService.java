@@ -48,7 +48,6 @@ public class NetworkService {
 
     private Message getMessage(MessageType type) {
         Message msg = new Message();
-
         String uuid = StateSingleton.getInstance().retrieveDeviceUUID(context).toString();
         msg.setSenderUuid(uuid);
         msg.setType(type.toString());
@@ -58,67 +57,58 @@ public class NetworkService {
     public void sendRegisterClient(String username) {
         Message msg = getMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
-
         sendMessage(msg);
     }
 
     public void sendCastSkipSongVote(Song song) {
         Message msg = getMessage(MessageType.CAST_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
-
         sendMessage(msg);
     }
 
     public void sendRemoveSkipSongVote(Song song) {
         Message msg = getMessage(MessageType.REMOVE_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
-
         sendMessage(msg);
     }
 
     public void sendKeepAlive() {
         Message msg = getMessage(MessageType.KEEP_ALIVE);
-
         sendMessage(msg);
     }
 
     public void sendRequestSong(Song song) {
         Message msg = getMessage(MessageType.REQUEST_SONG);
         msg.setSongDetails(song);
-
         sendMessage(msg);
     }
 
     public void sendUnRegisterClient() {
         Message msg = getMessage(MessageType.UNREGISTER_CLIENT);
-
         sendMessage(msg);
     }
 
     public void sendSessionUpdate(Session session) {
         Message msg = getMessage(MessageType.SESSION_UPDATE);
         msg.setSession(session);
-
         sendMessage(msg);
     }
 
     public void sendError(String error) {
         Message msg = getMessage(MessageType.ERROR);
         msg.setErrorMessage(error);
-
         sendMessage(msg);
     }
 
     public void sendFinishSession() {
         Message msg = getMessage(MessageType.FINISH_SESSION);
-
         sendMessage(msg);
     }
 
 
     private void sendMessage(Message message) {
-        Thread handler = new Thread(new MessageHandler(getSessionService(), message));
-        handler.start();
+//        Thread handler = new Thread(new MessageHandler(getSessionService(), message));
+//        handler.start();
 
         ServerConnectionDetails connectionDetails = getActiveConnection();
         if (connectionDetails == null) {
@@ -145,7 +135,6 @@ public class NetworkService {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Intent intent = null;
             try {
                 Socket socket = new Socket(hostIP, hostPort);
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
@@ -158,31 +147,20 @@ public class NetworkService {
                 printWriter.close();
 
                 // await response
-
-                socket.setSoTimeout(2000);
-                StringBuilder json = new StringBuilder();
-                char[] buffer = new char[1024];
-                int bytesRead;
-                while ((bytesRead = input.read(buffer)) != -1) {
-                    json.append(new String(buffer, 0, bytesRead));
-                }
-                Log.d(LOG_TAG, "response from host: " + json.toString());
-
-                intent = new Intent(NetworkService.RESPONSE_RECEIVED);
-                intent.putExtra("json", json.toString());
+//                socket.setSoTimeout(2000);
+//                StringBuilder json = new StringBuilder();
+//                char[] buffer = new char[1024];
+//                int bytesRead;
+//                while ((bytesRead = input.read(buffer)) != -1) {
+//                    json.append(new String(buffer, 0, bytesRead));
+//                }
+//                Log.d(LOG_TAG, "response from host: " + json.toString());
 
                 input.close();
                 socket.close();
             } catch (IOException e) {
-                Log.d(LOG_TAG, "exception occurred " + e.toString());
-            } finally {
-                if (intent == null) {
-                    intent = new Intent(NetworkService.RESPONSE_FAILURE);
-                }
+                e.printStackTrace();
             }
-
-            sendBroadcast(intent);
-
             return null;
         }
     }

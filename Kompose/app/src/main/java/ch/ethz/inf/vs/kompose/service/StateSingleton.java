@@ -20,7 +20,7 @@ public class StateSingleton {
 
     // Client specific fields
     public SessionModel activeSession;
-    public UUID deviceUUID;
+    public UUID deviceUUID = UUID.randomUUID();
     public ObservableList<SessionModel> orderedPastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
         @Override
         public int compare(SessionModel o1, SessionModel o2) {
