@@ -29,6 +29,11 @@ public class ConnectActivity extends AppCompatActivity {
         bindService(intent, connection, BIND_AUTO_CREATE);
     }
 
+    /*
+     * TODO
+     * bind to view
+     */
+
     @Override
     protected void onStart() {
         super.onStart();
@@ -42,9 +47,6 @@ public class ConnectActivity extends AppCompatActivity {
             clientNetworkService = binder.getService();
             clientNetworkServiceBound = true;
             clientNetworkService.findNetworkServices(networkSessions);
-
-            // TODO
-            // bind to view
         }
 
         @Override
