@@ -17,6 +17,7 @@ public class ConnectActivity extends AppCompatActivity {
     private static final String LOG_TAG = "## Connect Activity";
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
+    private ObservableArrayList<SessionModel> networkSessions = new ObservableArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +39,6 @@ public class ConnectActivity extends AppCompatActivity {
             ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
             clientNetworkService = binder.getService();
             clientNetworkServiceBound = true;
-
-            ObservableArrayList<SessionModel> networkSessions = new ObservableArrayList<>();
             clientNetworkService.findNetworkServices(networkSessions);
 
             // TODO
