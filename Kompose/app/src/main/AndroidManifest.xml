@@ -43,7 +43,7 @@
             android:name=".service.AndroidServerService"
             android:enabled="true"
             android:exported="true" />
-        <service android:name=".service.NetworkService" />
+        <service android:name=".service.ClientNetworkService" />
 
         <activity android:name=".DesignActivity"></activity>
     </application>

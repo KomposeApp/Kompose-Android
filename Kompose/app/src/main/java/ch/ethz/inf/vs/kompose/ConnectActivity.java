@@ -4,9 +4,11 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -23,13 +25,13 @@ public class ConnectActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect_placeholder);
+        Intent intent = new Intent(this, ClientNetworkService.class);
+        bindService(intent, connection, BIND_AUTO_CREATE);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Intent intent = new Intent(this, ClientNetworkService.class);
-        bindService(intent, connection, this.BIND_AUTO_CREATE);
     }
 
     private ServiceConnection connection = new ServiceConnection() {
