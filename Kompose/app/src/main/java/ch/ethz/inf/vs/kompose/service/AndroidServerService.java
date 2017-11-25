@@ -89,8 +89,15 @@ public class AndroidServerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.d(LOG_TAG, "destroyed");
         nsdManager.unregisterService(nsdRegistrationListener);
         serverTask.cancel(true);
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Log.d(LOG_TAG, "task removed");
+        stopSelf();
     }
 
     @Nullable

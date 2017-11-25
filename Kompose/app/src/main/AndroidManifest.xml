@@ -41,8 +41,7 @@
 
         <service
             android:name=".service.AndroidServerService"
-            android:enabled="true"
-            android:exported="true" />
+            android:stopWithTask="true" />
         <service android:name=".service.ClientNetworkService" />
 
         <activity android:name=".DesignActivity"></activity>
