@@ -1,11 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
 import android.os.AsyncTask;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedReader;
@@ -21,7 +16,6 @@ import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
@@ -29,26 +23,11 @@ import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
  */
 public class NetworkService {
 
-    private final String LOG_TAG = "## NetworkService";
-
-    public static final String RESPONSE_RECEIVED = "NetworkService.RESPONSE_RECEIVED";
-    public static final String RESPONSE_FAILURE = "NetworkService.RESPONSE_FAILURE";
-
-    private Context context;
-    private ServerConnectionDetails activeConnection;
-
-
-    public NetworkService(Context ctx){
-        context = ctx;
-    }
-
-    private ServerConnectionDetails getActiveConnection() {
-        return activeConnection;
-    }
+    private static final String LOG_TAG = "## NetworkService";
 
     private Message getMessage(MessageType type) {
         Message msg = new Message();
-        String uuid = StateSingleton.getInstance().retrieveDeviceUUID(context).toString();
+        String uuid = StateSingleton.getInstance().getDeviceUUID().toString();
         msg.setSenderUuid(uuid);
         msg.setType(type.toString());
         return msg;
@@ -107,10 +86,15 @@ public class NetworkService {
 
 
     private void sendMessage(Message message) {
-//        Thread handler = new Thread(new MessageHandler(getSessionService(), message));
-//        handler.start();
+        // if this device is host, call message handler directly
+        if (StateSingleton.getInstance().deviceIsHost) {
+            Thread handler = new Thread(new MessageHandler(message));
+            handler.start();
+            return;
+        }
 
-        ServerConnectionDetails connectionDetails = getActiveConnection();
+        // otherwise, send the message over network
+        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession.getConnectionDetails();
         if (connectionDetails == null) {
             Log.d(LOG_TAG, "tried to send message but no active connection");
         } else {
@@ -146,16 +130,6 @@ public class NetworkService {
                 printWriter.flush();
                 printWriter.close();
 
-                // await response
-//                socket.setSoTimeout(2000);
-//                StringBuilder json = new StringBuilder();
-//                char[] buffer = new char[1024];
-//                int bytesRead;
-//                while ((bytesRead = input.read(buffer)) != -1) {
-//                    json.append(new String(buffer, 0, bytesRead));
-//                }
-//                Log.d(LOG_TAG, "response from host: " + json.toString());
-
                 input.close();
                 socket.close();
             } catch (IOException e) {
@@ -164,6 +138,4 @@ public class NetworkService {
             return null;
         }
     }
-
-
 }

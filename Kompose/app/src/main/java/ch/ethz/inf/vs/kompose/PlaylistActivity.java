@@ -20,7 +20,7 @@ public class PlaylistActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist_placeholder);
-        networkService = new NetworkService(this);
+        networkService = new NetworkService();
     }
 
     public void requestSong(View v) {

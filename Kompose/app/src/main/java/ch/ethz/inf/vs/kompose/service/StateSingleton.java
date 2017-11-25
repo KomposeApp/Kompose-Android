@@ -45,21 +45,7 @@ public class StateSingleton {
 
     /* *********************************************************************** */
 
-    public void generateDeviceUUID(Context ctx){
-
-        if (deviceUUID != null){
-            Log.d(LOG_TAG, "Device UUID already exists, skipping...");
-            return;
-        }
-        deviceUUID = UUID.randomUUID();
-    }
-
-    @Nullable
-    public UUID retrieveDeviceUUID(Context ctx){
-        if (deviceUUID == null){
-            Log.e(LOG_TAG, "ALERT: Device UUID has not been set");
-        }
+    public UUID getDeviceUUID() {
         return deviceUUID;
     }
-
 }
