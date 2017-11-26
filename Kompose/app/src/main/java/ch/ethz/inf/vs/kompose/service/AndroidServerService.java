@@ -15,6 +15,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
@@ -48,7 +49,7 @@ public class AndroidServerService extends Service {
         Log.d(LOG_TAG, "started");
 
         try {
-            serverSocket = new ServerSocket(0);
+            serverSocket = new ServerSocket(PreferenceUtility.getCurrentPort(this));
             localPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
