@@ -6,6 +6,7 @@ import android.databinding.ObservableList;
 
 import org.joda.time.DateTime;
 
+import java.io.File;
 import java.net.URI;
 import java.util.UUID;
 
@@ -37,6 +38,10 @@ public class SongModel extends UniqueModel {
     private DateTime creationDateTime;
 
     private SongStatus status;
+
+    private boolean isDownloaded;
+    private boolean downloadStarted;
+    private File downloadPath;
 
     @Bindable
     public String getTitle() {
@@ -148,5 +153,29 @@ public class SongModel extends UniqueModel {
     public void setCreationDateTime(DateTime creationDateTime) {
         this.creationDateTime = creationDateTime;
         notifyPropertyChanged(BR.creationDateTime);
+    }
+
+    public File getDownloadPath() {
+        return downloadPath;
+    }
+
+    public void setDownloadPath(File downloadPath) {
+        this.downloadPath = downloadPath;
+    }
+
+    public boolean isDownloadStarted() {
+        return downloadStarted;
+    }
+
+    public void setDownloadStarted(boolean downloadStarted) {
+        this.downloadStarted = downloadStarted;
+    }
+
+    public boolean isDownloaded() {
+        return isDownloaded;
+    }
+
+    public void setDownloaded(boolean downloaded) {
+        isDownloaded = downloaded;
     }
 }

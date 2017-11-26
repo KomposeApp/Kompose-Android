@@ -1,8 +1,10 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.annotation.SuppressLint;
+import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -26,6 +28,9 @@ public class YoutubeDownloadUtility {
 
     private static final int RESOLVE_SUCCESS = 0x1;
     private static final int RESOLVE_FAILED = 0x2;
+
+    private static final int DOWNLOAD_SUCCESS = 0x3;
+    private static final int DOWNLOAD_FAILED = 0x4;
 
     private Context context;
 
@@ -81,35 +86,68 @@ public class YoutubeDownloadUtility {
      * The notifier will carry a MediaPlayer that can be used to play the file.
      * @param directURL WARNING: THIS IS NOT THE BROWSER URL. USE {@link #resolveSong(String, SimpleListener)} AND A LISTENER.
      * @param fileName file to store the song in
+     * @param listener the listener that will be called upon success or failure. Will carry
+     *                 the `File` if successful or `null` on failure.
      * @return true if the download succeeded, false otherwise
      */
-    public boolean downloadSong(String directURL, String fileName) {
-        try {
-            URL url = new URL(directURL);
-            URLConnection connection = url.openConnection();
-            connection.connect();
-
-            InputStream input = new BufferedInputStream(connection.getInputStream());
-            File storedFile = new File(context.getCacheDir(), fileName);
-            OutputStream output = new FileOutputStream(storedFile);
-
-            byte[] buffer = new byte[1024];
-            int count;
-            while ((count = input.read(buffer)) != -1) {
-                output.write(buffer, 0, count);
-            }
-
-            input.close();
-            output.close();
-
-            // MediaPlayer mediaPlayer = MediaPlayer.create(context, Uri.fromFile(storedFile));
-
-            return true;
-        } catch (Exception e) {
-            Log.e(LOG_TAG, "Something went wrong during downloading " + e.getMessage());
-            return false;
-        }
+    public void downloadSong(String directURL, String fileName, SimpleListener listener) {
+        AsyncDownloader asyncDownloader = new AsyncDownloader(context, directURL, fileName, listener);
+        asyncDownloader.execute();
     }
 
+    private static class AsyncDownloader extends AsyncTask<Void,Void,Void> {
 
+        private Context context;
+        private String downloadUrl;
+        private String fileName;
+        private SimpleListener listener;
+
+        private File storedFile = null;
+
+        AsyncDownloader(Context context,
+                        String downloadUrl,
+                        String fileName,
+                        SimpleListener listener) {
+            this.context = context;
+            this.downloadUrl = downloadUrl;
+            this.fileName = fileName;
+            this.listener = listener;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                URL url = new URL(downloadUrl);
+                URLConnection connection = url.openConnection();
+                connection.connect();
+
+                InputStream input = new BufferedInputStream(connection.getInputStream());
+                File storedFile = new File(context.getCacheDir(), fileName);
+                OutputStream output = new FileOutputStream(storedFile);
+
+                byte[] buffer = new byte[1024];
+                int count;
+                while ((count = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, count);
+                }
+
+                input.close();
+                output.close();
+
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "File download failed");
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void arg) {
+            if (storedFile != null) {
+                listener.onEvent(DOWNLOAD_SUCCESS, storedFile);
+            } else {
+                listener.onEvent(DOWNLOAD_FAILED, null);
+            }
+        }
+    }
 }
