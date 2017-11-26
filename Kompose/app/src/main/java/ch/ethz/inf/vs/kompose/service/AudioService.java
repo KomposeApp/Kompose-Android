@@ -91,8 +91,6 @@ public class AudioService extends Service {
         }
     }
 
-    // MediaPlayer
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
