@@ -10,12 +10,15 @@ import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
+import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
@@ -84,6 +87,19 @@ public class NetworkService {
         sendMessage(msg);
     }
 
+    public void updateAllClients(SessionModel sessionModel) {
+        SessionConverter sessionConverter = new SessionConverter();
+        Session session = sessionConverter.convert(sessionModel);
+        Message message = getMessage(MessageType.SESSION_UPDATE);
+        message.setSession(session);
+
+        // send message to all clients
+        for (ClientModel c : sessionModel.getClients()) {
+            Socket socket = c.getClientConnectionDetails().getSocket();
+            AsyncSender asyncSender = new AsyncSender(message, socket);
+            asyncSender.execute();
+        }
+    }
 
     private void sendMessage(Message message) {
         // if this device is host, call message handler directly
@@ -98,7 +114,8 @@ public class NetworkService {
         if (connectionDetails == null) {
             Log.d(LOG_TAG, "tried to send message but no active connection");
         } else {
-            AsyncSender asyncSender = new AsyncSender(message, connectionDetails.getHostIP(), connectionDetails.getHostPort());
+            AsyncSender asyncSender = new AsyncSender(message,
+                    connectionDetails.getHostIP(), connectionDetails.getHostPort());
             asyncSender.execute();
         }
     }
@@ -110,6 +127,7 @@ public class NetworkService {
         InetAddress hostIP;
         int hostPort;
         Message message;
+        Socket socket;
 
         public AsyncSender(Message msg, InetAddress ip, int port) {
             this.message = msg;
@@ -117,10 +135,22 @@ public class NetworkService {
             this.hostPort = port;
         }
 
+        public AsyncSender(Message message, Socket socket) {
+            this.message = message;
+            this.socket = socket;
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                Socket socket = new Socket(hostIP, hostPort);
+                boolean closeSocket = false;
+
+                // open a new socket if none given
+                if (socket == null) {
+                    socket = new Socket(hostIP, hostPort);
+                    closeSocket = true;
+                }
+
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
                 BufferedReader input = new BufferedReader(new InputStreamReader(
                         socket.getInputStream()));
@@ -131,7 +161,12 @@ public class NetworkService {
                 printWriter.close();
 
                 input.close();
-                socket.close();
+
+                // only close the socket if a new one was created
+                if (closeSocket) {
+                    socket.close();
+                }
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
