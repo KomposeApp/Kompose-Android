@@ -3,36 +3,49 @@ package ch.ethz.inf.vs.kompose;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.databinding.DataBindingUtil;
 import android.databinding.ObservableArrayList;
-import android.databinding.ObservableList;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
+import android.support.v7.widget.LinearLayoutManager;
 import android.view.View;
 
+import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
+import ch.ethz.inf.vs.kompose.view.adapter.ClientAdapter;
+import ch.ethz.inf.vs.kompose.view.adapter.SessionSelectAdapter;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
+import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 
-public class ConnectActivity extends AppCompatActivity {
+public class ConnectActivity extends AppCompatActivity implements ClickListeners {
 
     private static final String LOG_TAG = "## Connect Activity";
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
-    private ObservableArrayList<SessionModel> networkSessions = new ObservableArrayList<>();
+
+    private final ConnectViewModel viewModel = new ConnectViewModel(new ObservableArrayList<SessionModel>());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_connect_placeholder);
+        setContentView(R.layout.activity_connect);
+
+
+        ActivityConnectBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_design);
+
+
+        binding.list.setLayoutManager(new LinearLayoutManager(this));
+        binding.list.setAdapter(new SessionSelectAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
+
+        binding.setViewModel(viewModel);
+
+
+        //bind client network service
         Intent intent = new Intent(this, ClientNetworkService.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
     }
-
-    /*
-     * TODO
-     * bind to view
-     */
 
     @Override
     protected void onStart() {
@@ -46,7 +59,7 @@ public class ConnectActivity extends AppCompatActivity {
             ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
             clientNetworkService = binder.getService();
             clientNetworkServiceBound = true;
-            clientNetworkService.findNetworkServices(networkSessions);
+            clientNetworkService.findNetworkServices(viewModel.getSessionModels());
         }
 
         @Override
@@ -54,7 +67,6 @@ public class ConnectActivity extends AppCompatActivity {
             clientNetworkServiceBound = false;
         }
     };
-
 
 
 //    /**
@@ -101,8 +113,6 @@ public class ConnectActivity extends AppCompatActivity {
 //    }
 
     public void connect(View v) {
-
-//        //TODO: resolve pressed session and set client name
 //        String username = PreferenceManager.getDefaultSharedPreferences(this)
 //                .getString(BasePreferencesService.KEY_USERNAME, BasePreferencesService.DEFAULT_USERNAME);
 //        getSessionService().joinSession(null, username);
@@ -111,5 +121,18 @@ public class ConnectActivity extends AppCompatActivity {
 //        Intent playlistIntent = new Intent(this, PlaylistActivity.class);
 //        startActivity(playlistIntent);
 //        this.finish();
+    }
+
+    @Override
+    public void recyclerViewListClicked(View v, int position) {
+        //ignore
+    }
+
+    @Override
+    public void buttonClicked(View v, int position) {
+        //join button clicked
+        SessionModel pressedSession = viewModel.getSessionModels().get(position);
+        String clientName = viewModel.getClientName();
+        //todo: join session
     }
 }

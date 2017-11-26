@@ -21,7 +21,7 @@ public class SessionModel extends UniqueModel {
         this.hostUUID = hostUUID;
     }
 
-    private String sessionName;
+    private String name;
     private UUID hostUUID;
     private DateTime creationDateTime;
     private ServerConnectionDetails connectionDetails;
@@ -66,13 +66,13 @@ public class SessionModel extends UniqueModel {
     }
 
     @Bindable
-    public String getSessionName() {
-        return sessionName;
+    public String getName() {
+        return name;
     }
 
-    public void setSessionName(String sessionName) {
-        this.sessionName = sessionName;
-        notifyPropertyChanged(BR.sessionName);
+    public void setName(String name) {
+        this.name = name;
+        notifyPropertyChanged(BR.name);
     }
 
     public ObservableList<ClientModel> getClients() {

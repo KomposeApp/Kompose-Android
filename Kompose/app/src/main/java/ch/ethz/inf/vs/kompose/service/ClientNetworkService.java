@@ -2,7 +2,7 @@ package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
 import android.content.Intent;
-import android.databinding.ObservableArrayList;
+import android.databinding.ObservableList;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
@@ -34,13 +34,13 @@ public class ClientNetworkService extends Service {
     private IBinder binder = new LocalBinder();
     private NsdManager nsdManager;
 
-    private ObservableArrayList<SessionModel> sessionModels;
+    private ObservableList<SessionModel> sessionModels;
 
     /**
-     * Add Network services to the provided ObservableArrayList
+     * Add Network services to the provided ObservableList
      * @param list List which the NetworkServices are to be added to
      */
-    public void findNetworkServices(ObservableArrayList<SessionModel> list) {
+    public void findNetworkServices(ObservableList<SessionModel> list) {
         Log.d(LOG_TAG, "starting service discovery");
         this.sessionModels = list;
         nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
@@ -166,10 +166,11 @@ public class ClientNetworkService extends Service {
 
             Map<String,byte[]> attributes = serviceInfo.getAttributes();
             UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
+            //todo: retrieve host name directly?
             UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
 
             SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
-            sessionModel.setSessionName(new String(attributes.get("session")));
+            sessionModel.setName(new String(attributes.get("session")));
             sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
 
             sessionModels.add(sessionModel);

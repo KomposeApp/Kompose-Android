@@ -20,21 +20,21 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.BR;
-import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
+import ch.ethz.inf.vs.kompose.databinding.SessionSelectViewBinding;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
 import ch.ethz.inf.vs.kompose.view.viewholder.ClickableItemViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.RecyclerViewClickListener;
 
-public class ClientBindableAdapter extends BindableAdapter<ClientModel> {
-    public ClientBindableAdapter(ObservableList<ClientModel> items, final LayoutInflater layoutInflater, final RecyclerViewClickListener listener) {
+public class SessionSelectAdapter extends BindableAdapter<SessionModel> {
+    public SessionSelectAdapter(ObservableList<SessionModel> items, final LayoutInflater layoutInflater, final ClickListeners listener) {
         super(
                 items,
-                new BindableAdapter.ViewHolderFactory<ClientModel>() {
+                new ViewHolderFactory<SessionModel>() {
                     @Override
-                    public AbstractViewHolder<ClientModel> create(ViewGroup viewGroup) {
-                        return new ClickableItemViewHolder(ClientViewBinding.inflate(layoutInflater, viewGroup, false), BR.clientViewHolder, listener);
+                    public AbstractViewHolder<SessionModel> create(ViewGroup viewGroup) {
+                        return new ClickableItemViewHolder(SessionSelectViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
                     }
                 }
         );

@@ -16,14 +16,14 @@ public class SampleService {
     ObservableList<ClientModel> clientList = new ObservableUniqueSortedList<>(new Comparator<ClientModel>() {
         @Override
         public int compare(ClientModel o1, ClientModel o2) {
-            return 0;
+            return o1.getName().compareTo(o2.getName());
         }
     });
 
     private SessionModel getSampleSession(String sessionName) {
         SessionModel sessionModel = new SessionModel(UUID.randomUUID(), UUID.randomUUID());
         sessionModel.setCreationDateTime(DateTime.now());
-        sessionModel.setSessionName(sessionName);
+        sessionModel.setName(sessionName);
 
         return sessionModel;
     }

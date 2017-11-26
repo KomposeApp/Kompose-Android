@@ -15,4 +15,6 @@
     <string name="setting_error_preload">Maximum preload count is 10</string>
     <string name="setting_error_username">Username may not be empty</string>
     <string name="setting_error_port">Port may not be greater than 65535</string>
+    <string name="join">join</string>
+    <string name="client_name">client name</string>
 </resources>

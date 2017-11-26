@@ -265,7 +265,7 @@ public class MessageHandler implements Runnable {
     private void sessionUpdate(Message message, SessionModel activeSessionModel) {
 //        Session receivedSession = message.getSession();
 //
-//        activeSession.setSessionName(receivedSession.getSessionName());
+//        activeSession.setName(receivedSession.getName());
 //        activeSession.setCreationDateTime(receivedSession.getCreationDateTime());
 //        activeSession.setHostUuid(receivedSession.getHostUuid());
 

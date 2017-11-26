@@ -25,7 +25,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
                 UUID.fromString(session.getUuid()),
                 UUID.fromString(session.getHostUuid())
         );
-        sessionModel.setSessionName(session.getSessionName());
+        sessionModel.setName(session.getSessionName());
 
         // format DateTime as ISO 8601
         DateTimeFormatter isoParser = ISODateTimeFormat.dateTime();
@@ -72,7 +72,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
         //set remaining contents
         session.setHostUuid(sessionModel.getHostUUID().toString());
-        session.setSessionName(sessionModel.getSessionName());
+        session.setSessionName(sessionModel.getName());
         session.setUuid(sessionModel.getUuid().toString());
 
         if (sessionModel.getCreationDateTime() != null) {

@@ -5,7 +5,7 @@
     <data>
 
         <variable
-            name="clientViewHolder"
+            name="viewHolder"
             type="ch.ethz.inf.vs.kompose.view.viewholder.ClickableItemViewHolder" />
     </data>
 
@@ -17,7 +17,13 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{clientViewHolder.item.name}" />
+            android:text="@{viewHolder.item.name}" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="@{viewHolder.onButtonClick}"
+            />
 
     </LinearLayout>
 </layout>

@@ -20,12 +20,12 @@ import android.view.View;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.RecyclerViewClickListener;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
 
 public class ClickableItemViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, ClientModel> {
-    private RecyclerViewClickListener clickListener;
+    private ClickListeners clickListener;
 
-    public ClickableItemViewHolder(TModelViewBinding binding, int resourceId, RecyclerViewClickListener clickListener) {
+    public ClickableItemViewHolder(TModelViewBinding binding, int resourceId, ClickListeners clickListener) {
         super(binding, resourceId);
         this.clickListener = clickListener;
     }
@@ -36,6 +36,13 @@ public class ClickableItemViewHolder<TModelViewBinding extends ViewDataBinding> 
 
     @Override
     public void onClick(View v) {
+        int pos = this.getAdapterPosition();
+        if (clickListener != null) {
+            clickListener.recyclerViewListClicked(v, pos);
+        }
+    }
+
+    public void onButtonClick(View v) {
         int pos = this.getAdapterPosition();
         if (clickListener != null) {
             clickListener.recyclerViewListClicked(v, pos);

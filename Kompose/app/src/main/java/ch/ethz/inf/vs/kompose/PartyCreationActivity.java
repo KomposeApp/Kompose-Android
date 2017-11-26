@@ -32,7 +32,7 @@ public class PartyCreationActivity extends AppCompatActivity {
         // create a new session
         SessionModel newSession = new SessionModel(UUID.randomUUID(),
                 StateSingleton.getInstance().deviceUUID);
-        newSession.setSessionName(partyName);
+        newSession.setName(partyName);
         StateSingleton.getInstance().activeSession = newSession;
 
         // start the server service
@@ -51,7 +51,7 @@ public class PartyCreationActivity extends AppCompatActivity {
 //        isHost = true;
 //
 //        activeSessionModel = new SessionModel(UUID.randomUUID(), getDeviceUUID());
-//        activeSessionModel.setSessionName(sessionName);
+//        activeSessionModel.setName(sessionName);
 //        joinActiveSession(clientName);
 //
 //        Intent serverIntent = new Intent(this, AndroidServerService.class);
