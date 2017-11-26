@@ -21,6 +21,7 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 /*
@@ -126,12 +127,13 @@ public class MessageHandler implements Runnable {
         }
 
         if (sessionHasChanged) {
-            //sessionService.sessionChanged();
+            NetworkService networkService = new NetworkService();
+            networkService.updateAllClients(activeSessionModel);
         }
     }
 
+    // TODO
     private void finishSession() {
-        // TODO
     }
 
     private boolean registerClient(Message message, SessionModel sessionModel) {
@@ -140,43 +142,23 @@ public class MessageHandler implements Runnable {
         client.setName(message.getSenderUsername());
         sessionModel.getClients().add(client);
 
+        // if the message came from network, store the socket in the client model
         if (socket != null) {
             ClientConnectionDetails connectionDetails = new ClientConnectionDetails(socket, DateTime.now());
             client.setClientConnectionDetails(connectionDetails);
         }
 
         return true;
-
-//        Client client = new Client();
-//        client.setIsActive(true);
-//        client.setName(message.getSenderUsername());
-//        client.setUuid(message.getSenderUuid());
-//
-//        List<Client> list = Arrays.asList(session.getClients());
-//        list.add(client);
-//
-//        session.setClients((Client[]) list.toArray());
-//
-//        ClientConverter clientConverter = new ClientConverter(sessionModel);
-//        ClientModel clientModel = clientConverter.convert(client);
-//
-//        if (socket != null) {
-//            ClientConnectionDetails connectionDetails = new ClientConnectionDetails(socket, DateTime.now());
-//            clientModel.setClientConnectionDetails(connectionDetails);
-//        }
-//
-//        sessionModel.getClients().add(clientModel);
-//        return true;
     }
 
     private boolean unregisterClient(Message message, SessionModel sessionModel) {
-
         ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
 
         if (clientModel == null) {
             return false;
         }
 
+        // close the client's socket
         clientModel.setIsActive(false);
         if (clientModel.getClientConnectionDetails() != null) {
             try {
@@ -187,6 +169,7 @@ public class MessageHandler implements Runnable {
             clientModel.setClientConnectionDetails(null);
         }
 
+        // remove the client's downvotes
         UUID clientUUID = clientModel.getUuid();
         for (SongModel songModel : sessionModel.getSongs()) {
             for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
@@ -199,59 +182,9 @@ public class MessageHandler implements Runnable {
         }
 
         return true;
-
-//        Client foundClient = null;
-//        for (Client client :
-//                session.getClients()) {
-//            if (client.getUuid().equals(message.getSenderUsername())) {
-//                foundClient = client;
-//                break;
-//            }
-//        }
-//
-//        if (foundClient == null) {
-//            return false;
-//        }
-//
-//        foundClient.setIsActive(false);
-//
-//        UUID clientUUID = UUID.fromString(foundClient.getUuid());
-//        ClientModel clientModel = getClientModel(clientUUID, sessionModel);
-//        if (clientModel != null) {
-//            clientModel.setIsActive(false);
-//
-//            if (clientModel.getClientConnectionDetails() != null) {
-//                try {
-//                    clientModel.getClientConnectionDetails().getSocket().close();
-//                } catch (IOException e) {
-//                    Log.d(LOG_TAG, "socket could not be closed");
-//                }
-//                clientModel.setClientConnectionDetails(null);
-//            }
-//
-//            //remove downvote validity
-//            for (SongModel songModel : sessionModel.getSongs()) {
-//                for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
-//                    if (downVoteModel.getUuid().equals(clientUUID)) {
-//                        songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
-//                        checkDownVoteCount(sessionModel, songModel);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//        return true;
     }
 
     private boolean requestSong(Message message, SessionModel sessionModel) {
-//        Song song = message.getSongDetails();
-//        song.setProposedByClientUuid(message.getSenderUuid());
-//
-//        List<Song> list = Arrays.asList(session.getSongs());
-//        list.add(song);
-//
-//        session.setSongs((Song[]) list.toArray());
-//
         Song song = message.getSongDetails();
         song.setProposedByClientUuid(message.getSenderUuid());
 
@@ -266,100 +199,69 @@ public class MessageHandler implements Runnable {
 
     private boolean castSkipSongVote(Message message, SessionModel activeSessionModel) {
         SongModel downVoteTarget = null;
+        String requestedSongUUID = message.getSongDetails().getUuid();
+        String senderUUID = message.getSenderUuid();
+
+        // find the song in the session model
         for (SongModel song : activeSessionModel.getSongs()) {
-            if (message.getSongDetails().getUuid().equals(song.getUuid())) {
+            String songUUID = song.getUuid().toString();
+            if (requestedSongUUID.equals(songUUID)) {
+
+                // check if song already downvoted by this client
                 for (DownVoteModel downVote : song.getDownVotes()) {
-                    if (downVote.getClientModel().getUuid().toString().equals(message.getSenderUuid())) {
+                    String downVoteClientUUID = downVote.getClientModel().getUuid().toString();
+                    if (downVoteClientUUID.equals(senderUUID)) {
                         return false;
                     }
                 }
+
                 downVoteTarget = song;
                 break;
             }
         }
 
-//
-//        if (downVoteTarget == null) {
-//            return false;
-//        }
+        if (downVoteTarget == null) {
+            return false;
+        }
 
-//        DownVote downVote = new DownVote();
-//        downVote.setClientUuid(message.getSenderUuid());
-//        downVote.setUuid(UUID.randomUUID().toString());
-//
-//        List<DownVote> downVotes = Arrays.asList(downVoteTarget.getDownVotes());
-//        downVotes.add(downVote);
-//        downVoteTarget.setDownVotes((DownVote[]) downVotes.toArray());
-//
-//        UUID songUUID = UUID.fromString(downVoteTarget.getUuid());
-//        UUID clientUUID = UUID.fromString(message.getSenderUuid());
-//        for (SongModel songModel : activeSessionModel.getSongs()) {
-//            if (songModel.getUuid().equals(songUUID)) {
-//                for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
-//                    if (downVoteModel.getClientModel().getUuid().equals(clientUUID)) {
-//                        //ehm wat? this should have failed in the Session object.
-//                        return false;
-//                    }
-//                }
-//                DownVoteConverter downVoteConverter = new DownVoteConverter(activeSessionModel.getClients(), songModel);
-//                DownVoteModel model = downVoteConverter.convert(downVote);
-//                songModel.getDownVotes().add(model);
-//                songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() + 1);
-//
-//                checkDownVoteCount(activeSessionModel, songModel);
-//                return true;
-//            }
-//        }
-//        return false;
+        DownVoteModel downVoteModel = new DownVoteModel(UUID.randomUUID(),
+                getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel),
+                downVoteTarget);
+
+        downVoteTarget.setValidDownVoteCount(downVoteTarget.getValidDownVoteCount() + 1);
+        downVoteTarget.getDownVotes().add(downVoteModel);
+        checkDownVoteCount(activeSessionModel, downVoteTarget);
+
         return false;
     }
-
 
     private boolean removeSkipSongVote(Message message, SessionModel activeSessionModel) {
-//        Song downVoteTarget = null;
-//        DownVote downVote = null;
-//        for (Song song : activeSession.getSongs()) {
-//            if (message.getSongDetails().getUuid().equals(song.getUuid())) {
-//                List<DownVote> downVotes = Arrays.asList(song.getDownVotes());
-//                for (int i = 0; i < downVotes.size(); i++) {
-//                    if (downVotes.get(i).getClientUuid().equals(message.getSenderUuid())) {
-//                        downVote = downVotes.get(i);
-//                        downVotes.remove(i);
-//                        break;
-//                    }
-//                }
-//                if (downVote != null) {
-//                    song.setDownVotes((DownVote[]) downVotes.toArray());
-//                    downVoteTarget = song;
-//                }
-//                break;
-//            }
-//        }
-//
-//        if (downVoteTarget == null) {
-//            return false;
-//        }
-//
-//        UUID songUUID = UUID.fromString(downVoteTarget.getUuid());
-//        UUID downVoteUUID = UUID.fromString(downVote.getUuid());
-//
-//        for (SongModel songModel : activeSessionModel.getSongs()) {
-//            if (songModel.getUuid().equals(songUUID)) {
-//                for (int i = 0; i < songModel.getDownVotes().size(); i++) {
-//                    if (songModel.getDownVotes().get(i).getUuid().equals(downVoteUUID)) {
-//                        songModel.getDownVotes().remove(i);
-//                        checkDownVoteCount(activeSessionModel, songModel);
-//                        return true;
-//                    }
-//                }
-//                //ehm wat? this should have failed in the Session object.
-//                break;
-//            }
-//        }
-//        return false;
+        // find the song in the session
+        for (int i = 0; i < activeSessionModel.getSongs().size(); i++) {
+            SongModel songModel = activeSessionModel.getSongs().get(i);
+            String songUUID = songModel.getUuid().toString();
+            String requestedSongUUID = message.getSongDetails().getUuid();
+            if (songUUID.equals(requestedSongUUID)) {
+
+                // find the corresponding DownVoteModel
+                DownVoteModel downVoteModel;
+                for (int j = 0; j < songModel.getDownVotes().size(); j++) {
+                    downVoteModel = songModel.getDownVotes().get(j);
+                    String downvoteClientUUID = downVoteModel.getClientModel().getUuid().toString();
+                    String clientUUID = message.getSenderUuid();
+                    if (downvoteClientUUID.equals(clientUUID)) {
+                        songModel.getDownVotes().remove(j);
+                        checkDownVoteCount(activeSessionModel, songModel);
+                        return true;
+                    }
+                }
+            }
+        }
+
         return false;
     }
 
+    // TODO
     private void sessionUpdate(Message message, SessionModel activeSessionModel) {
 //        Session receivedSession = message.getSession();
 //
@@ -375,35 +277,35 @@ public class MessageHandler implements Runnable {
         //see the other implemenentations for reference
     }
 
-
+    // find a ClientModel in a session by UUID
     private ClientModel getClientModel(UUID clientUUID, SessionModel sessionModel) {
-//        for (ClientModel client :
-//                sessionModel.getClients()) {
-//            if (client.getUuid().equals(clientUUID)) {
-//                return client;
-//            }
-//        }
-//        return null;
+        for (ClientModel client : sessionModel.getClients()) {
+            if (client.getUuid().equals(clientUUID)) {
+                return client;
+            }
+        }
         return null;
     }
 
+    // update the song status according to how many downvotes it has
     private void checkDownVoteCount(SessionModel sessionModel, SongModel songModel) {
-//        if (songModel.getStatus() != SongStatus.IN_QUEUE && songModel.getStatus() != SongStatus.EXCLUDED_BY_POPULAR_VOTE) {
-//            return;
-//        }
-//
-//        Integer validClientCount = 0;
-//        for (ClientModel client : sessionModel.getClients()) {
-//            if (client.getIsActive()) {
-//                validClientCount += 1;
-//            }
-//        }
-//
-//        Integer quorum = validClientCount / 2;
-//        if (songModel.getValidDownVoteCount() >= quorum) {
-//            songModel.setStatus(SongStatus.EXCLUDED_BY_POPULAR_VOTE);
-//        } else {
-//            songModel.setStatus(SongStatus.IN_QUEUE);
-//        }
+        if (songModel.getStatus() != SongStatus.IN_QUEUE
+                && songModel.getStatus() != SongStatus.EXCLUDED_BY_POPULAR_VOTE) {
+            return;
+        }
+
+        int validClientCount = 0;
+        for (ClientModel client : sessionModel.getClients()) {
+            if (client.getIsActive()) {
+                validClientCount += 1;
+            }
+        }
+
+        int quorum = validClientCount / 2;
+        if (songModel.getValidDownVoteCount() >= quorum) {
+            songModel.setStatus(SongStatus.EXCLUDED_BY_POPULAR_VOTE);
+        } else {
+           songModel.setStatus(SongStatus.IN_QUEUE);
+        }
     }
 }
