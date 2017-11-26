@@ -14,16 +14,19 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
-public class ObservableArrayListTest {
+public class ObservableUniqueSortedListTest {
     @Test
     public void addTest() {
         ObservableList<SongModel> list = getListInstance();
 
         list.add(getSongModel(1));
+        list.add(getSongModel(-1));
+        list.add(getSongModel(-1));
         list.add(getSongModel(4));
         list.add(getSongModel(0));
 
         checkSorted(list);
+        Assert.assertTrue(list.size() == 4);
     }
 
     @Test
@@ -36,10 +39,12 @@ public class ObservableArrayListTest {
         arrayList.add(getSongModel(1));
         arrayList.add(getSongModel(2));
         arrayList.add(getSongModel(0));
+        arrayList.add(getSongModel(-10));
 
         list.addAll(arrayList);
 
         checkSorted(list);
+        Assert.assertTrue(list.size() == 4);
     }
 
     private SongModel getSongModel(int order) {
@@ -52,7 +57,7 @@ public class ObservableArrayListTest {
         return new ObservableUniqueSortedList<>(new Comparator<SongModel>() {
             @Override
             public int compare(SongModel o1, SongModel o2) {
-                return o1.getOrder() < o2.getOrder() ? -1 : 1;
+                return o1.getOrder() - o2.getOrder();
             }
         });
     }

@@ -23,31 +23,25 @@ public class ObservableUniqueSortedList<T extends UniqueModel> extends Observabl
     @Override
     public boolean add(T object) {
         boolean found = false;
-        boolean smaller = false;
-        // super.sort is only available in API 24
-        Iterator<T> it = super.iterator();
-        int i = 0;
-        while (it.hasNext()) {
-            T nextObject = it.next();
-            //first part: check where to put it
-            if (!smaller) {
-                if (comparator.compare(object, nextObject) < 0) {
-                    smaller = true;
-                } else {
-                    i++;
-                }
-            }
-            //check if item already exists
-            if (object.getUuid().equals(nextObject.getUuid())) {
+        int insertIdx = 0;
+        boolean idxSet = false;
+        for (int i = 0; i < super.size(); i++) {
+            if (comparator.compare(super.get(i), object) == 0) {
                 found = true;
                 break;
             }
+            if (!idxSet && comparator.compare(object, get(i)) < 0) {
+                insertIdx = i;
+                idxSet = true;
+            }
         }
+
         if (found) {
             return false;
         }
 
-        super.add(i, object);
+        insertIdx = idxSet ? insertIdx : super.size();
+        super.add(insertIdx, object);
         return true;
     }
 
