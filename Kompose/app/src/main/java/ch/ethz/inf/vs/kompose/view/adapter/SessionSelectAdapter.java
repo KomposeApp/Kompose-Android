@@ -23,13 +23,11 @@ import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.databinding.SessionSelectViewBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
-import ch.ethz.inf.vs.kompose.view.viewholder.ClientViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.SessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 
 public class SessionSelectAdapter extends BindableAdapter<SessionModel> {
-    public SessionSelectAdapter(ObservableList<SessionModel> items, final LayoutInflater layoutInflater, final ClickListeners listener) {
+    public SessionSelectAdapter(ObservableList<SessionModel> items, final LayoutInflater layoutInflater, final SessionViewHolder.ClickListener listener) {
         super(
                 items,
                 new ViewHolderFactory<SessionModel>() {

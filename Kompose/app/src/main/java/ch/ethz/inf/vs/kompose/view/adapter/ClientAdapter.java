@@ -25,10 +25,9 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.ClientViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
 
 public class ClientAdapter extends BindableAdapter<ClientModel> {
-    public ClientAdapter(ObservableList<ClientModel> items, final LayoutInflater layoutInflater, final ClickListeners listener) {
+    public ClientAdapter(ObservableList<ClientModel> items, final LayoutInflater layoutInflater, final ClientViewHolder.ClickListener listener) {
         super(
                 items,
                 new BindableAdapter.ViewHolderFactory<ClientModel>() {

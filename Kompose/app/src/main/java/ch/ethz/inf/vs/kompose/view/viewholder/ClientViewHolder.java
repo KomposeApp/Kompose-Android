@@ -20,12 +20,11 @@ import android.view.View;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
 
 public class ClientViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, ClientModel> {
-    private ClickListeners clickListener;
+    private ClickListener clickListener;
 
-    public ClientViewHolder(TModelViewBinding binding, int resourceId, ClickListeners clickListener) {
+    public ClientViewHolder(TModelViewBinding binding, int resourceId, ClickListener clickListener) {
         super(binding, resourceId);
         this.clickListener = clickListener;
     }
@@ -38,14 +37,21 @@ public class ClientViewHolder<TModelViewBinding extends ViewDataBinding> extends
     public void onClick(View v) {
         int pos = this.getAdapterPosition();
         if (clickListener != null) {
-            clickListener.recyclerViewListClicked(v, pos);
+            clickListener.itemClicked(v, pos);
         }
     }
 
     public void onButtonClick(View v) {
         int pos = this.getAdapterPosition();
         if (clickListener != null) {
-            clickListener.recyclerViewListClicked(v, pos);
+            clickListener.buttonClicked(v, pos);
         }
+    }
+
+
+    public interface ClickListener {
+        void buttonClicked(View v, int position);
+
+        void itemClicked(View v, int position);
     }
 }

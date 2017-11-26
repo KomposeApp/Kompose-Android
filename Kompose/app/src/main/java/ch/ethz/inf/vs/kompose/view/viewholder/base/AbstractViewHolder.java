@@ -57,4 +57,9 @@ public abstract class AbstractViewHolder<T> extends RecyclerView.ViewHolder impl
     public interface BindingInflater {
         ViewDataBinding inflate(LayoutInflater layoutInflater, ViewGroup viewGroup, boolean attachToRoot);
     }
+
+    @Override
+    public void onClick(View v) {
+
+    }
 }

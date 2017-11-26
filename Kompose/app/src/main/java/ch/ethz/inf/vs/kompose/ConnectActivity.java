@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
@@ -17,10 +18,10 @@ import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.view.adapter.ClientAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.SessionSelectAdapter;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
+import ch.ethz.inf.vs.kompose.view.viewholder.SessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 
-public class ConnectActivity extends AppCompatActivity implements ClickListeners {
+public class ConnectActivity extends AppCompatActivity implements SessionViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## Connect Activity";
     private ClientNetworkService clientNetworkService;
@@ -130,15 +131,9 @@ public class ConnectActivity extends AppCompatActivity implements ClickListeners
     }
 
     @Override
-    public void recyclerViewListClicked(View v, int position) {
-        //ignore
-    }
-
-    @Override
-    public void buttonClicked(View v, int position) {
-        //join button clicked
+    public void joinButtonClicked(View v, int position) {
+        Log.d(LOG_TAG, "pressed join button of item number " + position);
         SessionModel pressedSession = viewModel.getSessionModels().get(position);
         String clientName = viewModel.getClientName();
-        //todo: join session
     }
 }

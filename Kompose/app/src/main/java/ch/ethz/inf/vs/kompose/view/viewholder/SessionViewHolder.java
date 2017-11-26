@@ -18,35 +18,32 @@ package ch.ethz.inf.vs.kompose.view.viewholder;
 import android.databinding.ViewDataBinding;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
 
 public class SessionViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, SessionModel> {
-    private ClickListeners clickListener;
 
-    public SessionViewHolder(TModelViewBinding binding, int resourceId, ClickListeners clickListener) {
+    private ClickListener listener;
+
+    public SessionViewHolder(TModelViewBinding binding, int resourceId, ClickListener listener) {
         super(binding, resourceId);
-        this.clickListener = clickListener;
+        this.listener = listener;
     }
 
     public SessionViewHolder(TModelViewBinding binding, int resourceId) {
         super(binding, resourceId);
     }
 
-    @Override
-    public void onClick(View v) {
+    public void onJoinClick(View v) {
         int pos = this.getAdapterPosition();
-        if (clickListener != null) {
-            clickListener.recyclerViewListClicked(v, pos);
+        if (listener != null) {
+            listener.joinButtonClicked(v, pos);
         }
     }
 
-    public void onButtonClick(View v) {
-        int pos = this.getAdapterPosition();
-        if (clickListener != null) {
-            clickListener.recyclerViewListClicked(v, pos);
-        }
+
+    public interface ClickListener
+    {
+        void joinButtonClicked(View v, int position);
     }
 }

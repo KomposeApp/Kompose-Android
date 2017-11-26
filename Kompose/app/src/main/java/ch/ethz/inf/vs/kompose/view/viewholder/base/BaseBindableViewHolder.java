@@ -17,6 +17,7 @@ package ch.ethz.inf.vs.kompose.view.viewholder.base;
 
 import android.databinding.ObservableField;
 import android.databinding.ViewDataBinding;
+import android.view.View;
 
 public abstract class BaseBindableViewHolder<B extends ViewDataBinding, T> extends AbstractViewHolder<T> {
 
