@@ -20,7 +20,7 @@ public class SampleService {
         }
     });
 
-    private SessionModel getSampleSession(String sessionName) {
+    public SessionModel getSampleSession(String sessionName) {
         SessionModel sessionModel = new SessionModel(UUID.randomUUID(), UUID.randomUUID());
         sessionModel.setCreationDateTime(DateTime.now());
         sessionModel.setName(sessionName);
@@ -28,7 +28,7 @@ public class SampleService {
         return sessionModel;
     }
 
-    private ClientModel getSampleClient(SessionModel sessionModel, String clientName) {
+    public ClientModel getSampleClient(SessionModel sessionModel, String clientName) {
         ClientModel clientModel = new ClientModel(UUID.randomUUID(), sessionModel);
         clientModel.setIsActive(true);
         clientModel.setName(clientName);

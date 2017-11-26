@@ -22,7 +22,7 @@ import android.view.ViewGroup;
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.view.viewholder.ClickableItemViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewholder.ClientViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
@@ -34,7 +34,7 @@ public class ClientAdapter extends BindableAdapter<ClientModel> {
                 new BindableAdapter.ViewHolderFactory<ClientModel>() {
                     @Override
                     public AbstractViewHolder<ClientModel> create(ViewGroup viewGroup) {
-                        return new ClickableItemViewHolder(ClientViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
+                        return new ClientViewHolder<ClientViewBinding>(ClientViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
                     }
                 }
         );

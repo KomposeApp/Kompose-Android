@@ -14,6 +14,7 @@ import android.view.View;
 import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
+import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.view.adapter.ClientAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.SessionSelectAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
@@ -45,6 +46,11 @@ public class ConnectActivity extends AppCompatActivity implements ClickListeners
         //bind client network service
         Intent intent = new Intent(this, ClientNetworkService.class);
         bindService(intent, connection, BIND_AUTO_CREATE);
+
+        if (MainActivity.DESIGN_MODE) {
+            SampleService sampleService = new SampleService();
+            viewModel.getSessionModels().add(sampleService.getSampleSession("my session"));
+        }
     }
 
     @Override

@@ -22,15 +22,15 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
 
-public class ClickableItemViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, ClientModel> {
+public class ClientViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, ClientModel> {
     private ClickListeners clickListener;
 
-    public ClickableItemViewHolder(TModelViewBinding binding, int resourceId, ClickListeners clickListener) {
+    public ClientViewHolder(TModelViewBinding binding, int resourceId, ClickListeners clickListener) {
         super(binding, resourceId);
         this.clickListener = clickListener;
     }
 
-    public ClickableItemViewHolder(TModelViewBinding binding, int resourceId) {
+    public ClientViewHolder(TModelViewBinding binding, int resourceId) {
         super(binding, resourceId);
     }
 

@@ -24,7 +24,8 @@ import ch.ethz.inf.vs.kompose.databinding.SessionSelectViewBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.ClickListeners;
-import ch.ethz.inf.vs.kompose.view.viewholder.ClickableItemViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewholder.ClientViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewholder.SessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 
 public class SessionSelectAdapter extends BindableAdapter<SessionModel> {
@@ -34,7 +35,7 @@ public class SessionSelectAdapter extends BindableAdapter<SessionModel> {
                 new ViewHolderFactory<SessionModel>() {
                     @Override
                     public AbstractViewHolder<SessionModel> create(ViewGroup viewGroup) {
-                        return new ClickableItemViewHolder(SessionSelectViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
+                        return new SessionViewHolder<SessionSelectViewBinding>(SessionSelectViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
                     }
                 }
         );

@@ -16,6 +16,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
 
+    public static final boolean DESIGN_MODE = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
