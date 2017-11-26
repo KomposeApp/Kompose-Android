@@ -1,0 +1,12 @@
+{
+    "type": "REQUEST_SONG",
+    "sender_uuid": "c4d435c6-c92b-11e7-9e80-d1034c1b7b33",
+    "song_details": {
+		"uuid": "11ffcdd7-025b-4db9-831f-12a7b964bed9",
+		"title": "Kung Fu Fighting",
+		"thumbnail_url": "",
+		"source_url": "https://www.youtube.com/watch?v=SobQQWTmfbA",
+		"download_url": "https://r8---sn-nfpnnjvh-1giz.googlevideo.com/videoplayback?id=4a86d04164e67db0&itag=140&source=youtube&requiressl=yes&pl=30&mm=31&ei=Z9kaWpq0HYHYVfzjm9gD&initcwndbps=1248750&ms=au&mn=sn-nfpnnjvh-1giz&mv=m&ratebypass=yes&mime=audio/mp4&gir=yes&clen=3091872&lmt=1507716108456044&dur=194.629&mt=1511708917&signature=03C711D28BC01730A7B21E3A01583D968D7F7773.88EEAF67786799558854B9FDC0D3BD9FB2976C7F&key=dg_yt0&ip=2a02:1205:34f4:7410:bce3:a779:864a:645f&ipbits=0&expire=1511730631&sparams=ip,ipbits,expire,id,itag,source,requiressl,pl,mm,ei,initcwndbps,ms,mn,mv,ratebypass,mime,gir,clen,lmt,dur",
+		"status": "REQUESTED"
+    }
+}
