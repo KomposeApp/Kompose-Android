@@ -31,6 +31,7 @@ Tobias Brodmann (brotobia) 15-934-565
 
 Task | Assigned | Status
 ---|---|---
+Add a service for audio playback | Lukas | TODO
 MessageHandler: `sessionUpdate` | Tobias? | TODO
 Implement a way for clients to listen for session updates | Lukas | DONE
 Unit test for `SessionConverter` | Flo | *DONE*
