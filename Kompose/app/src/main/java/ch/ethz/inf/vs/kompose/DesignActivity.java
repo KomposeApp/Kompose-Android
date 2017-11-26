@@ -2,6 +2,8 @@ package ch.ethz.inf.vs.kompose;
 
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,7 +16,7 @@ import ch.ethz.inf.vs.kompose.view.adapter.ClientBindableAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.RecyclerViewClickListener;
 import ch.ethz.inf.vs.kompose.view.viewmodel.DesignViewModel;
 
-public class DesignActivity extends BaseServiceActivity {
+public class DesignActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Design Acitivty";
 
@@ -23,6 +25,10 @@ public class DesignActivity extends BaseServiceActivity {
     private RecyclerView.LayoutManager mLayoutManager;
 
     private SampleService sampleService;
+
+    private SampleService getSampleService() {
+        return new SampleService();
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

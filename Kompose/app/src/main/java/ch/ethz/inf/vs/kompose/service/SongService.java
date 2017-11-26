@@ -5,18 +5,14 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
 
-public class SongService extends BaseService {
+public class SongService {
 
     private static final String LOG_TAG = "## Song Service";
+    private NetworkService networkService;
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        bindBaseService(NetworkService.class);
-        bindBaseService(SessionService.class);
-        bindBaseService(ClientService.class);
+    public SongService(NetworkService networkService) {
+        this.networkService = networkService;
     }
 
     /**
@@ -26,7 +22,7 @@ public class SongService extends BaseService {
      */
     public void requestNewSong(Song song) {
         song.setUuid(UUID.randomUUID().toString());
-        getNetworkService().sendRequestSong(song);
+        networkService.sendRequestSong(song);
     }
 
     /**
@@ -37,7 +33,7 @@ public class SongService extends BaseService {
     public void castSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        getNetworkService().sendCastSkipSongVote(song);
+        networkService.sendCastSkipSongVote(song);
     }
 
     /**
@@ -48,7 +44,6 @@ public class SongService extends BaseService {
     public void removeSkipVote(SongModel songModel) {
         SongConverter songConverter = new SongConverter(songModel.getPartOfSession().getClients());
         Song song = songConverter.convert(songModel);
-        getNetworkService().sendRemoveSkipSongVote(song);
+        networkService.sendRemoveSkipSongVote(song);
     }
-
 }

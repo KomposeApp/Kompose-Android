@@ -1,44 +1,68 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.app.Service;
+import android.content.Intent;
 import android.databinding.ObservableArrayList;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
+import android.os.Binder;
+import android.os.IBinder;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.Map;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.base.BaseService;
+import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
-public class ClientNetworkService extends BaseService{
+public class ClientNetworkService extends Service {
 
     private static final String LOG_TAG = "## ClientNetworkService";
-    private static final String SERVICE_TYPE = "_kompose._tcp";
+    private static final String SERVICE_TYPE = "_kompose._tcp.";
 
-    // TODO
+    private IBinder binder = new LocalBinder();
+    private NsdManager nsdManager;
+
+    private ObservableArrayList<SessionModel> sessionModels;
 
     /**
      * Add Network services to the provided ObservableArrayList
      * @param list List which the NetworkServices are to be added to
      */
     public void findNetworkServices(ObservableArrayList<SessionModel> list) {
-        NsdManager nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
-        ClientServiceListener clientServiceListener = new ClientServiceListener(list);
+        Log.d(LOG_TAG, "starting service discovery");
+        this.sessionModels = list;
+        nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
+        ClientServiceListener clientServiceListener = new ClientServiceListener();
         nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, clientServiceListener);
     }
 
     public void startClientSocketListener(Socket socket) {
         ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
         clientListenerTask.execute();
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
+
+    public class LocalBinder extends Binder {
+        public ClientNetworkService getService() {
+            return ClientNetworkService.this;
+        }
     }
 
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
@@ -72,8 +96,9 @@ public class ClientNetworkService extends BaseService{
                 try {
                     Message msg = readMessage(socket);
                     if (MessageType.valueOf(msg.getType()) == MessageType.SESSION_UPDATE) {
-                        // TODO
-                        // call message handler
+                        MessageHandler messageHandler = new MessageHandler(msg);
+                        Thread msgHandler = new Thread(messageHandler);
+                        msgHandler.start();
                     }
 
                 } catch(Exception e) {
@@ -86,12 +111,6 @@ public class ClientNetworkService extends BaseService{
     }
 
     private class ClientServiceListener implements NsdManager.DiscoveryListener {
-
-        private ObservableArrayList<SessionModel> sessionList;
-
-        ClientServiceListener(ObservableArrayList<SessionModel> sessionList) {
-            this.sessionList = sessionList;
-        }
 
         @Override
         public void onStartDiscoveryFailed(String serviceType, int errorCode) {
@@ -115,17 +134,14 @@ public class ClientNetworkService extends BaseService{
 
         @Override
         public void onServiceFound(NsdServiceInfo serviceInfo) {
-            Log.d(LOG_TAG, "service found: "
-                    + serviceInfo.getServiceName() + " ("
-                    + serviceInfo.getHost() + ","
-                    + serviceInfo.getPort() + ")");
-            Map<String,byte[]> attributes = serviceInfo.getAttributes();
-            SessionModel sessionModel = new SessionModel(
-                    UUID.fromString(new String(attributes.get("uuid"))),
-                    UUID.fromString(new String(attributes.get("host_uuid")))
-            );
-            sessionModel.setSessionName(new String(attributes.get("session")));
-            sessionList.add(sessionModel);
+
+            Log.d(LOG_TAG, "service found: " + serviceInfo.getServiceName());
+            if (!serviceInfo.getServiceType().equals(SERVICE_TYPE)) {
+                Log.d(LOG_TAG, serviceInfo.getServiceType());
+                return;
+            }
+
+            nsdManager.resolveService(serviceInfo, resolveListener);
         }
 
         @Override
@@ -133,4 +149,30 @@ public class ClientNetworkService extends BaseService{
             Log.d(LOG_TAG, "service lost: " + serviceInfo.getServiceName());
         }
     }
+
+    NsdManager.ResolveListener resolveListener = new NsdManager.ResolveListener() {
+
+        @Override
+        public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.e(LOG_TAG, "Resolve failed" + errorCode);
+        }
+
+        @Override
+        public void onServiceResolved(NsdServiceInfo serviceInfo) {
+            Log.d(LOG_TAG, "Resolve Succeeded. " + serviceInfo);
+
+            int port = serviceInfo.getPort();
+            InetAddress host = serviceInfo.getHost();
+
+            Map<String,byte[]> attributes = serviceInfo.getAttributes();
+            UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
+            UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
+
+            SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
+            sessionModel.setSessionName(new String(attributes.get("session")));
+            sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
+
+            sessionModels.add(sessionModel);
+        }
+    };
 }

@@ -41,17 +41,9 @@
 
         <service
             android:name=".service.AndroidServerService"
-            android:enabled="true"
-            android:exported="true" />
-        <service android:name=".service.YoutubeService" />
-        <service android:name=".service.StorageService" />
-        <service android:name=".service.NetworkService" />
-        <service android:name=".service.DownloadService" />
-        <service android:name=".service.SongService" />
-        <service android:name=".service.SessionService" />
-        <service android:name=".service.ClientService" />
-        <service android:name=".service.SampleService" />
-        <service android:name=".service.PreferencesService" />
+            android:stopWithTask="true" />
+
+        <service android:name=".service.ClientNetworkService" />
 
         <activity android:name=".DesignActivity"></activity>
     </application>

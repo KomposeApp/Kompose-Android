@@ -2,38 +2,53 @@ package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.service.SongService;
-import ch.ethz.inf.vs.kompose.service.YoutubeService;
+import ch.ethz.inf.vs.kompose.service.NetworkService;
+import ch.ethz.inf.vs.kompose.service.SimpleListener;
+import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
 
-public class PlaylistActivity extends BaseServiceActivity implements BaseServiceActivity.IntentActionCallbackReceiver {
+public class PlaylistActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Playlist Activity";
+    private NetworkService networkService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist_placeholder);
-
-        bindBaseService(YoutubeService.class);
-        bindBaseService(SongService.class);
-
-        subscribeToIntentActions(new String[]{
-                YoutubeService.DOWNLOAD_FAILED, YoutubeService.DOWNLOAD_SUCCESSFUL
-        }, this);
+        networkService = new NetworkService();
     }
 
     public void requestSong(View v) {
-        getYoutubeService().resolveSong("https://www.youtube.com/watch?v=-Fz85FE0KtQ");
+
+        // TODO
+        // get youtube url from view
+        String youtubeUrl = "https://www.youtube.com/watch?v=-Fz85FE0KtQ";
+
+        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
+        youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
+                    @Override
+                    public void onEvent(int status) {}
+
+                    @Override
+                    public void onEvent(int status, Object object) {
+                        Song song = (Song) object;
+                        networkService.sendRequestSong(song);
+                    }
+                });
     }
 
     public void downvoteItem(View v) {
-        //todo: resolve song model from view
-        getSongService().castSkipVote(null);
+        // get song from view
+        // TODO
+        Song song = new Song();
+
+        // send downvote request
+        networkService.sendCastSkipSongVote(song);
     }
 
     public void viewHistoryFromPlaylist(View v) {
@@ -44,16 +59,31 @@ public class PlaylistActivity extends BaseServiceActivity implements BaseService
 
     public void leaveParty(View v) {
         Log.d(LOG_TAG, "Left the party by pressing the button");
-        getSessionService().leaveSession();
+
+        // update state
+        // TODO
+
+        // unregister the client
+        networkService.sendUnRegisterClient();
+
         this.finish();
     }
 
-    @Override
-    public void intentActionReceived(String action, Intent intent) {
-        if (YoutubeService.DOWNLOAD_SUCCESSFUL.equals(action)) {
-            getSongService().requestNewSong(intent.<Song>getParcelableExtra("songDetails"));
-        } else if (YoutubeService.DOWNLOAD_FAILED.equals(action)) {
-            Toast.makeText(PlaylistActivity.this, R.string.youtube_service_download_failed, Toast.LENGTH_LONG).show();
-        }
-    }
+    /**
+     * leaves the currently active session
+     */
+//    public void leaveSession() {
+//        if (isHost) {
+//            getNetworkService().sendFinishSession();
+//        } else {
+//            getNetworkService().sendUnRegisterClient();
+//        }
+//
+//        isHost = false;
+//        activeSessionModel = null;
+//        activeClient = null;
+//
+//        broadcastConnectionChanged();
+//    }
+
 }

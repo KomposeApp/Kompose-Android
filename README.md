@@ -31,13 +31,12 @@ Tobias Brodmann (brotobia) 15-934-565
 
 Task | Assigned | Status
 ---|---|---
-ServerMessageHandler | - | TODO
-SessionRepository: `getActiveSessions` (-> Service discovery in NetworkService) | - | TODO
-SessionRepository: `getPastSessions` should probably be asynchronous | - | TODO
-Implement a way for clients to listen for session updates | - | TODO
+Add a service for audio playback | Lukas | TODO
+MessageHandler: `sessionUpdate` | Tobias? | TODO
+Implement a way for clients to listen for session updates | Lukas | DONE
 Unit test for `SessionConverter` | Flo | *DONE*
 Unit test for `ObservableSortedList` | Lukas | *DONE*
-Settings: display selected username? | Dino | *DONE*
+Settings: display selected username | Dino | *DONE*
 Deal with App lifecylce: onPause etc. must disable NSD broadcasts | Lukas | TODO
 Design: Replace the placeholder layouts with actual designs based on the mockup | - | TODO
 Design: Figure out how to dynamically add Fragments that include a downvote button & text into a listview | - | TODO
