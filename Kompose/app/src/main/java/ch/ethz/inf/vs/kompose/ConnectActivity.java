@@ -33,7 +33,7 @@ public class ConnectActivity extends AppCompatActivity implements ClickListeners
         setContentView(R.layout.activity_connect);
 
 
-        ActivityConnectBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_design);
+        ActivityConnectBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_connect);
 
 
         binding.list.setLayoutManager(new LinearLayoutManager(this));
