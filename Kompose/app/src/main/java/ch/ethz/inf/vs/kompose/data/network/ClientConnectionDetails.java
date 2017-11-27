@@ -5,12 +5,7 @@ import android.os.Parcelable;
 
 import org.joda.time.DateTime;
 
-import java.net.InetAddress;
 import java.net.Socket;
-
-/**
- * Created by git@famoser.ch on 20/11/2017.
- */
 
 public class ClientConnectionDetails implements Parcelable {
 

@@ -33,16 +33,11 @@ public class ConnectActivity extends AppCompatActivity implements SessionViewHol
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
-
-
         ActivityConnectBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_connect);
-
 
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new SessionSelectAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
-
         binding.setViewModel(viewModel);
-
 
         //bind client network service
         Intent intent = new Intent(this, ClientNetworkService.class);

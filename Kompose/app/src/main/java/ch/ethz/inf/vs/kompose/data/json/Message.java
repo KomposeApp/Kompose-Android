@@ -1,7 +1,3 @@
-/*
- * This is auto-generated code. Do not change!
- * Source: https://quicktype.io/
- */
 package ch.ethz.inf.vs.kompose.data.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;

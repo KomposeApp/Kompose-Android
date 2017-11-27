@@ -53,6 +53,9 @@ public class AndroidServerService extends Service {
             localPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
+            Log.e(LOG_TAG, "SOCKET ERROR FOUND, FIX THIS DEVS");
+            stopSelf();
+            return START_STICKY;
         }
 
         // register network service

@@ -5,10 +5,6 @@ import android.os.Parcelable;
 
 import java.net.InetAddress;
 
-/**
- * Created by git@famoser.ch on 20/11/2017.
- */
-
 public class ServerConnectionDetails implements Parcelable {
 
     public ServerConnectionDetails(InetAddress hostIP, int hostPort) {
