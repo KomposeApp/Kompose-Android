@@ -1,32 +1,22 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.DatabaseUtils;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.TaskStackBuilder;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.R;
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
-import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;

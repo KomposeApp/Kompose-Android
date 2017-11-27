@@ -2,7 +2,6 @@ package ch.ethz.inf.vs.kompose.view.viewmodel;
 
 import android.databinding.ObservableList;
 
-import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 

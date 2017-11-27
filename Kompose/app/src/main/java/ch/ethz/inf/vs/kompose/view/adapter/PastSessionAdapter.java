@@ -21,10 +21,8 @@ import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.databinding.PastSessionViewBinding;
-import ch.ethz.inf.vs.kompose.databinding.SessionJoinViewBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
-import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.PastSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 

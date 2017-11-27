@@ -20,7 +20,6 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
-import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
 public class ConnectActivity extends BaseActivity implements JoinSessionViewHolder.ClickListener {
 

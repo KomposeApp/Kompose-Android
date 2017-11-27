@@ -1,9 +1,7 @@
 package ch.ethz.inf.vs.kompose.view.viewmodel;
 
 import android.databinding.Bindable;
-import android.databinding.ObservableList;
 
-import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
 /**
