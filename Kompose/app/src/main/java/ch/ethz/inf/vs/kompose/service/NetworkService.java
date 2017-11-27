@@ -41,10 +41,10 @@ public class NetworkService {
         return msg;
     }
 
-    public void sendRegisterClient(String username) {
-        Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
+    public void sendRegisterClient(String username, SimpleListener socketRetriever) {
+        Message msg = getMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
-        sendMessage(msg);
+        sendMessage(msg, socketRetriever);
     }
 
     public void sendCastSkipSongVote(Song song) {
@@ -106,6 +106,7 @@ public class NetworkService {
         }
     }
 
+    // send a message to the globally stored host via IP/port
     private void sendMessage(Message message) {
         // if this device is host, call message handler directly
         if (StateSingleton.getInstance().deviceIsHost) {
@@ -115,7 +116,8 @@ public class NetworkService {
         }
 
         // otherwise, send the message over network
-        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession.getConnectionDetails();
+        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession
+                .getConnectionDetails();
         if (connectionDetails == null) {
             Log.d(LOG_TAG, "tried to send message but no active connection");
         } else {
@@ -125,7 +127,30 @@ public class NetworkService {
         }
     }
 
-    private class AsyncSender extends AsyncTask<Void, Void, Void> {
+    // send a message to the globally stored host via IP/port and retrieve the openend socket
+    // afterwards
+    private void sendMessage(Message message, SimpleListener socketRetriever) {
+        // if this device is host, call message handler directly
+        if (StateSingleton.getInstance().deviceIsHost) {
+            Thread handler = new Thread(new MessageHandler(message));
+            handler.start();
+            return;
+        }
+
+        // otherwise, send the message over network
+        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession
+                .getConnectionDetails();
+        if (connectionDetails == null) {
+            Log.d(LOG_TAG, "tried to send message but no active connection");
+        } else {
+            AsyncSender asyncSender = new AsyncSender(message,
+                    connectionDetails.getHostIP(), connectionDetails.getHostPort(),
+                    socketRetriever);
+            asyncSender.execute();
+        }
+    }
+
+    private static class AsyncSender extends AsyncTask<Void, Void, Void> {
 
         private final String LOG_TAG = "## AsyncSender";
 
@@ -134,15 +159,27 @@ public class NetworkService {
         private Message message;
         private Socket socket;
 
-        private AsyncSender(Message msg, InetAddress ip, int port) {
+        SimpleListener socketRetriever;
+
+        AsyncSender(Message msg, InetAddress ip, int port) {
             this.message = msg;
             this.hostIP = ip;
             this.hostPort = port;
         }
 
-        private AsyncSender(Message message, Socket socket) {
+        AsyncSender(Message message, Socket socket) {
             this.message = message;
             this.socket = socket;
+        }
+
+        AsyncSender(Message message,
+                           InetAddress ip,
+                           int port,
+                           SimpleListener socketRetriever) {
+            this.message = message;
+            this.hostIP = ip;
+            this.hostPort = port;
+            this.socketRetriever = socketRetriever;
         }
 
         @Override
@@ -154,6 +191,10 @@ public class NetworkService {
                 if (socket == null) {
                     socket = new Socket(hostIP, hostPort);
                     closeSocket = true;
+                }
+
+                if (socketRetriever != null) {
+                    closeSocket = false;
                 }
 
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
@@ -178,6 +219,13 @@ public class NetworkService {
                 e.printStackTrace();
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void arg) {
+            if (socketRetriever != null) {
+                socketRetriever.onEvent(0, socket);
+            }
         }
     }
 }

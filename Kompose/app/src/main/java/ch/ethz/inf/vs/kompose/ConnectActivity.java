@@ -10,12 +10,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 
+import java.io.IOException;
+import java.net.Socket;
+
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
+import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
+import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
@@ -92,10 +97,30 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
         StateSingleton.getInstance().activeSession = pressedSession;
 
+        if (clientNetworkServiceBound) {
+            NetworkService networkService = new NetworkService();
+            Socket updateSocket;
 
-        // start the client service
-        Intent serverIntent = new Intent(this, ClientNetworkService.class);
-        startService(serverIntent);
+            Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
+
+            // sockets can't be created on the main thread, so we retrieve it from the
+            // AsyncTask that creates it via a callback
+            networkService.sendRegisterClient(clientName, new SimpleListener() {
+                @Override
+                public void onEvent(int status) {}
+
+                @Override
+                public void onEvent(int status, Object object) {
+                    Socket updateSocket = (Socket) object;
+                    clientNetworkService.initialize(updateSocket);
+
+                    // start the client service
+                    Intent serverIntent = new Intent(ConnectActivity.this,
+                            ClientNetworkService.class);
+                    startService(serverIntent);
+                }
+            });
+        }
 
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);

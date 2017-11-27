@@ -39,6 +39,9 @@ public class ClientNetworkService extends Service {
 
     private ObservableList<SessionModel> sessionModels;
 
+    private Socket updateSocket;
+    private boolean initialized = false;
+
     /**
      * Add Network services to the provided ObservableList
      * @param list List which the NetworkServices are to be added to
@@ -51,7 +54,23 @@ public class ClientNetworkService extends Service {
         nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, clientServiceListener);
     }
 
-    public void startClientSocketListener(Socket socket) {
+    public void initialize(Socket socket) {
+        this.updateSocket = socket;
+        this.initialized = true;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!initialized) {
+            Log.e(LOG_TAG, "not initialized, not starting socket listener");
+            return START_STICKY;
+        }
+
+        startClientSocketListener(updateSocket);
+        return START_STICKY;
+    }
+
+    private void startClientSocketListener(Socket socket) {
         ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
         clientListenerTask.execute();
     }
