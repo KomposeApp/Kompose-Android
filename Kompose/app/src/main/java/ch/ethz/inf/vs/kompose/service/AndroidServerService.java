@@ -67,6 +67,7 @@ public class AndroidServerService extends Service {
         String sessionName = activeSession.getName();
         String uuid = activeSession.getUuid().toString();
         String hostUuid = activeSession.getHostUUID().toString();
+        String hostName = PreferenceUtility.getCurrentUsername(this);
 
         sessionName = sessionName.substring(0, Math.min(255, sessionName.length()));
         uuid = uuid.substring(0, Math.min(255, uuid.length()));
@@ -75,6 +76,7 @@ public class AndroidServerService extends Service {
         serviceInfo.setAttribute("session", sessionName);
         serviceInfo.setAttribute("uuid", uuid);
         serviceInfo.setAttribute("host_uuid", hostUuid);
+        serviceInfo.setAttribute("host_name", hostName);
 
         Log.d(LOG_TAG, "using port: " + localPort);
         serviceInfo.setPort(localPort);

@@ -23,6 +23,7 @@ public class SessionModel extends UniqueModel {
 
     private String name;
     private UUID hostUUID;
+    private String hostName;
     private DateTime creationDateTime;
     private ServerConnectionDetails connectionDetails;
 
@@ -56,7 +57,7 @@ public class SessionModel extends UniqueModel {
     private class SongComparator implements Comparator<SongModel> {
         @Override
         public int compare(SongModel s1, SongModel s2) {
-            return s1.getOrder() < s2.getOrder() ? -1 : 1;
+            return s1.getOrder() - s2.getOrder();
         }
     }
 
@@ -73,6 +74,14 @@ public class SessionModel extends UniqueModel {
     public void setName(String name) {
         this.name = name;
         notifyPropertyChanged(BR.name);
+    }
+
+    public String getHostName() {
+        return hostName;
+    }
+
+    public void setHostName(String hostName) {
+        this.hostName = hostName;
     }
 
     public ObservableList<ClientModel> getClients() {

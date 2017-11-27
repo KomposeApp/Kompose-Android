@@ -1,13 +1,16 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -150,7 +153,15 @@ public class ClientNetworkService extends Service {
         }
     }
 
-    NsdManager.ResolveListener resolveListener = new NsdManager.ResolveListener() {
+    NsdManager.ResolveListener resolveListener = new KomposeResolveListener(this);
+
+    private class KomposeResolveListener implements NsdManager.ResolveListener {
+
+        private Context context;
+
+        KomposeResolveListener(Context context) {
+            this.context = context;
+        }
 
         @Override
         public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
@@ -166,14 +177,24 @@ public class ClientNetworkService extends Service {
 
             Map<String,byte[]> attributes = serviceInfo.getAttributes();
             UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
-            //todo: retrieve host name directly?
             UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
+            String hostName = new String(attributes.get("host_name"));
+            String sessionName = new String(attributes.get("session"));
 
-            SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
-            sessionModel.setName(new String(attributes.get("session")));
+            final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
+            sessionModel.setName(sessionName);
+            sessionModel.setHostName(hostName);
             sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
 
-            sessionModels.add(sessionModel);
+            // the observable list callbacks must be called on the UI thread
+            Runnable uiTask = new Runnable() {
+                @Override
+                public void run() {
+                    sessionModels.add(sessionModel);
+                }
+            };
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(uiTask);
         }
-    };
+    }
 }
