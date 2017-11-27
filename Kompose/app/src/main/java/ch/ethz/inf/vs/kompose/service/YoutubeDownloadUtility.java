@@ -31,6 +31,7 @@ public class YoutubeDownloadUtility {
 
     private Context context;
 
+    //Constructor
     public YoutubeDownloadUtility(Context ctx){
         context = ctx;
     }
@@ -45,17 +46,42 @@ public class YoutubeDownloadUtility {
         @SuppressLint("StaticFieldLeak")
         YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
             @Override
-            protected void onExtractionComplete(SparseArray<YtFile> sparseArray, VideoMeta videoMeta) {
-                if (sparseArray != null) {
-                    // magic number that selects m4a 128 bit
-                    // TODO: more intelligent selection
-                    int iTag = 140;
+            protected void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta) {
+                if (ytFiles != null) {
+                    // find the best audio track
+                    int iTag = -1;
+                    int maxBitrate = 0;
+                    for (int i = 0, temp_itag; i < ytFiles.size(); i++) {
+
+                        temp_itag = ytFiles.keyAt(i);
+                        YtFile file = ytFiles.get(temp_itag);
+
+                        int fBitrate = file.getFormat().getAudioBitrate();
+                        if( (file.getFormat().getHeight() == -1) && (fBitrate > maxBitrate)){
+                            iTag = temp_itag;
+                            maxBitrate = fBitrate;
+                        }
+                    }
+
+                    Log.d(LOG_TAG, "Selected itag: " + iTag);
+
+                    if (iTag == -1){
+                        Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
+                        listener.onEvent(RESOLVE_FAILED, null);
+                        return;
+                    }
 
                     // get URI & title
-                    String downloadUrl = sparseArray.get(iTag).getUrl();
+                    String downloadUrl = ytFiles.get(iTag).getUrl();
                     String thumbnailUrl = videoMeta.getThumbUrl();
                     String title = videoMeta.getTitle();
                     long length = videoMeta.getVideoLength();
+
+                    if (downloadUrl.isEmpty() || length <= 0){
+                        Log.e(LOG_TAG, "Download link was empty or length was too short");
+                        listener.onEvent(RESOLVE_FAILED, null);
+                        return;
+                    }
 
                     // construct song model
                     Song song = new Song();
@@ -69,6 +95,7 @@ public class YoutubeDownloadUtility {
                     listener.onEvent(RESOLVE_SUCCESS, song);
                 }
                 else{
+                    Log.w(LOG_TAG, "Failed to resolve youtube URL -- possible malformed link");
                     listener.onEvent(RESOLVE_FAILED, null);
                 }
             }
