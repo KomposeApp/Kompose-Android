@@ -42,7 +42,7 @@ public class NetworkService {
     }
 
     public void sendRegisterClient(String username, SimpleListener socketRetriever) {
-        Message msg = getMessage(MessageType.REGISTER_CLIENT);
+        Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
         sendMessage(msg, socketRetriever);
     }
