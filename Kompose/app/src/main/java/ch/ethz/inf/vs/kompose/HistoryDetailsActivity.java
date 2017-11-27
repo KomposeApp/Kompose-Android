@@ -4,16 +4,11 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
-import android.view.View;
 
-import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
 import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryDetailsBinding;
-import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.view.adapter.DesignClientAdapter;
 import ch.ethz.inf.vs.kompose.view.adapter.PlayedSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.PlayedSongViewHolder;
-import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel;
 
 public class HistoryDetailsActivity extends AppCompatActivity implements PlayedSongViewHolder.ClickListener {

@@ -7,7 +7,6 @@ import org.joda.time.DateTime;
 import java.util.Comparator;
 import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.MainActivity;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
