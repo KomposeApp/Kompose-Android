@@ -18,40 +18,35 @@ package ch.ethz.inf.vs.kompose.view.viewholder;
 import android.databinding.ViewDataBinding;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.model.ClientModel;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
 
-public class ClientViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, ClientModel> {
-    private ClickListener clickListener;
+public class PastSessionViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, SessionModel> {
 
-    public ClientViewHolder(TModelViewBinding binding, int resourceId, ClickListener clickListener) {
+    private ClickListener listener;
+
+    public PastSessionViewHolder(TModelViewBinding binding, int resourceId, ClickListener listener) {
         super(binding, resourceId);
-        this.clickListener = clickListener;
+        this.listener = listener;
     }
 
-    public ClientViewHolder(TModelViewBinding binding, int resourceId) {
-        super(binding, resourceId);
+    public void onJoinClick(View v) {
+        int pos = this.getAdapterPosition();
+        if (listener != null) {
+            listener.onClick(v, pos);
+        }
     }
 
     @Override
     public void onClick(View v) {
-        int pos = this.getAdapterPosition();
-        if (clickListener != null) {
-            clickListener.itemClicked(v, pos);
-        }
-    }
-
-    public void onButtonClick(View v) {
-        int pos = this.getAdapterPosition();
-        if (clickListener != null) {
-            clickListener.buttonClicked(v, pos);
+        int position = this.getAdapterPosition();
+        if (listener != null) {
+            listener.onClick(v, position);
         }
     }
 
 
     public interface ClickListener {
-        void buttonClicked(View v, int position);
-
-        void itemClicked(View v, int position);
+        void onClick(View v, int position);
     }
 }

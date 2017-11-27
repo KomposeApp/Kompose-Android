@@ -20,24 +20,24 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.BR;
-import ch.ethz.inf.vs.kompose.databinding.ClientViewBinding;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.view.viewholder.ClientViewHolder;
-import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
+import ch.ethz.inf.vs.kompose.databinding.InQueueSongViewBinding;
+import ch.ethz.inf.vs.kompose.databinding.PlayedSongViewBinding;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
+import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewholder.PlayedSongViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 
-public class ClientAdapter extends BindableAdapter<ClientModel> {
-    public ClientAdapter(ObservableList<ClientModel> items, final LayoutInflater layoutInflater, final ClientViewHolder.ClickListener listener) {
+public class PlayedSongAdapter extends BindableAdapter<SongModel> {
+    public PlayedSongAdapter(ObservableList<SongModel> items, final LayoutInflater layoutInflater, final PlayedSongViewHolder.ClickListener listener) {
         super(
                 items,
-                new BindableAdapter.ViewHolderFactory<ClientModel>() {
+                new ViewHolderFactory<SongModel>() {
                     @Override
-                    public AbstractViewHolder<ClientModel> create(ViewGroup viewGroup) {
-                        return new ClientViewHolder<ClientViewBinding>(ClientViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
+                    public AbstractViewHolder<SongModel> create(ViewGroup viewGroup) {
+                        return new PlayedSongViewHolder<>(PlayedSongViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
                     }
                 }
         );
     }
-
-
 }
