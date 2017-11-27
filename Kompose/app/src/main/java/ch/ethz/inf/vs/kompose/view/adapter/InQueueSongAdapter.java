@@ -20,24 +20,24 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.BR;
-import ch.ethz.inf.vs.kompose.databinding.SessionSelectViewBinding;
-import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.databinding.InQueueSongViewBinding;
+import ch.ethz.inf.vs.kompose.databinding.SessionJoinViewBinding;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
-import ch.ethz.inf.vs.kompose.view.viewholder.SessionViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 
-public class SessionSelectAdapter extends BindableAdapter<SessionModel> {
-    public SessionSelectAdapter(ObservableList<SessionModel> items, final LayoutInflater layoutInflater, final SessionViewHolder.ClickListener listener) {
+public class InQueueSongAdapter extends BindableAdapter<SongModel> {
+    public InQueueSongAdapter(ObservableList<SongModel> items, final LayoutInflater layoutInflater, final InQueueSongViewHolder.ClickListener listener) {
         super(
                 items,
-                new ViewHolderFactory<SessionModel>() {
+                new ViewHolderFactory<SongModel>() {
                     @Override
-                    public AbstractViewHolder<SessionModel> create(ViewGroup viewGroup) {
-                        return new SessionViewHolder<SessionSelectViewBinding>(SessionSelectViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
+                    public AbstractViewHolder<SongModel> create(ViewGroup viewGroup) {
+                        return new InQueueSongViewHolder<>(InQueueSongViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
                     }
                 }
         );
     }
-
-
 }

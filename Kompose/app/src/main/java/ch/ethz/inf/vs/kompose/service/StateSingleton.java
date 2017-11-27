@@ -15,6 +15,7 @@ public class StateSingleton {
 
     // Client specific fields
     public SessionModel activeSession;
+    public SessionModel activeHistorySession;
     public UUID deviceUUID = UUID.randomUUID();
     public ObservableList<SessionModel> orderedPastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
         @Override

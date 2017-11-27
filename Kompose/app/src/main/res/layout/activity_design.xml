@@ -5,7 +5,7 @@
     <data>
 
         <variable
-            name="designViewModel"
+            name="viewModel"
             type="ch.ethz.inf.vs.kompose.view.viewmodel.DesignViewModel" />
     </data>
 
@@ -17,7 +17,8 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{designViewModel.client.name}" />
+            android:text="@{viewModel.client.name}"
+            />
 
         <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"

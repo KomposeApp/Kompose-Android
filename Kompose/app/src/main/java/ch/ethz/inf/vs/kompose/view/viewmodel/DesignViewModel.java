@@ -4,12 +4,13 @@ import android.databinding.ObservableList;
 
 import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
+import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
 /**
  * Created by git@famoser.ch on 23/11/2017.
  */
 
-public class DesignViewModel {
+public class DesignViewModel extends BaseViewModel {
 
     private ClientModel client;
     private ObservableList<ClientModel> clients;
@@ -21,6 +22,9 @@ public class DesignViewModel {
 
     public ClientModel getClient() {
         return client;
+    }
+    public String getStuff() {
+        return "hi mom";
     }
 
     public ObservableList<ClientModel> getClients() {
