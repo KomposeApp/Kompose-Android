@@ -23,5 +23,11 @@
     <string name="choose_client_name">please choose a client name</string>
     <string name="choose_session_name">please fill out the session name</string>
     <string name="title_activity_playlist">PlaylistActivity</string>
-    <string name="leave_session">leave_sesssion</string>
+    <string name="leave_session">leave session</string>
+    <string name="show_history">show history</string>
+    <string name="youtube_link">youtube link</string>
+    <string name="add_link">add youtube link</string>
+    <string name="add_youtube_link">add youtube link</string>
+    <string name="confirm">confirm</string>
+    <string name="close">close</string>
 </resources>

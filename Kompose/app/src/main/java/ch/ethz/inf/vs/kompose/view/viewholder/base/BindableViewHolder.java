@@ -18,8 +18,6 @@ package ch.ethz.inf.vs.kompose.view.viewholder.base;
 import android.databinding.ViewDataBinding;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
-
 public class BindableViewHolder<B extends ViewDataBinding, T> extends AbstractViewHolder<T> {
 
     protected final B binding;

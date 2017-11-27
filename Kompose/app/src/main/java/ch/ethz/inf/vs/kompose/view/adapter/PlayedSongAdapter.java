@@ -20,11 +20,9 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.BR;
-import ch.ethz.inf.vs.kompose.databinding.InQueueSongViewBinding;
 import ch.ethz.inf.vs.kompose.databinding.PlayedSongViewBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
-import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.PlayedSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
 

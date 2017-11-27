@@ -8,9 +8,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.service.SimpleListener;
-import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
-
 /**
  * DONE
  */

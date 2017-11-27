@@ -16,7 +16,6 @@
 package ch.ethz.inf.vs.kompose.view.viewholder;
 
 import android.databinding.ViewDataBinding;
-import android.view.View;
 
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;

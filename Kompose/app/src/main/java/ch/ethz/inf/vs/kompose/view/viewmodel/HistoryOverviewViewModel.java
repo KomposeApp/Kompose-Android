@@ -3,8 +3,6 @@ package ch.ethz.inf.vs.kompose.view.viewmodel;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 
-import java.util.Observable;
-
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 

@@ -4,6 +4,7 @@ import android.databinding.ObservableArrayList;
 
 import java.util.Collection;
 import java.util.Comparator;
+
 import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
 
 /*

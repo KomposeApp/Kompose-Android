@@ -22,9 +22,9 @@ import android.view.ViewGroup;
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.databinding.DesignClientViewBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
+import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.DesignClientViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.AbstractViewHolder;
-import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 
 public class DesignClientAdapter extends BindableAdapter<ClientModel> {
     public DesignClientAdapter(ObservableList<ClientModel> items, final LayoutInflater layoutInflater, final DesignClientViewHolder.ClickListener listener) {

@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.converter;
 
 import android.databinding.ObservableList;
+
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.json.DownVote;
