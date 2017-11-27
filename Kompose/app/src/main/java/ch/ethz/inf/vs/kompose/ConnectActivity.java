@@ -10,7 +10,6 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 
-import java.io.IOException;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
@@ -45,9 +44,9 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
 
-        //bind client network service
+        //bind client network service --> Will start listening for hosts to connect to
         Intent intent = new Intent(this, ClientNetworkService.class);
-        bindService(intent, connection, BIND_AUTO_CREATE);
+        bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
 
         if (MainActivity.DESIGN_MODE) {
             SampleService sampleService = new SampleService();
@@ -58,14 +57,19 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
+    protected void onDestroy() {
+        super.onDestroy();
+        if (clientNetworkServiceBound) {
+            unbindService(cNetServiceConnection);
+            clientNetworkServiceBound = false;
+        }
     }
 
-    private ServiceConnection connection = new ServiceConnection() {
+    private ServiceConnection cNetServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "ClientNetworkService bound");
             ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
             clientNetworkService = binder.getService();
             clientNetworkServiceBound = true;
@@ -74,7 +78,14 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            clientNetworkServiceBound = false;
+            Log.w(LOG_TAG, "ClientNetworkService died");
+            clientNetworkService = null;
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0){
+            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
+            clientNetworkService = null;
         }
     };
 
@@ -95,9 +106,10 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         clientModel.setIsActive(true);
         pressedSession.getClients().add(clientModel);
 
+        //TODO Don't set this just yet
         StateSingleton.getInstance().activeSession = pressedSession;
 
-        if (clientNetworkServiceBound) {
+        if (clientNetworkServiceBound && !(clientNetworkService == null)) {
             NetworkService networkService = new NetworkService();
 
             Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
@@ -120,6 +132,8 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
                     startService(serverIntent);
                 }
             });
+        }else{
+
         }
 
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);

@@ -1,11 +1,8 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
-import android.net.nsd.NsdManager;
-import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
@@ -20,7 +17,6 @@ import com.youview.tinydnssd.MDNSDiscover;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -39,6 +35,8 @@ import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 public class ClientNetworkService extends Service {
 
     private static final String LOG_TAG = "## ClientNetworkService";
+
+    // Type by which our Kompose service will be identified
     private static final String SERVICE_TYPE = "_kompose._tcp";
 
     private IBinder binder = new LocalBinder();
@@ -48,6 +46,8 @@ public class ClientNetworkService extends Service {
 
     /**
      * Add Network services to the provided ObservableList
+     * Uses a third-party resolver library called "DiscoverResolver"
+     * in order to circumvent a bug with NSD in Android 6.0.
      * @param sessionModels List which the NetworkServices are to be added to
      */
     public void findNetworkServices(final ObservableList<SessionModel> sessionModels) {
@@ -74,27 +74,33 @@ public class ClientNetworkService extends Service {
         return START_STICKY;
     }
 
-    private void startClientSocketListener(Socket socket) {
-        ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
-        clientListenerTask.execute();
-    }
-
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
         return binder;
     }
 
-    public class LocalBinder extends Binder {
-        public ClientNetworkService getService() {
-            return ClientNetworkService.this;
-        }
+    @Override
+    public boolean onUnbind(Intent intent){
+        Log.d(LOG_TAG, "ClientNetworkService has been unbound!");
+        //Set to true if we want to use onRebind()
+        return false;
     }
+
+    private void startClientSocketListener(Socket socket) {
+        ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
+        clientListenerTask.execute();
+    }
+
 
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
 
-        private Socket socket;
         private static final String LOG_TAG = "## ClientListenerTask";
+        private Socket socket;
+
+        ClientListenerTask(Socket socket) {
+            this.socket = socket;
+        }
 
         private Message readMessage(Socket connection) throws IOException {
             BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
@@ -112,10 +118,6 @@ public class ClientNetworkService extends Service {
             return message;
         }
 
-        ClientListenerTask(Socket socket) {
-            this.socket = socket;
-        }
-
         @Override
         protected Void doInBackground(Void... voids) {
             while (!isCancelled()) {
@@ -127,12 +129,18 @@ public class ClientNetworkService extends Service {
                         msgHandler.start();
                     }
 
-                } catch(Exception e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
 
             return null;
+        }
+    }
+
+    public class LocalBinder extends Binder {
+        public ClientNetworkService getService() {
+            return ClientNetworkService.this;
         }
     }
 
