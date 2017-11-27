@@ -37,11 +37,17 @@ public class StorageHandler {
     public boolean persist(String directory, String fileName, String content) {
         String child = fileName;
 
+        if(fileName.isEmpty()){
+            Log.e(LOG_TAG, "Filename was empty");
+            return false;
+        }
+
         // create directory
         if (directory != null && directory.length() > 0) {
             File dir = new File(context.getFilesDir(), directory);
             if (!dir.exists()) {
                 if (!dir.mkdir()) {
+                    Log.e(LOG_TAG, "Creating directory failed");
                     return false;
                 }
             }

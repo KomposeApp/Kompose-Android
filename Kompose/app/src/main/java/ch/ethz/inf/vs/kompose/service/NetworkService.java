@@ -28,7 +28,12 @@ public class NetworkService {
 
     private static final String LOG_TAG = "## NetworkService";
 
-    private Message getMessage(MessageType type) {
+    /**
+     * Retrieves the base structure for a message
+     * @param type What kind of message this is
+     * @return Message data object
+     */
+    private Message getBaseMessage(MessageType type) {
         Message msg = new Message();
         String uuid = StateSingleton.getInstance().getDeviceUUID().toString();
         msg.setSenderUuid(uuid);
@@ -37,60 +42,60 @@ public class NetworkService {
     }
 
     public void sendRegisterClient(String username) {
-        Message msg = getMessage(MessageType.REGISTER_CLIENT);
+        Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
         sendMessage(msg);
     }
 
     public void sendCastSkipSongVote(Song song) {
-        Message msg = getMessage(MessageType.CAST_SKIP_SONG_VOTE);
+        Message msg = getBaseMessage(MessageType.CAST_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
         sendMessage(msg);
     }
 
     public void sendRemoveSkipSongVote(Song song) {
-        Message msg = getMessage(MessageType.REMOVE_SKIP_SONG_VOTE);
+        Message msg = getBaseMessage(MessageType.REMOVE_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
         sendMessage(msg);
     }
 
     public void sendKeepAlive() {
-        Message msg = getMessage(MessageType.KEEP_ALIVE);
+        Message msg = getBaseMessage(MessageType.KEEP_ALIVE);
         sendMessage(msg);
     }
 
     public void sendRequestSong(Song song) {
-        Message msg = getMessage(MessageType.REQUEST_SONG);
+        Message msg = getBaseMessage(MessageType.REQUEST_SONG);
         msg.setSongDetails(song);
         sendMessage(msg);
     }
 
     public void sendUnRegisterClient() {
-        Message msg = getMessage(MessageType.UNREGISTER_CLIENT);
+        Message msg = getBaseMessage(MessageType.UNREGISTER_CLIENT);
         sendMessage(msg);
     }
 
     public void sendSessionUpdate(Session session) {
-        Message msg = getMessage(MessageType.SESSION_UPDATE);
+        Message msg = getBaseMessage(MessageType.SESSION_UPDATE);
         msg.setSession(session);
         sendMessage(msg);
     }
 
     public void sendError(String error) {
-        Message msg = getMessage(MessageType.ERROR);
+        Message msg = getBaseMessage(MessageType.ERROR);
         msg.setErrorMessage(error);
         sendMessage(msg);
     }
 
     public void sendFinishSession() {
-        Message msg = getMessage(MessageType.FINISH_SESSION);
+        Message msg = getBaseMessage(MessageType.FINISH_SESSION);
         sendMessage(msg);
     }
 
     public void updateAllClients(SessionModel sessionModel) {
         SessionConverter sessionConverter = new SessionConverter();
         Session session = sessionConverter.convert(sessionModel);
-        Message message = getMessage(MessageType.SESSION_UPDATE);
+        Message message = getBaseMessage(MessageType.SESSION_UPDATE);
         message.setSession(session);
 
         // send message to all clients
@@ -124,18 +129,18 @@ public class NetworkService {
 
         private final String LOG_TAG = "## AsyncSender";
 
-        InetAddress hostIP;
-        int hostPort;
-        Message message;
-        Socket socket;
+        private InetAddress hostIP;
+        private int hostPort;
+        private Message message;
+        private Socket socket;
 
-        public AsyncSender(Message msg, InetAddress ip, int port) {
+        private AsyncSender(Message msg, InetAddress ip, int port) {
             this.message = msg;
             this.hostIP = ip;
             this.hostPort = port;
         }
 
-        public AsyncSender(Message message, Socket socket) {
+        private AsyncSender(Message message, Socket socket) {
             this.message = message;
             this.socket = socket;
         }
@@ -159,6 +164,8 @@ public class NetworkService {
                 printWriter.print(JsonConverter.toJsonString(message));
                 printWriter.flush();
                 printWriter.close();
+
+                //TODO: ???
 
                 input.close();
 
