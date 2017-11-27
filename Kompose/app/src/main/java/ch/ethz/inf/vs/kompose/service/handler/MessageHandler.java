@@ -140,13 +140,14 @@ public class MessageHandler implements Runnable {
         ClientModel client = new ClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
         client.setIsActive(true);
         client.setName(message.getSenderUsername());
-        sessionModel.getClients().add(client);
 
         // if the message came from network, store the socket in the client model
         if (socket != null) {
             ClientConnectionDetails connectionDetails = new ClientConnectionDetails(socket, DateTime.now());
             client.setClientConnectionDetails(connectionDetails);
         }
+
+        sessionModel.getClients().add(client);
 
         return true;
     }

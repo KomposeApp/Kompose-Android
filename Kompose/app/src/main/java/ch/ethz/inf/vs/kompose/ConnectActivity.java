@@ -99,7 +99,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
         if (clientNetworkServiceBound) {
             NetworkService networkService = new NetworkService();
-            Socket updateSocket;
 
             Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
 
@@ -111,6 +110,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
                 @Override
                 public void onEvent(int status, Object object) {
+                    Log.d(LOG_TAG, "socketRetriever called");
                     Socket updateSocket = (Socket) object;
                     clientNetworkService.initialize(updateSocket);
 

@@ -98,11 +98,16 @@ public class NetworkService {
         Message message = getBaseMessage(MessageType.SESSION_UPDATE);
         message.setSession(session);
 
-        // send message to all clients
+        // send message to all clients, but not to itself
         for (ClientModel c : sessionModel.getClients()) {
-            Socket socket = c.getClientConnectionDetails().getSocket();
-            AsyncSender asyncSender = new AsyncSender(message, socket);
-            asyncSender.execute();
+            if (!c.getUuid().equals(StateSingleton.getInstance().deviceUUID)) {
+                Log.d(LOG_TAG, "sending session update to: " + c.getName()
+                        + " (" + c.getUuid().toString() + ")");
+                Socket socket = c.getClientConnectionDetails().getSocket();
+                AsyncSender asyncSender = new AsyncSender(message, socket);
+                asyncSender.execute();
+
+            }
         }
     }
 
