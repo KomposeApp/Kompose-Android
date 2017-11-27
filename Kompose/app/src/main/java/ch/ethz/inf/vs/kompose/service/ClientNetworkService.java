@@ -177,11 +177,13 @@ public class ClientNetworkService extends Service {
 
             Map<String,byte[]> attributes = serviceInfo.getAttributes();
             UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
-            //todo: retrieve host name directly?
             UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
+            String hostName = new String(attributes.get("host_name"));
+            String sessionName = new String(attributes.get("session"));
 
             final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
-            sessionModel.setName(new String(attributes.get("session")));
+            sessionModel.setName(sessionName);
+            sessionModel.setHostName(hostName);
             sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
 
             // the observable list callbacks must be called on the UI thread
