@@ -18,32 +18,28 @@ package ch.ethz.inf.vs.kompose.view.viewholder;
 import android.databinding.ViewDataBinding;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
 
-public class SessionViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, SessionModel> {
+public class InQueueSongViewHolder<TModelViewBinding extends ViewDataBinding> extends BaseBindableViewHolder<TModelViewBinding, SongModel> {
 
     private ClickListener listener;
 
-    public SessionViewHolder(TModelViewBinding binding, int resourceId, ClickListener listener) {
+    public InQueueSongViewHolder(TModelViewBinding binding, int resourceId, ClickListener listener) {
         super(binding, resourceId);
         this.listener = listener;
     }
 
-    public SessionViewHolder(TModelViewBinding binding, int resourceId) {
-        super(binding, resourceId);
-    }
-
-    public void onJoinClick(View v) {
+    public void onDownVoteClick(View v) {
         int pos = this.getAdapterPosition();
         if (listener != null) {
-            listener.joinButtonClicked(v, pos);
+            listener.downVoteClicked(v, pos);
         }
     }
 
 
     public interface ClickListener
     {
-        void joinButtonClicked(View v, int position);
+        void downVoteClicked(View v, int position);
     }
 }

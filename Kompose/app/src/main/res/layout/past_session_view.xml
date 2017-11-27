@@ -6,7 +6,7 @@
 
         <variable
             name="viewHolder"
-            type="ch.ethz.inf.vs.kompose.view.viewholder.SessionViewHolder" />
+            type="ch.ethz.inf.vs.kompose.view.viewholder.PastSessionViewHolder" />
     </data>
 
 
@@ -18,8 +18,8 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/join"
-            android:onClick="@{viewHolder.onJoinClick}"/>
+            android:onClick="@{viewHolder.onJoinClick}"
+            android:text="@string/join" />
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -31,10 +31,6 @@
                 android:layout_height="wrap_content"
                 android:text="@{viewHolder.item.name}" />
 
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{viewHolder.item.name}" />
 
         </LinearLayout>
 

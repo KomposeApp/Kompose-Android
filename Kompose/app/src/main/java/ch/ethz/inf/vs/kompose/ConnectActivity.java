@@ -4,7 +4,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
-import android.databinding.ObservableArrayList;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.app.AppCompatActivity;
@@ -16,30 +15,28 @@ import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.view.adapter.ClientAdapter;
-import ch.ethz.inf.vs.kompose.view.adapter.SessionSelectAdapter;
-import ch.ethz.inf.vs.kompose.view.viewholder.SessionViewHolder;
+import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
+import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 
-public class ConnectActivity extends AppCompatActivity implements SessionViewHolder.ClickListener {
+public class ConnectActivity extends AppCompatActivity implements JoinSessionViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## Connect Activity";
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
 
-    private final ConnectViewModel viewModel = new ConnectViewModel(new ObservableArrayList<SessionModel>());
+    private final ConnectViewModel viewModel = new ConnectViewModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connect);
 
-
+        //get binding & bind viewmodel to view
         ActivityConnectBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_connect);
 
-
         binding.list.setLayoutManager(new LinearLayoutManager(this));
-        binding.list.setAdapter(new SessionSelectAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
+        binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
 
         binding.setViewModel(viewModel);
 

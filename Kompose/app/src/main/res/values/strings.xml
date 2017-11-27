@@ -17,4 +17,7 @@
     <string name="setting_error_port">Port may not be greater than 65535</string>
     <string name="join">join</string>
     <string name="client_name">client name</string>
+    <string name="create_party">create party</string>
+    <string name="session_name">session name</string>
+    <string name="downvote">downvote</string>
 </resources>

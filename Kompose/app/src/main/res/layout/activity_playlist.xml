@@ -6,8 +6,10 @@ xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <variable
         name="viewModel"
-        type="ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel" />
+        type="ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel" />
 </data>
+
+<!-- add buttons: leave party, view history, submit song -->
 
 <LinearLayout
     android:layout_width="match_parent"

@@ -25,7 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings_placeholder);
+        setContentView(R.layout.activity_settings);
 
         //Retrieve error text display
         error_display = findViewById(R.id.textview_settings_error);

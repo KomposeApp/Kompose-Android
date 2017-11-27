@@ -1,30 +1,44 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
-import android.databinding.ObservableList;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.View;
 
-import java.io.IOException;
-
-import ch.ethz.inf.vs.kompose.converter.SessionConverter;
-import ch.ethz.inf.vs.kompose.data.JsonConverter;
+import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryDetailsBinding;
+import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryOverviewBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.view.adapter.PastSessionAdapter;
+import ch.ethz.inf.vs.kompose.view.adapter.PlayedSongAdapter;
+import ch.ethz.inf.vs.kompose.view.viewholder.PastSessionViewHolder;
+import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
+import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryOverviewViewModel;
 
-public class HistoryOverviewActivity extends AppCompatActivity {
+public class HistoryOverviewActivity extends AppCompatActivity implements PastSessionViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## History Activity";
+    private final HistoryOverviewViewModel viewModel = new HistoryOverviewViewModel();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history_overview_placeholder);
+        setContentView(R.layout.activity_history_overview);
+
+
+        ActivityHistoryOverviewBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_history_overview);
+
+        binding.list.setLayoutManager(new LinearLayoutManager(this));
+        binding.list.setAdapter(new PastSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
+        binding.setViewModel(viewModel);
     }
 
-    public void examineHistoryItem() {
-        //TODO: Select the correct item to examine out of the listview
-        Log.d(LOG_TAG, "Item selected");
+    @Override
+    public void onClick(View v, int position) {
+        Log.d(LOG_TAG, "model seslected at position " + position);
+        SessionModel model = viewModel.getSessionModels().get(position);
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);
     }

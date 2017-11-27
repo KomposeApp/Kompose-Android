@@ -9,16 +9,6 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
  */
 
 public class PartyCreationViewModel {
-    private ObservableList<SessionModel> sessionModels;
-
-    public PartyCreationViewModel(ObservableList<SessionModel> sessionModels) {
-        this.sessionModels = sessionModels;
-    }
-
-    public ObservableList<SessionModel> getSessionModels() {
-        return sessionModels;
-    }
-
 
     private String clientName;
 

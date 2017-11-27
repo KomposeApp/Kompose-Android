@@ -10,11 +10,11 @@ import android.view.View;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityDesignBinding;
 import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.view.adapter.ClientAdapter;
-import ch.ethz.inf.vs.kompose.view.viewholder.ClientViewHolder;
+import ch.ethz.inf.vs.kompose.view.adapter.DesignClientAdapter;
+import ch.ethz.inf.vs.kompose.view.viewholder.DesignClientViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.DesignViewModel;
 
-public class DesignActivity extends AppCompatActivity implements ClientViewHolder.ClickListener {
+public class DesignActivity extends AppCompatActivity implements DesignClientViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## Design Acitivty";
 
@@ -29,10 +29,8 @@ public class DesignActivity extends AppCompatActivity implements ClientViewHolde
         ActivityDesignBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_design);
 
         binding.list.setLayoutManager(new LinearLayoutManager(this));
-        binding.list.setAdapter(new ClientAdapter(viewModel.getClients(), getLayoutInflater(), this));
-        binding.setDesignViewModel(viewModel);
-
-        sampleService.getClients().get(0).setName("my new bound name");
+        binding.list.setAdapter(new DesignClientAdapter(viewModel.getClients(), getLayoutInflater(), this));
+        binding.setViewModel(viewModel);
     }
 
     public void onClickFriend(View view) {
