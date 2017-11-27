@@ -28,7 +28,7 @@ public class HistoryDetailsActivity extends AppCompatActivity implements PlayedS
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_history_details);
-        
+
         ActivityHistoryDetailsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_history_details);
 
         binding.list.setLayoutManager(new LinearLayoutManager(this));
