@@ -14,11 +14,18 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.youview.tinydnssd.DiscoverResolver;
+import com.youview.tinydnssd.MDNSDiscover;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -32,26 +39,23 @@ import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 public class ClientNetworkService extends Service {
 
     private static final String LOG_TAG = "## ClientNetworkService";
-    private static final String SERVICE_TYPE = "_kompose._tcp.";
+    private static final String SERVICE_TYPE = "_kompose._tcp";
 
     private IBinder binder = new LocalBinder();
-    private NsdManager nsdManager;
-
-    private ObservableList<SessionModel> sessionModels;
 
     private Socket updateSocket;
     private boolean initialized = false;
 
     /**
      * Add Network services to the provided ObservableList
-     * @param list List which the NetworkServices are to be added to
+     * @param sessionModels List which the NetworkServices are to be added to
      */
-    public void findNetworkServices(ObservableList<SessionModel> list) {
-        Log.d(LOG_TAG, "starting service discovery");
-        this.sessionModels = list;
-        nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
-        ClientServiceListener clientServiceListener = new ClientServiceListener();
-        nsdManager.discoverServices(SERVICE_TYPE, NsdManager.PROTOCOL_DNS_SD, clientServiceListener);
+    public void findNetworkServices(final ObservableList<SessionModel> sessionModels) {
+        Log.d(LOG_TAG, "starting service discovery ...");
+
+        DiscoverResolver resolver = new DiscoverResolver(this, SERVICE_TYPE,
+                new KomposeResolveListener(sessionModels));
+        resolver.start();
     }
 
     public void initialize(Socket socket) {
@@ -132,84 +136,60 @@ public class ClientNetworkService extends Service {
         }
     }
 
-    private class ClientServiceListener implements NsdManager.DiscoveryListener {
+    private class KomposeResolveListener implements DiscoverResolver.Listener {
 
-        @Override
-        public void onStartDiscoveryFailed(String serviceType, int errorCode) {
-            Log.d(LOG_TAG, "starting service discovery failed");
+        private ObservableList<SessionModel> sessionModels;
+
+        KomposeResolveListener(ObservableList<SessionModel> sessionModels) {
+            this.sessionModels = sessionModels;
         }
 
         @Override
-        public void onStopDiscoveryFailed(String serviceType, int errorCode) {
-            Log.d(LOG_TAG, "stopping service discovery failed");
-        }
+        public void onServicesChanged(Map<String, MDNSDiscover.Result> services) {
+            Log.d(LOG_TAG, "mDNS service changed");
 
-        @Override
-        public void onDiscoveryStarted(String serviceType) {
-            Log.d(LOG_TAG, "service discovery started");
-        }
+            final List<SessionModel> newSessions = new ArrayList<>();
 
-        @Override
-        public void onDiscoveryStopped(String serviceType) {
-            Log.d(LOG_TAG, "service discovery stopped");
-        }
+            // Find the new services
+            for (MDNSDiscover.Result r : services.values()) {
+                UUID sessionUUID = UUID.fromString(r.txt.dict.get("uuid"));
+                UUID hostUUID = UUID.fromString(r.txt.dict.get("host_uuid"));
+                String hostName = r.txt.dict.get("host_name");
+                String sessionName = r.txt.dict.get("session");
 
-        @Override
-        public void onServiceFound(NsdServiceInfo serviceInfo) {
+                int port = r.srv.port;
+                InetAddress host;
+                try {
+                    host = InetAddress.getByName(r.a.ipaddr);
+                } catch (UnknownHostException e) {
+                    e.printStackTrace();
+                    continue;
+                }
 
-            Log.d(LOG_TAG, "service found: " + serviceInfo.getServiceName());
-            if (!serviceInfo.getServiceType().equals(SERVICE_TYPE)) {
-                Log.d(LOG_TAG, serviceInfo.getServiceType());
-                return;
+                // check if it is a newly found session
+                boolean foundBefore = false;
+                for (SessionModel s : sessionModels) {
+                    if (s.getUuid().equals(sessionUUID)) {
+                        foundBefore = true;
+                        break;
+                    }
+                }
+
+                if (!foundBefore) {
+                    SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
+                    sessionModel.setName(sessionName);
+                    sessionModel.setHostName(hostName);
+                    sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
+                    newSessions.add(sessionModel);
+                }
             }
 
-            nsdManager.resolveService(serviceInfo, resolveListener);
-        }
-
-        @Override
-        public void onServiceLost(NsdServiceInfo serviceInfo) {
-            Log.d(LOG_TAG, "service lost: " + serviceInfo.getServiceName());
-        }
-    }
-
-    NsdManager.ResolveListener resolveListener = new KomposeResolveListener(this);
-
-    private class KomposeResolveListener implements NsdManager.ResolveListener {
-
-        private Context context;
-
-        KomposeResolveListener(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            Log.e(LOG_TAG, "Resolve failed" + errorCode);
-        }
-
-        @Override
-        public void onServiceResolved(NsdServiceInfo serviceInfo) {
-            Log.d(LOG_TAG, "Resolve Succeeded. " + serviceInfo);
-
-            int port = serviceInfo.getPort();
-            InetAddress host = serviceInfo.getHost();
-
-            Map<String,byte[]> attributes = serviceInfo.getAttributes();
-            UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
-            UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
-            String hostName = new String(attributes.get("host_name"));
-            String sessionName = new String(attributes.get("session"));
-
-            final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
-            sessionModel.setName(sessionName);
-            sessionModel.setHostName(hostName);
-            sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
-
-            // the observable list callbacks must be called on the UI thread
+            // Add the newly found services to the ObservableList
+            // Note: the observable list callbacks must be called on the UI thread
             Runnable uiTask = new Runnable() {
                 @Override
                 public void run() {
-                    sessionModels.add(sessionModel);
+                    sessionModels.addAll(newSessions);
                 }
             };
             Handler handler = new Handler(Looper.getMainLooper());
