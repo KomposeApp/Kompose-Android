@@ -8,13 +8,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 
-import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryDetailsBinding;
 import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryOverviewBinding;
-import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.service.SampleService;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.view.adapter.PastSessionAdapter;
-import ch.ethz.inf.vs.kompose.view.adapter.PlayedSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.PastSessionViewHolder;
-import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryOverviewViewModel;
 
 public class HistoryOverviewActivity extends AppCompatActivity implements PastSessionViewHolder.ClickListener {
@@ -33,13 +31,23 @@ public class HistoryOverviewActivity extends AppCompatActivity implements PastSe
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new PastSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
+
+
+        if (MainActivity.DESIGN_MODE) {
+            SampleService sampleService = new SampleService();
+            viewModel.getSessionModels().add(sampleService.getSampleSession("session 1"));
+            viewModel.getSessionModels().add(sampleService.getSampleSession("session 2"));
+            viewModel.getSessionModels().add(sampleService.getSampleSession("session 3"));
+        }
     }
 
     @Override
     public void onClick(View v, int position) {
-        Log.d(LOG_TAG, "model seslected at position " + position);
-        SessionModel model = viewModel.getSessionModels().get(position);
-        Intent playlistIntent = new Intent(this, PlaylistActivity.class);
+        Log.d(LOG_TAG, "model selected at position " + position);
+
+        StateSingleton.getInstance().activeHistorySession = viewModel.getSessionModels().get(position);
+
+        Intent playlistIntent = new Intent(this, HistoryDetailsActivity.class);
         startActivity(playlistIntent);
     }
 

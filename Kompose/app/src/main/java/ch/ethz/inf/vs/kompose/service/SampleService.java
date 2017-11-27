@@ -7,8 +7,11 @@ import org.joda.time.DateTime;
 import java.util.Comparator;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.MainActivity;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
 
@@ -25,6 +28,15 @@ public class SampleService {
         sessionModel.setCreationDateTime(DateTime.now());
         sessionModel.setName(sessionName);
 
+        for (int i = 0; i < 4; i++) {
+            ClientModel clientModel = new ClientModel(UUID.randomUUID(), sessionModel);
+
+            for (int j = 0; j < 5; j++) {
+                sessionModel.getSongs().add(getSampleSong(sessionModel, clientModel, i * 10 + j));
+            }
+        }
+
+
         return sessionModel;
     }
 
@@ -34,6 +46,18 @@ public class SampleService {
         clientModel.setName(clientName);
 
         return clientModel;
+    }
+
+    public SongModel getSampleSong(SessionModel sessionModel, ClientModel model, Integer integer) {
+        SongModel songModel = new SongModel(UUID.randomUUID(), model, sessionModel);
+        songModel.setOrder(integer);
+        songModel.setStatus(SongStatus.REQUESTED);
+        songModel.setValidDownVoteCount(0);
+        songModel.setSecondsLength(100);
+        songModel.setSkipVoteCasted(integer % 2 == 0);
+        songModel.setDownloaded(integer % 4 == 0);
+        songModel.setTitle("song " + integer);
+        return songModel;
     }
 
     public ObservableList<ClientModel> getClients() {

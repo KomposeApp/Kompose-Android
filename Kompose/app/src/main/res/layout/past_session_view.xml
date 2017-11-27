@@ -15,12 +15,6 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="@{viewHolder.onJoinClick}"
-            android:text="@string/join" />
-
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"

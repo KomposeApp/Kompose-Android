@@ -39,7 +39,10 @@ public class PastSessionViewHolder<TModelViewBinding extends ViewDataBinding> ex
 
     @Override
     public void onClick(View v) {
-
+        int position = this.getAdapterPosition();
+        if (listener != null) {
+            listener.onClick(v, position);
+        }
     }
 
 

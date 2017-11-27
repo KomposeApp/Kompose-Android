@@ -25,7 +25,8 @@
             android:id="@+id/client_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions" />
+            android:inputType="textNoSuggestions"
+            android:text="@={viewModel.clientName}" />
 
         <TextView
             android:layout_width="match_parent"
@@ -37,7 +38,8 @@
             android:id="@+id/session_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="textNoSuggestions" />
+            android:inputType="textNoSuggestions"
+            android:text="@={viewModel.sessionName}" />
 
         <Button
             android:layout_width="wrap_content"
