@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/add_link"
+        android:title="@string/add_link" />
+    <item android:id="@+id/show_history"
+        android:title="@string/show_history" />
     <item android:id="@+id/leave_session"
         android:title="@string/leave_session" />
 </menu>

@@ -1,6 +1,6 @@
 package ch.ethz.inf.vs.kompose.view.viewmodel;
 
-import java.util.Observable;
+import android.databinding.Bindable;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
@@ -18,5 +18,17 @@ public class PlaylistViewModel extends BaseViewModel {
 
     public SessionModel getSessionModel() {
         return sessionModel;
+    }
+
+
+    private String searchLink;
+
+    @Bindable
+    public String getSearchLink() {
+        return searchLink;
+    }
+
+    public void setSearchLink(String searchLink) {
+        this.searchLink = searchLink;
     }
 }
