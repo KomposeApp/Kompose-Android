@@ -56,6 +56,7 @@ public class ClientNetworkService extends Service {
         DiscoverResolver resolver = new DiscoverResolver(this, SERVICE_TYPE,
                 new KomposeResolveListener(sessionModels));
         resolver.start();
+        //TODO: Stop this task again
     }
 
     public void initialize(Socket socket) {

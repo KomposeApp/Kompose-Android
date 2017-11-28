@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 
 import java.net.Socket;
-import java.util.concurrent.TimeUnit;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
@@ -86,6 +86,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
     @Override
     public void joinButtonClicked(View v, int position) {
+
         Log.d(LOG_TAG, "pressed join button of item number " + position);
         SessionModel pressedSession = viewModel.getSessionModels().get(position);
         String clientName = viewModel.getClientName();
@@ -114,7 +115,8 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
             networkService.sendRegisterClient(clientName);
 
             // Listen for responses from the host. If we get a matching response, proceed to the playlist.
-            hostConnection = responseHandler.get(StateSingleton.getInstance().getFixedTimeout() * 2, TimeUnit.MILLISECONDS);
+            responseHandler.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            hostConnection = responseHandler.get();
             if (hostConnection == null) throw new Exception("Host connection was null.");
         } catch (Exception e) {
             e.printStackTrace();

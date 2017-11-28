@@ -20,8 +20,6 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Socket> {
     private static final String LOG_TAG = "## RegistrationTask";
     private ServerSocket hostSocket;
     private InetAddress hostAddr;
-    private int localPort;
-
 
     public ClientRegistrationTask() throws Exception{
         //Retrieve connection details of active session:
@@ -31,7 +29,7 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Socket> {
         }
         hostAddr = session.getConnectionDetails().getHostIP();
         //TODO: Set this port to user's own chosen port, not that of the host -- Will need to tell host which port we want to use.
-        localPort = session.getConnectionDetails().getHostPort();
+        int localPort = session.getConnectionDetails().getHostPort();
         hostSocket = new ServerSocket(localPort);
         hostSocket.setSoTimeout(StateSingleton.getInstance().getFixedTimeout());
     }
@@ -43,7 +41,6 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Socket> {
      */
     @Override
     protected Socket doInBackground(Void... voids) {
-
         Socket connection = null;
         try {
             connection = hostSocket.accept();
