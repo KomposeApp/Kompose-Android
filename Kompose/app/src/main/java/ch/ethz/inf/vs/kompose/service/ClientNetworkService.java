@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.net.nsd.NsdManager;
@@ -34,36 +35,33 @@ import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
-public class ClientNSDService extends Service {
+public class ClientNetworkService extends Service {
 
-    private static final String LOG_TAG = "## ClientNSDService";
-
+    private static final String LOG_TAG = "## ClientNetworkService";
     private static final String SERVICE_TYPE = "_kompose._tcp";
     private static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
-    private DiscoverResolver resolver;
 
     private IBinder binder = new LocalBinder();
-
-    public class LocalBinder extends Binder {
-        public ClientNSDService getService() {
-            return ClientNSDService.this;
-        }
-    }
+    private Socket updateSocket;
+    private boolean initialized = false;
 
     /**
      * Add Network services to the provided ObservableList
      * @param sessionModels List which the NetworkServices are to be added to
      */
     public void findNetworkServices(final ObservableList<SessionModel> sessionModels) {
+        Log.d(LOG_TAG, "starting service discovery ...");
+
         // use workaround library for older android versions
         if (android.os.Build.VERSION.SDK_INT < 24) {
             Log.d(LOG_TAG, "using workaround library for service discovery on outdated devices");
 
-            resolver = new DiscoverResolver(this, SERVICE_TYPE, new KomposeResolveListenerWorkaround(sessionModels));
+            DiscoverResolver resolver = new DiscoverResolver(this, SERVICE_TYPE,
+                    new KomposeResolveListenerWorkaround(sessionModels));
             resolver.start();
-            Log.d(LOG_TAG, "NSD listener successfully started");
-        } // use standard android API for up-to-date versions
-        else {
+
+        // use standard android API for up-to-date versions
+        } else {
             Log.d(LOG_TAG, "using standard android NSD for service discovery");
 
             NsdManager nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
@@ -74,6 +72,22 @@ public class ClientNSDService extends Service {
         }
     }
 
+    public void initialize(Socket socket) {
+        this.updateSocket = socket;
+        this.initialized = true;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!initialized) {
+            Log.e(LOG_TAG, "not initialized, not starting socket listener");
+            return START_STICKY;
+        }
+
+        startClientSocketListener(updateSocket);
+        return START_STICKY;
+    }
+
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
@@ -82,19 +96,66 @@ public class ClientNSDService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent){
-
-        Log.d(LOG_TAG, "Unbinding service...");
-        if (resolver!=null){
-            try {
-                resolver.stop();
-                Log.d(LOG_TAG, "Stopping the NSD listener was successful");
-                resolver = null;
-            } catch(IllegalStateException ise){
-                ise.printStackTrace();
-                Log.e(LOG_TAG, "Attempted to stop NSD when it wasn't active");
-            }
-        }
+        Log.d(LOG_TAG, "ClientNetworkService has been unbound!");
+        //Set to true if we want to use onRebind()
         return false;
+    }
+
+    private void startClientSocketListener(Socket socket) {
+        ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
+        clientListenerTask.execute();
+    }
+
+
+    private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
+
+        private static final String LOG_TAG = "## ClientListenerTask";
+        private Socket socket;
+
+        ClientListenerTask(Socket socket) {
+            this.socket = socket;
+        }
+
+        private Message readMessage(Socket connection) throws IOException {
+            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder json = new StringBuilder();
+
+            char[] buffer = new char[1024];
+            int bytesRead;
+            while ((bytesRead = input.read(buffer)) != -1) {
+                json.append(new String(buffer, 0, bytesRead));
+            }
+            Log.d(LOG_TAG, "message read from stream: " + json.toString());
+
+            Message message = JsonConverter.fromMessageJsonString(json.toString());
+            input.close();
+            return message;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            while (!isCancelled()) {
+                try {
+                    Message msg = readMessage(socket);
+                    if (MessageType.valueOf(msg.getType()) == MessageType.SESSION_UPDATE) {
+                        MessageHandler messageHandler = new MessageHandler(msg);
+                        Thread msgHandler = new Thread(messageHandler);
+                        msgHandler.start();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+    }
+
+    public class LocalBinder extends Binder {
+        public ClientNetworkService getService() {
+            return ClientNetworkService.this;
+        }
     }
 
     /*
@@ -161,6 +222,7 @@ public class ClientNSDService extends Service {
             handler.post(uiTask);
         }
     }
+
 
     /*
      * Private classes for android API service discovery with NSD.
@@ -257,51 +319,4 @@ public class ClientNSDService extends Service {
             handler.post(uiTask);
         }
     }
-
-    //TODO: Reuse me elsewhere maybe
-    private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
-
-        private static final String LOG_TAG = "## ClientListenerTask";
-        private Socket socket;
-
-        ClientListenerTask(Socket socket) {
-            this.socket = socket;
-        }
-
-        private Message readMessage(Socket connection) throws IOException {
-            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder json = new StringBuilder();
-
-            char[] buffer = new char[1024];
-            int bytesRead;
-            while ((bytesRead = input.read(buffer)) != -1) {
-                json.append(new String(buffer, 0, bytesRead));
-            }
-            Log.d(LOG_TAG, "message read from stream: " + json.toString());
-
-            Message message = JsonConverter.fromMessageJsonString(json.toString());
-            input.close();
-            return message;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            while (!isCancelled()) {
-                try {
-                    Message msg = readMessage(socket);
-                    if (MessageType.valueOf(msg.getType()) == MessageType.SESSION_UPDATE) {
-                        MessageHandler messageHandler = new MessageHandler(msg);
-                        Thread msgHandler = new Thread(messageHandler);
-                        msgHandler.start();
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return null;
-        }
-    }
-
 }

@@ -6,8 +6,6 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -32,7 +30,6 @@ public class NetworkService {
 
     /**
      * Retrieves the base structure for a message
-     *
      * @param type What kind of message this is
      * @return Message data object
      */
@@ -44,15 +41,10 @@ public class NetworkService {
         return msg;
     }
 
-    public void sendRegisterClient(String username) {
+    public void sendRegisterClient(String username, SimpleListener socketRetriever) {
         Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
-        sendMessage(msg);
-    }
-
-    public void sendRegisterSuccess(){
-        Message msg = getBaseMessage(MessageType.REGISTER_SUCCESSFUL);
-        sendMessage(msg);
+        sendMessage(msg, socketRetriever);
     }
 
     public void sendCastSkipSongVote(Song song) {
@@ -121,6 +113,12 @@ public class NetworkService {
 
     // send a message to the globally stored host via IP/port
     private void sendMessage(Message message) {
+        // if this device is host, call message handler directly
+        if (StateSingleton.getInstance().deviceIsHost) {
+            Thread handler = new Thread(new MessageHandler(message));
+            handler.start();
+            return;
+        }
 
         // otherwise, send the message over network
         ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession
@@ -130,18 +128,43 @@ public class NetworkService {
         } else {
             AsyncSender asyncSender = new AsyncSender(message,
                     connectionDetails.getHostIP(), connectionDetails.getHostPort());
-            asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            asyncSender.execute();
+        }
+    }
+
+    // send a message to the globally stored host via IP/port and retrieve the openend socket
+    // afterwards
+    private void sendMessage(Message message, SimpleListener socketRetriever) {
+        // if this device is host, call message handler directly
+        if (StateSingleton.getInstance().deviceIsHost) {
+            Thread handler = new Thread(new MessageHandler(message));
+            handler.start();
+            return;
+        }
+
+        // otherwise, send the message over network
+        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession
+                .getConnectionDetails();
+        if (connectionDetails == null) {
+            Log.d(LOG_TAG, "tried to send message but no active connection");
+        } else {
+            AsyncSender asyncSender = new AsyncSender(message,
+                    connectionDetails.getHostIP(), connectionDetails.getHostPort(),
+                    socketRetriever);
+            asyncSender.execute();
         }
     }
 
     private static class AsyncSender extends AsyncTask<Void, Void, Void> {
 
         private final String LOG_TAG = "## AsyncSender";
-        SimpleListener socketRetriever;
+
         private InetAddress hostIP;
         private int hostPort;
         private Message message;
         private Socket socket;
+
+        SimpleListener socketRetriever;
 
         AsyncSender(Message msg, InetAddress ip, int port) {
             this.message = msg;
@@ -155,9 +178,9 @@ public class NetworkService {
         }
 
         AsyncSender(Message message,
-                    InetAddress ip,
-                    int port,
-                    SimpleListener socketRetriever) {
+                           InetAddress ip,
+                           int port,
+                           SimpleListener socketRetriever) {
             this.message = message;
             this.hostIP = ip;
             this.hostPort = port;
@@ -180,12 +203,17 @@ public class NetworkService {
                 }
 
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
+                BufferedReader input = new BufferedReader(new InputStreamReader(
+                        socket.getInputStream()));
 
                 // send message
                 printWriter.print(JsonConverter.toJsonString(message));
                 printWriter.flush();
                 printWriter.close();
 
+                //TODO: ???
+
+                input.close();
 
                 // only close the socket if a new one was created
                 if (closeSocket) {

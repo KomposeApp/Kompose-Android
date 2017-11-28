@@ -21,6 +21,7 @@ public class PartyCreationActivity extends BaseActivity {
     private static final String LOG_TAG = "## Party Activity";
     private final PartyCreationViewModel viewModel = new PartyCreationViewModel();
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,38 +33,37 @@ public class PartyCreationActivity extends BaseActivity {
     }
 
     public void confirmParty(View v) {
-
         Log.d(LOG_TAG, "Confirmation button pressed");
 
         String clientName = viewModel.getClientName();
-        //Check whether the client's name is empty or null
-        if (clientName == null || clientName.trim().isEmpty()) {
+        if (clientName == null) {
             showError(getString(R.string.choose_client_name));
             return;
         }
-
         String sessionName = viewModel.getSessionName();
-        if (sessionName == null || sessionName.trim().isEmpty()) {
+        if (sessionName == null) {
             showError(getString(R.string.choose_session_name));
             return;
         }
 
-        // Remove trailing whitespace from username and set it in the singleton
-        StateSingleton.getInstance().username = clientName.trim();
         UUID deviceUUID = StateSingleton.getInstance().deviceUUID;
+
 
         // create a new session
         SessionModel newSession = new SessionModel(UUID.randomUUID(), deviceUUID);
-        newSession.setName(sessionName.trim());
+        newSession.setName(sessionName);
 
-        // Add host as client to the session
+        //todo technical: am I doing this right?
         ClientModel clientModel = new ClientModel(deviceUUID, newSession);
-        clientModel.setName(StateSingleton.getInstance().username);
+        clientModel.setName(clientName);
         clientModel.setIsActive(true);
         newSession.getClients().add(clientModel);
 
         StateSingleton.getInstance().activeSession = newSession;
-        StateSingleton.getInstance().deviceIsHost = true;
+
+        // start the server service
+        Intent serverIntent = new Intent(this, AndroidServerService.class);
+        startService(serverIntent);
 
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);

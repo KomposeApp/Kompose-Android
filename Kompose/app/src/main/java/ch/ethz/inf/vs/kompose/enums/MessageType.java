@@ -2,7 +2,6 @@ package ch.ethz.inf.vs.kompose.enums;
 
 public enum MessageType {
     REGISTER_CLIENT,
-    REGISTER_SUCCESSFUL,
     UNREGISTER_CLIENT,
     SESSION_UPDATE,
     REQUEST_SONG,
