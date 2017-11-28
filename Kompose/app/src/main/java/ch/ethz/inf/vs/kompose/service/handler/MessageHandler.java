@@ -7,8 +7,6 @@ import org.joda.time.DateTime;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.Inet4Address;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.UUID;
 
@@ -309,7 +307,7 @@ public class MessageHandler implements Runnable {
         if (songModel.getValidDownVoteCount() >= quorum) {
             songModel.setStatus(SongStatus.EXCLUDED_BY_POPULAR_VOTE);
         } else {
-           songModel.setStatus(SongStatus.IN_QUEUE);
+            songModel.setStatus(SongStatus.IN_QUEUE);
         }
     }
 }

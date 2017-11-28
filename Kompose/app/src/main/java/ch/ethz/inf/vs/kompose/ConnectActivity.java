@@ -30,6 +30,8 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
     private static final String LOG_TAG = "## Connect Activity";
     private final ConnectViewModel viewModel = new ConnectViewModel();
     private boolean clientNetworkServiceBound = false;
+    private ClientRegistrationTask responseHandler = null;
+
     private ServiceConnection cNetServiceConnection = new ServiceConnection() {
 
         @Override
@@ -82,6 +84,10 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
             unbindService(cNetServiceConnection);
             clientNetworkServiceBound = false;
         }
+        if (responseHandler != null){
+            responseHandler.cancel(true);
+            responseHandler = null;
+        }
     }
 
     @Override
@@ -104,7 +110,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         StateSingleton.getInstance().activeSession = pressedSession;
 
         Socket hostConnection = null;
-        ClientRegistrationTask responseHandler = null;
         try {
             // Setting up the ServerSocket on the Client.
             responseHandler = new ClientRegistrationTask();
@@ -126,6 +131,14 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
             StateSingleton.getInstance().activeSession = null;
             Log.e(LOG_TAG, "Setting up the ServerSocket failed in ClientRegistrationTask.  Reason: " + e.getMessage());
             return;
+        }
+
+        //Reset responsehandler
+        responseHandler = null;
+
+        // In case we closed the activity while waiting for a connection, stop here.
+        if (this.isDestroyed()){
+            finish();
         }
 
         StateSingleton.getInstance().hostConnection = hostConnection;

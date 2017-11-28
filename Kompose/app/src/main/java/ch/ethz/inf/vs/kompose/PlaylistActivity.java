@@ -3,14 +3,18 @@ package ch.ethz.inf.vs.kompose;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+
+import java.io.IOException;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.json.Song;
@@ -30,13 +34,10 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## Playlist Activity";
-    private NetworkService networkService;
-
-    private Intent serverIntent = null;
-    private Intent nsdIntent = null;
-
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().activeSession);
-
+    private NetworkService networkService;
+    private boolean hostNSDService_isBound;
+    private boolean androidServerService_isBound;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,18 +45,20 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         setContentView(R.layout.activity_playlist);
 
         //Host setup
-        if (StateSingleton.getInstance().deviceIsHost){
+        if (StateSingleton.getInstance().deviceIsHost) {
             // start the playlist service
             // TODO
+
             // start the main server service
-            serverIntent = new Intent(this, AndroidServerService.class);
-            startService(serverIntent);
+            Intent serverIntent = new Intent(this, AndroidServerService.class);
+            bindService(serverIntent, androidServerServiceConnection, BIND_AUTO_CREATE);
+
             // Start the NSD sender
-            nsdIntent = new Intent(this, HostNSDService.class);
-            startService(nsdIntent);
+            Intent nsdIntent = new Intent(this, HostNSDService.class);
+            bindService(nsdIntent, hostNSDServiceConnection, BIND_AUTO_CREATE);
         }
         //Client setup
-        else{
+        else {
 
         }
         //networkService = new NetworkService();
@@ -67,17 +70,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         binding.setViewModel(viewModel);
     }
 
-
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (serverIntent != null){
-            stopService(serverIntent);
-            serverIntent = null;
+        if (hostNSDService_isBound) {
+            unbindService(hostNSDServiceConnection);
+            hostNSDService_isBound = false;
         }
-        if(nsdIntent != null){
-            stopService(nsdIntent);
+        if (androidServerService_isBound) {
+            unbindService(androidServerServiceConnection);
+            androidServerService_isBound = false;
         }
+        //TODO: Add playlist service
     }
 
     @Override
@@ -97,7 +101,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 Dialog builder = new Dialog(this);
                 builder.setCancelable(true);
 
-               // builder.setContentView(binding.getRoot());
+                // builder.setContentView(binding.getRoot());
 
                 binding.setViewModel(viewModel);
 
@@ -115,7 +119,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 return super.onOptionsItemSelected(item);
         }
     }
-
 
     public void requestSong() {
         // get youtube url from view
@@ -160,4 +163,75 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         // send downvote request
         networkService.sendCastSkipSongVote(null);
     }
+
+
+    private ServiceConnection androidServerServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "AndroidServerService bound");
+            AndroidServerService.LocalBinder binder = (AndroidServerService.LocalBinder) service;
+            AndroidServerService hostServerService = binder.getService();
+            androidServerService_isBound = true;
+            try {
+                hostServerService.acceptConnections();
+            } catch (IOException io) {
+                io.printStackTrace();
+                Log.e(LOG_TAG, "ServerSocket setup failed. Most likely, the chosen port was restricted");
+                //TODO: DESIGN -- Display an error message if this occurs and quit
+                finish();
+            }
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG_TAG, "ClientNSDService disconnected");
+            //TODO: Display error box before quitting
+            finish();
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0) {
+            Log.w(LOG_TAG, "Binding with ClientNSDService died");
+            //TODO: Display error box before quitting
+            finish();
+        }
+    };
+
+    private ServiceConnection hostNSDServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "HostNSDService bound");
+            HostNSDService.LocalBinder binder = (HostNSDService.LocalBinder) service;
+            HostNSDService hostNSDService = binder.getService();
+            hostNSDService_isBound = true;
+            try {
+                hostNSDService.startBroadcast();
+            } catch (RuntimeException r) {
+                r.printStackTrace();
+                //TODO: DESIGN -- Display an error message if this occurs and quit
+                finish();
+            }
+
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG_TAG, "ClientNSDService disconnected");
+            //TODO: Display error box before quitting
+            finish();
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0) {
+            Log.w(LOG_TAG, "Binding with ClientNSDService died");
+            //TODO: Display error box before quitting
+            finish();
+        }
+    };
+
+
+
 }

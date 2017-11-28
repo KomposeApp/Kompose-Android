@@ -40,6 +40,7 @@
             android:name=".service.AndroidServerService"
             android:stopWithTask="true" />
         <service android:name=".service.ClientNSDService" />
+        <service android:name=".service.HostNSDService"/>
 
         <activity android:name=".DesignActivity" />
         <activity
