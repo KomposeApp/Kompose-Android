@@ -3,6 +3,8 @@ package ch.ethz.inf.vs.kompose.service;
 import android.app.Service;
 import android.content.Intent;
 import android.databinding.ObservableList;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
@@ -38,6 +40,7 @@ public class ClientNSDService extends Service {
 
     // Type by which our Kompose service will be identified
     private static final String SERVICE_TYPE = "_kompose._tcp";
+    private static final String SERVICE_TYPE_NSD = "_kompose._tcp";
     private DiscoverResolver resolver;
 
     private IBinder binder = new LocalBinder();
@@ -50,21 +53,25 @@ public class ClientNSDService extends Service {
 
     /**
      * Add Network services to the provided ObservableList
-     * Uses a third-party resolver library called "DiscoverResolver"
-     * in order to circumvent a bug with NSD in Android 6.0.
      * @param sessionModels List which the NetworkServices are to be added to
      */
     public void findNetworkServices(final ObservableList<SessionModel> sessionModels) {
-        Log.d(LOG_TAG, "starting service discovery...");
+        // use workaround library for older android versions
+        if (android.os.Build.VERSION.SDK_INT < 24) {
+            Log.d(LOG_TAG, "using workaround library for service discovery on outdated devices");
 
-        // Start the third party NSD
-        resolver = new DiscoverResolver(this, SERVICE_TYPE, new KomposeResolveListener(sessionModels));
-        try{
+            resolver = new DiscoverResolver(this, SERVICE_TYPE, new KomposeResolveListenerWorkaround(sessionModels));
             resolver.start();
             Log.d(LOG_TAG, "NSD listener successfully started");
-        } catch(IllegalStateException ise){
-            ise.printStackTrace();
-            Log.e(LOG_TAG, "Attempted to start NSD listener that was already active");
+        } // use standard android API for up-to-date versions
+        else {
+            Log.d(LOG_TAG, "using standard android NSD for service discovery");
+
+            NsdManager nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
+            ClientServiceListener clientServiceListener = new ClientServiceListener(
+                    new KomposeResolveListener(sessionModels), nsdManager);
+            nsdManager.discoverServices(SERVICE_TYPE_NSD, NsdManager.PROTOCOL_DNS_SD,
+                    clientServiceListener);
         }
     }
 
@@ -91,11 +98,15 @@ public class ClientNSDService extends Service {
         return false;
     }
 
-    private class KomposeResolveListener implements DiscoverResolver.Listener {
+    /*
+     * Workaround library for API < 24: https://github.com/youviewtv/tinydnssd
+     */
+
+    private class KomposeResolveListenerWorkaround implements DiscoverResolver.Listener {
 
         private ObservableList<SessionModel> sessionModels;
 
-        KomposeResolveListener(ObservableList<SessionModel> sessionModels) {
+        KomposeResolveListenerWorkaround(ObservableList<SessionModel> sessionModels) {
             this.sessionModels = sessionModels;
         }
 
@@ -152,7 +163,104 @@ public class ClientNSDService extends Service {
         }
     }
 
-    //TODO: Reuse me elsewhere
+
+    /*
+     * Private classes for android API service discovery with NSD.
+     * This only works correctly for API >= 24
+     */
+
+    private class ClientServiceListener implements NsdManager.DiscoveryListener {
+
+        private NsdManager.ResolveListener resolveListener;
+        private NsdManager nsdManager;
+
+        ClientServiceListener(NsdManager.ResolveListener resolveListener, NsdManager nsdManager) {
+            this.resolveListener = resolveListener;
+            this.nsdManager = nsdManager;
+        }
+
+        @Override
+        public void onStartDiscoveryFailed(String serviceType, int errorCode) {
+            Log.d(LOG_TAG, "starting service discovery failed");
+        }
+
+        @Override
+        public void onStopDiscoveryFailed(String serviceType, int errorCode) {
+            Log.d(LOG_TAG, "stopping service discovery failed");
+        }
+
+        @Override
+        public void onDiscoveryStarted(String serviceType) {
+            Log.d(LOG_TAG, "service discovery started");
+        }
+
+        @Override
+        public void onDiscoveryStopped(String serviceType) {
+            Log.d(LOG_TAG, "service discovery stopped");
+        }
+
+        @Override
+        public void onServiceFound(NsdServiceInfo serviceInfo) {
+
+            Log.d(LOG_TAG, "service found: " + serviceInfo.getServiceName());
+            if (!serviceInfo.getServiceType().equals(SERVICE_TYPE_NSD)) {
+                Log.d(LOG_TAG, serviceInfo.getServiceType());
+                return;
+            }
+
+            nsdManager.resolveService(serviceInfo, resolveListener);
+        }
+
+        @Override
+        public void onServiceLost(NsdServiceInfo serviceInfo) {
+            Log.d(LOG_TAG, "service lost: " + serviceInfo.getServiceName());
+        }
+    }
+
+    private class KomposeResolveListener implements NsdManager.ResolveListener {
+
+        private ObservableList<SessionModel> sessionModels;
+
+        KomposeResolveListener(ObservableList<SessionModel> sessionModels) {
+            this.sessionModels = sessionModels;
+        }
+
+        @Override
+        public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
+            Log.e(LOG_TAG, "Resolve failed" + errorCode);
+        }
+
+        @Override
+        public void onServiceResolved(NsdServiceInfo serviceInfo) {
+            Log.d(LOG_TAG, "Resolve Succeeded. " + serviceInfo);
+
+            int port = serviceInfo.getPort();
+            InetAddress host = serviceInfo.getHost();
+
+            Map<String,byte[]> attributes = serviceInfo.getAttributes();
+            UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
+            UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
+            String hostName = new String(attributes.get("host_name"));
+            String sessionName = new String(attributes.get("session"));
+
+            final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
+            sessionModel.setName(sessionName);
+            sessionModel.setHostName(hostName);
+            sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
+
+            // the observable list callbacks must be called on the UI thread
+            Runnable uiTask = new Runnable() {
+                @Override
+                public void run() {
+                    sessionModels.add(sessionModel);
+                }
+            };
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(uiTask);
+        }
+    }
+
+    //TODO: Reuse me elsewhere maybe
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
 
         private static final String LOG_TAG = "## ClientListenerTask";

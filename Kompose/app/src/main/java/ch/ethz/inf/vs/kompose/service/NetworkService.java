@@ -121,13 +121,6 @@ public class NetworkService {
 
     // send a message to the globally stored host via IP/port
     private void sendMessage(Message message) {
-        // if this device is host, call message handler directly
-        // TODO : Make sure this checks for the different messagetypes...
-        if (StateSingleton.getInstance().deviceIsHost) {
-            Thread handler = new Thread(new MessageHandler(message));
-            handler.start();
-            return;
-        }
 
         // otherwise, send the message over network
         ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession

@@ -18,10 +18,13 @@ public class StateSingleton {
     private final String DIRECTORY_ARCHIVE = "session_archive";
     private final int SOCKET_TIMEOUT = 5000;
 
+    // THIS DENOTES WHETHER THE CURRENT DEVICE WE ARE USING IS HOST, NOTHING ELSE.
+    // PLEASE DON'T SCREW WITH THIS AGAIN, THANKS.
+    public boolean deviceIsHost;
+
     // Shared fields
     public String username;
     public SessionModel activeSession;
-    public boolean deviceIsHost;
     public UUID deviceUUID = UUID.randomUUID();
 
     // Client specific fields (should only be used by the client
