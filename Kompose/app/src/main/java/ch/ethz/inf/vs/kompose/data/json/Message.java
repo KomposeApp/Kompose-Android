@@ -2,7 +2,9 @@ package ch.ethz.inf.vs.kompose.data.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Message {
+import java.io.Serializable;
+
+public class Message implements Serializable {
     private String errorMessage;
     private String senderUsername;
     private String senderUuid;

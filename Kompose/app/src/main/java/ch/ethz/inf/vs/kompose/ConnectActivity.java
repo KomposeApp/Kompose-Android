@@ -11,16 +11,16 @@ import android.util.Log;
 import android.view.View;
 
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.uncategorized.ClientRegistrationTask;
 import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
@@ -28,10 +28,29 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 public class ConnectActivity extends BaseActivity implements JoinSessionViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## Connect Activity";
-    private ClientNetworkService clientNetworkService;
-    private boolean clientNetworkServiceBound = false;
-
     private final ConnectViewModel viewModel = new ConnectViewModel();
+    private boolean clientNetworkServiceBound = false;
+    private ServiceConnection cNetServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "ClientNetworkService bound");
+            ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
+            ClientNetworkService clientNetworkService = binder.getService();
+            clientNetworkServiceBound = true;
+            clientNetworkService.findNetworkServices(viewModel.getSessionModels());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG_TAG, "ClientNetworkService disconnected");
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0) {
+            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,77 +84,49 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         }
     }
 
-    private ServiceConnection cNetServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d(LOG_TAG, "ClientNetworkService bound");
-            ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
-            clientNetworkService = binder.getService();
-            clientNetworkServiceBound = true;
-            clientNetworkService.findNetworkServices(viewModel.getSessionModels());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.w(LOG_TAG, "ClientNetworkService died");
-            clientNetworkService = null;
-        }
-
-        @Override
-        public void onBindingDied(ComponentName arg0){
-            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
-            clientNetworkService = null;
-        }
-    };
-
     @Override
     public void joinButtonClicked(View v, int position) {
         Log.d(LOG_TAG, "pressed join button of item number " + position);
         SessionModel pressedSession = viewModel.getSessionModels().get(position);
         String clientName = viewModel.getClientName();
 
-        if (clientName == null) {
+        //Check whether the client's name is empty or null
+        if (clientName == null || clientName.trim().isEmpty()) {
             showError(getString(R.string.choose_client_name));
             return;
         }
 
-        //todo technical: am I doing this right?
-        ClientModel clientModel = new ClientModel(StateSingleton.getInstance().deviceUUID, pressedSession);
-        clientModel.setName(clientName);
-        clientModel.setIsActive(true);
-        pressedSession.getClients().add(clientModel);
+        // Remove trailing whitespace from username and set it in the singleton
+        StateSingleton.getInstance().username = clientName.trim();
 
-        //TODO Don't set this just yet
+        // Set our active session. Note: Connection details have already been prepared beforehand.
         StateSingleton.getInstance().activeSession = pressedSession;
 
-        if (clientNetworkServiceBound && !(clientNetworkService == null)) {
+        Socket hostConnection = null;
+        ClientRegistrationTask responseHandler = null;
+        try {
+            // Setting up the ServerSocket on the Client.
+            responseHandler = new ClientRegistrationTask();
+
+            // Send join request to the host.
+            Log.d(LOG_TAG, "Sending a join request to the host");
             NetworkService networkService = new NetworkService();
+            networkService.sendRegisterClient(clientName);
 
-            Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
+            // Listen for responses from the host. If we get a matching response, proceed to the playlist.
+            hostConnection = responseHandler.get(StateSingleton.getInstance().getFixedTimeout() * 2, TimeUnit.MILLISECONDS);
+            if (hostConnection == null) throw new Exception("Host connection was null.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showError("Failed to establish a connection with the host.");
 
-            // sockets can't be created on the main thread, so we retrieve it from the
-            // AsyncTask that creates it via a callback
-            networkService.sendRegisterClient(clientName, new SimpleListener() {
-                @Override
-                public void onEvent(int status) {}
-
-                @Override
-                public void onEvent(int status, Object object) {
-                    Log.d(LOG_TAG, "socketRetriever called");
-                    Socket updateSocket = (Socket) object;
-                    clientNetworkService.initialize(updateSocket);
-
-                    // start the client service
-                    Intent serverIntent = new Intent(ConnectActivity.this,
-                            ClientNetworkService.class);
-                    startService(serverIntent);
-                }
-            });
-        }else{
-
+            StateSingleton.getInstance().username = null;
+            StateSingleton.getInstance().activeSession = null;
+            Log.e(LOG_TAG, "Setting up the ServerSocket failed in ClientRegistrationTask.  Reason: " + e.getMessage());
+            return;
         }
 
+        StateSingleton.getInstance().hostConnection = hostConnection;
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);
         this.finish();

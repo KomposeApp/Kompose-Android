@@ -8,6 +8,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
+
 
 public class MainActivity extends AppCompatActivity {
 

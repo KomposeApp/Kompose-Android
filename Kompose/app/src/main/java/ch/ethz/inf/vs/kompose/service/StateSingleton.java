@@ -2,6 +2,9 @@ package ch.ethz.inf.vs.kompose.service;
 
 import android.databinding.ObservableList;
 
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.Socket;
 import java.util.Comparator;
 import java.util.UUID;
 
@@ -11,9 +14,13 @@ import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 public class StateSingleton {
 
     private static final String LOG_TAG = "## SINGLETON HUB:";
+
     private final String DIRECTORY_ARCHIVE = "session_archive";
+    private final int SOCKET_TIMEOUT = 5000;
 
     // Client specific fields
+    public String username;
+    public Socket hostConnection;
     public SessionModel activeSession;
     public SessionModel activeHistorySession;
     public UUID deviceUUID = UUID.randomUUID();
@@ -43,5 +50,13 @@ public class StateSingleton {
 
     public UUID getDeviceUUID() {
         return deviceUUID;
+    }
+
+    public int getFixedTimeout(){
+        return SOCKET_TIMEOUT;
+    }
+
+    public String getDirectoryArchive(){
+        return DIRECTORY_ARCHIVE;
     }
 }

@@ -6,6 +6,8 @@ import android.util.Log;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -41,10 +43,10 @@ public class NetworkService {
         return msg;
     }
 
-    public void sendRegisterClient(String username, SimpleListener socketRetriever) {
+    public void sendRegisterClient(String username) {
         Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
-        sendMessage(msg, socketRetriever);
+        sendMessage(msg);
     }
 
     public void sendCastSkipSongVote(Song song) {
@@ -114,6 +116,7 @@ public class NetworkService {
     // send a message to the globally stored host via IP/port
     private void sendMessage(Message message) {
         // if this device is host, call message handler directly
+        // TODO : Make sure this checks for the different messagetypes...
         if (StateSingleton.getInstance().deviceIsHost) {
             Thread handler = new Thread(new MessageHandler(message));
             handler.start();
@@ -202,14 +205,13 @@ public class NetworkService {
                     closeSocket = false;
                 }
 
-                PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-                BufferedReader input = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
+                ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
+                ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
 
                 // send message
-                printWriter.print(JsonConverter.toJsonString(message));
-                printWriter.flush();
-                printWriter.close();
+                outputStream.writeObject(message);
+                outputStream.flush();
+                outputStream.close();
 
                 //TODO: ???
 
