@@ -32,17 +32,21 @@ import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
-public class ClientNetworkService extends Service {
+public class ClientNSDService extends Service {
 
-    private static final String LOG_TAG = "## ClientNetworkService";
+    private static final String LOG_TAG = "## ClientNSDService";
 
     // Type by which our Kompose service will be identified
     private static final String SERVICE_TYPE = "_kompose._tcp";
+    private DiscoverResolver resolver;
 
     private IBinder binder = new LocalBinder();
 
-    private Socket updateSocket;
-    private boolean initialized = false;
+    public class LocalBinder extends Binder {
+        public ClientNSDService getService() {
+            return ClientNSDService.this;
+        }
+    }
 
     /**
      * Add Network services to the provided ObservableList
@@ -51,28 +55,17 @@ public class ClientNetworkService extends Service {
      * @param sessionModels List which the NetworkServices are to be added to
      */
     public void findNetworkServices(final ObservableList<SessionModel> sessionModels) {
-        Log.d(LOG_TAG, "starting service discovery ...");
+        Log.d(LOG_TAG, "starting service discovery...");
 
-        DiscoverResolver resolver = new DiscoverResolver(this, SERVICE_TYPE,
-                new KomposeResolveListener(sessionModels));
-        resolver.start();
-        //TODO: Stop this task again
-    }
-
-    public void initialize(Socket socket) {
-        this.updateSocket = socket;
-        this.initialized = true;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (!initialized) {
-            Log.e(LOG_TAG, "not initialized, not starting socket listener");
-            return START_STICKY;
+        // Start the third party NSD
+        resolver = new DiscoverResolver(this, SERVICE_TYPE, new KomposeResolveListener(sessionModels));
+        try{
+            resolver.start();
+            Log.d(LOG_TAG, "NSD listener successfully started");
+        } catch(IllegalStateException ise){
+            ise.printStackTrace();
+            Log.e(LOG_TAG, "Attempted to start NSD listener that was already active");
         }
-
-        startClientSocketListener(updateSocket);
-        return START_STICKY;
     }
 
     @Nullable
@@ -83,66 +76,19 @@ public class ClientNetworkService extends Service {
 
     @Override
     public boolean onUnbind(Intent intent){
-        Log.d(LOG_TAG, "ClientNetworkService has been unbound!");
-        //Set to true if we want to use onRebind()
+
+        Log.d(LOG_TAG, "Unbinding service...");
+        if (resolver!=null){
+            try {
+                resolver.stop();
+                Log.d(LOG_TAG, "Stopping the NSD listener was successful");
+                resolver = null;
+            } catch(IllegalStateException ise){
+                ise.printStackTrace();
+                Log.e(LOG_TAG, "Attempted to stop NSD when it wasn't active");
+            }
+        }
         return false;
-    }
-
-    private void startClientSocketListener(Socket socket) {
-        ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
-        clientListenerTask.execute();
-    }
-
-
-    private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
-
-        private static final String LOG_TAG = "## ClientListenerTask";
-        private Socket socket;
-
-        ClientListenerTask(Socket socket) {
-            this.socket = socket;
-        }
-
-        private Message readMessage(Socket connection) throws IOException {
-            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder json = new StringBuilder();
-
-            char[] buffer = new char[1024];
-            int bytesRead;
-            while ((bytesRead = input.read(buffer)) != -1) {
-                json.append(new String(buffer, 0, bytesRead));
-            }
-            Log.d(LOG_TAG, "message read from stream: " + json.toString());
-
-            Message message = JsonConverter.fromMessageJsonString(json.toString());
-            input.close();
-            return message;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            while (!isCancelled()) {
-                try {
-                    Message msg = readMessage(socket);
-                    if (MessageType.valueOf(msg.getType()) == MessageType.SESSION_UPDATE) {
-                        MessageHandler messageHandler = new MessageHandler(msg);
-                        Thread msgHandler = new Thread(messageHandler);
-                        msgHandler.start();
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-
-            return null;
-        }
-    }
-
-    public class LocalBinder extends Binder {
-        public ClientNetworkService getService() {
-            return ClientNetworkService.this;
-        }
     }
 
     private class KomposeResolveListener implements DiscoverResolver.Listener {
@@ -205,4 +151,51 @@ public class ClientNetworkService extends Service {
             handler.post(uiTask);
         }
     }
+
+    //TODO: Reuse me elsewhere
+    private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
+
+        private static final String LOG_TAG = "## ClientListenerTask";
+        private Socket socket;
+
+        ClientListenerTask(Socket socket) {
+            this.socket = socket;
+        }
+
+        private Message readMessage(Socket connection) throws IOException {
+            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            StringBuilder json = new StringBuilder();
+
+            char[] buffer = new char[1024];
+            int bytesRead;
+            while ((bytesRead = input.read(buffer)) != -1) {
+                json.append(new String(buffer, 0, bytesRead));
+            }
+            Log.d(LOG_TAG, "message read from stream: " + json.toString());
+
+            Message message = JsonConverter.fromMessageJsonString(json.toString());
+            input.close();
+            return message;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            while (!isCancelled()) {
+                try {
+                    Message msg = readMessage(socket);
+                    if (MessageType.valueOf(msg.getType()) == MessageType.SESSION_UPDATE) {
+                        MessageHandler messageHandler = new MessageHandler(msg);
+                        Thread msgHandler = new Thread(messageHandler);
+                        msgHandler.start();
+                    }
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+            return null;
+        }
+    }
+
 }

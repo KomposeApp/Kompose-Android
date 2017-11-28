@@ -39,7 +39,7 @@
         <service
             android:name=".service.AndroidServerService"
             android:stopWithTask="true" />
-        <service android:name=".service.ClientNetworkService" />
+        <service android:name=".service.ClientNSDService" />
 
         <activity android:name=".DesignActivity" />
         <activity

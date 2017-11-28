@@ -16,7 +16,7 @@ import java.net.Socket;
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
+import ch.ethz.inf.vs.kompose.service.ClientNSDService;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
@@ -34,21 +34,21 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d(LOG_TAG, "ClientNetworkService bound");
-            ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
-            ClientNetworkService clientNetworkService = binder.getService();
+            Log.d(LOG_TAG, "ClientNSDService bound");
+            ClientNSDService.LocalBinder binder = (ClientNSDService.LocalBinder) service;
+            ClientNSDService clientNetworkService = binder.getService();
             clientNetworkServiceBound = true;
             clientNetworkService.findNetworkServices(viewModel.getSessionModels());
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            Log.w(LOG_TAG, "ClientNetworkService disconnected");
+            Log.w(LOG_TAG, "ClientNSDService disconnected");
         }
 
         @Override
         public void onBindingDied(ComponentName arg0) {
-            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
+            Log.w(LOG_TAG, "Binding with ClientNSDService died");
         }
     };
 
@@ -64,7 +64,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         binding.setViewModel(viewModel);
 
         //bind client network service --> Will start listening for hosts to connect to
-        Intent intent = new Intent(this, ClientNetworkService.class);
+        Intent intent = new Intent(this, ClientNSDService.class);
         bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
 
         if (MainActivity.DESIGN_MODE) {
