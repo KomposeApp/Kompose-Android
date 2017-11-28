@@ -38,9 +38,8 @@ public class ClientNSDService extends Service {
 
     private static final String LOG_TAG = "## ClientNSDService";
 
-    // Type by which our Kompose service will be identified
     private static final String SERVICE_TYPE = "_kompose._tcp";
-    private static final String SERVICE_TYPE_NSD = "_kompose._tcp";
+    private static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
     private DiscoverResolver resolver;
 
     private IBinder binder = new LocalBinder();
@@ -162,7 +161,6 @@ public class ClientNSDService extends Service {
             handler.post(uiTask);
         }
     }
-
 
     /*
      * Private classes for android API service discovery with NSD.
