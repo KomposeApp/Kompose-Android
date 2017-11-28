@@ -129,6 +129,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         }
 
         StateSingleton.getInstance().hostConnection = hostConnection;
+        StateSingleton.getInstance().deviceIsHost = false;
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         startActivity(playlistIntent);
         this.finish();

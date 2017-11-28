@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
@@ -16,6 +17,8 @@ import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.service.AndroidServerService;
+import ch.ethz.inf.vs.kompose.service.HostNSDService;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
@@ -29,6 +32,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private static final String LOG_TAG = "## Playlist Activity";
     private NetworkService networkService;
 
+    private Intent serverIntent = null;
+    private Intent nsdIntent = null;
+
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().activeSession);
 
 
@@ -37,7 +43,22 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
-        networkService = new NetworkService();
+        //Host setup
+        if (StateSingleton.getInstance().deviceIsHost){
+            // start the playlist service
+            // TODO
+            // start the main server service
+            serverIntent = new Intent(this, AndroidServerService.class);
+            startService(serverIntent);
+            // Start the NSD sender
+            nsdIntent = new Intent(this, HostNSDService.class);
+            startService(nsdIntent);
+        }
+        //Client setup
+        else{
+
+        }
+        //networkService = new NetworkService();
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
 
@@ -46,6 +67,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         binding.setViewModel(viewModel);
     }
 
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (serverIntent != null){
+            stopService(serverIntent);
+            serverIntent = null;
+        }
+        if(nsdIntent != null){
+            stopService(nsdIntent);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

@@ -19,10 +19,10 @@ import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
- * Android service that starts the server.
- * First the service is registered on the network, then an AsyncTask
- * that accepts connections is started.
+ * This class is home to the the host ServerSocket.
+ * All requests from clients pass through here.
  */
+
 public class AndroidServerService extends Service {
 
     private static final String LOG_TAG = "## AndroidServerService";
@@ -39,14 +39,8 @@ public class AndroidServerService extends Service {
     private ServerTask serverTask;
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d(LOG_TAG, "created");
-    }
-
-    @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "started");
+        Log.d(LOG_TAG, "Service started");
 
         try {
             serverSocket = new ServerSocket(PreferenceUtility.getCurrentPort(this));
