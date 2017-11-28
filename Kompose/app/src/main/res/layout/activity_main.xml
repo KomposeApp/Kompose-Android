@@ -1,58 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="ch.ethz.inf.vs.kompose.MainActivity">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <variable
+            name="title"
+            type="String" />
+        <variable
+            name="text1"
+            type="String" />
+        <variable
+            name="subText1"
+            type="String" />
+        <variable
+            name="text2"
+            type="String" />
+        <variable
+            name="subText2"
+            type="String" />
+    </data>
+
+    <LinearLayout
+        android:background="@color/colorAccent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="15dp"
+        android:orientation="vertical">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="15dp"
+            android:adjustViewBounds="true"
+            android:maxWidth="69dp"
+            android:maxHeight="69dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/konkret" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textColor="@color/textColor"
+            android:text="@{title}" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp"
+            android:adjustViewBounds="true"
+            android:maxWidth="69dp"
+            android:maxHeight="69dp"
+            android:src="@drawable/konkret" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
+            android:textSize="22sp"
+            android:text="@{text1}" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
+            android:text="@{subText1}" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/button_main_join"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@color/buttonColor"
+                android:textColor="@color/buttonTextColor"
+                android:onClick="callConnectActivity"
+                android:text="Join Party" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:maxWidth="69dp"
+                android:maxHeight="69dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/konkret" />
+        </LinearLayout>
 
 
-    <Button
-        android:id="@+id/button_main_join"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="callConnectActivity"
-        android:text="Join Party"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.127" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
+            android:textSize="22sp"
+            android:text="@{text2}" />
 
-    <Button
-        android:id="@+id/button_main_create"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="callCreationActivity"
-        android:text="Create Party"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.3" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColor"
+            android:text="@{subText2}" />
 
-    <Button
-        android:id="@+id/button_main_history"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="viewHistoryFromTitle"
-        android:text="View History"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.498" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-    <Button
-        android:id="@+id/button_main_design"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="viewDesignFromTitle"
-        android:text="View Design"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.758" />
-</android.support.constraint.ConstraintLayout>
+            <Button
+                android:id="@+id/button_main_create"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="30dp"
+                android:layout_gravity="center_vertical"
+                android:background="@color/buttonColor"
+                android:textColor="@color/buttonTextColor"
+                android:onClick="callCreationActivity"
+                android:text="Create Party" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:adjustViewBounds="true"
+                android:maxWidth="69dp"
+                android:maxHeight="69dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/konkret" />
+        </LinearLayout>
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/button_main_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/colorAccent"
+            android:textColor="@color/textColor"
+            android:onClick="viewHistoryFromTitle"
+            android:text="View History" />
+
+    </LinearLayout>
+</layout>
+

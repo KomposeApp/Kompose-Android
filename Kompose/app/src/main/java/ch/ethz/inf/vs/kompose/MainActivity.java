@@ -1,12 +1,16 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+
+import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -18,7 +22,17 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if (DESIGN_MODE) {
+            this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+            ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+            binding.setTitle("create a shared playlist with friends");
+            binding.setText1("someone is already komposing music");
+            binding.setSubText1("... and I want to join!");
+            binding.setText2("no, others should join my party");
+            binding.setSubText2("... because I am connected to the music station");
+        }else {
+            setContentView(R.layout.activity_main_old);
+        }
     }
 
     /**
