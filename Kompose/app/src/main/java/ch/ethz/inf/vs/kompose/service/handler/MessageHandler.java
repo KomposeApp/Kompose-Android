@@ -52,16 +52,15 @@ public class MessageHandler implements Runnable {
     private Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder json = new StringBuilder();
-
         char[] buffer = new char[1024];
         int bytesRead;
         while ((bytesRead = input.read(buffer)) != -1) {
             json.append(new String(buffer, 0, bytesRead));
         }
         Log.d(LOG_TAG, "message read from stream: " + json.toString());
-
         Message message = JsonConverter.fromMessageJsonString(json.toString());
         input.close();
+
         return message;
     }
 
@@ -72,6 +71,7 @@ public class MessageHandler implements Runnable {
             try {
                 message = readMessage(socket);
             } catch (IOException e) {
+                //TODO: Better error handling
                 e.printStackTrace();
             }
         }
@@ -100,6 +100,10 @@ public class MessageHandler implements Runnable {
             case REGISTER_CLIENT:
                 sessionHasChanged = registerClient(message, activeSessionModel);
                 break;
+            case REGISTER_SUCCESSFUL:
+                //This should never arrive here. If it does, discard.
+                //TODO: Think of proper discarding mechanisms
+                break;
             case UNREGISTER_CLIENT:
                 sessionHasChanged = unregisterClient(message, activeSessionModel);
                 break;
@@ -124,6 +128,8 @@ public class MessageHandler implements Runnable {
             case ERROR:
                 //not used so far
                 break;
+            default:
+                break;
         }
 
         if (sessionHasChanged) {
@@ -137,18 +143,20 @@ public class MessageHandler implements Runnable {
     }
 
     private boolean registerClient(Message message, SessionModel sessionModel) {
+
         ClientModel client = new ClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
         client.setIsActive(true);
         client.setName(message.getSenderUsername());
 
-        //TODO: Store client ip and socket port
+        //TODO: Get client port from the message
         // if the message came from network, store the socket in the client model
         if (socket != null) {
             ClientConnectionDetails connectionDetails = new ClientConnectionDetails(socket, DateTime.now());
             client.setClientConnectionDetails(connectionDetails);
         }
-
         sessionModel.getClients().add(client);
+
+        new NetworkService().sendRegisterSuccess();
 
         return true;
     }

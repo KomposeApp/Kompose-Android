@@ -32,6 +32,7 @@ public class NetworkService {
 
     /**
      * Retrieves the base structure for a message
+     *
      * @param type What kind of message this is
      * @return Message data object
      */
@@ -46,6 +47,11 @@ public class NetworkService {
     public void sendRegisterClient(String username) {
         Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
+        sendMessage(msg);
+    }
+
+    public void sendRegisterSuccess(){
+        Message msg = getBaseMessage(MessageType.REGISTER_SUCCESSFUL);
         sendMessage(msg);
     }
 
@@ -131,43 +137,18 @@ public class NetworkService {
         } else {
             AsyncSender asyncSender = new AsyncSender(message,
                     connectionDetails.getHostIP(), connectionDetails.getHostPort());
-            asyncSender.execute();
-        }
-    }
-
-    // send a message to the globally stored host via IP/port and retrieve the openend socket
-    // afterwards
-    private void sendMessage(Message message, SimpleListener socketRetriever) {
-        // if this device is host, call message handler directly
-        if (StateSingleton.getInstance().deviceIsHost) {
-            Thread handler = new Thread(new MessageHandler(message));
-            handler.start();
-            return;
-        }
-
-        // otherwise, send the message over network
-        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession
-                .getConnectionDetails();
-        if (connectionDetails == null) {
-            Log.d(LOG_TAG, "tried to send message but no active connection");
-        } else {
-            AsyncSender asyncSender = new AsyncSender(message,
-                    connectionDetails.getHostIP(), connectionDetails.getHostPort(),
-                    socketRetriever);
-            asyncSender.execute();
+            asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
     private static class AsyncSender extends AsyncTask<Void, Void, Void> {
 
         private final String LOG_TAG = "## AsyncSender";
-
+        SimpleListener socketRetriever;
         private InetAddress hostIP;
         private int hostPort;
         private Message message;
         private Socket socket;
-
-        SimpleListener socketRetriever;
 
         AsyncSender(Message msg, InetAddress ip, int port) {
             this.message = msg;
@@ -181,9 +162,9 @@ public class NetworkService {
         }
 
         AsyncSender(Message message,
-                           InetAddress ip,
-                           int port,
-                           SimpleListener socketRetriever) {
+                    InetAddress ip,
+                    int port,
+                    SimpleListener socketRetriever) {
             this.message = message;
             this.hostIP = ip;
             this.hostPort = port;
@@ -205,17 +186,13 @@ public class NetworkService {
                     closeSocket = false;
                 }
 
-                ObjectOutputStream outputStream = new ObjectOutputStream(socket.getOutputStream());
-                ObjectInputStream input = new ObjectInputStream(socket.getInputStream());
+                PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
 
                 // send message
-                outputStream.writeObject(message);
-                outputStream.flush();
-                outputStream.close();
+                printWriter.print(JsonConverter.toJsonString(message));
+                printWriter.flush();
+                printWriter.close();
 
-                //TODO: ???
-
-                input.close();
 
                 // only close the socket if a new one was created
                 if (closeSocket) {

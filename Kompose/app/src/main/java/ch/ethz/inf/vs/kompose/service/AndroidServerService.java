@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
 
 /**
@@ -24,7 +23,6 @@ public class AndroidServerService extends Service {
 
     private static final String LOG_TAG = "## AndroidServerService";
 
-    private ServerSocket serverSocket;
     private ServerTask serverTask;
 
     private IBinder binder = new AndroidServerService.LocalBinder();
@@ -40,10 +38,8 @@ public class AndroidServerService extends Service {
     }
 
     public void acceptConnections() throws IOException{
-        serverSocket = new ServerSocket(PreferenceUtility.getCurrentPort(this));
-
         // start server task
-        serverTask = new ServerTask(serverSocket);
+        serverTask = new ServerTask();
         serverTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -66,13 +62,16 @@ public class AndroidServerService extends Service {
 
         private ServerSocket srvSocket;
 
-        private ServerTask(ServerSocket serverSocket){
-            this.srvSocket = serverSocket;
-        }
-
         @Override
         protected Void doInBackground(Void... voids) {
             Log.d(LOG_TAG, "Server ready to receive connections");
+
+            try {
+                srvSocket = new ServerSocket(StateSingleton.getInstance().hostPort);
+            } catch (IOException e) {
+                //TODO: Better error handling
+                e.printStackTrace();
+            }
 
             while (!this.isCancelled()) {
                 try {
@@ -92,6 +91,8 @@ public class AndroidServerService extends Service {
             return null;
         }
 
+
+        //TODO: Put a callback into this so that we can stop the service when it closes
         @Override
         protected void onPostExecute(Void v){
             try {

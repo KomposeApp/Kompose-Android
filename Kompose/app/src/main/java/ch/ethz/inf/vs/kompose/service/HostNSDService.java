@@ -38,7 +38,7 @@ public class HostNSDService extends Service {
 
     public void startBroadcast() throws RuntimeException{
 
-        int localPort = PreferenceUtility.getCurrentPort(this);
+        int localPort = StateSingleton.getInstance().hostPort;
 
         // register network service
         NsdServiceInfo serviceInfo = new NsdServiceInfo();
@@ -65,6 +65,8 @@ public class HostNSDService extends Service {
 
         nsdRegistrationListener = new ServerRegistrationListener();
         nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
+
+        //TODO: Invalid port numbers can be specified here.
         if (nsdManager != null) {
             nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
         } else{
@@ -99,6 +101,7 @@ public class HostNSDService extends Service {
         public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
             Log.e(LOG_TAG, "Failed to register the NSD Broadcasting Service. ErrorCode: " + errorCode);
             //TODO: Check whether this works correctly.
+            nsdManager = null;
             stopSelf();
         }
 

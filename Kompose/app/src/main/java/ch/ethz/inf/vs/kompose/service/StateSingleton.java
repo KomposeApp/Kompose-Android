@@ -18,12 +18,20 @@ public class StateSingleton {
     private final String DIRECTORY_ARCHIVE = "session_archive";
     private final int SOCKET_TIMEOUT = 5000;
 
-    // Client specific fields
+    // Shared fields
     public String username;
-    public Socket hostConnection;
     public SessionModel activeSession;
-    public SessionModel activeHistorySession;
+    public boolean deviceIsHost;
     public UUID deviceUUID = UUID.randomUUID();
+
+    // Client specific fields (should only be used by the client
+    public Socket hostConnection;
+
+    // Host specific fields
+    public int hostPort;
+
+    //History related fields (independent from networking)
+    public SessionModel activeHistorySession;
     public ObservableList<SessionModel> orderedPastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
         @Override
         public int compare(SessionModel o1, SessionModel o2) {
@@ -32,7 +40,6 @@ public class StateSingleton {
     });
 
     // Host specific fields
-    public boolean deviceIsHost;
 
     /* * Initialization on-demand holder idiom for Singleton Pattern * */
 

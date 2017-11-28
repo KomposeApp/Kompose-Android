@@ -3,12 +3,15 @@ package ch.ethz.inf.vs.kompose.uncategorized;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -47,21 +50,22 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Socket> {
 
             if (connection.getInetAddress().equals(hostAddr)) {
 
-                //Read message out message
-                ObjectInputStream input = new ObjectInputStream(connection.getInputStream());
-                Object o =  input.readObject();
-                Message msg = null;
+                BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                StringBuilder json = new StringBuilder();
 
-                //TODO: Test if this is really a good way to implement this. Maybe loop until we find right message, in case InputStream is cluttered with garbage data?
-                if (o instanceof Message) msg = (Message) o;
-                else throw new RuntimeException("Received message did not match necessary type.");
+                char[] buffer = new char[1024];
+                int bytesRead;
+                while ((bytesRead = input.read(buffer)) != -1) {
+                    json.append(new String(buffer, 0, bytesRead));
+                }
+                Log.d(LOG_TAG, "message read from stream: " + json.toString());
 
-                Log.d(LOG_TAG, "message read from stream: " + msg.toString());
+                Message message = JsonConverter.fromMessageJsonString(json.toString());
                 input.close();
 
                 // Check whether the message we received matches the expected message. If not, close the connection.
                 // TODO: Add UUID check for increased security
-                if (MessageType.valueOf(msg.getType()) == MessageType.REGISTER_SUCCESSFUL) {
+                if (MessageType.valueOf(message.getType()) == MessageType.REGISTER_SUCCESSFUL) {
                     return connection;
                 }else{
                     throw new RuntimeException("Type of message did not match REGISTER_SUCCESSFUL");

@@ -15,12 +15,14 @@ import android.view.MenuItem;
 import android.view.View;
 
 import java.io.IOException;
+import java.net.ServerSocket;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.AndroidServerService;
 import ch.ethz.inf.vs.kompose.service.HostNSDService;
 import ch.ethz.inf.vs.kompose.service.NetworkService;
@@ -39,10 +41,15 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private boolean hostNSDService_isBound;
     private boolean androidServerService_isBound;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
+
+        // Check if port is 0. If so, generate a random one.
+        checkPort();
 
         //Host setup
         if (StateSingleton.getInstance().deviceIsHost) {
@@ -233,5 +240,45 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     };
 
 
+    //TODO: If you know a better way to generate a random free open port beforehand, let me know
+    private void checkPort(){
+        int temp_port = PreferenceUtility.getCurrentPort(this);
+        if (temp_port == 0) {
+            try {
+                Thread getRandomPort = new Thread(new SocketPortGenerator(temp_port));
+                getRandomPort.start();
+                getRandomPort.join();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            if (StateSingleton.getInstance().hostPort == 0){
+                //TODO: Display error in UI and quit
+                Log.e(LOG_TAG, "Generating a random port has failed");
+                finish();
+            }
+        } else{
+            StateSingleton.getInstance().hostPort = temp_port;
+        }
+    }
+
+    private class SocketPortGenerator implements Runnable{
+        int port = 0;
+        private SocketPortGenerator(int port){
+            this.port = port;
+        }
+
+        @Override
+        public void run() {
+            try {
+                ServerSocket socket = new ServerSocket(port);
+                StateSingleton.getInstance().hostPort = socket.getLocalPort();
+                socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
 
 }
