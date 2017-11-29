@@ -124,7 +124,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
         /* sockets can't be created on the main thread,
          *  so we retrieve it from the AsyncTask that creates it via a callback */
-
         networkHandler.sendRegisterClient(clientName, new SimpleListener() {
             @Override
             public void onEvent(int status) {}
@@ -157,7 +156,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
                     //Error handling done here:
                     Log.e(LOG_TAG, "Failed to establish a connection with host.");
                     if(clientNetworkService== null || !clientNetworkServiceBound){
-                        Log.e(LOG_TAG, "ClientNetworkService is either gone or not bound.");
+                        Log.w(LOG_TAG, "ClientNetworkService is either gone or not bound.");
                         if (!isDestroyed()) showError(getString(R.string.view_error_service_dead));
                     }
                     else if(updateSocket==null || !updateSocket.isConnected()){

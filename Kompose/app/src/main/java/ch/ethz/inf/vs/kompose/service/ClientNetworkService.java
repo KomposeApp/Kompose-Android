@@ -94,6 +94,12 @@ public class ClientNetworkService extends Service {
     }
 
     @Override
+    public void onDestroy(){
+        super.onDestroy();
+        Log.d(LOG_TAG,"I have been killed for real now");
+    }
+
+    @Override
     public boolean onUnbind(Intent intent){
         Log.d(LOG_TAG, "ClientNetworkService has been unbound!");
         //Set to true if we want to use onRebind()

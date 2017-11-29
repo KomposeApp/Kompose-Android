@@ -37,9 +37,10 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
-        //TODO: Bug: Log tags don't show up here.
+
         responseHandler = new OutgoingMessageHandler();
         clientNetworkServiceIntent = this.getIntent().getParcelableExtra(MainActivity.KEY_CNETWORKSERVICE);
+        Log.d(LOG_TAG, "Client NetworkServiceIntent is null : " + (clientNetworkServiceIntent == null) );
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
