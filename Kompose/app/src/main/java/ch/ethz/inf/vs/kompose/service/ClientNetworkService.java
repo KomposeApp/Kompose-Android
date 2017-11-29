@@ -197,7 +197,7 @@ public class ClientNetworkService extends Service {
      */
     private class KomposeResolveListenerWorkaround implements DiscoverResolver.Listener {
 
-        //
+        // Observable list obtained from View
         private ObservableList<SessionModel> sessionModels;
 
         KomposeResolveListenerWorkaround(ObservableList<SessionModel> sessionModels) {
@@ -226,29 +226,22 @@ public class ClientNetworkService extends Service {
                     continue;
                 }
 
-                // check if it is a newly found session
-                boolean foundBefore = false;
-                for (SessionModel s : sessionModels) {
-                    if (s.getUuid().equals(sessionUUID)) {
-                        foundBefore = true;
-                        break;
-                    }
-                }
+                SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
+                sessionModel.setName(sessionName);
+                sessionModel.setHostName(hostName);
+                sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
+                newSessions.add(sessionModel);
 
-                if (!foundBefore) {
-                    SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
-                    sessionModel.setName(sessionName);
-                    sessionModel.setHostName(hostName);
-                    sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
-                    newSessions.add(sessionModel);
-                }
             }
 
-            // Add the newly found services to the ObservableList
+            // Replace all found services in the ObservableList
+            // * Note (bdino): I changed it to simply replace the whole list now
+            // * This is less efficient but allows us to keep the list up-to-date.
             // Note: the observable list callbacks must be called on the UI thread
             Runnable uiTask = new Runnable() {
                 @Override
                 public void run() {
+                    sessionModels.clear();
                     sessionModels.addAll(newSessions);
                 }
             };
@@ -262,7 +255,7 @@ public class ClientNetworkService extends Service {
      * Private classes for android API service discovery with NSD.
      * This only works correctly for API >= 24
      */
-
+    /** If the DiscoveryListener hears anything, something in here is called **/
     private class ClientServiceListener implements NsdManager.DiscoveryListener {
 
         private NsdManager.ResolveListener resolveListener;
@@ -275,12 +268,14 @@ public class ClientNetworkService extends Service {
 
         @Override
         public void onStartDiscoveryFailed(String serviceType, int errorCode) {
-            Log.d(LOG_TAG, "starting service discovery failed");
+            Log.e(LOG_TAG, "starting service discovery failed. Error Code: " + errorCode);
+            //TODO: Figure out whether this needs special treatment
         }
 
         @Override
         public void onStopDiscoveryFailed(String serviceType, int errorCode) {
-            Log.d(LOG_TAG, "stopping service discovery failed");
+            Log.e(LOG_TAG, "stopping service discovery failed. Error Code: " + errorCode);
+            //TODO: See above
         }
 
         @Override
@@ -307,15 +302,16 @@ public class ClientNetworkService extends Service {
         @Override
         public void onServiceLost(NsdServiceInfo serviceInfo) {
             Log.d(LOG_TAG, "service lost: " + serviceInfo.getServiceName());
-            if (!serviceInfo.getServiceType().equals(SERVICE_TYPE_NSD)) {
-                Log.d(LOG_TAG, serviceInfo.getServiceType());
-                return;
-            }
+            //if (!serviceInfo.getServiceType().equals(SERVICE_TYPE_NSD)) {
+            //    Log.d(LOG_TAG, serviceInfo.getServiceType());
+            //    return;
+            //}
             //serviceInfo.setAttribute(KEY_FOUND_STATE, LOST);
             //nsdManager.resolveService(serviceInfo, resolveListener);
 
         }
     }
+
 
     private class KomposeResolveListener implements NsdManager.ResolveListener {
 
