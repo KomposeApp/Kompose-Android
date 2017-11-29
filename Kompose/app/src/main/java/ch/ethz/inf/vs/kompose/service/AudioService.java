@@ -50,7 +50,7 @@ public class AudioService extends Service {
     public void initializeAudioService(SessionModel sessionModel) {
         this.initialized = true;
         this.sessionModel = sessionModel;
-        this.songs = sessionModel.getSongs();
+        this.songs = sessionModel.getPlayQueue();
     }
 
     public void startPlayback() {

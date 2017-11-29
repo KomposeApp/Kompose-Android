@@ -11,7 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.json.Song;
@@ -46,7 +45,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
-        binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getSongs(), getLayoutInflater(), this));
+        binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getPlayQueue(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
 
         if (MainActivity.DESIGN_MODE) {
@@ -123,7 +122,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     @Override
     public void downVoteClicked(View v, int position) {
-        SongModel songModel = viewModel.getSessionModel().getSongs().get(position);
+        SongModel songModel = viewModel.getSessionModel().getPlayQueue().get(position);
         //todo technical: transform songModel to song
         // send downvote request
         responseHandler.sendCastSkipSongVote(null);

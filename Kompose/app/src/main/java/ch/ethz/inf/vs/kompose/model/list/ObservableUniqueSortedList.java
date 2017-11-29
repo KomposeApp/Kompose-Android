@@ -13,25 +13,27 @@ import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
  */
 public class ObservableUniqueSortedList<T extends UniqueModel> extends ObservableArrayList<T> {
 
-    private Comparator<T> comparator;
+    private Comparator<T> orderComparator;
+    private Comparator<T> uniqueComparator;
 
-    public ObservableUniqueSortedList(Comparator<T> comparator) {
-        this.comparator = comparator;
+    public ObservableUniqueSortedList(Comparator<T> orderComparator, Comparator<T> uniqueComparator) {
+        this.orderComparator = orderComparator;
+        this.uniqueComparator = uniqueComparator;
     }
 
     @Override
     public boolean add(T object) {
         boolean found = false;
-        int insertIdx = 0;
-        boolean idxSet = false;
+        int insertPosition = 0;
+        boolean positionFixed = false;
         for (int i = 0; i < super.size(); i++) {
-            if (comparator.compare(super.get(i), object) == 0) {
+            if (uniqueComparator.compare(super.get(i), object) == 0) {
                 found = true;
                 break;
             }
-            if (!idxSet && comparator.compare(object, get(i)) < 0) {
-                insertIdx = i;
-                idxSet = true;
+            if (!positionFixed && orderComparator.compare(object, get(i)) < 0) {
+                insertPosition = i;
+                positionFixed = true;
             }
         }
 
@@ -39,8 +41,8 @@ public class ObservableUniqueSortedList<T extends UniqueModel> extends Observabl
             return false;
         }
 
-        insertIdx = idxSet ? insertIdx : super.size();
-        super.add(insertIdx, object);
+        insertPosition = positionFixed ? insertPosition : super.size();
+        super.add(insertPosition, object);
         return true;
     }
 

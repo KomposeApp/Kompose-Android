@@ -12,7 +12,8 @@ public class Song implements Parcelable {
     private int order;
     private String proposedByClientUuid;
     private String sourceUrl;
-    private String status;
+    private String songStatus;
+    private String downloadStatus;
     private String thumbnailUrl;
     private String title;
     private int lengthInSeconds;
@@ -27,7 +28,8 @@ public class Song implements Parcelable {
         order = in.readInt();
         proposedByClientUuid = in.readString();
         sourceUrl = in.readString();
-        status = in.readString();
+        songStatus = in.readString();
+        downloadStatus = in.readString();
         thumbnailUrl = in.readString();
         title = in.readString();
         lengthInSeconds = in.readInt();
@@ -41,7 +43,8 @@ public class Song implements Parcelable {
         dest.writeInt(order);
         dest.writeString(proposedByClientUuid);
         dest.writeString(sourceUrl);
-        dest.writeString(status);
+        dest.writeString(songStatus);
+        dest.writeString(downloadStatus);
         dest.writeString(thumbnailUrl);
         dest.writeString(title);
         dest.writeInt(lengthInSeconds);
@@ -115,14 +118,14 @@ public class Song implements Parcelable {
         this.sourceUrl = value;
     }
 
-    @JsonProperty("status")
-    public String getStatus() {
-        return status;
+    @JsonProperty("songStatus")
+    public String getSongStatus() {
+        return songStatus;
     }
 
-    @JsonProperty("status")
-    public void setStatus(String value) {
-        this.status = value;
+    @JsonProperty("songStatus")
+    public void setSongStatus(String value) {
+        this.songStatus = value;
     }
 
     @JsonProperty("thumbnail_url")
@@ -163,5 +166,15 @@ public class Song implements Parcelable {
     @JsonProperty("length_in_seconds")
     public void setLengthInSeconds(int lengthInSeconds) {
         this.lengthInSeconds = lengthInSeconds;
+    }
+
+    @JsonProperty("download_status")
+    public String getDownloadStatus() {
+        return downloadStatus;
+    }
+
+    @JsonProperty("download_status")
+    public void setDownloadStatus(String downloadStatus) {
+        this.downloadStatus = downloadStatus;
     }
 }

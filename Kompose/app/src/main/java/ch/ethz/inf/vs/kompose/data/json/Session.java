@@ -10,17 +10,18 @@ public class Session implements Parcelable {
     private String hostUuid;
     private Song[] songs;
     private String sessionName;
+    private String sessionStatus;
     private String creationDateTime;
     private String uuid;
 
-    public Session() {
-    }
+    public Session() {}
 
     protected Session(Parcel in) {
         clients = in.createTypedArray(Client.CREATOR);
         hostUuid = in.readString();
         songs = in.createTypedArray(Song.CREATOR);
         sessionName = in.readString();
+        sessionStatus = in.readString();
         creationDateTime = in.readString();
         uuid = in.readString();
     }
@@ -31,6 +32,7 @@ public class Session implements Parcelable {
         dest.writeString(hostUuid);
         dest.writeTypedArray(songs, flags);
         dest.writeString(sessionName);
+        dest.writeString(sessionStatus);
         dest.writeString(creationDateTime);
         dest.writeString(uuid);
     }
@@ -110,5 +112,15 @@ public class Session implements Parcelable {
     @JsonProperty("uuid")
     public void setUuid(String value) {
         this.uuid = value;
+    }
+
+    @JsonProperty("session_status")
+    public String getSessionStatus() {
+        return sessionStatus;
+    }
+
+    @JsonProperty("session_status")
+    public void setSessionStatus(String sessionStatus) {
+        this.sessionStatus = sessionStatus;
     }
 }
