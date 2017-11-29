@@ -50,6 +50,7 @@
         <activity android:name=".DesignActivity" />
         <activity
             android:name=".PlaylistActivity"
+            android:screenOrientation="portrait"
             android:label="@string/title_activity_playlist" />
     </application>
 
