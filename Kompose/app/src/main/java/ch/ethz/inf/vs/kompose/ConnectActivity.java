@@ -115,59 +115,34 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         clientModel.setIsActive(true);
         pressedSession.getClients().add(clientModel);
 
-        // Set the current session state
-        StateSingleton.getInstance().activeSession = pressedSession;
-
         OutgoingMessageHandler networkHandler = new OutgoingMessageHandler();
         Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
 
-        /* sockets can't be created on the main thread,
-         *  so we retrieve it from the AsyncTask that creates it via a callback */
-        networkHandler.sendRegisterClient(clientName, new SimpleListener() {
-            @Override
-            public void onEvent(int status) {}
+        if (clientNetworkServiceBound && clientNetworkService != null) {
+            // Set the current session state
+            StateSingleton.getInstance().activeSession = pressedSession;
 
-            /** This serves as our confirmation that the registration worked.
-             *  We start the next activity and close the current from here.  **/
-            @Override
-            public void onEvent(int status, Object object) {
-                Log.d(LOG_TAG, "Callback handler: SocketRetriever called");
-                Socket updateSocket = (Socket) object;
+            clientNetworkService.initSocketListener();
+            networkHandler.sendRegisterClient(clientName, clientNetworkService.getClientPort());
 
-                // Show an error if the service failed or the socket is null
-                if (clientNetworkService != null && clientNetworkServiceBound &&
-                        updateSocket!=null && updateSocket.isConnected() && !updateSocket.isClosed()){
-                    clientNetworkService.initSocketListener(updateSocket);
+            // start the client service again -- THIS IS INTENTIONAL
+            // it will keep the service alive across different activities.
+            Intent serverIntent = new Intent(ctx.getBaseContext(), ClientNetworkService.class);
+            startService(serverIntent);
 
-                    // start the client service again -- THIS IS INTENTIONAL
-                    // it will keep the service alive across different activities.
-                    Intent serverIntent = new Intent(ctx.getBaseContext(), ClientNetworkService.class);
-                    startService(serverIntent);
+            Intent playlistIntent = new Intent(ctx, PlaylistActivity.class);
+            playlistIntent.putExtra(MainActivity.KEY_CNETWORKSERVICE, serverIntent);
 
-                    Intent playlistIntent = new Intent(ctx, PlaylistActivity.class);
-                    playlistIntent.putExtra(MainActivity.KEY_CNETWORKSERVICE, serverIntent);
-
-                    ctx.startActivity(playlistIntent);
-                    ctx.finish();
-                }
-                else{
-                    StateSingleton.getInstance().activeSession = null;
-                    //Error handling done here:
-                    Log.e(LOG_TAG, "Failed to establish a connection with host.");
-                    if(clientNetworkService== null || !clientNetworkServiceBound){
-                        Log.w(LOG_TAG, "ClientNetworkService is either gone or not bound.");
-                        if (!isDestroyed()) showError(getString(R.string.view_error_service_dead));
-                    }
-                    else if(updateSocket==null || !updateSocket.isConnected()){
-                        Log.e(LOG_TAG, "Socket connection failed, host unreachable.");
-                        if (!isDestroyed()) showError(getString(R.string.view_error_socket_dead));
-                    }
-                    else if(updateSocket.isClosed()){
-                        Log.e(LOG_TAG, "Socket on host is closed");
-                        if (!isDestroyed()) showError(getString(R.string.view_error_socket_closed));
-                    }
+            ctx.startActivity(playlistIntent);
+            ctx.finish();
+        } else {
+            Log.e(LOG_TAG, "Failed to establish a connection with host.");
+            if (clientNetworkService== null || !clientNetworkServiceBound) {
+                Log.w(LOG_TAG, "ClientNetworkService is either gone or not bound.");
+                if (!isDestroyed()) {
+                    showError(getString(R.string.view_error_service_dead));
                 }
             }
-        });
+        }
     }
 }

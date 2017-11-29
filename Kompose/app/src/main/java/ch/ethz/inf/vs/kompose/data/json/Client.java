@@ -9,6 +9,7 @@ public class Client implements Parcelable {
     private boolean isActive;
     private String name;
     private String uuid;
+    private int port;
 
     public Client() {
     }
@@ -71,5 +72,15 @@ public class Client implements Parcelable {
     @JsonProperty("uuid")
     public void setUuid(String value) {
         this.uuid = value;
+    }
+
+    @JsonProperty("port")
+    public int getPort() {
+        return port;
+    }
+
+    @JsonProperty("port")
+    public void setPort(int port) {
+        this.port = port;
     }
 }

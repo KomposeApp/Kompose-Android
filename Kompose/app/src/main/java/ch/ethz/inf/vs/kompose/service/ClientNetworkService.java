@@ -20,6 +20,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
@@ -30,7 +31,6 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
-import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
 
@@ -41,17 +41,29 @@ public class ClientNetworkService extends Service {
     private static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
 
     private IBinder binder = new LocalBinder();
-    private Socket updateSocket;
     private boolean initialized = false;
+    private ServerSocket clientServerSocket;
+    private int localPort = 0;
 
     private DiscoverResolver resolver;
     private NsdManager nsdManager;
     private ClientServiceListener clientServiceListener;
 
+    private  ClientListenerTask clientListenerTask;
+
     /** Prepare for onStartCommand **/
-    public void initSocketListener(Socket socket) {
-        this.updateSocket = socket;
-        this.initialized = true;
+    public void initSocketListener() {
+        try {
+            this.clientServerSocket = new ServerSocket(0);
+            this.initialized = true;
+            this.localPort = clientServerSocket.getLocalPort();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public int getClientPort() {
+        return localPort;
     }
 
     /**
@@ -65,7 +77,8 @@ public class ClientNetworkService extends Service {
             return START_STICKY;
         }
 
-        startClientSocketListener(updateSocket);
+        clientListenerTask = new ClientListenerTask(clientServerSocket, localPort);
+        clientListenerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         return START_STICKY;
     }
 
@@ -88,7 +101,7 @@ public class ClientNetworkService extends Service {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        //TODO: Stop Async Task here
+        clientListenerTask.cancel(true);
         Log.d(LOG_TAG,"Service killed for real.");
     }
 
@@ -140,13 +153,6 @@ public class ClientNetworkService extends Service {
         return false;
     }
 
-    /**  **/
-    private void startClientSocketListener(Socket socket) {
-        ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
-        clientListenerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
-
     /*
      * This is where the client listens for messages from the host.
      * Only started once we call startService().
@@ -154,42 +160,33 @@ public class ClientNetworkService extends Service {
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
 
         private static final String LOG_TAG = "## ClientListenerTask";
-        private Socket socket;
 
-        ClientListenerTask(Socket socket) {
-            this.socket = socket;
-        }
+        private ServerSocket serverSocket;
+        private int localPort;
 
-        private Message readMessage(Socket connection) throws IOException {
-            BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            String json = input.readLine();
-            Log.d(LOG_TAG, "message read from stream: " + json.toString());
-
-            Message message = JsonConverter.fromMessageJsonString(json.toString());
-            input.close();
-            return message;
+        ClientListenerTask(ServerSocket serverSocket, int port) {
+            this.serverSocket = serverSocket;
+            this.localPort = port;
         }
 
         @Override
         protected Void doInBackground(Void... voids) {
+            Log.d(LOG_TAG, "started on port " + localPort);
             while (!isCancelled()) {
                 try {
-                    Message msg = readMessage(socket);
-                    if (MessageType.valueOf(msg.getType()) == MessageType.SESSION_UPDATE) {
-                        IncomingMessageHandler messageHandler = new IncomingMessageHandler(msg);
-                        Thread msgHandler = new Thread(messageHandler);
-                        msgHandler.start();
-                    }
-
+                    final Socket connection = serverSocket.accept();
+                    Log.d(LOG_TAG, "message received");
+                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(connection);
+                    Thread msgHandler = new Thread(messageHandler);
+                    msgHandler.start();
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.d(LOG_TAG, "could not process message; exception occurred! " + e.toString());
                 }
             }
 
             return null;
         }
     }
-
 
     /*
      * Workaround library for API < 24: https://github.com/youviewtv/tinydnssd
@@ -256,7 +253,6 @@ public class ClientNetworkService extends Service {
             handler.post(uiTask);
         }
     }
-
 
     /*
      * Private classes for android API service discovery with NSD.
@@ -361,7 +357,5 @@ public class ClientNetworkService extends Service {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(uiTask);
         }
-
-
     }
 }

@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.kompose.converter;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.json.Client;
+import ch.ethz.inf.vs.kompose.data.network.ClientConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 
@@ -22,6 +23,8 @@ public class ClientConverter implements IBaseConverter<ClientModel, Client> {
         ClientModel clientModel = new ClientModel(UUID.fromString(client.getUuid()), sessionModel);
         clientModel.setName(client.getName());
         clientModel.setIsActive(client.getIsActive());
+        clientModel.setClientConnectionDetails(new ClientConnectionDetails(null,
+                client.getPort(), null));
         return clientModel;
     }
 
@@ -31,6 +34,11 @@ public class ClientConverter implements IBaseConverter<ClientModel, Client> {
         client.setUuid(clientModel.getUuid().toString());
         client.setName(clientModel.getName());
         client.setIsActive(clientModel.getIsActive());
+
+        if (clientModel.getClientConnectionDetails() != null) {
+            client.setPort(clientModel.getClientConnectionDetails().getPort());
+        }
+
         return client;
     }
 }

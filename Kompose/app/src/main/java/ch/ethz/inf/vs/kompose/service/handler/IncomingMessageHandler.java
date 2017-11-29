@@ -137,7 +137,8 @@ public class IncomingMessageHandler implements Runnable {
 
         // if the message came from network, store the socket in the client model
         if (socket != null) {
-            ClientConnectionDetails connectionDetails = new ClientConnectionDetails(socket, DateTime.now());
+            ClientConnectionDetails connectionDetails = new ClientConnectionDetails(
+                    socket.getInetAddress(), message.getPort(), DateTime.now());
             client.setClientConnectionDetails(connectionDetails);
         }
 
@@ -155,14 +156,7 @@ public class IncomingMessageHandler implements Runnable {
 
         // close the client's socket
         clientModel.setIsActive(false);
-        if (clientModel.getClientConnectionDetails() != null) {
-            try {
-                clientModel.getClientConnectionDetails().getSocket().close();
-            } catch (IOException e) {
-                Log.d(LOG_TAG, "socket could not be closed");
-            }
-            clientModel.setClientConnectionDetails(null);
-        }
+        clientModel.setClientConnectionDetails(null);
 
         // remove the client's downvotes
         UUID clientUUID = clientModel.getUuid();
@@ -258,6 +252,7 @@ public class IncomingMessageHandler implements Runnable {
 
     // TODO
     private void sessionUpdate(Message message, SessionModel activeSessionModel) {
+        Log.d(LOG_TAG, "session update");
 //        Session receivedSession = message.getSession();
 //
 //        activeSession.setName(receivedSession.getName());

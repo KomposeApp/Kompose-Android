@@ -42,10 +42,11 @@ public class OutgoingMessageHandler {
         return msg;
     }
 
-    public void sendRegisterClient(String username, SimpleListener socketRetriever) {
+    public void sendRegisterClient(String username, int port) {
         Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
-        sendMessage(msg, socketRetriever);
+        msg.setPort(port);
+        sendMessage(msg);
     }
 
     public void sendCastSkipSongVote(Song song) {
@@ -104,10 +105,10 @@ public class OutgoingMessageHandler {
             if (!c.getUuid().equals(StateSingleton.getInstance().deviceUUID)) {
                 Log.d(LOG_TAG, "sending session update to: " + c.getName()
                         + " (" + c.getUuid().toString() + ")");
-                Socket socket = c.getClientConnectionDetails().getSocket();
-                AsyncSender asyncSender = new AsyncSender(message, socket);
+                InetAddress clientIP = c.getClientConnectionDetails().getIp();
+                int clientPort = c.getClientConnectionDetails().getPort();
+                AsyncSender asyncSender = new AsyncSender(message, clientIP, clientPort);
                 asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
             }
         }
     }
@@ -133,29 +134,6 @@ public class OutgoingMessageHandler {
         }
     }
 
-    // send a message to the globally stored host via IP/port and retrieve the openend socket
-    // afterwards
-    private void sendMessage(Message message, SimpleListener socketRetriever) {
-        // if this device is host, call message handler directly
-        if (StateSingleton.getInstance().deviceIsHost) {
-            Thread handler = new Thread(new IncomingMessageHandler(message));
-            handler.start();
-            return;
-        }
-
-        // otherwise, send the message over network
-        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession
-                .getConnectionDetails();
-        if (connectionDetails == null) {
-            Log.d(LOG_TAG, "tried to send message but no active connection");
-        } else {
-            AsyncSender asyncSender = new AsyncSender(message,
-                    connectionDetails.getHostIP(), connectionDetails.getHostPort(),
-                    socketRetriever);
-            asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }
-    }
-
     private static class AsyncSender extends AsyncTask<Void, Void, Void> {
 
         private final String LOG_TAG = "## AsyncSender";
@@ -173,47 +151,18 @@ public class OutgoingMessageHandler {
             this.hostPort = port;
         }
 
-        AsyncSender(Message message, Socket socket) {
-            this.message = message;
-            this.socket = socket;
-        }
-
-        AsyncSender(Message message,
-                           InetAddress ip,
-                           int port,
-                           SimpleListener socketRetriever) {
-            this.message = message;
-            this.hostIP = ip;
-            this.hostPort = port;
-            this.socketRetriever = socketRetriever;
-        }
-
         @Override
         protected Void doInBackground(Void... voids) {
             try {
-                boolean closeSocket = false;
-
-                // open a new socket if none given
-                if (socket == null) {
-                    socket = new Socket(hostIP, hostPort);
-                    closeSocket = true;
-                }
-
-                if (socketRetriever != null) {
-                    closeSocket = false;
-                }
+                socket = new Socket(hostIP, hostPort);
 
                 // send message
                 PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
                 printWriter.print(JsonConverter.toJsonString(message));
                 printWriter.flush();
 
-                // only close the socket if a new one was created
-                if (closeSocket) {
-                    // closing this will also close accompanying resources, i.e. the socket
-                    printWriter.close();
-                    socket.close();
-                }
+                printWriter.close();
+                socket.close();
 
             } catch (IOException e) {
                 e.printStackTrace();

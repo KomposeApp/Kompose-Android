@@ -9,6 +9,7 @@ public class Message {
     private Session session;
     private Song songDetails;
     private String type;
+    private int port;
 
     @JsonProperty("error_message")
     public String getErrorMessage() { return errorMessage; }
@@ -39,4 +40,13 @@ public class Message {
     public String getType() { return type; }
     @JsonProperty("type")
     public void setType(String value) { this.type = value; }
+
+    @JsonProperty("port")
+    public int getPort() {
+        return port;
+    }
+    @JsonProperty("port")
+    public void setPort(int port) {
+        this.port = port;
+    }
 }

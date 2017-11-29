@@ -5,16 +5,19 @@ import android.os.Parcelable;
 
 import org.joda.time.DateTime;
 
+import java.net.InetAddress;
 import java.net.Socket;
 
 public class ClientConnectionDetails implements Parcelable {
 
-    public ClientConnectionDetails(Socket socket, DateTime lastRequestReceived) {
-        this.socket = socket;
+    public ClientConnectionDetails(InetAddress clientIP, int clientPort, DateTime lastRequestReceived) {
+        this.ip = clientIP;
+        this.port = clientPort;
         this.lastRequestReceived = lastRequestReceived;
     }
 
-    private Socket socket;
+    private InetAddress ip;
+    private int port;
     private DateTime lastRequestReceived;
 
     protected ClientConnectionDetails(Parcel in) {
@@ -41,15 +44,27 @@ public class ClientConnectionDetails implements Parcelable {
         }
     };
 
-    public Socket getSocket() {
-        return socket;
-    }
-
     public DateTime getLastRequestReceived() {
         return lastRequestReceived;
     }
 
     public void setLastRequestReceived(DateTime lastRequestReceived) {
         this.lastRequestReceived = lastRequestReceived;
+    }
+
+    public InetAddress getIp() {
+        return ip;
+    }
+
+    public void setIp(InetAddress ip) {
+        this.ip = ip;
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 }
