@@ -6,6 +6,8 @@ import java.util.Comparator;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.model.comparators.SessionComparator;
+import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
 public class StateSingleton {
@@ -17,19 +19,14 @@ public class StateSingleton {
     public SessionModel activeSession;
     public SessionModel activeHistorySession;
     public UUID deviceUUID = UUID.randomUUID();
-    public ObservableList<SessionModel> orderedPastSessions = new ObservableUniqueSortedList<>(new Comparator<SessionModel>() {
-        @Override
-        public int compare(SessionModel o1, SessionModel o2) {
-            return o1.getCreationDateTime().compareTo(o2.getCreationDateTime());
-        }
-    });
 
     // Host specific fields
     public boolean deviceIsHost;
 
     /* * Initialization on-demand holder idiom for Singleton Pattern * */
 
-    private StateSingleton() {}
+    private StateSingleton() {
+    }
 
     private static class LazyHolder {
         static final StateSingleton INSTANCE = new StateSingleton();

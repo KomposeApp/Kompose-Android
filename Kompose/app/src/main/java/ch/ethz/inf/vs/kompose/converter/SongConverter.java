@@ -8,13 +8,16 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.json.DownVote;
 import ch.ethz.inf.vs.kompose.data.json.Song;
+import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
-/** Convert Session data representation to model representation, and vice-versa. **/
+/**
+ * Convert Session data representation to model representation, and vice-versa.
+ **/
 
 public class SongConverter implements IBaseConverter<SongModel, Song> {
 
@@ -35,7 +38,9 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         }
     }
 
-    /** Data --> Model **/
+    /**
+     * Data --> Model
+     **/
     public SongModel convert(Song song) {
 
         //resolve client / session
@@ -61,7 +66,8 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         songModel.setThumbnailUrl(URI.create(song.getThumbnailUrl()));
         songModel.setSourceUrl(URI.create(song.getSourceUrl()));
 
-        songModel.setStatus(SongStatus.valueOf(song.getStatus()));
+        songModel.setSongStatus(SongStatus.valueOf(song.getSongStatus()));
+        songModel.setDownloadStatus(DownloadStatus.valueOf(song.getDownloadStatus()));
 
         //create downVotes
         if (song.getDownVotes() != null) {
@@ -92,7 +98,8 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         song.setSourceUrl(songModel.getSourceUrl().toString());
         song.setThumbnailUrl(songModel.getThumbnailUrl().toString());
 
-        song.setStatus(songModel.getStatus().toString());
+        song.setSongStatus(songModel.getSongStatus().toString());
+        song.setDownloadStatus(songModel.getDownloadStatus().toString());
         song.setProposedByClientUuid(songModel.getProposedBy().getUUID().toString());
 
         DownVoteConverter downVoteConverter = new DownVoteConverter(clientModels, songModel);

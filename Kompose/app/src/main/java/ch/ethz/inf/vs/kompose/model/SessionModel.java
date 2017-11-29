@@ -11,7 +11,10 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
+import ch.ethz.inf.vs.kompose.model.comparators.SongComparator;
+import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
 public class SessionModel extends UniqueModel {
@@ -22,18 +25,58 @@ public class SessionModel extends UniqueModel {
     }
 
     private String name;
+    private SessionStatus sessionStatus;
     private UUID hostUUID;
     private String hostName;
     private DateTime creationDateTime;
     private ServerConnectionDetails connectionDetails;
+    private SongModel currentlyPlaying;
+    private int activeDevices;
 
     private final ObservableList<ClientModel> clients = new ObservableArrayList<>();
 
-    private final ObservableList<SongModel> songs = new ObservableUniqueSortedList<>(
-            new SongComparator());
+    private final ObservableList<SongModel> playQueue = new ObservableUniqueSortedList<>(
+            new SongComparator(), new UniqueModelComparator<SongModel>()
+    );
 
-    public ObservableList<SongModel> getSongs() {
-        return songs;
+    private final ObservableList<SongModel> allSongList = new ObservableUniqueSortedList<>(
+            new SongComparator(), new UniqueModelComparator<SongModel>()
+    );
+
+    private final ObservableList<SongModel> playedSongs = new ObservableUniqueSortedList<>(
+            new SongComparator(), new UniqueModelComparator<SongModel>()
+    );
+
+    private final ObservableList<SongModel> skippedSongs = new ObservableUniqueSortedList<>(
+            new SongComparator(), new UniqueModelComparator<SongModel>()
+    );
+
+    /**
+     * @return all songs waiting to be played
+     */
+    public ObservableList<SongModel> getPlayQueue() {
+        return playQueue;
+    }
+
+    /**
+     * @return all songs already played
+     */
+    public ObservableList<SongModel> getPlayedSongs() {
+        return playedSongs;
+    }
+
+    /**
+     * @return all songs from this session, weather played, not yet played or skipped
+     */
+    public ObservableList<SongModel> getAllSongList() {
+        return allSongList;
+    }
+
+    /**
+     * @return the songs which are / were skipped
+     */
+    public ObservableList<SongModel> getSkippedSongs() {
+        return skippedSongs;
     }
 
     public ServerConnectionDetails getConnectionDetails() {
@@ -54,13 +97,25 @@ public class SessionModel extends UniqueModel {
         notifyPropertyChanged(BR.creationDateTime);
     }
 
-    private class SongComparator implements Comparator<SongModel> {
-        @Override
-        public int compare(SongModel s1, SongModel s2) {
-            return s1.getOrder() - s2.getOrder();
-        }
+    @Bindable
+    public SongModel getCurrentlyPlaying() {
+        return currentlyPlaying;
     }
 
+    public void setCurrentlyPlaying(SongModel currentlyPlaying) {
+        this.currentlyPlaying = currentlyPlaying;
+        notifyPropertyChanged(BR.currentlyPlaying);
+    }
+
+    @Bindable
+    public SessionStatus getSessionStatus() {
+        return sessionStatus;
+    }
+
+    public void setSessionStatus(SessionStatus sessionStatus) {
+        this.sessionStatus = sessionStatus;
+        notifyPropertyChanged(BR.sessionStatus);
+    }
 
     public UUID getHostUUID() {
         return hostUUID;
@@ -76,15 +131,27 @@ public class SessionModel extends UniqueModel {
         notifyPropertyChanged(BR.name);
     }
 
+    @Bindable
     public String getHostName() {
         return hostName;
     }
 
     public void setHostName(String hostName) {
         this.hostName = hostName;
+        notifyPropertyChanged(BR.hostName);
     }
 
     public ObservableList<ClientModel> getClients() {
         return clients;
+    }
+
+    @Bindable
+    public int getActiveDevices() {
+        return activeDevices;
+    }
+
+    public void setActiveDevices(int activeDevices) {
+        this.activeDevices = activeDevices;
+        notifyPropertyChanged(BR.activeDevices);
     }
 }

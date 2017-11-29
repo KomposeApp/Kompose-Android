@@ -11,6 +11,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
 
@@ -37,10 +38,9 @@ public class SongModel extends UniqueModel {
     private boolean skipVoteCasted;
     private DateTime creationDateTime;
 
-    private SongStatus status;
+    private SongStatus songStatus;
+    private DownloadStatus downloadStatus;
 
-    private boolean isDownloaded;
-    private boolean downloadStarted;
     private File downloadPath;
 
     @Bindable
@@ -122,13 +122,13 @@ public class SongModel extends UniqueModel {
     }
 
     @Bindable
-    public SongStatus getStatus() {
-        return status;
+    public SongStatus getSongStatus() {
+        return songStatus;
     }
 
-    public void setStatus(SongStatus status) {
-        this.status = status;
-        notifyPropertyChanged(BR.status);
+    public void setSongStatus(SongStatus songStatus) {
+        this.songStatus = songStatus;
+        notifyPropertyChanged(BR.songStatus);
     }
 
     @Bindable
@@ -163,19 +163,13 @@ public class SongModel extends UniqueModel {
         this.downloadPath = downloadPath;
     }
 
-    public boolean isDownloadStarted() {
-        return downloadStarted;
+    @Bindable
+    public DownloadStatus getDownloadStatus() {
+        return downloadStatus;
     }
 
-    public void setDownloadStarted(boolean downloadStarted) {
-        this.downloadStarted = downloadStarted;
-    }
-
-    public boolean isDownloaded() {
-        return isDownloaded;
-    }
-
-    public void setDownloaded(boolean downloaded) {
-        isDownloaded = downloaded;
+    public void setDownloadStatus(DownloadStatus downloadStatus) {
+        this.downloadStatus = downloadStatus;
+        notifyPropertyChanged(BR.downloadStatus);
     }
 }

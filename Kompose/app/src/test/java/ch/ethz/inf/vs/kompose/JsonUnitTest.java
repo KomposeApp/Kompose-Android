@@ -35,7 +35,7 @@ public class JsonUnitTest extends ReflectionUnitTest {
         Session session = new Session();
         session.setHostUuid(UUID.randomUUID().toString());
         session.setSessionName("session name");
-        session.setUuid(UUID.randomUUID().toString());
+        session.setUUID(UUID.randomUUID().toString());
 
         String json = JsonConverter.toJsonString(session);
 

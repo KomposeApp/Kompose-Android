@@ -10,15 +10,20 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 
-/** Convert Session data representation to model representation, and vice-versa. **/
+/**
+ * Convert Session data representation to model representation, and vice-versa.
+ **/
 
 public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
-    /** Data --> Model **/
+    /**
+     * Data --> Model
+     **/
     public SessionModel convert(Session session) {
 
         SessionModel sessionModel = new SessionModel(
@@ -26,6 +31,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
                 UUID.fromString(session.getHostUuid())
         );
         sessionModel.setName(session.getSessionName());
+        sessionModel.setSessionStatus(SessionStatus.valueOf(session.getSessionStatus()));
 
         // format DateTime as ISO 8601
         DateTimeFormatter isoParser = ISODateTimeFormat.dateTime();
@@ -43,14 +49,16 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         if (session.getSongs() != null) {
             SongConverter songConverter = new SongConverter(sessionModel.getClients());
             for (Song song : session.getSongs()) {
-                sessionModel.getSongs().add(songConverter.convert(song));
+                sessionModel.getPlayQueue().add(songConverter.convert(song));
             }
         }
 
         return sessionModel;
     }
 
-    /** Model --> Data **/
+    /**
+     * Model --> Data
+     **/
     public Session convert(SessionModel sessionModel) {
         Session session = new Session();
 
@@ -64,7 +72,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
         //convert song models to data
         SongConverter songConverter = new SongConverter(clientModels);
-        ObservableList<SongModel> songModels = sessionModel.getSongs();
+        ObservableList<SongModel> songModels = sessionModel.getPlayQueue();
         session.setSongs(new Song[songModels.size()]);
         for (int i = 0; i < songModels.size(); i++) {
             session.getSongs()[i] = songConverter.convert(songModels.get(i));
@@ -73,7 +81,8 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         //set remaining contents
         session.setHostUuid(sessionModel.getHostUUID().toString());
         session.setSessionName(sessionModel.getName());
-        session.setUuid(sessionModel.getUUID().toString());
+        session.setUUID(sessionModel.getUUID().toString());
+        session.setSessionStatus(sessionModel.getSessionStatus().toString());
 
         if (sessionModel.getCreationDateTime() != null) {
             session.setCreationDateTime(sessionModel.getCreationDateTime().toString());

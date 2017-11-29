@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.model.comparators.SongComparator;
+import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
 public class ObservableUniqueSortedListTest {
@@ -54,12 +56,7 @@ public class ObservableUniqueSortedListTest {
     }
 
     private ObservableList<SongModel> getListInstance() {
-        return new ObservableUniqueSortedList<>(new Comparator<SongModel>() {
-            @Override
-            public int compare(SongModel o1, SongModel o2) {
-                return o1.getOrder() - o2.getOrder();
-            }
-        });
+        return new ObservableUniqueSortedList<>(new SongComparator(), new UniqueModelComparator<SongModel>());
     }
 
     private void checkSorted(ObservableList<SongModel> list) {

@@ -300,6 +300,7 @@ public class ClientNetworkService extends Service {
                 Log.d(LOG_TAG, serviceInfo.getServiceType());
                 return;
             }
+            //TODO: Fix the error 3 issue. it sort of works without it, but it'd be better
             nsdManager.resolveService(serviceInfo,
                     new KomposeResolveListener(sessionModels, NSDUpdateType.FOUND));
         }

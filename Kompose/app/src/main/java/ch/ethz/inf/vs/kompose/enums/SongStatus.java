@@ -10,14 +10,6 @@ public enum SongStatus {
      */
     IN_QUEUE,
     /**
-     * the song is in queue, but will be skipped once its his turn because it has too many negative votes
-     */
-    EXCLUDED_BY_POPULAR_VOTE,
-    /**
-     * the song could not be downloaded at the server and will therfore be skipped once its his turn
-     */
-    DOWNLOAD_FAILED,
-    /**
      * the song is currently playing
      */
     PLAYING,
