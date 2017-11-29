@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/KomposeTheme">
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -22,18 +23,23 @@
         </activity>
         <activity
             android:name=".PartyCreationActivity"
+            android:screenOrientation="portrait"
             android:label="Create your own Party" />
         <activity
             android:name=".ConnectActivity"
+            android:screenOrientation="portrait"
             android:label="Choose a Party" />
         <activity
             android:name=".HistoryOverviewActivity"
+            android:screenOrientation="portrait"
             android:label="Overview of past Playlists" />
         <activity
             android:name=".HistoryDetailsActivity"
+            android:screenOrientation="portrait"
             android:label="Playlist History" />
         <activity
             android:name=".SettingsActivity"
+            android:screenOrientation="portrait"
             android:label="Settings" />
 
         <service
