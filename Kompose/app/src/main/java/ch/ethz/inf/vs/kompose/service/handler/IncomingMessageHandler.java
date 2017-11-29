@@ -165,7 +165,7 @@ public class IncomingMessageHandler implements Runnable {
         }
 
         // remove the client's downvotes
-        UUID clientUUID = clientModel.getUuid();
+        UUID clientUUID = clientModel.getUUID();
         for (SongModel songModel : sessionModel.getSongs()) {
             for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
                 if (downVoteModel.getUuid().equals(clientUUID)) {
@@ -199,12 +199,12 @@ public class IncomingMessageHandler implements Runnable {
 
         // find the song in the session model
         for (SongModel song : activeSessionModel.getSongs()) {
-            String songUUID = song.getUuid().toString();
+            String songUUID = song.getUUID().toString();
             if (requestedSongUUID.equals(songUUID)) {
 
                 // check if song already downvoted by this client
                 for (DownVoteModel downVote : song.getDownVotes()) {
-                    String downVoteClientUUID = downVote.getClientModel().getUuid().toString();
+                    String downVoteClientUUID = downVote.getClientModel().getUUID().toString();
                     if (downVoteClientUUID.equals(senderUUID)) {
                         return false;
                     }
@@ -234,7 +234,7 @@ public class IncomingMessageHandler implements Runnable {
         // find the song in the session
         for (int i = 0; i < activeSessionModel.getSongs().size(); i++) {
             SongModel songModel = activeSessionModel.getSongs().get(i);
-            String songUUID = songModel.getUuid().toString();
+            String songUUID = songModel.getUUID().toString();
             String requestedSongUUID = message.getSongDetails().getUuid();
             if (songUUID.equals(requestedSongUUID)) {
 
@@ -242,7 +242,7 @@ public class IncomingMessageHandler implements Runnable {
                 DownVoteModel downVoteModel;
                 for (int j = 0; j < songModel.getDownVotes().size(); j++) {
                     downVoteModel = songModel.getDownVotes().get(j);
-                    String downvoteClientUUID = downVoteModel.getClientModel().getUuid().toString();
+                    String downvoteClientUUID = downVoteModel.getClientModel().getUUID().toString();
                     String clientUUID = message.getSenderUuid();
                     if (downvoteClientUUID.equals(clientUUID)) {
                         songModel.getDownVotes().remove(j);
@@ -275,7 +275,7 @@ public class IncomingMessageHandler implements Runnable {
         for (ClientModel updateClient : sessionModel.getClients()) {
             boolean updated = false;
             for (ClientModel activeClient : activeSessionModel.getClients()) {
-                if (updateClient.getUuid().equals(activeClient.getUuid())) {
+                if (updateClient.getUUID().equals(activeClient.getUUID())) {
                     updateClient(updateClient, activeClient);
                     updated = true;
                 }
@@ -288,7 +288,7 @@ public class IncomingMessageHandler implements Runnable {
         for (SongModel updateSong : sessionModel.getSongs()) {
             boolean updated = false;
             for (SongModel activeSong : activeSessionModel.getSongs()) {
-                if (updateSong.getUuid().equals(activeSong.getUuid())) {
+                if (updateSong.getUUID().equals(activeSong.getUUID())) {
                     updateSong(updateSong, activeSong);
                     updated = true;
                 }
@@ -330,7 +330,7 @@ public class IncomingMessageHandler implements Runnable {
     // find a ClientModel in a session by UUID
     private ClientModel getClientModel(UUID clientUUID, SessionModel sessionModel) {
         for (ClientModel client : sessionModel.getClients()) {
-            if (client.getUuid().equals(clientUUID)) {
+            if (client.getUUID().equals(clientUUID)) {
                 return client;
             }
         }

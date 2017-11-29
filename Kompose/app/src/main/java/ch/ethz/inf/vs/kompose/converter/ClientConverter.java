@@ -28,7 +28,7 @@ public class ClientConverter implements IBaseConverter<ClientModel, Client> {
     /** Model --> Data **/
     public Client convert(ClientModel clientModel) {
         Client client = new Client();
-        client.setUuid(clientModel.getUuid().toString());
+        client.setUuid(clientModel.getUUID().toString());
         client.setName(clientModel.getName());
         client.setIsActive(clientModel.getIsActive());
         return client;

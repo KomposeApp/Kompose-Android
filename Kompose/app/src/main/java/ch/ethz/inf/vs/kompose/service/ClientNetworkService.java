@@ -26,13 +26,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Semaphore;
 
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
+import ch.ethz.inf.vs.kompose.enums.NSDUpdateType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
+
+import static java.lang.Thread.sleep;
 
 public class ClientNetworkService extends Service {
 
@@ -114,7 +119,7 @@ public class ClientNetworkService extends Service {
             Log.d(LOG_TAG, "using standard android NSD for service discovery");
 
             nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
-            clientServiceListener = new ClientServiceListener(new KomposeResolveListener(sessionModels), nsdManager);
+            clientServiceListener = new ClientServiceListener(sessionModels, nsdManager);
             nsdManager.discoverServices(SERVICE_TYPE_NSD, NsdManager.PROTOCOL_DNS_SD, clientServiceListener);
         }
     }
@@ -250,7 +255,6 @@ public class ClientNetworkService extends Service {
         }
     }
 
-
     /*
      * Private classes for android API service discovery with NSD.
      * This only works correctly for API >= 24
@@ -258,11 +262,11 @@ public class ClientNetworkService extends Service {
     /** If the DiscoveryListener hears anything, something in here is called **/
     private class ClientServiceListener implements NsdManager.DiscoveryListener {
 
-        private NsdManager.ResolveListener resolveListener;
+        private ObservableList<SessionModel> sessionModels;
         private NsdManager nsdManager;
 
-        ClientServiceListener(NsdManager.ResolveListener resolveListener, NsdManager nsdManager) {
-            this.resolveListener = resolveListener;
+        ClientServiceListener(ObservableList<SessionModel> models, NsdManager nsdManager) {
+            this.sessionModels = models;
             this.nsdManager = nsdManager;
         }
 
@@ -296,19 +300,14 @@ public class ClientNetworkService extends Service {
                 Log.d(LOG_TAG, serviceInfo.getServiceType());
                 return;
             }
-            nsdManager.resolveService(serviceInfo, resolveListener);
+            nsdManager.resolveService(serviceInfo,
+                    new KomposeResolveListener(sessionModels, NSDUpdateType.FOUND));
         }
 
         @Override
         public void onServiceLost(NsdServiceInfo serviceInfo) {
-            Log.d(LOG_TAG, "service lost: " + serviceInfo.getServiceName());
-            //if (!serviceInfo.getServiceType().equals(SERVICE_TYPE_NSD)) {
-            //    Log.d(LOG_TAG, serviceInfo.getServiceType());
-            //    return;
-            //}
-            //serviceInfo.setAttribute(KEY_FOUND_STATE, LOST);
-            //nsdManager.resolveService(serviceInfo, resolveListener);
-
+            Log.d(LOG_TAG, "service lost: " + serviceInfo.toString());
+            //TODO: For the far future: Find out a way to remove services dynamically
         }
     }
 
@@ -316,44 +315,73 @@ public class ClientNetworkService extends Service {
     private class KomposeResolveListener implements NsdManager.ResolveListener {
 
         private ObservableList<SessionModel> sessionModels;
+        public NSDUpdateType updateType;
 
-        KomposeResolveListener(ObservableList<SessionModel> sessionModels) {
+        KomposeResolveListener(ObservableList<SessionModel> sessionModels, NSDUpdateType updateType) {
             this.sessionModels = sessionModels;
+            this.updateType = updateType;
         }
 
         @Override
         public void onResolveFailed(NsdServiceInfo serviceInfo, int errorCode) {
-            Log.e(LOG_TAG, "Resolve failed" + errorCode);
+            Log.e(LOG_TAG, "Resolve failed. Error Code: " + errorCode);
+
+            //TODO: ISSUES
         }
 
         @Override
         public void onServiceResolved(NsdServiceInfo serviceInfo) {
             Log.d(LOG_TAG, "Resolve Succeeded. " + serviceInfo);
 
-            int port = serviceInfo.getPort();
-            InetAddress host = serviceInfo.getHost();
-
             Map<String,byte[]> attributes = serviceInfo.getAttributes();
+
             UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
             UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
-            String hostName = new String(attributes.get("host_name"));
-            String sessionName = new String(attributes.get("session"));
 
-            final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
-            sessionModel.setName(sessionName);
-            sessionModel.setHostName(hostName);
-            sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
+            final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);;
+            Runnable uiTask = null;
+            switch (updateType){
+                case FOUND:
 
-            // the observable list callbacks must be called on the UI thread
-            Runnable uiTask = new Runnable() {
-                @Override
-                public void run() {
-                    for (SessionModel s: sessionModels){
-                        if (sessionModel.getHostUUID().equals(s.getHostUUID())) return;
-                    }
-                    sessionModels.add(sessionModel);
-                }
-            };
+                    int port = serviceInfo.getPort();
+                    InetAddress host = serviceInfo.getHost();
+                    String hostName = new String(attributes.get("host_name"));
+                    String sessionName = new String(attributes.get("session"));
+
+                    sessionModel.setName(sessionName);
+                    sessionModel.setHostName(hostName);
+                    sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
+
+                    // the observable list callbacks must be called on the UI thread
+                    uiTask = new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (this) {
+                                for (SessionModel s : sessionModels) {
+                                    if (s.getUUID().equals(sessionModel.getUUID())) return;
+                                }
+                                sessionModels.add(sessionModel);
+                            }
+                        }
+                    };
+                    break;
+                case LOST:
+                    // the observable list callbacks must be called on the UI thread
+                    uiTask = new Runnable() {
+                        @Override
+                        public void run() {
+                            synchronized (this) {
+                                for (SessionModel s : sessionModels) {
+                                    if (sessionModel.getUUID().equals(s.getUUID())) {
+                                        sessionModels.remove(s);
+                                    }
+                                }
+                            }
+                        }
+                    };
+                    break;
+            }
+
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(uiTask);
         }

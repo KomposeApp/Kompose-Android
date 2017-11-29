@@ -65,7 +65,7 @@ public class AndroidServerService extends Service {
 
         SessionModel activeSession = StateSingleton.getInstance().activeSession;
         String sessionName = activeSession.getName();
-        String uuid = activeSession.getUuid().toString();
+        String uuid = activeSession.getUUID().toString();
         String hostUuid = activeSession.getHostUUID().toString();
         String hostName = PreferenceUtility.getCurrentUsername(this);
 

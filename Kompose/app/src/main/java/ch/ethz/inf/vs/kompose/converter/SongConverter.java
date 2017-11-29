@@ -43,7 +43,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         SessionModel sessionModel = null;
         UUID proposedUUID = UUID.fromString(song.getProposedByClientUuid());
         for (ClientModel clientModel : clientModels) {
-            if (clientModel.getUuid().equals(proposedUUID)) {
+            if (clientModel.getUUID().equals(proposedUUID)) {
                 proposedBy = clientModel;
                 sessionModel = clientModel.getPartOfSession();
             }
@@ -83,7 +83,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
     public Song convert(SongModel songModel) {
         Song song = new Song();
 
-        song.setUuid(songModel.getUuid().toString());
+        song.setUuid(songModel.getUUID().toString());
         song.setOrder(songModel.getOrder());
         song.setTitle(songModel.getTitle());
         song.setLengthInSeconds(songModel.getSecondsLength());
@@ -93,7 +93,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         song.setThumbnailUrl(songModel.getThumbnailUrl().toString());
 
         song.setStatus(songModel.getStatus().toString());
-        song.setProposedByClientUuid(songModel.getProposedBy().getUuid().toString());
+        song.setProposedByClientUuid(songModel.getProposedBy().getUUID().toString());
 
         DownVoteConverter downVoteConverter = new DownVoteConverter(clientModels, songModel);
         List<DownVoteModel> downVoteModels = songModel.getDownVotes();
