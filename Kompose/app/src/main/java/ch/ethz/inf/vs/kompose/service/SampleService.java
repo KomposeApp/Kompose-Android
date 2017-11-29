@@ -4,23 +4,20 @@ import android.databinding.ObservableList;
 
 import org.joda.time.DateTime;
 
-import java.util.Comparator;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.model.comparators.ClientComparator;
+import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
 
 public class SampleService {
-    ObservableList<ClientModel> clientList = new ObservableUniqueSortedList<>(new Comparator<ClientModel>() {
-        @Override
-        public int compare(ClientModel o1, ClientModel o2) {
-            return o1.getName().compareTo(o2.getName());
-        }
-    });
+    private final ObservableList<ClientModel> clientList = new ObservableUniqueSortedList<>(new ClientComparator(), new UniqueModelComparator<ClientModel>());
 
     public SessionModel getSampleSession(String sessionName) {
         SessionModel sessionModel = new SessionModel(UUID.randomUUID(), UUID.randomUUID());
@@ -31,7 +28,7 @@ public class SampleService {
             ClientModel clientModel = new ClientModel(UUID.randomUUID(), sessionModel);
 
             for (int j = 0; j < 5; j++) {
-                sessionModel.getSongs().add(getSampleSong(sessionModel, clientModel, i * 10 + j));
+                sessionModel.getPlayQueue().add(getSampleSong(sessionModel, clientModel, i * 10 + j));
             }
         }
 
@@ -50,11 +47,11 @@ public class SampleService {
     public SongModel getSampleSong(SessionModel sessionModel, ClientModel model, Integer integer) {
         SongModel songModel = new SongModel(UUID.randomUUID(), model, sessionModel);
         songModel.setOrder(integer);
-        songModel.setStatus(SongStatus.REQUESTED);
+        songModel.setSongStatus(SongStatus.REQUESTED);
         songModel.setValidDownVoteCount(0);
         songModel.setSecondsLength(100);
         songModel.setSkipVoteCasted(integer % 2 == 0);
-        songModel.setDownloaded(integer % 4 == 0);
+        songModel.setDownloadStatus(integer % 4 == 0 ? DownloadStatus.FINISHED : DownloadStatus.STARTED);
         songModel.setTitle("song " + integer);
         return songModel;
     }

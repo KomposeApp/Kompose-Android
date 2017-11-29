@@ -3,9 +3,7 @@ package ch.ethz.inf.vs.kompose.service.handler;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -102,7 +100,7 @@ public class OutgoingMessageHandler {
 
         // send message to all clients, but not to itself
         for (ClientModel c : sessionModel.getClients()) {
-            if (!c.getUuid().equals(StateSingleton.getInstance().deviceUUID)) {
+            if (!c.getUUID().equals(StateSingleton.getInstance().deviceUUID)) {
                 Log.d(LOG_TAG, "sending session update to: " + c.getName()
                         + " (" + c.getUuid().toString() + ")");
                 InetAddress clientIP = c.getClientConnectionDetails().getIp();

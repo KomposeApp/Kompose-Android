@@ -13,7 +13,7 @@ public abstract class UniqueModel extends BaseObservable {
 
     private UUID uuid;
 
-    public UUID getUuid() {
+    public UUID getUUID() {
         return uuid;
     }
 }

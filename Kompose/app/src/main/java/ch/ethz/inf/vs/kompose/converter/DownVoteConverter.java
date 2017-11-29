@@ -37,7 +37,7 @@ public class DownVoteConverter implements IBaseConverter<DownVoteModel, DownVote
         UUID clientUUID = UUID.fromString(downVote.getClientUuid());
         ClientModel clientModel = null;
         for (ClientModel model : clientModels) {
-            if (model.getUuid().equals(clientUUID)) {
+            if (model.getUUID().equals(clientUUID)) {
                 clientModel = model;
                 break;
             }
@@ -52,7 +52,7 @@ public class DownVoteConverter implements IBaseConverter<DownVoteModel, DownVote
         DownVote downVote = new DownVote();
         downVote.setUuid(downVoteModel.getUuid().toString());
         if (downVoteModel.getClientModel() != null)
-            downVote.setClientUuid(downVoteModel.getClientModel().getUuid().toString());
+            downVote.setClientUuid(downVoteModel.getClientModel().getUUID().toString());
         return downVote;
     }
 }

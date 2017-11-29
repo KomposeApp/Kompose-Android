@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     //Some static variables here because I didn't know where else to put them
     public static final String KEY_CNETWORKSERVICE = String.valueOf("ClientNetworkService".hashCode());
 
-    public static final boolean DESIGN_MODE = true;
+    public static final boolean DESIGN_MODE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

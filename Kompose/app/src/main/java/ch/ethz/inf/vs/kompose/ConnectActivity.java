@@ -100,6 +100,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
     @Override
     public void joinButtonClicked(View v, int position) {
         Log.d(LOG_TAG, "pressed join button of item number " + position);
+
         SessionModel pressedSession = viewModel.getSessionModels().get(position);
         String clientName = viewModel.getClientName();
 
