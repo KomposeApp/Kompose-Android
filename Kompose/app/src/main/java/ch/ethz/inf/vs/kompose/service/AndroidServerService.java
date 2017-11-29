@@ -16,7 +16,7 @@ import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
-import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
+import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
 
 /**
  * Android service that starts the server.
@@ -155,7 +155,7 @@ public class AndroidServerService extends Service {
 
                     Log.d(LOG_TAG, "message received");
 
-                    MessageHandler messageHandler = new MessageHandler(connection);
+                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(connection);
                     Thread msgHandler = new Thread(messageHandler);
                     msgHandler.start();
                 } catch (Exception e) {

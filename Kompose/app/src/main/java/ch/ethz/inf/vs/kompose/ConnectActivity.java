@@ -17,10 +17,10 @@ import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
-import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
@@ -32,6 +32,14 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
     private boolean clientNetworkServiceBound = false;
 
     private final ConnectViewModel viewModel = new ConnectViewModel();
+    private final ConnectActivity ctx = this;
+
+        /*
+          Note on unbinding the service started here:
+            * If it occurs before we join a room, it simply kills the service and the NSD Listener
+            * If it occurs after we join a room, it will simply disconnect the service from this
+              activity, and live on. This service will then be killed at some other point.
+         */
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +52,8 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
 
-        //bind client network service --> Will start listening for hosts to connect to
-        Intent intent = new Intent(this, ClientNetworkService.class);
+        //bind client network service
+        Intent intent = new Intent(this.getBaseContext(), ClientNetworkService.class);
         bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
 
         if (MainActivity.DESIGN_MODE) {
@@ -95,49 +103,69 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         SessionModel pressedSession = viewModel.getSessionModels().get(position);
         String clientName = viewModel.getClientName();
 
-        if (clientName == null) {
-            showError(getString(R.string.choose_client_name));
+        // Client's name must not be empty
+        if (clientName == null || clientName.trim().isEmpty()) {
+            showError(getString(R.string.view_error_clientname));
             return;
         }
 
-        //todo technical: am I doing this right?
+        // Add ourselves to the current session locally
         ClientModel clientModel = new ClientModel(StateSingleton.getInstance().deviceUUID, pressedSession);
-        clientModel.setName(clientName);
+        clientModel.setName(clientName.trim());
         clientModel.setIsActive(true);
         pressedSession.getClients().add(clientModel);
 
-        //TODO Don't set this just yet
+        // Set the current session state
         StateSingleton.getInstance().activeSession = pressedSession;
 
-        if (clientNetworkServiceBound && !(clientNetworkService == null)) {
-            NetworkService networkService = new NetworkService();
 
-            Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
+        OutgoingMessageHandler networkHandler = new OutgoingMessageHandler();
+        Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
 
-            // sockets can't be created on the main thread, so we retrieve it from the
-            // AsyncTask that creates it via a callback
-            networkService.sendRegisterClient(clientName, new SimpleListener() {
-                @Override
-                public void onEvent(int status) {}
+        /* sockets can't be created on the main thread,
+         *  so we retrieve it from the AsyncTask that creates it via a callback */
 
-                @Override
-                public void onEvent(int status, Object object) {
-                    Log.d(LOG_TAG, "socketRetriever called");
-                    Socket updateSocket = (Socket) object;
+        networkHandler.sendRegisterClient(clientName, new SimpleListener() {
+            @Override
+            public void onEvent(int status) {}
+
+            /** This serves as our confirmation that the registration worked.
+             *  We start the next activity and close the current from here.  **/
+            @Override
+            public void onEvent(int status, Object object) {
+                Log.d(LOG_TAG, "Callback handler: SocketRetriever called");
+                Socket updateSocket = (Socket) object;
+
+                // Show an error if the service failed or the socket is null
+                if (clientNetworkService != null && clientNetworkServiceBound && updateSocket!=null && updateSocket.isConnected()){
                     clientNetworkService.initialize(updateSocket);
 
-                    // start the client service
-                    Intent serverIntent = new Intent(ConnectActivity.this,
-                            ClientNetworkService.class);
+                    // start the client service again -- THIS IS INTENTIONAL
+                    // it will keep the service alive across different activities.
+                    Intent serverIntent = new Intent(ctx.getBaseContext(), ClientNetworkService.class);
                     startService(serverIntent);
+
+                    Intent playlistIntent = new Intent(ctx, PlaylistActivity.class);
+                    playlistIntent.putExtra(MainActivity.KEY_CNETWORKSERVICE, serverIntent);
+
+                    ctx.startActivity(playlistIntent);
+                    ctx.finish();
                 }
-            });
-        }else{
-
-        }
-
-        Intent playlistIntent = new Intent(this, PlaylistActivity.class);
-        startActivity(playlistIntent);
-        this.finish();
+                else{
+                    StateSingleton.getInstance().activeSession = null;
+                    //Error handling done here:
+                    Log.e(LOG_TAG, "Failed to establish a connection with host.");
+                    if(clientNetworkService== null || !clientNetworkServiceBound){
+                        Log.e(LOG_TAG, "ClientNetworkService is either gone or not bound.");
+                    }
+                    if(updateSocket==null || !updateSocket.isConnected()){
+                        Log.e(LOG_TAG, "Socket connection to host failed.");
+                    }
+                    if (!isDestroyed()){
+                        showError(getString(R.string.view_error_clientname));
+                    }
+                }
+            }
+        });
     }
 }

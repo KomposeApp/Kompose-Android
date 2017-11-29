@@ -9,19 +9,21 @@
     <string name="setting_port">Host Server Port:</string>
     <string name="setting_username">Default Username:</string>
     <string name="settings_confirm">Confirm Changes</string>
-    <string name="youtube_service.download_failed">could not resolve the song details :(</string>
-    <string name="title_activity_test_frontend">TestFrontendActivity</string>
     <!-- Error Strings -->
     <string name="setting_error_preload">Maximum preload count is 10</string>
     <string name="setting_error_username">Username may not be empty</string>
     <string name="setting_error_port">Port may not be greater than 65535</string>
+    <string name="view_error_clientname">please choose a non-empty client name</string>
+    <string name="view_error_sessionname">please choose a non-empty session name</string>
+    <string name="view_error_connection">Failed to establish a connection to host</string>
+    <!-- Uncategorized -->
     <string name="join">join</string>
     <string name="client_name">client name</string>
     <string name="create_party">create party</string>
     <string name="session_name">session name</string>
     <string name="downvote">downvote</string>
-    <string name="choose_client_name">please choose a client name</string>
-    <string name="choose_session_name">please fill out the session name</string>
+    <string name="youtube_service.download_failed">could not resolve the song details :(</string>
+    <string name="title_activity_test_frontend">TestFrontendActivity</string>
     <string name="title_activity_playlist">PlaylistActivity</string>
     <string name="leave_session">leave session</string>
     <string name="show_history">show history</string>

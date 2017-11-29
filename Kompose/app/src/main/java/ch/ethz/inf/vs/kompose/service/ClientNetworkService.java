@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.net.nsd.NsdManager;
@@ -33,7 +32,7 @@ import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
+import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
 
 public class ClientNetworkService extends Service {
 
@@ -138,7 +137,7 @@ public class ClientNetworkService extends Service {
                 try {
                     Message msg = readMessage(socket);
                     if (MessageType.valueOf(msg.getType()) == MessageType.SESSION_UPDATE) {
-                        MessageHandler messageHandler = new MessageHandler(msg);
+                        IncomingMessageHandler messageHandler = new IncomingMessageHandler(msg);
                         Thread msgHandler = new Thread(messageHandler);
                         msgHandler.start();
                     }

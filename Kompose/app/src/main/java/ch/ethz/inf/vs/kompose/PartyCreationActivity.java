@@ -37,12 +37,12 @@ public class PartyCreationActivity extends BaseActivity {
 
         String clientName = viewModel.getClientName();
         if (clientName == null) {
-            showError(getString(R.string.choose_client_name));
+            showError(getString(R.string.view_error_clientname));
             return;
         }
         String sessionName = viewModel.getSessionName();
         if (sessionName == null) {
-            showError(getString(R.string.choose_session_name));
+            showError(getString(R.string.view_error_sessionname));
             return;
         }
 

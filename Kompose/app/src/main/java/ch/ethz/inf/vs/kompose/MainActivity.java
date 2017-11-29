@@ -11,13 +11,17 @@ import android.view.View;
 import android.view.Window;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
+import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
 
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
 
-    public static final boolean DESIGN_MODE = true;
+    //Some static variables here because I didn't know where else to put them
+    public static final String KEY_CNETWORKSERVICE = String.valueOf("ClientNetworkService".hashCode());
+
+    public static final boolean DESIGN_MODE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

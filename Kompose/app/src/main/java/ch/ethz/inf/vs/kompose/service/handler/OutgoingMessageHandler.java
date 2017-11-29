@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.service;
+package ch.ethz.inf.vs.kompose.service.handler;
 
 import android.os.AsyncTask;
 import android.util.Log;
@@ -19,14 +19,15 @@ import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.service.handler.MessageHandler;
+import ch.ethz.inf.vs.kompose.service.SimpleListener;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 /**
  * Service that provides various network functionality.
  */
-public class NetworkService {
+public class OutgoingMessageHandler {
 
-    private static final String LOG_TAG = "## NetworkService";
+    private static final String LOG_TAG = "## OutMessageHandler";
 
     /**
      * Retrieves the base structure for a message
@@ -115,7 +116,7 @@ public class NetworkService {
     private void sendMessage(Message message) {
         // if this device is host, call message handler directly
         if (StateSingleton.getInstance().deviceIsHost) {
-            Thread handler = new Thread(new MessageHandler(message));
+            Thread handler = new Thread(new IncomingMessageHandler(message));
             handler.start();
             return;
         }
@@ -137,7 +138,7 @@ public class NetworkService {
     private void sendMessage(Message message, SimpleListener socketRetriever) {
         // if this device is host, call message handler directly
         if (StateSingleton.getInstance().deviceIsHost) {
-            Thread handler = new Thread(new MessageHandler(message));
+            Thread handler = new Thread(new IncomingMessageHandler(message));
             handler.start();
             return;
         }

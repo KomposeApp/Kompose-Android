@@ -16,7 +16,7 @@ import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.NetworkService;
+import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
@@ -27,25 +27,35 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## Playlist Activity";
-    private NetworkService networkService;
+    private OutgoingMessageHandler responseHandler;
 
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().activeSession);
-
+    private Intent clientNetworkServiceIntent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
-        networkService = new NetworkService();
+        //TODO: Bug: Log tags don't show up here.
+        responseHandler = new OutgoingMessageHandler();
+        clientNetworkServiceIntent = this.getIntent().getParcelableExtra(MainActivity.KEY_CNETWORKSERVICE);
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
-
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getSongs(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if(clientNetworkServiceIntent != null){
+            stopService(clientNetworkServiceIntent);
+            Log.d(LOG_TAG, "ClientNetworkService successfully stopped");
+        }
+
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -98,7 +108,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             @Override
             public void onEvent(int status, Object object) {
                 Song song = (Song) object;
-                networkService.sendRequestSong(song);
+                responseHandler.sendRequestSong(song);
             }
         });
     }
@@ -115,7 +125,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         //todo technical: do what you must
 
         // unregister the client
-        networkService.sendUnRegisterClient();
+        responseHandler.sendUnRegisterClient();
 
         this.finish();
     }
@@ -125,6 +135,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         SongModel songModel = viewModel.getSessionModel().getSongs().get(position);
         //todo technical: transform songModel to song
         // send downvote request
-        networkService.sendCastSkipSongVote(null);
+        responseHandler.sendCastSkipSongVote(null);
     }
 }

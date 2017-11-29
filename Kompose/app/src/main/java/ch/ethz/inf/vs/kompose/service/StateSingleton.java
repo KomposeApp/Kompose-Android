@@ -10,7 +10,7 @@ import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 
 public class StateSingleton {
 
-    private static final String LOG_TAG = "## SINGLETON HUB:";
+    private final String LOG_TAG = "## SINGLETON HUB:";
     private final String DIRECTORY_ARCHIVE = "session_archive";
 
     // Client specific fields

@@ -21,24 +21,23 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.NetworkService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 /*
 TODO
  */
 
-public class MessageHandler implements Runnable {
-    private static final String LOG_TAG = "## MessageHandler";
+public class IncomingMessageHandler implements Runnable {
+    private static final String LOG_TAG = "## InMessageHandler";
 
     private Socket socket;
     private Message message;
 
-    public MessageHandler(Socket socket) {
+    public IncomingMessageHandler(Socket socket) {
         this.socket = socket;
     }
 
-    public MessageHandler(Message message) {
+    public IncomingMessageHandler(Message message) {
         this.message = message;
     }
 
@@ -127,8 +126,7 @@ public class MessageHandler implements Runnable {
         }
 
         if (sessionHasChanged) {
-            NetworkService networkService = new NetworkService();
-            networkService.updateAllClients(activeSessionModel);
+            new OutgoingMessageHandler().updateAllClients(activeSessionModel);
         }
     }
 
