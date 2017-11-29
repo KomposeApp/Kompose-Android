@@ -44,8 +44,57 @@ public class ClientNetworkService extends Service {
     private Socket updateSocket;
     private boolean initialized = false;
 
+    private DiscoverResolver resolver;
+    private NsdManager nsdManager;
+    private ClientServiceListener clientServiceListener;
+
+    /** Prepare for onStartCommand **/
+    public void initSocketListener(Socket socket) {
+        this.updateSocket = socket;
+        this.initialized = true;
+    }
+
+    /**
+     * This starts the path where the ClientNetworkService begins listening for incoming JSON messages.
+     */
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (!initialized) {
+            Log.e(LOG_TAG, "FATAL ERROR: Socket has not been properly initialized!");
+            stopSelf();
+            return START_STICKY;
+        }
+
+        startClientSocketListener(updateSocket);
+        return START_STICKY;
+    }
+
+    /**
+     * This starts the path where the ClientNetworkService does NSD discovery.
+     */
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return binder;
+    }
+
+    public class LocalBinder extends Binder {
+        public ClientNetworkService getService() {
+            return ClientNetworkService.this;
+        }
+    }
+
+    /** Handles breakdown of client socket listener **/
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        //TODO: Stop Async Task here
+        Log.d(LOG_TAG,"Service killed for real.");
+    }
+
     /**
      * Add Network services to the provided ObservableList
+     * Started when the service is BOUND
      * @param sessionModels List which the NetworkServices are to be added to
      */
     public void findNetworkServices(final ObservableList<SessionModel> sessionModels) {
@@ -55,63 +104,53 @@ public class ClientNetworkService extends Service {
         if (android.os.Build.VERSION.SDK_INT < 24) {
             Log.d(LOG_TAG, "using workaround library for service discovery on outdated devices");
 
-            DiscoverResolver resolver = new DiscoverResolver(this, SERVICE_TYPE,
+            resolver = new DiscoverResolver(this, SERVICE_TYPE,
                     new KomposeResolveListenerWorkaround(sessionModels));
             resolver.start();
 
+        }
         // use standard android API for up-to-date versions
-        } else {
+        else {
             Log.d(LOG_TAG, "using standard android NSD for service discovery");
 
-            NsdManager nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
-            ClientServiceListener clientServiceListener = new ClientServiceListener(
-                    new KomposeResolveListener(sessionModels), nsdManager);
-            nsdManager.discoverServices(SERVICE_TYPE_NSD, NsdManager.PROTOCOL_DNS_SD,
-                    clientServiceListener);
+            nsdManager = (NsdManager) this.getSystemService(NSD_SERVICE);
+            clientServiceListener = new ClientServiceListener(new KomposeResolveListener(sessionModels), nsdManager);
+            nsdManager.discoverServices(SERVICE_TYPE_NSD, NsdManager.PROTOCOL_DNS_SD, clientServiceListener);
         }
     }
 
-    public void initialize(Socket socket) {
-        this.updateSocket = socket;
-        this.initialized = true;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        if (!initialized) {
-            Log.e(LOG_TAG, "not initialized, not starting socket listener");
-            return START_STICKY;
-        }
-
-        startClientSocketListener(updateSocket);
-        return START_STICKY;
-    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return binder;
-    }
-
-    @Override
-    public void onDestroy(){
-        super.onDestroy();
-        Log.d(LOG_TAG,"I have been killed for real now");
-    }
-
+    /** Handles breakdown of NSD listener **/
     @Override
     public boolean onUnbind(Intent intent){
-        Log.d(LOG_TAG, "ClientNetworkService has been unbound!");
-        //Set to true if we want to use onRebind()
+        Log.d(LOG_TAG, "Service has been unbound!");
+
+        // use workaround library for older android versions
+        if (android.os.Build.VERSION.SDK_INT < 24) {
+            Log.d(LOG_TAG, "Breaking down NSD Service for outdated devices...");
+            if (resolver!=null) resolver.stop();
+        }
+        // use standard android API for up-to-date versions
+        else {
+            Log.d(LOG_TAG, "Breaking down NSD Service for newer devices...");
+            if (nsdManager!=null && clientServiceListener != null)
+                nsdManager.stopServiceDiscovery(clientServiceListener);
+        }
+
+        //Set to true if we want to use onRebind() at some point
         return false;
     }
 
+    /**  **/
     private void startClientSocketListener(Socket socket) {
         ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
         clientListenerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
+    /*
+     * This is where the client listens for messages from the host.
+     * Only started once we call startService().
+     */
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
 
         private static final String LOG_TAG = "## ClientListenerTask";
@@ -157,18 +196,14 @@ public class ClientNetworkService extends Service {
         }
     }
 
-    public class LocalBinder extends Binder {
-        public ClientNetworkService getService() {
-            return ClientNetworkService.this;
-        }
-    }
 
     /*
      * Workaround library for API < 24: https://github.com/youviewtv/tinydnssd
+     * NSD Listener
      */
-
     private class KomposeResolveListenerWorkaround implements DiscoverResolver.Listener {
 
+        //
         private ObservableList<SessionModel> sessionModels;
 
         KomposeResolveListenerWorkaround(ObservableList<SessionModel> sessionModels) {
@@ -267,18 +302,24 @@ public class ClientNetworkService extends Service {
         @Override
         public void onServiceFound(NsdServiceInfo serviceInfo) {
 
-            Log.d(LOG_TAG, "service found: " + serviceInfo.getServiceName());
+            Log.d(LOG_TAG, "service found: " + serviceInfo.toString());
             if (!serviceInfo.getServiceType().equals(SERVICE_TYPE_NSD)) {
                 Log.d(LOG_TAG, serviceInfo.getServiceType());
                 return;
             }
-
             nsdManager.resolveService(serviceInfo, resolveListener);
         }
 
         @Override
         public void onServiceLost(NsdServiceInfo serviceInfo) {
             Log.d(LOG_TAG, "service lost: " + serviceInfo.getServiceName());
+            if (!serviceInfo.getServiceType().equals(SERVICE_TYPE_NSD)) {
+                Log.d(LOG_TAG, serviceInfo.getServiceType());
+                return;
+            }
+            //serviceInfo.setAttribute(KEY_FOUND_STATE, LOST);
+            //nsdManager.resolveService(serviceInfo, resolveListener);
+
         }
     }
 
@@ -317,11 +358,16 @@ public class ClientNetworkService extends Service {
             Runnable uiTask = new Runnable() {
                 @Override
                 public void run() {
+                    for (SessionModel s: sessionModels){
+                        if (sessionModel.getHostUUID().equals(s.getHostUUID())) return;
+                    }
                     sessionModels.add(sessionModel);
                 }
             };
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(uiTask);
         }
+
+
     }
 }
