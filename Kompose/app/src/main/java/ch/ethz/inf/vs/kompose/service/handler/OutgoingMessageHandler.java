@@ -203,21 +203,15 @@ public class OutgoingMessageHandler {
                     closeSocket = false;
                 }
 
-                PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
-                BufferedReader input = new BufferedReader(new InputStreamReader(
-                        socket.getInputStream()));
-
                 // send message
+                PrintWriter printWriter = new PrintWriter(socket.getOutputStream());
                 printWriter.print(JsonConverter.toJsonString(message));
                 printWriter.flush();
-                printWriter.close();
-
-                //TODO: ???
-
-                input.close();
 
                 // only close the socket if a new one was created
                 if (closeSocket) {
+                    // closing this will also close accompanying resources, i.e. the socket
+                    printWriter.close();
                     socket.close();
                 }
 
