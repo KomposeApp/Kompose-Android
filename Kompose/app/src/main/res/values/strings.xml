@@ -15,7 +15,9 @@
     <string name="setting_error_port">Port may not be greater than 65535</string>
     <string name="view_error_clientname">please choose a non-empty client name</string>
     <string name="view_error_sessionname">please choose a non-empty session name</string>
-    <string name="view_error_connection">Failed to establish a connection to host</string>
+    <string name="view_error_service_dead">ClientNetworkService is dead. Report me to the devs!</string>
+    <string name="view_error_socket_dead">Establishing connection failed: Host is unreachable.</string>
+    <string name="view_error_socket_closed">Establishing connection failed: Host socket port is closed.</string>
     <!-- Uncategorized -->
     <string name="join">join</string>
     <string name="client_name">client name</string>

@@ -137,7 +137,8 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
                 Socket updateSocket = (Socket) object;
 
                 // Show an error if the service failed or the socket is null
-                if (clientNetworkService != null && clientNetworkServiceBound && updateSocket!=null && updateSocket.isConnected()){
+                if (clientNetworkService != null && clientNetworkServiceBound &&
+                        updateSocket!=null && updateSocket.isConnected() && !updateSocket.isClosed()){
                     clientNetworkService.initialize(updateSocket);
 
                     // start the client service again -- THIS IS INTENTIONAL
@@ -157,12 +158,15 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
                     Log.e(LOG_TAG, "Failed to establish a connection with host.");
                     if(clientNetworkService== null || !clientNetworkServiceBound){
                         Log.e(LOG_TAG, "ClientNetworkService is either gone or not bound.");
+                        if (!isDestroyed()) showError(getString(R.string.view_error_service_dead));
                     }
-                    if(updateSocket==null || !updateSocket.isConnected()){
-                        Log.e(LOG_TAG, "Socket connection to host failed.");
+                    else if(updateSocket==null || !updateSocket.isConnected()){
+                        Log.e(LOG_TAG, "Socket connection failed, host unreachable.");
+                        if (!isDestroyed()) showError(getString(R.string.view_error_socket_dead));
                     }
-                    if (!isDestroyed()){
-                        showError(getString(R.string.view_error_clientname));
+                    else if(updateSocket.isClosed()){
+                        Log.e(LOG_TAG, "Socket on host is closed");
+                        if (!isDestroyed()) showError(getString(R.string.view_error_socket_closed));
                     }
                 }
             }

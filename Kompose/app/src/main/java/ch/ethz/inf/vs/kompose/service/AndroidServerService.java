@@ -87,7 +87,7 @@ public class AndroidServerService extends Service {
 
         // start server task
         serverTask = new ServerTask();
-        serverTask.execute();
+        serverTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         return START_STICKY;
     }

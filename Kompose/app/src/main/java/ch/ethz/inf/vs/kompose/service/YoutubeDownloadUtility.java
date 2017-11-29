@@ -114,7 +114,7 @@ public class YoutubeDownloadUtility {
      */
     public void downloadSong(String directURL, String fileName, SimpleListener listener) {
         AsyncDownloader asyncDownloader = new AsyncDownloader(context, directURL, fileName, listener);
-        asyncDownloader.execute();
+        asyncDownloader.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     private static class AsyncDownloader extends AsyncTask<Void,Void,Void> {

@@ -106,7 +106,7 @@ public class OutgoingMessageHandler {
                         + " (" + c.getUuid().toString() + ")");
                 Socket socket = c.getClientConnectionDetails().getSocket();
                 AsyncSender asyncSender = new AsyncSender(message, socket);
-                asyncSender.execute();
+                asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
             }
         }
@@ -129,7 +129,7 @@ public class OutgoingMessageHandler {
         } else {
             AsyncSender asyncSender = new AsyncSender(message,
                     connectionDetails.getHostIP(), connectionDetails.getHostPort());
-            asyncSender.execute();
+            asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 
@@ -152,7 +152,7 @@ public class OutgoingMessageHandler {
             AsyncSender asyncSender = new AsyncSender(message,
                     connectionDetails.getHostIP(), connectionDetails.getHostPort(),
                     socketRetriever);
-            asyncSender.execute();
+            asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
     }
 

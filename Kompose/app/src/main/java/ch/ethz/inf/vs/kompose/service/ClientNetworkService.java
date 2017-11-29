@@ -102,7 +102,7 @@ public class ClientNetworkService extends Service {
 
     private void startClientSocketListener(Socket socket) {
         ClientListenerTask clientListenerTask = new ClientListenerTask(socket);
-        clientListenerTask.execute();
+        clientListenerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
