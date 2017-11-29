@@ -1,19 +1,18 @@
 package ch.ethz.inf.vs.kompose.view.viewmodel;
 
 import android.databinding.Bindable;
+import android.view.View;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
-/**
- * Created by git@famoser.ch on 23/11/2017.
- */
-
 public class PlaylistViewModel extends BaseViewModel {
     private SessionModel sessionModel;
+    private ClickListener listener;
 
-    public PlaylistViewModel(SessionModel sessionModel) {
+    public PlaylistViewModel(SessionModel sessionModel, ClickListener listener) {
         this.sessionModel = sessionModel;
+        this.listener = listener;
     }
 
     public SessionModel getSessionModel() {
@@ -30,5 +29,16 @@ public class PlaylistViewModel extends BaseViewModel {
 
     public void setSearchLink(String searchLink) {
         this.searchLink = searchLink;
+    }
+
+    public void onLinkAddClicked(View view) {
+        if (listener != null) {
+            listener.addSongClicked(view);
+        }
+    }
+
+
+    public interface ClickListener {
+        void addSongClicked(View v);
     }
 }

@@ -1,35 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-<data>
+    <data>
 
-    <variable
-        name="viewModel"
-        type="ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel" />
-</data>
+        <variable
+            name="viewModel"
+            type="ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel" />
+    </data>
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical">
-
-
-    <TextView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:labelFor="@id/youtube_link"
-        android:text="@string/youtube_link"
-        />
+        android:orientation="vertical"
+        android:padding="5pt">
 
-    <EditText
-        android:id="@+id/youtube_link"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textNoSuggestions"
-        android:text="@={viewModel.searchLink}"
-        />
 
-</LinearLayout>
+        <TextView
+            android:id="@+id/youtube_link_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:labelFor="@id/youtube_link"
+            android:text="@string/youtube_link" />
+
+        <EditText
+            android:id="@+id/youtube_link"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/youtube_link_label"
+            android:inputType="textNoSuggestions"
+            android:text="@={viewModel.searchLink}" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/youtube_link"
+            android:onClick="@{viewModel.onLinkAddClicked}"
+            android:text="@string/add_song" />
+
+    </RelativeLayout>
 </layout>
 

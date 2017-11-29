@@ -10,9 +10,11 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
+import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ClientConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
@@ -50,13 +52,7 @@ public class IncomingMessageHandler implements Runnable {
      */
     private Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-        StringBuilder json = new StringBuilder();
-
-        char[] buffer = new char[1024];
-        int bytesRead;
-        while ((bytesRead = input.read(buffer)) != -1) {
-            json.append(new String(buffer, 0, bytesRead));
-        }
+        String json = input.readLine();
         Log.d(LOG_TAG, "message read from stream: " + json.toString());
 
         Message message = JsonConverter.fromMessageJsonString(json.toString());
@@ -267,13 +263,68 @@ public class IncomingMessageHandler implements Runnable {
 //        activeSession.setName(receivedSession.getName());
 //        activeSession.setCreationDateTime(receivedSession.getCreationDateTime());
 //        activeSession.setHostUuid(receivedSession.getHostUuid());
+        Session receivedSession = message.getSession();
 
+        SessionConverter converter = new SessionConverter();
+        SessionModel sessionModel = converter.convert(receivedSession);
+
+        activeSessionModel.setName(sessionModel.getName());
+        activeSessionModel.setCreationDateTime(sessionModel.getCreationDateTime());
+        activeSessionModel.setConnectionDetails(sessionModel.getConnectionDetails());
+
+        for (ClientModel updateClient : sessionModel.getClients()) {
+            boolean updated = false;
+            for (ClientModel activeClient : activeSessionModel.getClients()) {
+                if (updateClient.getUuid().equals(activeClient.getUuid())) {
+                    updateClient(updateClient, activeClient);
+                    updated = true;
+                }
+            }
+            if (!updated) {
+                activeSessionModel.getClients().add(updateClient);
+            }
+        }
+
+        for (SongModel updateSong : sessionModel.getSongs()) {
+            boolean updated = false;
+            for (SongModel activeSong : activeSessionModel.getSongs()) {
+                if (updateSong.getUuid().equals(activeSong.getUuid())) {
+                    updateSong(updateSong, activeSong);
+                    updated = true;
+                }
+            }
+            if (!updated) {
+                activeSessionModel.getSongs().add(updateSong);
+            }
+        }
 
         //this method receives the SESSION_UPDATE command from the server
         //the SESSION_UPDATE command contains the server approved session (in the message object)
         //use this server approved message now to update the activeSession object and the activeSessionModel
         //the hard part: do not replace ANY references. if the object already exists (identified with the UUID) you can not create a new one, but rather have to replace the content of the fields.
         //see the other implemenentations for reference
+    }
+
+    private void updateClient (ClientModel source, ClientModel target) {
+        target.setName(source.getName());
+        target.setClientConnectionDetails(source.getClientConnectionDetails());
+        target.setIsActive(source.getIsActive());
+    }
+
+    private void updateSong (SongModel source, SongModel target) {
+        target.setCreationDateTime(source.getCreationDateTime());
+        target.setTitle(source.getTitle());
+        target.setDownloadPath(source.getDownloadPath());
+        target.setDownloadUrl(source.getDownloadUrl());
+        target.setOrder(source.getOrder());
+        target.setStatus(source.getStatus());
+        target.setSourceUrl(source.getSourceUrl());
+        target.setThumbnailUrl(source.getThumbnailUrl());
+        target.setValidDownVoteCount(source.getValidDownVoteCount());
+        target.setSkipVoteCasted(source.getSkipVoteCasted());
+        target.setSecondsLength(source.getSecondsLength());
+        target.setDownloadStarted(source.isDownloadStarted());
+        target.setDownloaded(source.isDownloaded());
     }
 
     // find a ClientModel in a session by UUID

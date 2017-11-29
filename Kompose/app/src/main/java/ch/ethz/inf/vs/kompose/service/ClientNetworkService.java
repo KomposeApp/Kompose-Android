@@ -162,13 +162,7 @@ public class ClientNetworkService extends Service {
 
         private Message readMessage(Socket connection) throws IOException {
             BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-            StringBuilder json = new StringBuilder();
-
-            char[] buffer = new char[1024];
-            int bytesRead;
-            while ((bytesRead = input.read(buffer)) != -1) {
-                json.append(new String(buffer, 0, bytesRead));
-            }
+            String json = input.readLine();
             Log.d(LOG_TAG, "message read from stream: " + json.toString());
 
             Message message = JsonConverter.fromMessageJsonString(json.toString());

@@ -53,12 +53,10 @@
             android:label="Settings"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"/>
-
         <service
             android:name=".service.AndroidServerService"
             android:stopWithTask="true" />
         <service android:name=".service.ClientNetworkService" />
-
         <activity android:name=".DesignActivity" />
     </application>
 
