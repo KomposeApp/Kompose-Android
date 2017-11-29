@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.Window;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
-import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
 
 
 public class MainActivity extends AppCompatActivity {

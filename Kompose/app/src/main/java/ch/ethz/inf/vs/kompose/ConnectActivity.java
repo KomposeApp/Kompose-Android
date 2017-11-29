@@ -118,7 +118,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         // Set the current session state
         StateSingleton.getInstance().activeSession = pressedSession;
 
-
         OutgoingMessageHandler networkHandler = new OutgoingMessageHandler();
         Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
 
@@ -138,7 +137,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
                 // Show an error if the service failed or the socket is null
                 if (clientNetworkService != null && clientNetworkServiceBound &&
                         updateSocket!=null && updateSocket.isConnected() && !updateSocket.isClosed()){
-                    clientNetworkService.initialize(updateSocket);
+                    clientNetworkService.initSocketListener(updateSocket);
 
                     // start the client service again -- THIS IS INTENTIONAL
                     // it will keep the service alive across different activities.
