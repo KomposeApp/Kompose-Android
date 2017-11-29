@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.json.Song;
@@ -24,12 +26,12 @@ import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
-public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener {
+public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
 
     private static final String LOG_TAG = "## Playlist Activity";
     private OutgoingMessageHandler responseHandler;
 
-    private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().activeSession);
+    private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().activeSession, this);
     private Intent clientNetworkServiceIntent;
 
     @Override
@@ -40,18 +42,22 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         responseHandler = new OutgoingMessageHandler();
         clientNetworkServiceIntent = this.getIntent().getParcelableExtra(MainActivity.KEY_CNETWORKSERVICE);
-        Log.d(LOG_TAG, "Client NetworkServiceIntent is null : " + (clientNetworkServiceIntent == null) );
+        Log.d(LOG_TAG, "Client NetworkServiceIntent is null : " + (clientNetworkServiceIntent == null));
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getSongs(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
+
+        if (MainActivity.DESIGN_MODE) {
+            viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if(clientNetworkServiceIntent != null){
+        if (clientNetworkServiceIntent != null) {
             stopService(clientNetworkServiceIntent);
             Log.d(LOG_TAG, "ClientNetworkService successfully stopped");
         }
@@ -70,16 +76,20 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.add_link:
-                DialogAddYoutubeLinkBinding binding = DataBindingUtil.setContentView(this, R.layout.dialog_add_youtube_link);
+                Dialog dialog = new Dialog(this);
+                dialog.setCancelable(true);
 
-                Dialog builder = new Dialog(this);
-                builder.setCancelable(true);
+                DialogAddYoutubeLinkBinding binding = DataBindingUtil.inflate(getLayoutInflater().from(this), R.layout.dialog_add_youtube_link, null, false);
 
-               // builder.setContentView(binding.getRoot());
+                DisplayMetrics displaymetrics = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+                int width = (int) (displaymetrics.widthPixels * 0.9);
+                int height = (int) (displaymetrics.heightPixels * 0.7);
+                dialog.getWindow().setLayout(width, height);
 
+                dialog.setContentView(binding.getRoot());
                 binding.setViewModel(viewModel);
-
-                builder.show();
+                dialog.show();
                 return true;
             case R.id.leave_session:
                 leaveSession();
@@ -92,26 +102,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             default:
                 return super.onOptionsItemSelected(item);
         }
-    }
-
-
-    public void requestSong() {
-        // get youtube url from view
-        String youtubeUrl = viewModel.getSearchLink();
-        viewModel.setSearchLink("");
-
-        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
-            @Override
-            public void onEvent(int status) {
-            }
-
-            @Override
-            public void onEvent(int status, Object object) {
-                Song song = (Song) object;
-                responseHandler.sendRequestSong(song);
-            }
-        });
     }
 
     public void showHistory() {
@@ -137,5 +127,25 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         //todo technical: transform songModel to song
         // send downvote request
         responseHandler.sendCastSkipSongVote(null);
+    }
+
+    @Override
+    public void addSongClicked(View v) {
+        // get youtube url from view
+        String youtubeUrl = viewModel.getSearchLink();
+        viewModel.setSearchLink("");
+
+        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
+        youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
+            @Override
+            public void onEvent(int status) {
+            }
+
+            @Override
+            public void onEvent(int status, Object object) {
+                Song song = (Song) object;
+                responseHandler.sendRequestSong(song);
+            }
+        });
     }
 }
