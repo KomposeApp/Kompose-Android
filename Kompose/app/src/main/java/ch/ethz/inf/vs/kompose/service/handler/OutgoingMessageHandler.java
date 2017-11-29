@@ -102,7 +102,7 @@ public class OutgoingMessageHandler {
         for (ClientModel c : sessionModel.getClients()) {
             if (!c.getUUID().equals(StateSingleton.getInstance().deviceUUID)) {
                 Log.d(LOG_TAG, "sending session update to: " + c.getName()
-                        + " (" + c.getUuid().toString() + ")");
+                        + " (" + c.getUUID().toString() + ")");
                 InetAddress clientIP = c.getClientConnectionDetails().getIp();
                 int clientPort = c.getClientConnectionDetails().getPort();
                 AsyncSender asyncSender = new AsyncSender(message, clientIP, clientPort);
