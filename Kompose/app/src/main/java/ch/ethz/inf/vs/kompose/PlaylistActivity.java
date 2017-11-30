@@ -17,6 +17,7 @@ import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
@@ -39,6 +40,12 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         setContentView(R.layout.activity_playlist);
 
 
+        if (MainActivity.DESIGN_MODE) {
+            viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
+            SampleService sampleService = new SampleService();
+            sampleService.fillSampleSession(viewModel.getSessionModel());
+        }
+
         responseHandler = new OutgoingMessageHandler();
         clientNetworkServiceIntent = this.getIntent().getParcelableExtra(MainActivity.KEY_CNETWORKSERVICE);
         Log.d(LOG_TAG, "Client NetworkServiceIntent is null : " + (clientNetworkServiceIntent == null));
@@ -47,10 +54,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getPlayQueue(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
-
-        if (MainActivity.DESIGN_MODE) {
-            viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
-        }
     }
 
     @Override

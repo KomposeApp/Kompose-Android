@@ -35,4 +35,7 @@
     <string name="confirm">confirm</string>
     <string name="close">close</string>
     <string name="add_song">add song</string>
+    <string name="thumbnail">thumbnail</string>
+    <string name="proposed_by">proposed by</string>
+    <string name="down_vote">down vote</string>
 </resources>
