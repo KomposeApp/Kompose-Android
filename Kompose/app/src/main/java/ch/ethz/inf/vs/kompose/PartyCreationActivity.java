@@ -62,6 +62,9 @@ public class PartyCreationActivity extends BaseActivity {
         // creation timestamp
         newSession.setCreationDateTime(DateTime.now());
 
+        // make this device the host
+        StateSingleton.getInstance().deviceIsHost = true;
+
         //todo technical: am I doing this right?
         ClientModel clientModel = new ClientModel(deviceUUID, newSession);
         clientModel.setName(clientName);
