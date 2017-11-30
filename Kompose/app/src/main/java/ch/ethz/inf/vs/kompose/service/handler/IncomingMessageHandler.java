@@ -27,10 +27,6 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
-/*
-TODO
- */
-
 public class IncomingMessageHandler implements Runnable {
     private static final String LOG_TAG = "## InMessageHandler";
 
@@ -87,7 +83,9 @@ public class IncomingMessageHandler implements Runnable {
             clientModel.getClientConnectionDetails().setLastRequestReceived(DateTime.now());
         }
 
-        if (clientModel == null && messageType != MessageType.REGISTER_CLIENT) {
+        if (clientModel == null
+                && messageType != MessageType.REGISTER_CLIENT
+                && messageType != MessageType.SESSION_UPDATE) {
             //client unknown; therefore not allows to do request
             return;
         }
@@ -260,8 +258,7 @@ public class IncomingMessageHandler implements Runnable {
     }
 
     // TODO
-    private void sessionUpdate(Message message, SessionModel activeSessionModel) {
-        Log.d(LOG_TAG, "session update");
+    private void sessionUpdate(Message message, final SessionModel activeSessionModel) {
 //        Session receivedSession = message.getSession();
 //
 //        activeSession.setName(receivedSession.getName());
@@ -270,40 +267,50 @@ public class IncomingMessageHandler implements Runnable {
         Session receivedSession = message.getSession();
 
         SessionConverter converter = new SessionConverter();
-        SessionModel sessionModel = converter.convert(receivedSession);
+        final SessionModel sessionModel = converter.convert(receivedSession);
 
         activeSessionModel.setName(sessionModel.getName());
         activeSessionModel.setCreationDateTime(sessionModel.getCreationDateTime());
-        activeSessionModel.setConnectionDetails(sessionModel.getConnectionDetails());
 
-        for (ClientModel updateClient : sessionModel.getClients()) {
-            boolean updated = false;
-            for (ClientModel activeClient : activeSessionModel.getClients()) {
-                if (updateClient.getUUID().equals(activeClient.getUUID())) {
-                    updateClient(updateClient, activeClient);
-                    updated = true;
+        /*
+         * The host does currently not include its IP/Port in the messages
+         */
+        // activeSessionModel.setConnectionDetails(sessionModel.getConnectionDetails());
+
+        Runnable uiTask = new Runnable() {
+            @Override
+            public void run() {
+                for (ClientModel updateClient : sessionModel.getClients()) {
+                    boolean updated = false;
+                    for (ClientModel activeClient : activeSessionModel.getClients()) {
+                        if (updateClient.getUUID().equals(activeClient.getUUID())) {
+                            updateClient(updateClient, activeClient);
+                            updated = true;
+                        }
+                    }
+                    if (!updated) {
+                        activeSessionModel.getClients().add(updateClient);
+                    }
+                }
+
+                for (SongModel updateSong : sessionModel.getPlayQueue()) {
+                    boolean updated = false;
+                    for (SongModel activeSong : activeSessionModel.getPlayQueue()) {
+                        if (updateSong.getUUID().equals(activeSong.getUUID())) {
+                            updateSong(updateSong, activeSong);
+                            updated = true;
+                        }
+                    }
+                    if (!updated) {
+                        activeSessionModel.getPlayQueue().add(updateSong);
+                    }
                 }
             }
-            if (!updated) {
-                activeSessionModel.getClients().add(updateClient);
-            }
-        }
+        };
+        new Handler(Looper.getMainLooper()).post(uiTask);
 
-        for (SongModel updateSong : sessionModel.getPlayQueue()) {
-            boolean updated = false;
-            for (SongModel activeSong : activeSessionModel.getPlayQueue()) {
-                if (updateSong.getUUID().equals(activeSong.getUUID())) {
-                    updateSong(updateSong, activeSong);
-                    updated = true;
-                }
-            }
-            if (!updated) {
-                activeSessionModel.getPlayQueue().add(updateSong);
-            }
-        }
 
         //todo: handle up/downvote changes
-
     }
 
     private void updateClient(ClientModel source, ClientModel target) {
