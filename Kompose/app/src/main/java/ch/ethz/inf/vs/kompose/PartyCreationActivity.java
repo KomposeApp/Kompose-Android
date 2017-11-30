@@ -6,6 +6,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
+import org.joda.time.DateTime;
+
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
@@ -56,6 +58,9 @@ public class PartyCreationActivity extends BaseActivity {
 
         // initialize session as paused
         newSession.setSessionStatus(SessionStatus.PAUSED);
+
+        // creation timestamp
+        newSession.setCreationDateTime(DateTime.now());
 
         //todo technical: am I doing this right?
         ClientModel clientModel = new ClientModel(deviceUUID, newSession);
