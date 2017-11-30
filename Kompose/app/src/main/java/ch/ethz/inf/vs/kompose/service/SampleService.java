@@ -47,6 +47,15 @@ public class SampleService {
                 sessionModel.getPlayQueue().add(getSampleSong(sessionModel, clientModel, order++));
             }
         }
+
+        for (SongModel songModel : sessionModel.getPlayedSongs()) {
+            sessionModel.getAllSongList().add(songModel);
+        }
+        sessionModel.getAllSongList().add(sessionModel.getCurrentlyPlaying());
+
+        for (SongModel songModel : sessionModel.getPlayQueue()) {
+            sessionModel.getPlayQueue().add(songModel);
+        }
     }
 
     public ClientModel getSampleClient(SessionModel sessionModel, String clientName) {

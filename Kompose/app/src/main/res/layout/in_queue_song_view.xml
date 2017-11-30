@@ -30,7 +30,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{viewHolder.item.title}"
-                android:textColor="#000" />
+                android:textColor="#000"
+                tools:text="example text of video" />
 
             <TextView
                 android:id="@+id/currently_playing_seconds_length"

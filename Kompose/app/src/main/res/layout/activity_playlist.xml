@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <import type="android.view.View"/>
         <variable
             name="viewModel"
             type="ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel" />
@@ -24,7 +24,9 @@
             android:layout_height="40pt"
             android:padding="3pt"
             android:layout_margin="3pt"
-            android:background="#efefef">
+            android:background="#efefef"
+            android:visibility="@{viewModel.sessionModel.currentlyPlaying == null ? View.GONE : View.VISIBLE}"
+            >
 
             <ImageView
                 android:id="@+id/image"
@@ -32,6 +34,7 @@
                 android:layout_height="match_parent"
                 android:contentDescription="@string/thumbnail"
                 android:src="@{viewModel.sessionModel.currentlyPlaying.thumbnail}"
+                android:layout_alignParentStart="true"
                 />
 
             <RelativeLayout
@@ -39,6 +42,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_toEndOf="@id/image"
+                android:layout_toStartOf="@id/play_button_wrapper"
                 android:orientation="vertical">
 
                 <TextView
@@ -79,6 +83,21 @@
                         />
                 </LinearLayout>
             </RelativeLayout>
+            <RelativeLayout
+                android:id="@+id/play_button_wrapper"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentStart="true"
+                    android:onClick="@{viewModel.onPlayClicked}"
+                    android:text="@string/play" />
+
+            </RelativeLayout>
 
         </RelativeLayout>
 
@@ -90,6 +109,7 @@
             android:layout_marginTop="10pt"
             android:layout_marginLeft="3pt"
             android:layout_marginRight="3pt"
+            tools:listitem="@layout/in_queue_song_view"
             >
 
         </android.support.v7.widget.RecyclerView>

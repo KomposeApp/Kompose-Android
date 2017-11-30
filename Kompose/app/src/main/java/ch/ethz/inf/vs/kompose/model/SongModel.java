@@ -183,11 +183,12 @@ public class SongModel extends UniqueModel {
     }
 
     public void downloadThumbnail() {
-        //todo technical: move this were you like
+        //todo technical: do this in backend
         try {
             InputStream is = (InputStream) new URL(getThumbnailUrl().toString()).getContent();
             thumbnail = Drawable.createFromStream(is, "src name");
         } catch (Exception e) {
+            e.toString();
         }
     }
 }

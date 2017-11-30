@@ -1,26 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-<data>
+    <data>
 
-    <variable
-        name="viewModel"
-        type="ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel" />
-</data>
+        <import type="android.view.View"/>
+        <variable
+            name="viewModel"
+            type="ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel" />
+    </data>
 
-<LinearLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <android.support.v7.widget.RecyclerView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/list">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    </android.support.v7.widget.RecyclerView>
 
-</LinearLayout>
+        <RelativeLayout
+            android:id="@+id/currently_playing"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="3pt"
+            android:background="#efefef"
+            android:padding="3pt"
+            android:visibility="@{viewModel.sessionModel.currentlyPlaying == null ? View.GONE : View.VISIBLE}">
+
+            <TextView
+                android:id="@+id/currently_playing_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{viewModel.sessionModel.name}"
+                android:textColor="#000"
+                tools:text="Session name" />
+
+        </RelativeLayout>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3pt"
+            android:layout_marginRight="3pt"
+            android:layout_marginTop="10pt"
+            tools:listitem="@layout/history_song_view">
+
+        </android.support.v7.widget.RecyclerView>
+
+    </LinearLayout>
 </layout>
 

@@ -38,4 +38,6 @@
     <string name="thumbnail">thumbnail</string>
     <string name="proposed_by">proposed by</string>
     <string name="down_vote">down vote</string>
+    <string name="play">play</string>
+    <string name="songs_contained">songs contained</string>
 </resources>

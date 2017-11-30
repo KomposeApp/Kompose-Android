@@ -150,4 +150,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             }
         });
     }
+
+    @Override
+    public void playClicked(View v) {
+        //todo: play/pause session
+    }
 }
