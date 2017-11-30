@@ -14,49 +14,66 @@
         android:supportsRtl="true"
 
         android:theme="@style/KomposeTheme">
+
         <activity android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".PartyCreationActivity"
             android:label="Create your own Party"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"/>
+
         <activity
             android:name=".ConnectActivity"
             android:label="Choose a Party"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"/>
+
         <activity
             android:name=".PlaylistActivity"
             android:label="@string/title_activity_playlist"
             android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait">
+
+            <!--youtube link share intents-->
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+        </activity>
+
         <activity
             android:name=".HistoryOverviewActivity"
             android:label="Overview of past Playlists"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"/>
+
         <activity
             android:name=".HistoryDetailsActivity"
             android:label="Playlist History"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"/>
+
         <activity
             android:name=".SettingsActivity"
             android:label="Settings"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait"/>
+
         <service
             android:name=".service.AndroidServerService"
             android:stopWithTask="true" />
+
         <service android:name=".service.ClientNetworkService" />
+
         <activity android:name=".DesignActivity" />
     </application>
 

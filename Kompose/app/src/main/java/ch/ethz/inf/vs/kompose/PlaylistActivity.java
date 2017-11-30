@@ -16,6 +16,7 @@ import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
@@ -40,6 +41,15 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
+        // share links
+        Intent intent = getIntent();
+        String action = intent.getAction();
+        String type = intent.getType();
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
+            if ("text/plain".equals(type)) {
+                handleSendText(intent);
+            }
+        }
 
         responseHandler = new OutgoingMessageHandler();
         clientNetworkServiceIntent = this.getIntent().getParcelableExtra(MainActivity.KEY_CNETWORKSERVICE);
@@ -53,6 +63,41 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         if (MainActivity.DESIGN_MODE) {
             viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
         }
+    }
+
+    private void handleSendText(Intent intent) {
+        SessionModel activeSession = StateSingleton.getInstance().activeSession;
+        if (activeSession == null) {
+            showError("Not connected to a session!");
+            return;
+        }
+        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
+        if (sharedText != null) {
+            resolveAndRequestSong(sharedText);
+        }
+    }
+
+    private void resolveAndRequestSong(String youtubeUrl) {
+        Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
+
+        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
+        youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
+            @Override
+            public void onEvent(int status) {
+            }
+
+            @Override
+            public void onEvent(int status, Object object) {
+                if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
+                    Song song = (Song) object;
+                    Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
+                    responseHandler.sendRequestSong(song);
+                } else {
+                    Log.e(LOG_TAG, "resolving url failed");
+                    showError("Failed to resolve Youtube URL");
+                }
+            }
+        });
     }
 
     @Override
@@ -137,26 +182,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         String youtubeUrl = viewModel.getSearchLink();
         viewModel.setSearchLink("");
         songRequestDialog.dismiss();
-
-        Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
-
-        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
-            @Override
-            public void onEvent(int status) {
-            }
-
-            @Override
-            public void onEvent(int status, Object object) {
-                if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
-                    Song song = (Song) object;
-                    Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
-                    responseHandler.sendRequestSong(song);
-                } else {
-                    Log.e(LOG_TAG, "resolving url failed");
-                    showError("Failed to resolve Youtube URL");
-                }
-            }
-        });
+        resolveAndRequestSong(youtubeUrl);
     }
 }
