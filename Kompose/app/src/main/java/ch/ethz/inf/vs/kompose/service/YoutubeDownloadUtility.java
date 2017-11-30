@@ -27,10 +27,10 @@ public class YoutubeDownloadUtility {
 
     private static final String LOG_TAG = "## Download Utility";
 
-    private static final int RESOLVE_SUCCESS = 0x1;
-    private static final int RESOLVE_FAILED = 0x2;
-    private static final int DOWNLOAD_SUCCESS = 0x3;
-    private static final int DOWNLOAD_FAILED = 0x4;
+    public static final int RESOLVE_SUCCESS = 0x1;
+    public static final int RESOLVE_FAILED = 0x2;
+    public static final int DOWNLOAD_SUCCESS = 0x3;
+    public static final int DOWNLOAD_FAILED = 0x4;
 
     private Context context;
 

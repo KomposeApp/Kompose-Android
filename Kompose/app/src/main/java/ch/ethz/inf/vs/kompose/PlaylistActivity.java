@@ -148,9 +148,14 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
             @Override
             public void onEvent(int status, Object object) {
-                Song song = (Song) object;
-                Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
-                responseHandler.sendRequestSong(song);
+                if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
+                    Song song = (Song) object;
+                    Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
+                    responseHandler.sendRequestSong(song);
+                } else {
+                    Log.e(LOG_TAG, "resolving url failed");
+                    showError("Failed to resolve Youtube URL");
+                }
             }
         });
     }
