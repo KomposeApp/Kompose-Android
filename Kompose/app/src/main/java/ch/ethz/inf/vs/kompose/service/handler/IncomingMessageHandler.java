@@ -123,6 +123,7 @@ public class IncomingMessageHandler implements Runnable {
 
         if (sessionHasChanged) {
             new OutgoingMessageHandler().updateAllClients(activeSessionModel);
+            //adaptsLists()
         }
     }
 
