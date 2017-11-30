@@ -13,11 +13,14 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.UUID;
 
 import at.huber.youtubeExtractor.VideoMeta;
 import at.huber.youtubeExtractor.YouTubeExtractor;
 import at.huber.youtubeExtractor.YtFile;
 import ch.ethz.inf.vs.kompose.data.json.Song;
+import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 
 
 public class YoutubeDownloadUtility {
@@ -90,6 +93,9 @@ public class YoutubeDownloadUtility {
                     song.setThumbnailUrl(thumbnailUrl);
                     song.setSourceUrl(sourceUrl);
                     song.setLengthInSeconds((int) length);
+                    song.setUuid(UUID.randomUUID().toString());
+                    song.setSongStatus(SongStatus.REQUESTED.toString());
+                    song.setDownloadStatus(DownloadStatus.NOT_STARTED.toString());
 
                     // notify listener
                     listener.onEvent(RESOLVE_SUCCESS, song);

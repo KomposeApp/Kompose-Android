@@ -134,6 +134,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         String youtubeUrl = viewModel.getSearchLink();
         viewModel.setSearchLink("");
 
+        Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
+
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
             @Override
@@ -143,6 +145,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             @Override
             public void onEvent(int status, Object object) {
                 Song song = (Song) object;
+                Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
                 responseHandler.sendRequestSong(song);
             }
         });
