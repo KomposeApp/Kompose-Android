@@ -3,11 +3,14 @@ package ch.ethz.inf.vs.kompose.model;
 import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
+import android.graphics.drawable.Drawable;
 
 import org.joda.time.DateTime;
 
 import java.io.File;
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;
@@ -41,6 +44,7 @@ public class SongModel extends UniqueModel {
     private SongStatus songStatus;
     private DownloadStatus downloadStatus;
 
+    private Drawable thumbnail;
     private File downloadPath;
 
     @Bindable
@@ -171,5 +175,16 @@ public class SongModel extends UniqueModel {
     public void setDownloadStatus(DownloadStatus downloadStatus) {
         this.downloadStatus = downloadStatus;
         notifyPropertyChanged(BR.downloadStatus);
+    }
+
+    @Bindable
+    public Drawable getThumbnail() {
+        return thumbnail;
+    }
+
+    public void setThumbnail(Drawable drawable)
+    {
+        this.thumbnail = thumbnail;
+        notifyPropertyChanged(BR.thumbnail);
     }
 }

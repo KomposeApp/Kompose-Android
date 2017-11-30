@@ -31,19 +31,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginTop="-20dp"
+            android:layout_marginBottom="-10dp"
             android:adjustViewBounds="true"
-            android:maxWidth="69dp"
-            android:maxHeight="69dp"
+            android:maxHeight="512dp"
             android:scaleType="fitXY"
-            android:src="@drawable/konkret" />
+            android:src="@drawable/ic_logo_wide" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textColor="@color/textColor"
+            android:fontFamily="@font/opensans_regular"
             android:text="@{title}" />
 
         <ImageView
@@ -53,21 +53,22 @@
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"
             android:adjustViewBounds="true"
-            android:maxWidth="69dp"
-            android:maxHeight="69dp"
-            android:src="@drawable/konkret" />
+            android:maxHeight="367px"
+            android:src="@drawable/ic_kompose_group" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/textColor"
-            android:textSize="22sp"
+            android:textSize="20sp"
+            android:fontFamily="@font/opensans_regular"
             android:text="@{text1}" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/textColor"
+            android:fontFamily="@font/opensans_regular"
             android:text="@{subText1}" />
 
         <LinearLayout
@@ -83,6 +84,7 @@
                 android:layout_gravity="center_vertical"
                 android:background="@color/buttonColor"
                 android:textColor="@color/buttonTextColor"
+                android:fontFamily="@font/russoone_regular"
                 android:onClick="callConnectActivity"
                 android:text="Join Party" />
 
@@ -90,10 +92,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:maxWidth="69dp"
-                android:maxHeight="69dp"
+                android:maxHeight="367px"
                 android:scaleType="fitXY"
-                android:src="@drawable/konkret" />
+                android:src="@drawable/ic_kompose_join_group" />
         </LinearLayout>
 
 
@@ -101,13 +102,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/textColor"
-            android:textSize="22sp"
+            android:textSize="20sp"
+            android:fontFamily="@font/opensans_regular"
             android:text="@{text2}" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/textColor"
+            android:fontFamily="@font/opensans_regular"
             android:text="@{subText2}" />
 
         <LinearLayout
@@ -123,17 +126,19 @@
                 android:layout_gravity="center_vertical"
                 android:background="@color/buttonColor"
                 android:textColor="@color/buttonTextColor"
+                android:fontFamily="@font/russoone_regular"
                 android:onClick="callCreationActivity"
                 android:text="Create Party" />
 
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="-15dp"
+                android:layout_marginBottom="-10dp"
                 android:adjustViewBounds="true"
-                android:maxWidth="69dp"
-                android:maxHeight="69dp"
+                android:maxHeight="300px"
                 android:scaleType="fitXY"
-                android:src="@drawable/konkret" />
+                android:src="@drawable/ic_kompose_create" />
         </LinearLayout>
 
         <Space
@@ -148,7 +153,9 @@
             android:layout_gravity="center_horizontal"
             android:background="@color/colorAccent"
             android:textColor="@color/textColor"
+            android:fontFamily="@font/russoone_regular"
             android:onClick="viewHistoryFromTitle"
+            android:stateListAnimator="@null"
             android:text="View History" />
 
     </LinearLayout>

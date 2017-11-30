@@ -20,7 +20,7 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.BR;
-import ch.ethz.inf.vs.kompose.databinding.PlayedSongViewBinding;
+import ch.ethz.inf.vs.kompose.databinding.HistorySongViewBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.view.adapter.recycler.BindableAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.PlayedSongViewHolder;
@@ -33,7 +33,7 @@ public class PlayedSongAdapter extends BindableAdapter<SongModel> {
                 new ViewHolderFactory<SongModel>() {
                     @Override
                     public AbstractViewHolder<SongModel> create(ViewGroup viewGroup) {
-                        return new PlayedSongViewHolder<>(PlayedSongViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
+                        return new PlayedSongViewHolder<>(HistorySongViewBinding.inflate(layoutInflater, viewGroup, false), BR.viewHolder, listener);
                     }
                 }
         );
