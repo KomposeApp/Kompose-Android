@@ -53,7 +53,7 @@
             android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"
             android:adjustViewBounds="true"
-            android:maxHeight="367px"
+            android:maxHeight="160dp"
             android:src="@drawable/ic_kompose_group" />
 
         <TextView
@@ -92,7 +92,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
-                android:maxHeight="367px"
+                android:maxHeight="160dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_kompose_join_group" />
         </LinearLayout>
@@ -136,7 +136,7 @@
                 android:layout_marginTop="-15dp"
                 android:layout_marginBottom="-10dp"
                 android:adjustViewBounds="true"
-                android:maxHeight="300px"
+                android:maxHeight="120dp"
                 android:scaleType="fitXY"
                 android:src="@drawable/ic_kompose_create" />
         </LinearLayout>
