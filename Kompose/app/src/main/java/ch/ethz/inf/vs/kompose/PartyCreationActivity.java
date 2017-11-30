@@ -57,7 +57,7 @@ public class PartyCreationActivity extends BaseActivity {
         newSession.setName(sessionName);
 
         // initialize session as paused
-        newSession.setSessionStatus(SessionStatus.PAUSED);
+        newSession.setSessionStatus(SessionStatus.WAITING);
 
         // creation timestamp
         newSession.setCreationDateTime(DateTime.now());
