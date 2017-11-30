@@ -98,7 +98,7 @@ public class ClientNetworkService extends Service {
     @Override
     public void onDestroy(){
         super.onDestroy();
-        clientListenerTask.cancel(true);
+        if (clientListenerTask!=null) clientListenerTask.cancel(true);
         Log.d(LOG_TAG,"Service killed for real.");
     }
 

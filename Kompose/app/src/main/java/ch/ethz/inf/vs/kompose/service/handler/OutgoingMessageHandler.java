@@ -115,6 +115,7 @@ public class OutgoingMessageHandler {
     private void sendMessage(Message message) {
         // if this device is host, call message handler directly
         if (StateSingleton.getInstance().deviceIsHost) {
+            Log.d(LOG_TAG, "device is host, don't send message to network");
             Thread handler = new Thread(new IncomingMessageHandler(message));
             handler.start();
             return;
