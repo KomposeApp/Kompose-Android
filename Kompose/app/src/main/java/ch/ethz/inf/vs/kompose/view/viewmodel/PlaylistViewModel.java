@@ -37,8 +37,15 @@ public class PlaylistViewModel extends BaseViewModel {
         }
     }
 
+    public void onPlayClicked(View view) {
+        if (listener != null) {
+            listener.playClicked(view);
+        }
+    }
+
 
     public interface ClickListener {
         void addSongClicked(View v);
+        void playClicked(View v);
     }
 }
