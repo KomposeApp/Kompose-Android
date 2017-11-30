@@ -137,14 +137,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(youtubeUrl, new SimpleListener() {
+        youtubeService.resolveSong(youtubeUrl, new SimpleListener<Integer, Song>() {
             @Override
-            public void onEvent(int status) {
-            }
-
-            @Override
-            public void onEvent(int status, Object object) {
-                Song song = (Song) object;
+            public void onEvent(Integer status, Song song) {
                 Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
                 responseHandler.sendRequestSong(song);
             }
