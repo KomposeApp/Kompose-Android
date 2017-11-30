@@ -33,6 +33,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().activeSession, this);
     private Intent clientNetworkServiceIntent;
 
+    private Dialog songRequestDialog;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,20 +77,22 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.add_link:
-                Dialog dialog = new Dialog(this);
-                dialog.setCancelable(true);
+                songRequestDialog = new Dialog(this);
+                songRequestDialog.setCancelable(true);
 
-                DialogAddYoutubeLinkBinding binding = DataBindingUtil.inflate(getLayoutInflater().from(this), R.layout.dialog_add_youtube_link, null, false);
+                DialogAddYoutubeLinkBinding binding = DataBindingUtil.inflate(
+                        getLayoutInflater().from(this), R.layout.dialog_add_youtube_link,
+                        null, false);
 
                 DisplayMetrics displaymetrics = new DisplayMetrics();
                 getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
                 int width = (int) (displaymetrics.widthPixels * 0.9);
                 int height = (int) (displaymetrics.heightPixels * 0.7);
-                dialog.getWindow().setLayout(width, height);
+                songRequestDialog.getWindow().setLayout(width, height);
 
-                dialog.setContentView(binding.getRoot());
+                songRequestDialog.setContentView(binding.getRoot());
                 binding.setViewModel(viewModel);
-                dialog.show();
+                songRequestDialog.show();
                 return true;
             case R.id.leave_session:
                 leaveSession();
@@ -130,9 +134,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     @Override
     public void addSongClicked(View v) {
-        // get youtube url from view
         String youtubeUrl = viewModel.getSearchLink();
         viewModel.setSearchLink("");
+        songRequestDialog.dismiss();
 
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
 
