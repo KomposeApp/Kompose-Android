@@ -1,5 +1,7 @@
 package ch.ethz.inf.vs.kompose.service.handler;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import org.joda.time.DateTime;
@@ -173,16 +175,23 @@ public class IncomingMessageHandler implements Runnable {
         return true;
     }
 
-    private boolean requestSong(Message message, SessionModel sessionModel) {
+    private boolean requestSong(Message message, final SessionModel sessionModel) {
         Song song = message.getSongDetails();
         song.setProposedByClientUuid(message.getSenderUuid());
 
         SongConverter songConverter = new SongConverter(sessionModel.getClients());
-        SongModel songModel = songConverter.convert(song);
+        final SongModel songModel = songConverter.convert(song);
         songModel.setSongStatus(SongStatus.IN_QUEUE);
         songModel.setOrder(sessionModel.getPlayQueue().size() + 1);
 
-        sessionModel.getPlayQueue().add(songModel);
+        Runnable uiTask = new Runnable() {
+            @Override
+            public void run() {
+
+                sessionModel.getPlayQueue().add(songModel);
+            }
+        };
+        new Handler(Looper.getMainLooper()).post(uiTask);
         return true;
     }
 
