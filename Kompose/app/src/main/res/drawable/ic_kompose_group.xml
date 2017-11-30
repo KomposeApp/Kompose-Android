@@ -9,14 +9,14 @@
     <group>
         <clip-path android:pathData="M145.1,83h210.6v210.6h-210.6z M 0,0" />
     <path
-        android:pathData="M277.521,117.904H259.56h-81.923v140.879h81.923h17.961h40.996V117.904    H277.521z M300.186,241.695h-22.665H259.56h-61.727V134.993h61.727h17.961h22.665V241.695z"
-        android:fillColor="#FFFFFF"/>
+        android:pathData="M145.06,83.028h210.632v210.631h-210.632z"
+        android:fillColor="#EF3B39"/>
     </group>
     <group>
         <clip-path android:pathData="M145.1,83h210.6v210.6h-210.6z M 0,0" />
     <path
-        android:pathData="M145.06,83.028h210.632v210.631h-210.632z"
-        android:fillColor="#EF3B39"/>
+        android:pathData="M277.521,117.904H259.56h-81.923v140.879h81.923h17.961h40.996V117.904    H277.521z M300.186,241.695h-22.665H259.56h-61.727V134.993h61.727h17.961h22.665V241.695z"
+        android:fillColor="#FFFFFF"/>
     </group>
     <group>
         <clip-path android:pathData="M145.1,83h210.6v210.6h-210.6z M 0,0" />
