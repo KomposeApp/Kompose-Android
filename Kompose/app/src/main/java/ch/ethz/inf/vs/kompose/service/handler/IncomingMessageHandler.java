@@ -139,22 +139,52 @@ public class IncomingMessageHandler implements Runnable {
     }
 
     private void adaptLists(SessionModel sessionModel) {
+        boolean playingSet = false;
         for (SongModel songModel :
                 sessionModel.getAllSongList()) {
-            if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED)) {
+            if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_ERROR)) {
                 //in played queue
-                if (!sessionModel.getPlayedSongs().contains(songModel)) {
-                    sessionModel.getPlayedSongs().add(songModel);
+                sessionModel.getPastSongs().add(songModel);
+                if (sessionModel.getPlayQueue().contains(songModel)) {
+                    sessionModel.getPlayQueue().remove(songModel);
+                }
+                if (sessionModel.getPlayQueueWithDislikedSongs().contains(songModel)) {
+                    sessionModel.getPlayQueueWithDislikedSongs().remove(songModel);
                 }
             } else if (songModel.getSongStatus().equals(SongStatus.PLAYING)) {
+                playingSet = true;
                 sessionModel.setCurrentlyPlaying(songModel);
-            } else if (songModel.getSongStatus().equals(SongStatus.IN_QUEUE)) {
-                if (songModel.getValidDownVoteCount() < sessionModel.getActiveDevices() / 2) {
+                if (sessionModel.getPlayQueue().contains(songModel)) {
+                    sessionModel.getPlayQueue().remove(songModel);
+                }
+                if (sessionModel.getPlayQueueWithDislikedSongs().contains(songModel)) {
+                    sessionModel.getPlayQueueWithDislikedSongs().remove(songModel);
+                }
+                if (sessionModel.getPastSongs().contains(songModel)) {
+                    sessionModel.getPastSongs().remove(songModel);
+                }
+            } else if (songModel.getSongStatus().equals(SongStatus.IN_QUEUE) || songModel.getSongStatus().equals(SongStatus.REQUESTED)) {
+                if (sessionModel.getPastSongs().contains(songModel)) {
+                    sessionModel.getPastSongs().remove(songModel);
+                }
+
+                int quorum = sessionModel.getActiveDevices() / 2;
+                if (songModel.getValidDownVoteCount() >= quorum) {
+                    //add to skipped if not played
                     if (sessionModel.getPlayQueue().contains(songModel)) {
-                        sessionModel.getPlayQueue().add(songModel);
+                        sessionModel.getPlayQueue().remove(songModel);
                     }
+                    sessionModel.getPlayQueueWithDislikedSongs().add(songModel);
+                } else {
+                    sessionModel.getPlayQueue().add(songModel);
+                    sessionModel.getPlayQueueWithDislikedSongs().add(songModel);
                 }
             }
+        }
+
+        //no currently playing song found; ensure it is null
+        if (!playingSet) {
+            sessionModel.setCurrentlyPlaying(null);
         }
 
     }
@@ -177,6 +207,7 @@ public class IncomingMessageHandler implements Runnable {
         }
 
         sessionModel.getClients().add(client);
+        setActiveDevices(sessionModel);
 
         return true;
     }
@@ -198,11 +229,12 @@ public class IncomingMessageHandler implements Runnable {
             for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
                 if (downVoteModel.getUuid().equals(clientUUID)) {
                     songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
-                    checkDownVoteCount(sessionModel, songModel);
                     break;
                 }
             }
         }
+
+        setActiveDevices(sessionModel);
 
         return true;
     }
@@ -258,7 +290,6 @@ public class IncomingMessageHandler implements Runnable {
 
         downVoteTarget.setValidDownVoteCount(downVoteTarget.getValidDownVoteCount() + 1);
         downVoteTarget.getDownVotes().add(downVoteModel);
-        checkDownVoteCount(activeSessionModel, downVoteTarget);
 
         return false;
     }
@@ -279,7 +310,6 @@ public class IncomingMessageHandler implements Runnable {
                     String clientUUID = message.getSenderUuid();
                     if (downvoteClientUUID.equals(clientUUID)) {
                         songModel.getDownVotes().remove(j);
-                        checkDownVoteCount(activeSessionModel, songModel);
                         return true;
                     }
                 }
@@ -376,7 +406,7 @@ public class IncomingMessageHandler implements Runnable {
     }
 
     // update the song status according to how many downvotes it has
-    private void checkDownVoteCount(SessionModel sessionModel, SongModel songModel) {
+    private void setActiveDevices(SessionModel sessionModel) {
         int validClientCount = 0;
         for (ClientModel client : sessionModel.getClients()) {
             if (client.getIsActive()) {
@@ -385,20 +415,5 @@ public class IncomingMessageHandler implements Runnable {
         }
 
         sessionModel.setActiveDevices(validClientCount);
-
-        int quorum = validClientCount / 2;
-        if (songModel.getValidDownVoteCount() >= quorum) {
-            //add to skipped if not played
-            if (sessionModel.getAllSongList().contains(songModel)) {
-                sessionModel.getAllSongList().remove(songModel);
-                sessionModel.getSkippedSongs().add(songModel);
-            }
-        } else {
-            //add to queue if not skipped and still allows to be added
-            if (sessionModel.getSkippedSongs().contains(songModel) && songModel.getOrder() < sessionModel.getCurrentlyPlaying().getOrder()) {
-                sessionModel.getSkippedSongs().remove(songModel);
-                sessionModel.getAllSongList().add(songModel);
-            }
-        }
     }
 }
