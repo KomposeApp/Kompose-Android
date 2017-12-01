@@ -44,7 +44,7 @@ public class AudioService extends Service {
         downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public void startPlaying() {
+    public void stopPlaying() {
         final SongModel currentSong = sessionModel.getCurrentlyPlaying();
         final MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
         if (currentSong.getSongStatus() == SongStatus.PLAYING && mediaPlayer != null) {
@@ -60,7 +60,7 @@ public class AudioService extends Service {
         }
     }
 
-    public void stopPlaying() {
+    public void startPlaying() {
         if (sessionModel.getIsHost()) {
             final SongModel currentSong = sessionModel.getCurrentlyPlaying();
             final MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
