@@ -8,6 +8,7 @@ import java.net.URI;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -21,9 +22,10 @@ public class SampleService {
     private final ObservableList<ClientModel> clientList = new ObservableUniqueSortedList<>(new ClientComparator(), new UniqueModelComparator<ClientModel>());
 
     public SessionModel getSampleSession(String sessionName) {
-        SessionModel sessionModel = new SessionModel(UUID.randomUUID(), UUID.randomUUID());
+        SessionModel sessionModel = new SessionModel(UUID.randomUUID(), UUID.randomUUID(), true);
         sessionModel.setCreationDateTime(DateTime.now());
         sessionModel.setName(sessionName);
+        sessionModel.setSessionStatus(SessionStatus.PLAYING);
 
         fillSampleSession(sessionModel);
 
@@ -31,7 +33,9 @@ public class SampleService {
     }
 
     public void fillSampleSession(SessionModel sessionModel) {
+        //sessionModel.setSessionStatus(SessionStatus.PLAYING);
         int order = 0;
+        sessionModel.setSessionStatus(SessionStatus.PLAYING);
         for (int i = 0; i < 1; i++) {
             ClientModel clientModel = new ClientModel(UUID.randomUUID(), sessionModel);
 
@@ -41,9 +45,11 @@ public class SampleService {
             }
             sessionModel.setCurrentlyPlaying(getSampleSong(sessionModel, clientModel, order++));
 
+            /*
             for (int j = 0; j < 5; j++) {
                 sessionModel.getPlayQueue().add(getSampleSong(sessionModel, clientModel, order++));
             }
+            */
         }
 
         for (SongModel songModel : sessionModel.getPastSongs()) {

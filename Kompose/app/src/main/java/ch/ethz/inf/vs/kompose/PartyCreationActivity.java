@@ -57,17 +57,9 @@ public class PartyCreationActivity extends BaseActivity {
 
 
         // create a new session
-        SessionModel newSession = new SessionModel(UUID.randomUUID(), deviceUUID);
+        SessionModel newSession = new SessionModel(UUID.randomUUID(), deviceUUID, true);
         newSession.setName(sessionName);
-
-        // initialize session as paused
-        newSession.setSessionStatus(SessionStatus.WAITING);
-
-        // creation timestamp
         newSession.setCreationDateTime(DateTime.now());
-
-        // make this device the host
-        StateSingleton.getInstance().deviceIsHost = true;
 
         //todo technical: am I doing this right?
         ClientModel clientModel = new ClientModel(deviceUUID, newSession);

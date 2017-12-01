@@ -10,18 +10,18 @@
     </data>
 
     <LinearLayout
-        android:background="@color/colorAccent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="15dp"
-        android:orientation="vertical">
+        android:background="@color/colorAccent"
+        android:orientation="vertical"
+        android:padding="15dp">
 
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="-20dp"
             android:layout_marginBottom="-10dp"
+            android:layout_marginTop="-20dp"
             android:adjustViewBounds="true"
             android:maxHeight="512dp"
             android:scaleType="fitXY"
@@ -51,12 +51,12 @@
             android:id="@+id/client_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/buttonColor"
             android:fontFamily="@font/opensans_regular"
             android:inputType="textNoSuggestions"
             android:singleLine="false"
             android:text="@={viewModel.clientName}"
-            android:textColor="@color/buttonColor"
-            android:backgroundTint="@color/buttonColor"/>
+            android:textColor="@color/buttonColor" />
 
         <TextView
             android:layout_width="match_parent"
@@ -71,11 +71,11 @@
             android:id="@+id/session_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:backgroundTint="@color/buttonColor"
             android:fontFamily="@font/opensans_regular"
             android:inputType="textNoSuggestions"
             android:text="@={viewModel.sessionName}"
-            android:textColor="@color/buttonColor"
-            android:backgroundTint="@color/buttonColor"/>
+            android:textColor="@color/buttonColor" />
 
         <Button
             android:layout_width="250dp"
@@ -84,15 +84,15 @@
             android:layout_marginTop="50dp"
             android:background="@color/buttonColor"
             android:baselineAligned="false"
+            android:bottomLeftRadius="8dp"
+            android:bottomRightRadius="8dp"
             android:fontFamily="@font/russo_one"
             android:onClick="confirmParty"
             android:text="@string/create_party"
             android:textColor="@color/buttonTextColor"
             android:textSize="20sp"
-            android:bottomRightRadius="8dp"
-            android:bottomLeftRadius="8dp"
-            android:topRightRadius="8dp"
-            android:topLeftRadius="8dp"/>
+            android:topLeftRadius="8dp"
+            android:topRightRadius="8dp" />
 
     </LinearLayout>
 </layout>
