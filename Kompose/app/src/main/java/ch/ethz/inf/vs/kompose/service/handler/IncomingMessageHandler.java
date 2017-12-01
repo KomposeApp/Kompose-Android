@@ -150,8 +150,7 @@ public class IncomingMessageHandler implements Runnable {
 
     private void adaptLists(SessionModel sessionModel) {
         boolean playingSet = false;
-        for (SongModel songModel :
-                sessionModel.getAllSongList()) {
+        for (SongModel songModel : sessionModel.getAllSongList()) {
             if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_ERROR)) {
                 //in played queue
                 sessionModel.getPastSongs().add(songModel);
