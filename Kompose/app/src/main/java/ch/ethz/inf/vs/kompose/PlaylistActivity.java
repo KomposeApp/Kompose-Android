@@ -83,7 +83,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         super.onStart();
 
         // bind to audio service
-        if (StateSingleton.getInstance().deviceIsHost) {
+        if (StateSingleton.getInstance().activeSession.getIsHost()) {
             Log.d(LOG_TAG, "binding AudioService");
             Intent audioServiceIntent = new Intent(this.getBaseContext(), AudioService.class);
             bindService(audioServiceIntent, audioServiceConnection, BIND_AUTO_CREATE);
