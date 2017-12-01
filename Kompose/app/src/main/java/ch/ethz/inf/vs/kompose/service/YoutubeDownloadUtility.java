@@ -45,7 +45,7 @@ public class YoutubeDownloadUtility {
      * @param sourceUrl Youtube URL as seen in the browser
      * @param listener Listener which will be notified upon completion
      */
-    public void resolveSong(final String sourceUrl, final SimpleListener listener) {
+    public void resolveSong(final String sourceUrl, final SimpleListener<Integer,Song> listener) {
         @SuppressLint("StaticFieldLeak")
         YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
             @Override

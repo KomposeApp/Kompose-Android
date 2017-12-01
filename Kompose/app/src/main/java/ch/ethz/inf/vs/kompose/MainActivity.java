@@ -17,8 +17,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
 
-    //Some static variables here because I didn't know where else to put them
-    public static final String KEY_CNETWORKSERVICE = String.valueOf("ClientNetworkService".hashCode());
+    public static final String KEY_CNETWORKSERVICE = "ClientNetworkService";
 
     public static final boolean DESIGN_MODE = true;
 

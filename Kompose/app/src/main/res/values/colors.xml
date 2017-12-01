@@ -6,6 +6,6 @@
     <color name="colorBlack">#000000</color>
     <color name="colorRedFlat">#FF0000</color>
     <color name="textColor">#FFFFFF</color>
-    <color name="buttonColor">#FFFFFF</color>
-    <color name="buttonTextColor">#EE383A</color>
+    <color name="buttonColor">#ffffff</color>
+    <color name="buttonTextColor">#ee3a39</color>
 </resources>
