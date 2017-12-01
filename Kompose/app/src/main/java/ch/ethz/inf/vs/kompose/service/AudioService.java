@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.media.MediaPlayer;
@@ -13,25 +12,13 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.File;
-import java.io.ObjectInputStream;
 import java.lang.ref.WeakReference;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Phaser;
-import java.util.concurrent.Semaphore;
 
-import ch.ethz.inf.vs.kompose.ConnectActivity;
-import ch.ethz.inf.vs.kompose.PlaylistActivity;
-import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
-import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.model.comparators.SongComparator;
-import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
-import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
@@ -51,7 +38,7 @@ public class AudioService extends Service {
         sessionModel = StateSingleton.getInstance().activeSession;
 
         // start the download worker
-        DownloadWorker downloadWorker = new DownloadWorker(this, sessionModel.getPlayQueue());
+        DownloadWorker downloadWorker = new DownloadWorker(this, sessionModel);
         downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
@@ -61,6 +48,8 @@ public class AudioService extends Service {
         if (currentSong.getSongStatus() == SongStatus.PLAYING && mediaPlayer != null) {
             mediaPlayer.pause();
             currentSong.setSongStatus(SongStatus.PAUSED);
+
+            new OutgoingMessageHandler().sendSessionUpdate();
         }
     }
 
@@ -71,74 +60,70 @@ public class AudioService extends Service {
             if (currentSong.getSongStatus() == SongStatus.PAUSED && mediaPlayer != null) {
                 mediaPlayer.start();
                 currentSong.setSongStatus(SongStatus.PLAYING);
+
+                new OutgoingMessageHandler().sendSessionUpdate();
             }
         }
     }
 
-    private void startCurrentSong() {
-        final SongModel currentSong = sessionModel.getCurrentlyPlaying();
-        // TODO null check
-        if (currentSong.getSongStatus() == SongStatus.IN_QUEUE
-                && currentSong.getMediaPlayer() != null
-                && currentSong.getDownloadStatus() != DownloadStatus.FINISHED) {
-
-            currentSong.setSongStatus(SongStatus.PLAYING);
-
-            MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
-            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                @Override
-                public void onCompletion(MediaPlayer mp) {
-                    mp.release();
-                    currentSong.setMediaPlayer(null);
-                    currentSong.setSongStatus(SongStatus.PLAYED);
-                    updateCurrentSong();
-                    startCurrentSong();
-                }
-            });
-            mediaPlayer.start();
-
+    private void checkOnCurrentSong() {
+        if (sessionModel.getCurrentlyPlaying() == null) {
+            goToNextSong();
         }
     }
 
-    private void updateCurrentSong() {
+    private void goToNextSong() {
         Log.d(LOG_TAG, "updating currently playing song");
-        SongModel currentSong = sessionModel.getCurrentlyPlaying();
+        if (sessionModel.getCurrentlyPlaying() != null) {
+            MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
+            mp.stop();
+            mp.release();
+            
+            SongModel songModel = sessionModel.getCurrentlyPlaying();
+            songModel.setSongStatus(SongStatus.PLAYED);
+            sessionModel.getCurrentlyPlaying().setMediaPlayer(null);
 
-        Log.d(LOG_TAG, "play queue size = " + sessionModel.getPlayQueue().size()); // tmp
-
-        // currently playing song needs to be newly set
-        if (currentSong == null || currentSong.getSongStatus() != SongStatus.PLAYING) {
-
-            // current song was previously set
-            if (currentSong != null) {
-
-                // cleanup old MediaPlayer
-                if (currentSong.getMediaPlayer() != null) {
-                    MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
-                    mediaPlayer.stop();
-                    mediaPlayer.release();
-                    currentSong.setMediaPlayer(null);
-                }
-
-                currentSong.setSongStatus(SongStatus.PLAYED);
-            }
-
-            Log.d(LOG_TAG, "play queue size = " + sessionModel.getPlayQueue().size()); // tmp
-
-            // get the next song from the play queue and set it as the currently playing one
-            if (sessionModel.getPlayQueue().size() > 0) {
-                SongModel nextSong = sessionModel.getPlayQueue().get(0);
-                nextSong.setSongStatus(SongStatus.PLAYING);
-                sessionModel.setCurrentlyPlaying(nextSong);
-                Log.d(LOG_TAG, "currently playing song: "
-                        + sessionModel.getCurrentlyPlaying().getTitle());
-            } else {
-                sessionModel.setCurrentlyPlaying(null);
-            }
-
-            // notify clients about the currently playing song change
-            new OutgoingMessageHandler().sendSessionUpdate(sessionModel);
+            sessionModel.setCurrentlyPlaying(null);
+            Log.d(LOG_TAG, "stopping & removing current song");
         }
+
+
+        if (sessionModel.getPlayQueue().size() > 0) {
+            SongModel chosenSong = null;
+            for (SongModel songModel : sessionModel.getPlayQueue()) {
+                if (songModel.getDownloadStatus() == DownloadStatus.FINISHED) {
+                    chosenSong = songModel;
+                    break;
+                } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
+                    //directly to trash :P
+                    sessionModel.getPlayQueue().remove(songModel);
+                    sessionModel.getPastSongs().add(songModel);
+                    songModel.setSongStatus(SongStatus.SKIPPED_BY_ERROR);
+                } else {
+                    //else wait for download to finish
+                    break;
+                }
+            }
+            if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
+                sessionModel.getPlayQueue().remove(chosenSong);
+
+                chosenSong.setSongStatus(SongStatus.PLAYING);
+                sessionModel.setCurrentlyPlaying(chosenSong);
+
+                MediaPlayer mediaPlayer = chosenSong.getMediaPlayer();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        goToNextSong();
+                    }
+                });
+                mediaPlayer.start();
+
+                Log.d(LOG_TAG, "now playing song: " + sessionModel.getCurrentlyPlaying().getTitle());
+            }
+        }
+
+        new OutgoingMessageHandler().sendSessionUpdate();
     }
 
     public class LocalBinder extends Binder {
@@ -174,7 +159,7 @@ public class AudioService extends Service {
         @Override
         public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
             Log.d(LOG_TAG, (i1 - i) + " new items in play queue");
-            audioService.updateCurrentSong();
+            audioService.goToNextSong();
             notifier.register();
         }
 
@@ -194,30 +179,19 @@ public class AudioService extends Service {
         private Phaser notifier;
         private int numSongsPreload;
         private WeakReference<AudioService> context;
-        private ObservableUniqueSortedList<SongModel> playQueue;
+        private SessionModel sessionModel;
 
-        DownloadWorker(AudioService context, ObservableUniqueSortedList<SongModel> playQueue) {
-
+        DownloadWorker(AudioService context, SessionModel sessionModel) {
             this.context = new WeakReference<AudioService>(context);
-            this.playQueue = playQueue;
+            this.sessionModel = sessionModel;
 
             this.numSongsPreload = PreferenceUtility.getCurrentPreload(context);
             this.notifier = new Phaser(1);
-            playQueue.addOnListChangedCallback(new PlaylistListener(notifier, context));
+            sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(notifier, context));
         }
 
         private MediaPlayer mediaPlayerFromFile(File file) {
             return MediaPlayer.create(context.get(), Uri.fromFile(file));
-        }
-
-        private int getNumDownloaded() {
-            int n = 0;
-            for (SongModel s : playQueue) {
-                if (s.getDownloadStatus() == DownloadStatus.FINISHED) {
-                    n++;
-                }
-            }
-            return n;
         }
 
         @Override
@@ -229,23 +203,36 @@ public class AudioService extends Service {
                 // the download queue)
                 notifier.arriveAndDeregister();
 
-                int numDownloaded = getNumDownloaded();
+                int numDownloaded = 0;
 
-                while (numDownloaded < numSongsPreload && playQueue.size() > 0) {
-                    SongModel nextDownload = playQueue.remove(0);
-                    Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
+                //todo:
+                //make error handling better; and allow parallel downloads
+                //simply create a thread for each song, instead of this weird loop; helps to better account for failures
+                int index = 0;
+                while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
+                    SongModel nextDownload = sessionModel.getPlayQueue().get(index++);
+                    if (nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
+                        Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
+                        nextDownload.setDownloadStatus(DownloadStatus.STARTED);
 
-                    File storedFile = youtubeDownloadUtility.downloadSong(
-                            nextDownload.getDownloadUrl().toString(),
-                            nextDownload.getTitle() + ".m4a");
+                        File storedFile = youtubeDownloadUtility.downloadSong(
+                                nextDownload.getDownloadUrl().toString(),
+                                nextDownload.getTitle() + ".m4a");
 
-                    if (storedFile != null) {
-                        nextDownload.setDownloadPath(storedFile);
-                        nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
-                        nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
-                        context.get().startCurrentSong();
+                        if (storedFile != null) {
+                            nextDownload.setDownloadPath(storedFile);
+                            nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
+                            nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
+                            numDownloaded++;
+
+                            context.get().checkOnCurrentSong();
+                        } else {
+                            nextDownload.setDownloadStatus(DownloadStatus.FAILED);
+                        }
+
+                        new OutgoingMessageHandler().sendSessionUpdate();
                     } else {
-                        nextDownload.setDownloadStatus(DownloadStatus.FAILED);
+                        numDownloaded++;
                     }
                 }
             }

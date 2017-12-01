@@ -9,14 +9,17 @@ import java.net.InetAddress;
 import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
+import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
@@ -48,13 +51,19 @@ public class OutgoingMessageHandler {
         sendMessageToHost(msg);
     }
 
-    public void sendCastSkipSongVote(Song song) {
+    public void sendCastSkipSongVote(SongModel songModel) {
+        SongConverter songConverter = new SongConverter(getSession().getClients());
+        Song song = songConverter.convert(songModel);
+
         Message msg = getBaseMessageHost(MessageType.CAST_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
         sendMessageToHost(msg);
     }
 
-    public void sendRemoveSkipSongVote(Song song) {
+    public void sendRemoveSkipSongVote(SongModel songModel) {
+        SongConverter songConverter = new SongConverter(getSession().getClients());
+        Song song = songConverter.convert(songModel);
+
         Message msg = getBaseMessageHost(MessageType.REMOVE_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
         sendMessageToHost(msg);
@@ -65,39 +74,49 @@ public class OutgoingMessageHandler {
         sendMessageToHost(msg);
     }
 
-    public void sendRequestSong(Song song) {
+    public void sendRequestSong(SongModel songModel) {
+        SongConverter songConverter = new SongConverter(getSession().getClients());
+        Song song = songConverter.convert(songModel);
+
         Message msg = getBaseMessageHost(MessageType.REQUEST_SONG);
         msg.setSongDetails(song);
         sendMessageToHost(msg);
     }
 
-    public void sendUnRegisterClient(SessionModel sessionModel) {
-        if (sessionModel.getIsHost()) {
+    public void sendUnRegisterClient() {
+        getSession().setSessionStatus(SessionStatus.FINISHED);
+        if (getSession().getIsHost()) {
+            Message msg = getBaseMessageHost(MessageType.FINISH_SESSION);
+            sendMessageToHost(msg);
+        } else {
             Message msg = getBaseMessageHost(MessageType.UNREGISTER_CLIENT);
             sendMessageToHost(msg);
         }
     }
 
-    public void sendSessionUpdate(SessionModel sessionModel) {
-        if (sessionModel.getIsHost()) {
+    public void sendSessionUpdate() {
+        if (getSession().getIsHost()) {
             SessionConverter sessionConverter = new SessionConverter();
-            Session session = sessionConverter.convert(sessionModel);
+            Session session = sessionConverter.convert(getSession());
             Message message = getBaseMessageHost(MessageType.SESSION_UPDATE);
             message.setSession(session);
 
-            // send message to all clients, but not to itself
-            for (ClientModel c : sessionModel.getClients()) {
-                if (!c.getUUID().equals(StateSingleton.getInstance().deviceUUID)) {
-                    Log.d(LOG_TAG, "sending session update to: " + c.getName()
-                            + " (" + c.getUUID().toString() + ")");
-                    InetAddress clientIP = c.getClientConnectionDetails().getIp();
-                    int clientPort = c.getClientConnectionDetails().getPort();
-                    AsyncSender asyncSender = new AsyncSender(message, clientIP, clientPort);
-                    asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-                }
-            }
+            sendMessageToClients(message);
         } else {
             Log.d(LOG_TAG, "tried to send session update but not host ");
+        }
+    }
+
+    private void sendMessageToClients(Message message) {// send message to all clients, but not to itself
+        for (ClientModel c : getSession().getClients()) {
+            if (!c.getUUID().equals(StateSingleton.getInstance().deviceUUID)) {
+                Log.d(LOG_TAG, "sending session update to: " + c.getName()
+                        + " (" + c.getUUID().toString() + ")");
+                InetAddress clientIP = c.getClientConnectionDetails().getIp();
+                int clientPort = c.getClientConnectionDetails().getPort();
+                AsyncSender asyncSender = new AsyncSender(message, clientIP, clientPort);
+                asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            }
         }
     }
 
@@ -132,6 +151,10 @@ public class OutgoingMessageHandler {
                     connectionDetails.getHostIP(), connectionDetails.getHostPort());
             asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }
+    }
+
+    private SessionModel getSession() {
+        return StateSingleton.getInstance().activeSession;
     }
 
     private static class AsyncSender extends AsyncTask<Void, Void, Void> {

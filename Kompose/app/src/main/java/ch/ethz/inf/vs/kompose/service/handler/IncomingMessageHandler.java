@@ -79,7 +79,7 @@ public class IncomingMessageHandler implements Runnable {
 
         final SessionModel activeSessionModel = StateSingleton.getInstance().activeSession;
 
-        MessageType messageType = MessageType.valueOf(message.getType());
+        final MessageType messageType = MessageType.valueOf(message.getType());
         Log.d(LOG_TAG, "Message processing (" + messageType + ")");
 
         ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel);
@@ -133,16 +133,19 @@ public class IncomingMessageHandler implements Runnable {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
-                    adaptLists(activeSessionModel);
                     finalSessionUIChanges.run();
+                    adaptLists(activeSessionModel);
 
-                    Thread t = new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            new OutgoingMessageHandler().sendSessionUpdate(activeSessionModel);
-                        }
-                    });
-                    t.run();
+                    if (messageType != MessageType.SESSION_UPDATE && activeSessionModel.getIsHost()) {
+                        //if the processed request was not session update, we update the session
+                        Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new OutgoingMessageHandler().sendSessionUpdate();
+                            }
+                        });
+                        t.run();
+                    }
                 }
             });
         }

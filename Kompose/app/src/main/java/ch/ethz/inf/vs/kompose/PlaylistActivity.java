@@ -122,7 +122,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         SessionModel activeSession = StateSingleton.getInstance().activeSession;
 
         //set session to active if host
-        if (activeSession.getSessionStatus().equals(SessionStatus.WAITING) && activeSession.getIsHost()) {
+        if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
             activeSession.setSessionStatus(SessionStatus.ACTIVE);
         }
 
@@ -192,24 +192,20 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     private void leaveSession() {
         Log.d(LOG_TAG, "Left the party by pressing the button");
-
-        //todo technical: do what you must
-
         // unregister the client
-        responseHandler.sendUnRegisterClient(StateSingleton.getInstance().activeSession);
-
+        responseHandler.sendUnRegisterClient();
         this.finish();
     }
 
     @Override
     public void downVoteClicked(View v, int position) {
-        ImageButton button = (ImageButton) findViewById(R.id.down_vote_button);
-        button.setBackgroundColor(Color.BLACK);
-
         SongModel songModel = viewModel.getSessionModel().getPlayQueue().get(position);
-        //todo: how to get songModel to song?
-        // send downvote request
-        responseHandler.sendCastSkipSongVote(null);
+
+        if (songModel.getSkipVoteCasted()) {
+            responseHandler.sendRemoveSkipSongVote(songModel);
+        } else {
+            responseHandler.sendCastSkipSongVote(songModel);
+        }
     }
 
     @Override
@@ -217,8 +213,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         String youtubeUrl = viewModel.getSearchLink();
         viewModel.setSearchLink("");
         songRequestDialog.dismiss();
-        if (viewModel.getSessionModel().getSessionStatus().equals(SessionStatus.WAITING))
-            viewModel.getSessionModel().setSessionStatus(SessionStatus.ACTIVE);
         resolveAndRequestSong(youtubeUrl);
     }
 
@@ -241,8 +235,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     public void onEvent(Integer status, SongModel value) {
         if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
             Log.d(LOG_TAG, "resolved download url: " + value.getDownloadUrl());
-            //todo: how to get songModel to session?
-            responseHandler.sendRequestSong(null);
+            responseHandler.sendRequestSong(value);
         } else {
             Log.e(LOG_TAG, "resolving url failed");
             showError("Failed to resolve Youtube URL");
