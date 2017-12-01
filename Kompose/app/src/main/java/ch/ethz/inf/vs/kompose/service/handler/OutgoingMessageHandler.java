@@ -29,12 +29,13 @@ public class OutgoingMessageHandler {
 
     /**
      * Retrieves the base structure for a message
+     *
      * @param type What kind of message this is
      * @return Message data object
      */
     private Message getBaseMessage(MessageType type) {
         Message msg = new Message();
-        String uuid = StateSingleton.getInstance().getDeviceUUID().toString();
+        String uuid = StateSingleton.getInstance().activeClient.getUUID().toString();
         msg.setSenderUuid(uuid);
         msg.setType(type.toString());
         return msg;

@@ -41,8 +41,8 @@ public class SongModel extends UniqueModel {
     private boolean skipVoteCasted;
     private DateTime creationDateTime;
 
-    private SongStatus songStatus;
-    private DownloadStatus downloadStatus;
+    private SongStatus songStatus = SongStatus.REQUESTED;
+    private DownloadStatus downloadStatus = DownloadStatus.NOT_STARTED;
 
     private Drawable thumbnail;
     private File downloadPath;

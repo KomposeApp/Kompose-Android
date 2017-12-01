@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.kompose;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,7 +34,6 @@ public class PartyCreationActivity extends BaseActivity {
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         //setContentView(R.layout.activity_party_creation);
 
-
         //get binding & bind viewmodel to view
         ActivityPartyCreationBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_party_creation);
         binding.setViewModel(viewModel);
@@ -53,20 +54,17 @@ public class PartyCreationActivity extends BaseActivity {
             return;
         }
 
-        UUID deviceUUID = StateSingleton.getInstance().deviceUUID;
-
-
         // create a new session
-        SessionModel newSession = new SessionModel(UUID.randomUUID(), deviceUUID, true);
+        SessionModel newSession = new SessionModel(UUID.randomUUID(), StateSingleton.getInstance().deviceUUID, true);
         newSession.setName(sessionName);
         newSession.setCreationDateTime(DateTime.now());
 
-        //todo technical: am I doing this right?
-        ClientModel clientModel = new ClientModel(deviceUUID, newSession);
+        ClientModel clientModel = new ClientModel(StateSingleton.getInstance().deviceUUID, newSession);
         clientModel.setName(clientName);
         clientModel.setIsActive(true);
         newSession.getClients().add(clientModel);
 
+        StateSingleton.getInstance().activeClient = clientModel;
         StateSingleton.getInstance().activeSession = newSession;
 
         // start the server service
@@ -77,4 +75,5 @@ public class PartyCreationActivity extends BaseActivity {
         startActivity(playlistIntent);
         this.finish();
     }
+
 }

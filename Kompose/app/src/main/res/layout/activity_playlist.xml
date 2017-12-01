@@ -9,6 +9,8 @@
 
         <import type="ch.ethz.inf.vs.kompose.enums.SessionStatus" />
 
+        <import type="ch.ethz.inf.vs.kompose.enums.SongStatus" />
+
         <variable
             name="viewModel"
             type="ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel" />
@@ -23,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="@{!viewModel.sessionModel.sessionStatus.equals(SessionStatus.WAITING) ? View.VISIBLE : View.GONE}"
+            android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.ACTIVE) ? View.VISIBLE : View.GONE}"
             tools:visibility="visible">
 
 
@@ -103,7 +105,7 @@
                         android:enabled="@{viewModel.sessionModel.isHost}"
                         android:onClick="@{viewModel.onPlayClicked}"
                         android:text="@string/play"
-                        android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.PAUSED) ? View.VISIBLE : View.GONE}" />
+                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PAUSED) ? View.VISIBLE : View.GONE}" />
 
                     <Button
                         android:layout_width="wrap_content"
@@ -113,7 +115,7 @@
                         android:enabled="@{viewModel.sessionModel.isHost}"
                         android:onClick="@{viewModel.onPauseClicked}"
                         android:text="@string/pause"
-                        android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.PLAYING) ? View.VISIBLE : View.GONE}" />
+                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING) ? View.VISIBLE : View.GONE}" />
 
                 </RelativeLayout>
 

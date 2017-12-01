@@ -1,6 +1,8 @@
 package ch.ethz.inf.vs.kompose;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,7 +12,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
+import java.util.UUID;
+
 import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -31,6 +37,23 @@ public class MainActivity extends AppCompatActivity {
         binding.setSubText1("... and I want to join!");
         binding.setText2("no, others should join my party");
         binding.setSubText2("... because I am connected to the music station");
+
+        ensureDeviceUUIDSet();
+    }
+
+
+    private void ensureDeviceUUIDSet() {
+        String preferencesKey = "preferences";
+        SharedPreferences preferences = getSharedPreferences(preferencesKey, Context.MODE_PRIVATE);
+
+        if (!preferences.contains("device_uuid")) {
+            StateSingleton.getInstance().deviceUUID = UUID.randomUUID();
+        } else {
+            StateSingleton.getInstance().deviceUUID = UUID.fromString(preferences.getString("device_uuid", null));
+            SharedPreferences.Editor editor = getSharedPreferences(preferencesKey, Context.MODE_PRIVATE).edit();
+            editor.putString("device_uuid", StateSingleton.getInstance().deviceUUID.toString());
+            editor.apply();
+        }
     }
 
     /**

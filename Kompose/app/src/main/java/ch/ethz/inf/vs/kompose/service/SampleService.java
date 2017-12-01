@@ -26,7 +26,7 @@ public class SampleService {
         SessionModel sessionModel = new SessionModel(UUID.randomUUID(), UUID.randomUUID(), true);
         sessionModel.setCreationDateTime(DateTime.now());
         sessionModel.setName(sessionName);
-        sessionModel.setSessionStatus(SessionStatus.PLAYING);
+        sessionModel.setSessionStatus(SessionStatus.ACTIVE);
 
         fillSampleSession(sessionModel);
 
@@ -36,7 +36,6 @@ public class SampleService {
     public void fillSampleSession(SessionModel sessionModel) {
         //sessionModel.setSessionStatus(SessionStatus.PLAYING);
         int order = 0;
-        sessionModel.setSessionStatus(SessionStatus.PLAYING);
         for (int i = 0; i < 1; i++) {
             ClientModel clientModel = new ClientModel(UUID.randomUUID(), sessionModel);
 
@@ -44,7 +43,10 @@ public class SampleService {
             for (int j = 0; j < 3; j++) {
                 sessionModel.getPlayedSongs().add(getSampleSong(sessionModel, clientModel, order++));
             }
-            sessionModel.setCurrentlyPlaying(getSampleSong(sessionModel, clientModel, order++));
+
+            SongModel songModel = getSampleSong(sessionModel, clientModel, order++);
+            songModel.setSongStatus(SongStatus.PLAYING);
+            sessionModel.setCurrentlyPlaying(songModel);
 
             /*
             for (int j = 0; j < 5; j++) {

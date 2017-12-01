@@ -19,6 +19,7 @@ import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SampleService;
@@ -30,7 +31,7 @@ import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
-public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
+public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener, SimpleListener<Integer, SongModel> {
 
     private static final String LOG_TAG = "## Playlist Activity";
     private OutgoingMessageHandler responseHandler;
@@ -85,20 +86,16 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     private void resolveAndRequestSong(String youtubeUrl) {
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
+        SessionModel activeSession = StateSingleton.getInstance().activeSession;
+
+        //set session to active if host
+        if (activeSession.getSessionStatus().equals(SessionStatus.WAITING) && activeSession.getIsHost()) {
+            activeSession.setSessionStatus(SessionStatus.ACTIVE);
+        }
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(youtubeUrl, new SimpleListener<Integer, Song>() {
-            @Override
-            public void onEvent(Integer status, Song song) {
-                if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
-                    Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
-                    responseHandler.sendRequestSong(song);
-                } else {
-                    Log.e(LOG_TAG, "resolving url failed");
-                    showError("Failed to resolve Youtube URL");
-                }
-            }
-        });
+
+        youtubeService.resolveSong(youtubeUrl, activeSession, StateSingleton.getInstance().activeClient, this);
     }
 
     @Override
@@ -176,7 +173,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         button.setBackgroundColor(Color.BLACK);
 
         SongModel songModel = viewModel.getSessionModel().getPlayQueue().get(position);
-        //todo technical: transform songModel to song
+        //todo: how to get songModel to song?
         // send downvote request
         responseHandler.sendCastSkipSongVote(null);
     }
@@ -192,11 +189,23 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     @Override
     public void playClicked(View v) {
-        StateSingleton.getInstance().activeSession.setSessionStatus(SessionStatus.PLAYING);
+        StateSingleton.getInstance().activeSession.getCurrentlyPlaying().setSongStatus(SongStatus.PLAYING);
     }
 
     @Override
     public void pauseClicked(View v) {
-        StateSingleton.getInstance().activeSession.setSessionStatus(SessionStatus.PAUSED);
+        StateSingleton.getInstance().activeSession.getCurrentlyPlaying().setSongStatus(SongStatus.PAUSED);
+    }
+
+    @Override
+    public void onEvent(Integer status, SongModel value) {
+        if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
+            Log.d(LOG_TAG, "resolved download url: " + value.getDownloadUrl());
+            //todo: how to get songModel to session?
+            responseHandler.sendRequestSong(null);
+        } else {
+            Log.e(LOG_TAG, "resolving url failed");
+            showError("Failed to resolve Youtube URL");
+        }
     }
 }

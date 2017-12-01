@@ -32,7 +32,7 @@ public class ReflectionUnitTest {
         typeToValueDictionary.put(URI.class, "http://youtube.com");
         typeToValueDictionary.put(SongStatus.class, SongStatus.IN_QUEUE.toString());
         typeToValueDictionary.put(DownloadStatus.class, DownloadStatus.FAILED.toString());
-        typeToValueDictionary.put(SessionStatus.class, SessionStatus.PAUSED.toString());
+        typeToValueDictionary.put(SessionStatus.class, SessionStatus.ACTIVE.toString());
     }
 
     protected void fillObject(Object obj) {
@@ -63,7 +63,7 @@ public class ReflectionUnitTest {
                             method.invoke(obj, typeToValueDictionary.get(SongStatus.class));
                         } else if (methodName.endsWith("DownloadStatus")) {
                             method.invoke(obj, typeToValueDictionary.get(DownloadStatus.class));
-                        }  else if (methodName.endsWith("SessionStatus")) {
+                        } else if (methodName.endsWith("SessionStatus")) {
                             method.invoke(obj, typeToValueDictionary.get(SessionStatus.class));
                         } else {
                             method.invoke(obj, typeToValueDictionary.get(parameterType));
