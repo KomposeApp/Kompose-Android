@@ -33,7 +33,7 @@ public class OutgoingMessageHandler {
      * @param type What kind of message this is
      * @return Message data object
      */
-    private Message getBaseMessage(MessageType type) {
+    private Message getBaseMessageHost(MessageType type) {
         Message msg = new Message();
         String uuid = StateSingleton.getInstance().activeClient.getUUID().toString();
         msg.setSenderUuid(uuid);
@@ -42,78 +42,78 @@ public class OutgoingMessageHandler {
     }
 
     public void sendRegisterClient(String username, int port) {
-        Message msg = getBaseMessage(MessageType.REGISTER_CLIENT);
+        Message msg = getBaseMessageHost(MessageType.REGISTER_CLIENT);
         msg.setSenderUsername(username);
         msg.setPort(port);
-        sendMessage(msg);
+        sendMessageToHost(msg);
     }
 
     public void sendCastSkipSongVote(Song song) {
-        Message msg = getBaseMessage(MessageType.CAST_SKIP_SONG_VOTE);
+        Message msg = getBaseMessageHost(MessageType.CAST_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
-        sendMessage(msg);
+        sendMessageToHost(msg);
     }
 
     public void sendRemoveSkipSongVote(Song song) {
-        Message msg = getBaseMessage(MessageType.REMOVE_SKIP_SONG_VOTE);
+        Message msg = getBaseMessageHost(MessageType.REMOVE_SKIP_SONG_VOTE);
         msg.setSongDetails(song);
-        sendMessage(msg);
+        sendMessageToHost(msg);
     }
 
     public void sendKeepAlive() {
-        Message msg = getBaseMessage(MessageType.KEEP_ALIVE);
-        sendMessage(msg);
+        Message msg = getBaseMessageHost(MessageType.KEEP_ALIVE);
+        sendMessageToHost(msg);
     }
 
     public void sendRequestSong(Song song) {
-        Message msg = getBaseMessage(MessageType.REQUEST_SONG);
+        Message msg = getBaseMessageHost(MessageType.REQUEST_SONG);
         msg.setSongDetails(song);
-        sendMessage(msg);
+        sendMessageToHost(msg);
     }
 
-    public void sendUnRegisterClient() {
-        Message msg = getBaseMessage(MessageType.UNREGISTER_CLIENT);
-        sendMessage(msg);
-    }
-
-    public void sendSessionUpdate(Session session) {
-        Message msg = getBaseMessage(MessageType.SESSION_UPDATE);
-        msg.setSession(session);
-        sendMessage(msg);
-    }
-
-    public void sendError(String error) {
-        Message msg = getBaseMessage(MessageType.ERROR);
-        msg.setErrorMessage(error);
-        sendMessage(msg);
-    }
-
-    public void sendFinishSession() {
-        Message msg = getBaseMessage(MessageType.FINISH_SESSION);
-        sendMessage(msg);
-    }
-
-    public void updateAllClients(SessionModel sessionModel) {
-        SessionConverter sessionConverter = new SessionConverter();
-        Session session = sessionConverter.convert(sessionModel);
-        Message message = getBaseMessage(MessageType.SESSION_UPDATE);
-        message.setSession(session);
-
-        // send message to all clients, but not to itself
-        for (ClientModel c : sessionModel.getClients()) {
-            if (!c.getUUID().equals(StateSingleton.getInstance().deviceUUID)) {
-                Log.d(LOG_TAG, "sending session update to: " + c.getName()
-                        + " (" + c.getUUID().toString() + ")");
-                InetAddress clientIP = c.getClientConnectionDetails().getIp();
-                int clientPort = c.getClientConnectionDetails().getPort();
-                AsyncSender asyncSender = new AsyncSender(message, clientIP, clientPort);
-                asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-            }
+    public void sendUnRegisterClient(SessionModel sessionModel) {
+        if (sessionModel.getIsHost()) {
+            Message msg = getBaseMessageHost(MessageType.UNREGISTER_CLIENT);
+            sendMessageToHost(msg);
         }
     }
 
+    public void sendSessionUpdate(SessionModel sessionModel) {
+        if (sessionModel.getIsHost()) {
+            SessionConverter sessionConverter = new SessionConverter();
+            Session session = sessionConverter.convert(sessionModel);
+            Message message = getBaseMessageHost(MessageType.SESSION_UPDATE);
+            message.setSession(session);
+
+            // send message to all clients, but not to itself
+            for (ClientModel c : sessionModel.getClients()) {
+                if (!c.getUUID().equals(StateSingleton.getInstance().deviceUUID)) {
+                    Log.d(LOG_TAG, "sending session update to: " + c.getName()
+                            + " (" + c.getUUID().toString() + ")");
+                    InetAddress clientIP = c.getClientConnectionDetails().getIp();
+                    int clientPort = c.getClientConnectionDetails().getPort();
+                    AsyncSender asyncSender = new AsyncSender(message, clientIP, clientPort);
+                    asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                }
+            }
+        } else {
+            Log.d(LOG_TAG, "tried to send session update but not host ");
+        }
+    }
+
+    public void sendError(String error) {
+        Message msg = getBaseMessageHost(MessageType.ERROR);
+        msg.setErrorMessage(error);
+        sendMessageToHost(msg);
+    }
+
+    public void sendFinishSession() {
+        Message msg = getBaseMessageHost(MessageType.FINISH_SESSION);
+        sendMessageToHost(msg);
+    }
+
     // send a message to the globally stored host via IP/port
-    private void sendMessage(Message message) {
+    private void sendMessageToHost(Message message) {
         // if this device is host, call message handler directly
         if (StateSingleton.getInstance().activeSession.getIsHost()) {
             Log.d(LOG_TAG, "device is host, don't send message to network");

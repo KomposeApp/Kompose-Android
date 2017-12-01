@@ -139,7 +139,7 @@ public class IncomingMessageHandler implements Runnable {
                     Thread t = new Thread(new Runnable() {
                         @Override
                         public void run() {
-                            new OutgoingMessageHandler().updateAllClients(activeSessionModel);
+                            new OutgoingMessageHandler().sendSessionUpdate(activeSessionModel);
                         }
                     });
                     t.run();

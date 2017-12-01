@@ -49,21 +49,29 @@ public class AudioService extends Service {
 
         Log.d(LOG_TAG, "started");
         sessionModel = StateSingleton.getInstance().activeSession;
-        ObservableUniqueSortedList<SongModel> playQueue
-                = (ObservableUniqueSortedList<SongModel>) sessionModel.getPlayQueue();
 
         // start the download worker
-        DownloadWorker downloadWorker = new DownloadWorker(this, playQueue);
+        DownloadWorker downloadWorker = new DownloadWorker(this, sessionModel.getPlayQueue());
         downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
-    public void togglePlayPause() {
+    public void startPlaying() {
         SongModel currentSong = sessionModel.getCurrentlyPlaying();
         MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
-        if (sessionModel.getSessionStatus() == SessionStatus.PLAYING && mediaPlayer != null) {
+        if (currentSong.getSongStatus() == SongStatus.PLAYING && mediaPlayer != null) {
             mediaPlayer.pause();
-        } else if (sessionModel.getSessionStatus() == SessionStatus.PAUSED && mediaPlayer != null) {
-            mediaPlayer.start();
+            currentSong.setSongStatus(SongStatus.PAUSED);
+        }
+    }
+
+    public void stopPlaying() {
+        if (sessionModel.getIsHost()) {
+            SongModel currentSong = sessionModel.getCurrentlyPlaying();
+            MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
+            if (currentSong.getSongStatus() == SongStatus.PAUSED && mediaPlayer != null) {
+                mediaPlayer.start();
+                currentSong.setSongStatus(SongStatus.PLAYING);
+            }
         }
     }
 
@@ -75,6 +83,7 @@ public class AudioService extends Service {
                 && currentSong.getDownloadStatus() != DownloadStatus.FINISHED) {
 
             currentSong.setSongStatus(SongStatus.PLAYING);
+
             MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -87,7 +96,7 @@ public class AudioService extends Service {
                 }
             });
             mediaPlayer.start();
-            sessionModel.setSessionStatus(SessionStatus.PLAYING);
+
         }
     }
 
@@ -128,7 +137,7 @@ public class AudioService extends Service {
             }
 
             // notify clients about the currently playing song change
-            new OutgoingMessageHandler().updateAllClients(sessionModel);
+            new OutgoingMessageHandler().sendSessionUpdate(sessionModel);
         }
     }
 
@@ -155,29 +164,32 @@ public class AudioService extends Service {
         }
 
         @Override
-        public void onChanged(ObservableList observableList) { }
+        public void onChanged(ObservableList observableList) {
+        }
 
         @Override
-        public void onItemRangeChanged(ObservableList observableList, int i, int i1) { }
+        public void onItemRangeChanged(ObservableList observableList, int i, int i1) {
+        }
 
         @Override
         public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
-            Log.d(LOG_TAG, (i1-i) + " new items in play queue");
+            Log.d(LOG_TAG, (i1 - i) + " new items in play queue");
             audioService.updateCurrentSong();
             notifier.register();
         }
 
         @Override
-        public void onItemRangeMoved(ObservableList observableList, int i, int i1, int i2) { }
+        public void onItemRangeMoved(ObservableList observableList, int i, int i1, int i2) {
+        }
 
         @Override
         public void onItemRangeRemoved(ObservableList observableList, int i, int i1) {
-            Log.d(LOG_TAG, (i1-i) + " items removed from play queue");
+            Log.d(LOG_TAG, (i1 - i) + " items removed from play queue");
             notifier.register();
         }
     }
 
-    private static class DownloadWorker extends AsyncTask<Void,Void,Void> {
+    private static class DownloadWorker extends AsyncTask<Void, Void, Void> {
 
         private Phaser notifier;
         private int numSongsPreload;

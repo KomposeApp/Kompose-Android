@@ -70,7 +70,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         ActivityConnectBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_connect);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
-        binding.setTitle("create a shared playlist with friends");
         binding.setViewModel(viewModel);
 
         //bind client network service

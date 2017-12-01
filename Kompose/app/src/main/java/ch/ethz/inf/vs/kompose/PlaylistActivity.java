@@ -18,11 +18,9 @@ import android.view.View;
 import android.widget.ImageButton;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
-import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
-import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.AudioService;
@@ -198,7 +196,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         //todo technical: do what you must
 
         // unregister the client
-        responseHandler.sendUnRegisterClient();
+        responseHandler.sendUnRegisterClient(StateSingleton.getInstance().activeSession);
 
         this.finish();
     }
@@ -220,7 +218,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         viewModel.setSearchLink("");
         songRequestDialog.dismiss();
         if (viewModel.getSessionModel().getSessionStatus().equals(SessionStatus.WAITING))
-            viewModel.getSessionModel().setSessionStatus(SessionStatus.PLAYING);
+            viewModel.getSessionModel().setSessionStatus(SessionStatus.ACTIVE);
         resolveAndRequestSong(youtubeUrl);
     }
 
@@ -228,14 +226,14 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     @Override
     public void playClicked(View v) {
         if (audioServiceBound) {
-            audioService.togglePlayPause();
+            audioService.startPlaying();
         }
     }
 
     @Override
     public void pauseClicked(View v) {
         if (audioServiceBound) {
-            audioService.togglePlayPause();
+            audioService.stopPlaying();
         }
     }
 
