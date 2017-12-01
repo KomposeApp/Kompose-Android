@@ -186,6 +186,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         String youtubeUrl = viewModel.getSearchLink();
         viewModel.setSearchLink("");
         songRequestDialog.dismiss();
+        if (viewModel.getSessionModel().getSessionStatus().equals(SessionStatus.WAITING))
+            viewModel.getSessionModel().setSessionStatus(SessionStatus.PLAYING);
         resolveAndRequestSong(youtubeUrl);
     }
 

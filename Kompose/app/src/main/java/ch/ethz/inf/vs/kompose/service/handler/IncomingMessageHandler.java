@@ -179,7 +179,7 @@ public class IncomingMessageHandler implements Runnable {
                 }
 
                 int quorum = sessionModel.getActiveDevices() / 2;
-                if (songModel.getValidDownVoteCount() >= quorum) {
+                if (songModel.getValidDownVoteCount() > quorum) {
                     //add to skipped if not played
                     if (sessionModel.getPlayQueue().contains(songModel)) {
                         sessionModel.getPlayQueue().remove(songModel);
