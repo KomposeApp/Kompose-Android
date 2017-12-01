@@ -74,6 +74,8 @@
 
         <service android:name=".service.ClientNetworkService" />
 
+        <service android:name=".service.AudioService" />
+
         <activity android:name=".DesignActivity" />
     </application>
 

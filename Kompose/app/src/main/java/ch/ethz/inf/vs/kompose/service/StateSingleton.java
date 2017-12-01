@@ -1,10 +1,12 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.content.SharedPreferences;
 import android.databinding.ObservableList;
 
 import java.util.Comparator;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.comparators.SessionComparator;
 import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
@@ -17,12 +19,9 @@ public class StateSingleton {
 
     // Client specific fields
     public SessionModel activeSession;
-    public String currentUsername;
+    public ClientModel activeClient;
     public SessionModel activeHistorySession;
-    public UUID deviceUUID = UUID.randomUUID();
-
-    // Host specific fields
-    public boolean deviceIsHost;
+    public UUID deviceUUID;
 
     /* * Initialization on-demand holder idiom for Singleton Pattern * */
 
@@ -38,8 +37,4 @@ public class StateSingleton {
     }
 
     /* *********************************************************************** */
-
-    public UUID getDeviceUUID() {
-        return deviceUUID;
-    }
 }

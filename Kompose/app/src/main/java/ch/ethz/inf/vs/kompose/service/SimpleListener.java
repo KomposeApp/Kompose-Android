@@ -1,5 +1,5 @@
 package ch.ethz.inf.vs.kompose.service;
 
-public interface SimpleListener<_STATE, _OBJECT> {
-    void onEvent(_STATE status, _OBJECT value);
+public interface SimpleListener<TMessage, TPayload> {
+    void onEvent(TMessage status, TPayload value);
 }

@@ -4,6 +4,7 @@ import android.databinding.Bindable;
 import android.databinding.ObservableArrayList;
 import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 
 import org.joda.time.DateTime;
 
@@ -41,11 +42,13 @@ public class SongModel extends UniqueModel {
     private boolean skipVoteCasted;
     private DateTime creationDateTime;
 
-    private SongStatus songStatus;
-    private DownloadStatus downloadStatus;
+    private SongStatus songStatus = SongStatus.REQUESTED;
+    private DownloadStatus downloadStatus = DownloadStatus.NOT_STARTED;
 
     private Drawable thumbnail;
     private File downloadPath;
+
+    private MediaPlayer mediaPlayer;
 
     @Bindable
     public String getTitle() {
@@ -182,9 +185,16 @@ public class SongModel extends UniqueModel {
         return thumbnail;
     }
 
-    public void setThumbnail(Drawable drawable)
-    {
+    public void setThumbnail(Drawable drawable) {
         this.thumbnail = thumbnail;
         notifyPropertyChanged(BR.thumbnail);
+    }
+
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
+    public void setMediaPlayer(MediaPlayer mediaPlayer) {
+        this.mediaPlayer = mediaPlayer;
     }
 }

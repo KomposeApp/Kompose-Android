@@ -32,7 +32,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{String.valueOf(viewHolder.item.secondsLength)}"
-            tools:text="length of my video"/>
+            tools:text="length of my video" />
 
     </LinearLayout>
 </layout>

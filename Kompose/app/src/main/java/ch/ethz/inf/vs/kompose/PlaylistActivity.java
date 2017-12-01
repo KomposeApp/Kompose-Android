@@ -1,9 +1,13 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -11,13 +15,15 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
-import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.service.AudioService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
@@ -27,7 +33,7 @@ import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
-public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
+public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener, SimpleListener<Integer, SongModel> {
 
     private static final String LOG_TAG = "## Playlist Activity";
     private OutgoingMessageHandler responseHandler;
@@ -36,6 +42,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private Intent clientNetworkServiceIntent;
 
     private Dialog songRequestDialog;
+
+    private AudioService audioService;
+    private boolean audioServiceBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +77,34 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         binding.setViewModel(viewModel);
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // bind to audio service
+        if (StateSingleton.getInstance().activeSession.getIsHost()) {
+            Log.d(LOG_TAG, "binding AudioService");
+            Intent audioServiceIntent = new Intent(this.getBaseContext(), AudioService.class);
+            bindService(audioServiceIntent, audioServiceConnection, BIND_AUTO_CREATE);
+        }
+    }
+
+    private ServiceConnection audioServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "AudioService connected");
+            audioServiceBound = true;
+            audioService = ((AudioService.LocalBinder) service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.d(LOG_TAG, "AudioService disconnected");
+            audioServiceBound = false;
+        }
+    };
+
     private void handleSendText(Intent intent) {
         SessionModel activeSession = StateSingleton.getInstance().activeSession;
         if (activeSession == null) {
@@ -82,20 +119,16 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     private void resolveAndRequestSong(String youtubeUrl) {
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
+        SessionModel activeSession = StateSingleton.getInstance().activeSession;
+
+        //set session to active if host
+        if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
+            activeSession.setSessionStatus(SessionStatus.ACTIVE);
+        }
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(youtubeUrl, new SimpleListener<Integer, Song>() {
-            @Override
-            public void onEvent(Integer status, Song song) {
-                if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
-                    Log.d(LOG_TAG, "resolved download url: " + song.getDownloadUrl());
-                    responseHandler.sendRequestSong(song);
-                } else {
-                    Log.e(LOG_TAG, "resolving url failed");
-                    showError("Failed to resolve Youtube URL");
-                }
-            }
-        });
+
+        youtubeService.resolveSong(youtubeUrl, activeSession, StateSingleton.getInstance().activeClient, this);
     }
 
     @Override
@@ -105,7 +138,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             stopService(clientNetworkServiceIntent);
             Log.d(LOG_TAG, "ClientNetworkService successfully stopped");
         }
-
+        unbindService(audioServiceConnection);
+        audioServiceBound = false;
     }
 
     @Override
@@ -158,21 +192,20 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     private void leaveSession() {
         Log.d(LOG_TAG, "Left the party by pressing the button");
-
-        //todo technical: do what you must
-
         // unregister the client
         responseHandler.sendUnRegisterClient();
-
         this.finish();
     }
 
     @Override
     public void downVoteClicked(View v, int position) {
         SongModel songModel = viewModel.getSessionModel().getPlayQueue().get(position);
-        //todo technical: transform songModel to song
-        // send downvote request
-        responseHandler.sendCastSkipSongVote(null);
+
+        if (songModel.getSkipVoteCasted()) {
+            responseHandler.sendRemoveSkipSongVote(songModel);
+        } else {
+            responseHandler.sendCastSkipSongVote(songModel);
+        }
     }
 
     @Override
@@ -186,6 +219,26 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     @Override
     public void playClicked(View v) {
-        //todo: play/pause session
+        if (audioServiceBound) {
+            audioService.startPlaying();
+        }
+    }
+
+    @Override
+    public void pauseClicked(View v) {
+        if (audioServiceBound) {
+            audioService.stopPlaying();
+        }
+    }
+
+    @Override
+    public void onEvent(Integer status, SongModel value) {
+        if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
+            Log.d(LOG_TAG, "resolved download url: " + value.getDownloadUrl());
+            responseHandler.sendRequestSong(value);
+        } else {
+            Log.e(LOG_TAG, "resolving url failed");
+            showError("Failed to resolve Youtube URL");
+        }
     }
 }

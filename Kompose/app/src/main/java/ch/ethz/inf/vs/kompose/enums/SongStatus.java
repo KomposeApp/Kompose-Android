@@ -14,7 +14,11 @@ public enum SongStatus {
      */
     PLAYING,
     /**
-     * the song was skipped because it was excluded by popular vote
+     * the song is currently paused
+     */
+    PAUSED,
+    /**
+     * the song was skipped because it could not be downloaded or it was excluded by popular vote
      */
     SKIPPED_BY_POPULAR_VOTE,
     /**

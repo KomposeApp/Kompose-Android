@@ -5,7 +5,8 @@
 
     <data>
 
-        <import type="android.view.View"/>
+        <import type="android.view.View" />
+
         <variable
             name="viewModel"
             type="ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel" />

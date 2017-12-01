@@ -114,7 +114,8 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         pressedSession.getClients().add(clientModel);
 
         StateSingleton.getInstance().activeSession = pressedSession;
-        StateSingleton.getInstance().currentUsername  = clientName;
+        StateSingleton.getInstance().activeClient = clientModel;
+
         try {
             if (!clientNetworkServiceBound && clientNetworkService == null)
                 throw new IllegalStateException("Failed to properly set up Client Network Service");

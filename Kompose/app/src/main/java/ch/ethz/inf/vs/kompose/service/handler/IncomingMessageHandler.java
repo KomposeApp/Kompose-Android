@@ -10,11 +10,14 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
+import ch.ethz.inf.vs.kompose.data.json.DownVote;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
@@ -76,7 +79,7 @@ public class IncomingMessageHandler implements Runnable {
 
         final SessionModel activeSessionModel = StateSingleton.getInstance().activeSession;
 
-        MessageType messageType = MessageType.valueOf(message.getType());
+        final MessageType messageType = MessageType.valueOf(message.getType());
         Log.d(LOG_TAG, "Message processing (" + messageType + ")");
 
         ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel);
@@ -91,57 +94,66 @@ public class IncomingMessageHandler implements Runnable {
             return;
         }
 
-        boolean sessionHasChanged = false;
+        Runnable sessionUIChanges = null;
         switch (messageType) {
             case REGISTER_CLIENT:
-                sessionHasChanged = registerClient(message, activeSessionModel);
+                sessionUIChanges = registerClient(message, activeSessionModel);
                 break;
             case UNREGISTER_CLIENT:
-                sessionHasChanged = unregisterClient(message, activeSessionModel);
+                sessionUIChanges = unregisterClient(message, activeSessionModel);
                 break;
             case SESSION_UPDATE:
-                sessionUpdate(message, activeSessionModel);
+                sessionUIChanges = sessionUpdate(message, activeSessionModel);
                 break;
             case REQUEST_SONG:
-                sessionHasChanged = requestSong(message, activeSessionModel);
+                sessionUIChanges = requestSong(message, activeSessionModel);
                 break;
             case CAST_SKIP_SONG_VOTE:
-                sessionHasChanged = castSkipSongVote(message, activeSessionModel);
+                sessionUIChanges = castSkipSongVote(message, activeSessionModel);
                 break;
             case REMOVE_SKIP_SONG_VOTE:
-                sessionHasChanged = removeSkipSongVote(message, activeSessionModel);
+                sessionUIChanges = removeSkipSongVote(message, activeSessionModel);
                 break;
             case KEEP_ALIVE:
                 //already handled by refreshClientTimeout before
                 break;
             case FINISH_SESSION:
-                finishSession(activeSessionModel);
+                sessionUIChanges = finishSession(activeSessionModel);
                 break;
             case ERROR:
                 //not used so far
                 break;
         }
 
-        if (sessionHasChanged) {
+        if (sessionUIChanges != null) {
             // Queue this on the  UI thread to avoid a race condition where updateAllClients
             // would be called *before* the object actually gets updated in a previously posted
             // UI task (e.g. in `requestSong`)
+            final Runnable finalSessionUIChanges = sessionUIChanges;
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    finalSessionUIChanges.run();
                     adaptLists(activeSessionModel);
-                    new OutgoingMessageHandler().updateAllClients(activeSessionModel);
+
+                    if (messageType != MessageType.SESSION_UPDATE && activeSessionModel.getIsHost()) {
+                        //if the processed request was not session update, we update the session
+                        Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new OutgoingMessageHandler().sendSessionUpdate();
+                            }
+                        });
+                        t.run();
+                    }
                 }
             });
-
-            //adaptsLists()
         }
     }
 
     private void adaptLists(SessionModel sessionModel) {
         boolean playingSet = false;
-        for (SongModel songModel :
-                sessionModel.getAllSongList()) {
+        for (SongModel songModel : sessionModel.getAllSongList()) {
             if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_ERROR)) {
                 //in played queue
                 sessionModel.getPastSongs().add(songModel);
@@ -169,7 +181,7 @@ public class IncomingMessageHandler implements Runnable {
                 }
 
                 int quorum = sessionModel.getActiveDevices() / 2;
-                if (songModel.getValidDownVoteCount() >= quorum) {
+                if (songModel.getValidDownVoteCount() > quorum) {
                     //add to skipped if not played
                     if (sessionModel.getPlayQueue().contains(songModel)) {
                         sessionModel.getPlayQueue().remove(songModel);
@@ -189,13 +201,18 @@ public class IncomingMessageHandler implements Runnable {
 
     }
 
-    // TODO
-    private void finishSession(SessionModel sessionModel) {
-        sessionModel.setSessionStatus(SessionStatus.FINISHED);
+    private Runnable finishSession(final SessionModel sessionModel) {
+        return new Runnable() {
+            @Override
+            public void run() {
+                sessionModel.setSessionStatus(SessionStatus.FINISHED);
+            }
+        };
     }
 
-    private boolean registerClient(Message message, SessionModel sessionModel) {
-        ClientModel client = new ClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
+    private Runnable registerClient(Message message, final SessionModel sessionModel) {
+
+        final ClientModel client = new ClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
         client.setIsActive(true);
         client.setName(message.getSenderUsername());
 
@@ -206,40 +223,46 @@ public class IncomingMessageHandler implements Runnable {
             client.setClientConnectionDetails(connectionDetails);
         }
 
-        sessionModel.getClients().add(client);
-        setActiveDevices(sessionModel);
+        return new Runnable() {
+            @Override
+            public void run() {
 
-        return true;
+                sessionModel.getClients().add(client);
+                setActiveDevices(sessionModel);
+            }
+        };
     }
 
-    private boolean unregisterClient(Message message, SessionModel sessionModel) {
-        ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
+    private Runnable unregisterClient(Message message, final SessionModel sessionModel) {
+        final ClientModel clientModel = getClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
 
         if (clientModel == null) {
-            return false;
+            return null;
         }
 
-        // close the client's socket
-        clientModel.setIsActive(false);
-        clientModel.setClientConnectionDetails(null);
+        return new Runnable() {
+            @Override
+            public void run() {
+                clientModel.setIsActive(false);
+                clientModel.setClientConnectionDetails(null);
 
-        // remove the client's downvotes
-        UUID clientUUID = clientModel.getUUID();
-        for (SongModel songModel : sessionModel.getAllSongList()) {
-            for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
-                if (downVoteModel.getUuid().equals(clientUUID)) {
-                    songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
-                    break;
+                // remove the client's downvotes
+                UUID clientUUID = clientModel.getUUID();
+                for (SongModel songModel : sessionModel.getAllSongList()) {
+                    for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
+                        if (downVoteModel.getUuid().equals(clientUUID)) {
+                            songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
+                            break;
+                        }
+                    }
                 }
+
+                setActiveDevices(sessionModel);
             }
-        }
-
-        setActiveDevices(sessionModel);
-
-        return true;
+        };
     }
 
-    private boolean requestSong(Message message, final SessionModel sessionModel) {
+    private Runnable requestSong(Message message, final SessionModel sessionModel) {
         Song song = message.getSongDetails();
         song.setProposedByClientUuid(message.getSenderUuid());
 
@@ -248,19 +271,19 @@ public class IncomingMessageHandler implements Runnable {
         songModel.setSongStatus(SongStatus.IN_QUEUE);
         songModel.setOrder(sessionModel.getAllSongList().size() + 1);
 
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
+        return new Runnable() {
             @Override
             public void run() {
                 sessionModel.getAllSongList().add(songModel);
             }
-        });
-        return true;
+        };
     }
 
-    private boolean castSkipSongVote(Message message, SessionModel activeSessionModel) {
+    private Runnable castSkipSongVote(Message message, SessionModel activeSessionModel) {
         SongModel downVoteTarget = null;
         String requestedSongUUID = message.getSongDetails().getUuid();
         String senderUUID = message.getSenderUuid();
+        UUID senderUUIDAsUUID = UUID.fromString(senderUUID);
 
         // find the song in the session model
         for (SongModel song : activeSessionModel.getAllSongList()) {
@@ -269,9 +292,9 @@ public class IncomingMessageHandler implements Runnable {
 
                 // check if song already downvoted by this client
                 for (DownVoteModel downVote : song.getDownVotes()) {
-                    String downVoteClientUUID = downVote.getClientModel().getUUID().toString();
-                    if (downVoteClientUUID.equals(senderUUID)) {
-                        return false;
+                    if (downVote.getClientModel().getUUID().equals(senderUUIDAsUUID)) {
+                        //already received downvote request
+                        return null;
                     }
                 }
 
@@ -281,23 +304,28 @@ public class IncomingMessageHandler implements Runnable {
         }
 
         if (downVoteTarget == null) {
-            return false;
+            return null;
         }
 
-        DownVoteModel downVoteModel = new DownVoteModel(UUID.randomUUID(),
+        final DownVoteModel downVoteModel = new DownVoteModel(UUID.randomUUID(),
                 getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel),
                 downVoteTarget);
 
         downVoteTarget.setValidDownVoteCount(downVoteTarget.getValidDownVoteCount() + 1);
-        downVoteTarget.getDownVotes().add(downVoteModel);
 
-        return false;
+        final SongModel finalDownVoteTarget = downVoteTarget;
+        return new Runnable() {
+            @Override
+            public void run() {
+                finalDownVoteTarget.getDownVotes().add(downVoteModel);
+            }
+        };
     }
 
-    private boolean removeSkipSongVote(Message message, SessionModel activeSessionModel) {
+    private Runnable removeSkipSongVote(Message message, SessionModel activeSessionModel) {
         // find the song in the session
         for (int i = 0; i < activeSessionModel.getAllSongList().size(); i++) {
-            SongModel songModel = activeSessionModel.getAllSongList().get(i);
+            final SongModel songModel = activeSessionModel.getAllSongList().get(i);
             String songUUID = songModel.getUUID().toString();
             String requestedSongUUID = message.getSongDetails().getUuid();
             if (songUUID.equals(requestedSongUUID)) {
@@ -309,70 +337,86 @@ public class IncomingMessageHandler implements Runnable {
                     String downvoteClientUUID = downVoteModel.getClientModel().getUUID().toString();
                     String clientUUID = message.getSenderUuid();
                     if (downvoteClientUUID.equals(clientUUID)) {
-                        songModel.getDownVotes().remove(j);
-                        return true;
+                        final DownVoteModel finalDownVoteModel = downVoteModel;
+                        return new Runnable() {
+                            @Override
+                            public void run() {
+                                songModel.getDownVotes().remove(finalDownVoteModel);
+                            }
+                        };
                     }
                 }
             }
         }
 
-        return false;
+        return null;
     }
 
-    // TODO
-    private void sessionUpdate(Message message, final SessionModel activeSessionModel) {
-//        Session receivedSession = message.getSession();
-//
-//        activeSession.setName(receivedSession.getName());
-//        activeSession.setCreationDateTime(receivedSession.getCreationDateTime());
-//        activeSession.setHostUuid(receivedSession.getHostUuid());
+    private Runnable sessionUpdate(Message message, final SessionModel activeSessionModel) {
         Session receivedSession = message.getSession();
 
         SessionConverter converter = new SessionConverter();
         final SessionModel sessionModel = converter.convert(receivedSession);
 
-        activeSessionModel.setName(sessionModel.getName());
-        activeSessionModel.setCreationDateTime(sessionModel.getCreationDateTime());
 
-        /*
-         * The host does currently not include its IP/Port in the messages
-         */
-        // activeSessionModel.setConnectionDetails(sessionModel.getConnectionDetails());
-
-        Runnable uiTask = new Runnable() {
+        return new Runnable() {
             @Override
             public void run() {
+                activeSessionModel.setName(sessionModel.getName());
+                activeSessionModel.setCreationDateTime(sessionModel.getCreationDateTime());
+
+
                 for (ClientModel updateClient : sessionModel.getClients()) {
-                    boolean updated = false;
+                    boolean found = false;
                     for (ClientModel activeClient : activeSessionModel.getClients()) {
                         if (updateClient.getUUID().equals(activeClient.getUUID())) {
                             updateClient(updateClient, activeClient);
-                            updated = true;
+                            found = true;
+                            break;
                         }
                     }
-                    if (!updated) {
+                    if (!found) {
                         activeSessionModel.getClients().add(updateClient);
                     }
                 }
 
                 for (SongModel updateSong : sessionModel.getAllSongList()) {
-                    boolean updated = false;
+                    boolean found = false;
                     for (SongModel activeSong : activeSessionModel.getAllSongList()) {
                         if (updateSong.getUUID().equals(activeSong.getUUID())) {
                             updateSong(updateSong, activeSong);
-                            updated = true;
+                            found = true;
+
+                            List<DownVoteModel> activeDownVotes = new ArrayList<>(activeSong.getDownVotes());
+                            for (DownVoteModel updateDownVote : updateSong.getDownVotes()) {
+                                boolean downVoteFound = false;
+                                for (int i = 0; i < activeDownVotes.size(); i++) {
+                                    if (activeDownVotes.get(i).getUuid().equals(updateDownVote.getUuid())) {
+                                        //found; remove it from the list
+                                        activeDownVotes.remove(activeDownVotes.get(i));
+                                        downVoteFound = true;
+                                        break;
+                                    }
+                                }
+                                if (!downVoteFound) {
+                                    DownVoteModel model = new DownVoteModel(updateDownVote.getUuid(), updateDownVote.getClientModel(), updateDownVote.getDownVoteFor());
+                                    activeSong.getDownVotes().add(model);
+                                }
+                            }
+
+                            //remove all still contained down votes because they have not been found
+                            for (DownVoteModel activeDownVote : activeDownVotes) {
+                                activeSong.getDownVotes().remove(activeDownVote);
+                            }
+
                         }
                     }
-                    if (!updated) {
+                    if (!found) {
                         activeSessionModel.getAllSongList().add(updateSong);
                     }
                 }
             }
         };
-        new Handler(Looper.getMainLooper()).post(uiTask);
-
-
-        //todo: handle up/downvote changes
     }
 
     private void updateClient(ClientModel source, ClientModel target) {
