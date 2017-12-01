@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.databinding.ObservableList;
-import android.databinding.OnRebindCallback;
 
 import org.joda.time.DateTime;
 
@@ -41,7 +40,7 @@ public class SampleService {
 
 
             for (int j = 0; j < 3; j++) {
-                sessionModel.getPlayedSongs().add(getSampleSong(sessionModel, clientModel, order++));
+                sessionModel.getPastSongs().add(getSampleSong(sessionModel, clientModel, order++));
             }
 
             SongModel songModel = getSampleSong(sessionModel, clientModel, order++);
@@ -55,7 +54,7 @@ public class SampleService {
             */
         }
 
-        for (SongModel songModel : sessionModel.getPlayedSongs()) {
+        for (SongModel songModel : sessionModel.getPastSongs()) {
             sessionModel.getAllSongList().add(songModel);
         }
         sessionModel.getAllSongList().add(sessionModel.getCurrentlyPlaying());

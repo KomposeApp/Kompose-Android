@@ -46,47 +46,47 @@ public class SessionModel extends UniqueModel {
 
     private final ObservableList<ClientModel> clients = new ObservableArrayList<>();
 
-    private final ObservableList<SongModel> playQueue = new ObservableUniqueSortedList<>(
+    private final ObservableUniqueSortedList<SongModel> playQueue = new ObservableUniqueSortedList<>(
             new SongComparator(), new UniqueModelComparator<SongModel>()
     );
 
-    private final ObservableList<SongModel> allSongList = new ObservableUniqueSortedList<>(
+    private final ObservableUniqueSortedList<SongModel> allSongList = new ObservableUniqueSortedList<>(
             new SongComparator(), new UniqueModelComparator<SongModel>()
     );
 
-    private final ObservableList<SongModel> playedSongs = new ObservableUniqueSortedList<>(
+    private final ObservableUniqueSortedList<SongModel> playedSongs = new ObservableUniqueSortedList<>(
             new SongComparator(), new UniqueModelComparator<SongModel>()
     );
 
-    private final ObservableList<SongModel> skippedSongs = new ObservableUniqueSortedList<>(
+    private final ObservableUniqueSortedList<SongModel> skippedSongs = new ObservableUniqueSortedList<>(
             new SongComparator(), new UniqueModelComparator<SongModel>()
     );
 
     /**
      * @return all songs waiting to be played
      */
-    public ObservableList<SongModel> getPlayQueue() {
+    public ObservableUniqueSortedList<SongModel> getPlayQueue() {
         return playQueue;
     }
 
     /**
      * @return all songs already played
      */
-    public ObservableList<SongModel> getPlayedSongs() {
+    public ObservableUniqueSortedList<SongModel> getPastSongs() {
         return playedSongs;
     }
 
     /**
      * @return all songs from this session, weather played, not yet played or skipped
      */
-    public ObservableList<SongModel> getAllSongList() {
+    public ObservableUniqueSortedList<SongModel> getAllSongList() {
         return allSongList;
     }
 
     /**
      * @return the songs which are / were skipped
      */
-    public ObservableList<SongModel> getSkippedSongs() {
+    public ObservableUniqueSortedList<SongModel> getPlayQueueWithDislikedSongs() {
         return skippedSongs;
     }
 
@@ -114,8 +114,10 @@ public class SessionModel extends UniqueModel {
     }
 
     public void setCurrentlyPlaying(SongModel currentlyPlaying) {
-        this.currentlyPlaying = currentlyPlaying;
-        notifyPropertyChanged(BR.currentlyPlaying);
+        if (currentlyPlaying != this.currentlyPlaying) {
+            this.currentlyPlaying = currentlyPlaying;
+            notifyPropertyChanged(BR.currentlyPlaying);
+        }
     }
 
     @Bindable

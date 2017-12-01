@@ -1,10 +1,13 @@
 package ch.ethz.inf.vs.kompose;
 
 import android.app.Dialog;
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -22,6 +25,7 @@ import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.service.AudioService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
@@ -40,6 +44,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private Intent clientNetworkServiceIntent;
 
     private Dialog songRequestDialog;
+
+    private AudioService audioService;
+    private boolean audioServiceBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +78,34 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getPlayQueue(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        // bind to audio service
+        if (StateSingleton.getInstance().activeSession.getIsHost()) {
+            Log.d(LOG_TAG, "binding AudioService");
+            Intent audioServiceIntent = new Intent(this.getBaseContext(), AudioService.class);
+            bindService(audioServiceIntent, audioServiceConnection, BIND_AUTO_CREATE);
+        }
+    }
+
+    private ServiceConnection audioServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "AudioService connected");
+            audioServiceBound = true;
+            audioService = ((AudioService.LocalBinder) service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.d(LOG_TAG, "AudioService disconnected");
+            audioServiceBound = false;
+        }
+    };
 
     private void handleSendText(Intent intent) {
         SessionModel activeSession = StateSingleton.getInstance().activeSession;
@@ -105,7 +140,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             stopService(clientNetworkServiceIntent);
             Log.d(LOG_TAG, "ClientNetworkService successfully stopped");
         }
-
+        unbindService(audioServiceConnection);
+        audioServiceBound = false;
     }
 
     @Override
@@ -183,18 +219,24 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         String youtubeUrl = viewModel.getSearchLink();
         viewModel.setSearchLink("");
         songRequestDialog.dismiss();
+        if (viewModel.getSessionModel().getSessionStatus().equals(SessionStatus.WAITING))
+            viewModel.getSessionModel().setSessionStatus(SessionStatus.PLAYING);
         resolveAndRequestSong(youtubeUrl);
     }
 
 
     @Override
     public void playClicked(View v) {
-        StateSingleton.getInstance().activeSession.getCurrentlyPlaying().setSongStatus(SongStatus.PLAYING);
+        if (audioServiceBound) {
+            audioService.togglePlayPause();
+        }
     }
 
     @Override
     public void pauseClicked(View v) {
-        StateSingleton.getInstance().activeSession.getCurrentlyPlaying().setSongStatus(SongStatus.PAUSED);
+        if (audioServiceBound) {
+            audioService.togglePlayPause();
+        }
     }
 
     @Override

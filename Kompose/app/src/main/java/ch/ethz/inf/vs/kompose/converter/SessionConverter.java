@@ -49,7 +49,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         if (session.getSongs() != null) {
             SongConverter songConverter = new SongConverter(sessionModel.getClients());
             for (Song song : session.getSongs()) {
-                sessionModel.getPlayQueue().add(songConverter.convert(song));
+                sessionModel.getAllSongList().add(songConverter.convert(song));
             }
         }
 
@@ -72,7 +72,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
         //convert song models to data
         SongConverter songConverter = new SongConverter(clientModels);
-        ObservableList<SongModel> songModels = sessionModel.getPlayQueue();
+        ObservableList<SongModel> songModels = sessionModel.getAllSongList();
         session.setSongs(new Song[songModels.size()]);
         for (int i = 0; i < songModels.size(); i++) {
             session.getSongs()[i] = songConverter.convert(songModels.get(i));

@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String KEY_CNETWORKSERVICE = "ClientNetworkService";
 
-    public static final boolean DESIGN_MODE = true;
+    public static final boolean DESIGN_MODE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

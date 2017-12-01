@@ -20,7 +20,11 @@ public enum SongStatus {
     /**
      * the song was skipped because it could not be downloaded or it was excluded by popular vote
      */
-    SKIPPED,
+    SKIPPED_BY_POPULAR_VOTE,
+    /**
+     * the song was skipped because it errored to be played / downlaoded
+     */
+    SKIPPED_BY_ERROR,
     /**
      * the song was played
      */
