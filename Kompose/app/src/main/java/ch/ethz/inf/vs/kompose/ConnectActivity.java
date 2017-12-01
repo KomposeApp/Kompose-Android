@@ -10,7 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 
-import java.net.Socket;
+import java.net.SocketException;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityConnectBinding;
@@ -20,7 +20,6 @@ import ch.ethz.inf.vs.kompose.service.ClientNetworkService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
@@ -28,18 +27,39 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 public class ConnectActivity extends BaseActivity implements JoinSessionViewHolder.ClickListener {
 
     private static final String LOG_TAG = "## Connect Activity";
+    private final ConnectViewModel viewModel = new ConnectViewModel();
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
 
-    private final ConnectViewModel viewModel = new ConnectViewModel();
-    private final ConnectActivity ctx = this;
+    /*
+      Note on unbinding the service started here:
+        * If it occurs before we join a room, it simply kills the service and the NSD Listener
+        * If it occurs after we join a room, it will simply disconnect the service from this
+          activity, and live on. This service will then be killed at some other point.
+     */
+    private ServiceConnection cNetServiceConnection = new ServiceConnection() {
 
-        /*
-          Note on unbinding the service started here:
-            * If it occurs before we join a room, it simply kills the service and the NSD Listener
-            * If it occurs after we join a room, it will simply disconnect the service from this
-              activity, and live on. This service will then be killed at some other point.
-         */
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "ClientNetworkService bound");
+            ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
+            clientNetworkService = binder.getService();
+            clientNetworkServiceBound = true;
+            clientNetworkService.findNetworkServices(viewModel.getSessionModels());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG_TAG, "ClientNetworkService died");
+            clientNetworkService = null;
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0) {
+            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
+            clientNetworkService = null;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,30 +93,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         }
     }
 
-    private ServiceConnection cNetServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d(LOG_TAG, "ClientNetworkService bound");
-            ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
-            clientNetworkService = binder.getService();
-            clientNetworkServiceBound = true;
-            clientNetworkService.findNetworkServices(viewModel.getSessionModels());
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.w(LOG_TAG, "ClientNetworkService died");
-            clientNetworkService = null;
-        }
-
-        @Override
-        public void onBindingDied(ComponentName arg0){
-            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
-            clientNetworkService = null;
-        }
-    };
-
     @Override
     public void joinButtonClicked(View v, int position) {
         Log.d(LOG_TAG, "pressed join button of item number " + position);
@@ -109,41 +105,66 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
             showError(getString(R.string.view_error_clientname));
             return;
         }
+        clientName = clientName.trim();
 
         // Add ourselves to the current session locally
         ClientModel clientModel = new ClientModel(StateSingleton.getInstance().deviceUUID, pressedSession);
-        clientModel.setName(clientName.trim());
+        clientModel.setName(clientName);
         clientModel.setIsActive(true);
         pressedSession.getClients().add(clientModel);
 
-        OutgoingMessageHandler networkHandler = new OutgoingMessageHandler();
-        Log.d(LOG_TAG, "joining session: " + pressedSession.getName());
+        StateSingleton.getInstance().activeSession = pressedSession;
+        StateSingleton.getInstance().currentUsername  = clientName;
+        try {
+            if (!clientNetworkServiceBound && clientNetworkService == null)
+                throw new IllegalStateException("Failed to properly set up Client Network Service");
 
-        if (clientNetworkServiceBound && clientNetworkService != null) {
-            // Set the current session state
-            StateSingleton.getInstance().activeSession = pressedSession;
-
+            RegistrationListener listener = new RegistrationListener(this);
             clientNetworkService.initSocketListener();
-            networkHandler.sendRegisterClient(clientName, clientNetworkService.getClientPort());
+            clientNetworkService.registerClientOnHost(listener, clientName);
+        } catch (IllegalStateException | SocketException e) {
+            e.printStackTrace();
+            showError("Failed to set up connection.");
+            StateSingleton.getInstance().activeSession = null;
+        }
+    }
+
+    private class RegistrationListener implements SimpleListener<Boolean, Void> {
+
+        private ConnectActivity connectActivity;
+
+        public RegistrationListener(ConnectActivity connectActivity) {
+            this.connectActivity = connectActivity;
+        }
+
+        @Override
+        public void onEvent(Boolean success, Void v) {
+            if (!success) {
+                Log.e(LOG_TAG, "Failed to establish connection with host");
+                if (!connectActivity.isDestroyed())
+                    connectActivity.showError(getString(R.string.view_error_connection_failed));
+                StateSingleton.getInstance().activeSession = null;
+                return;
+            }
+
+            // In case we closed the activity while waiting for a connection, stop here.
+            if (connectActivity.isDestroyed()) {
+                StateSingleton.getInstance().activeSession = null;
+                connectActivity.finish();
+                return;
+            }
 
             // start the client service again -- THIS IS INTENTIONAL
             // it will keep the service alive across different activities.
-            Intent serverIntent = new Intent(ctx.getBaseContext(), ClientNetworkService.class);
-            startService(serverIntent);
+            Intent serverIntent = new Intent(connectActivity, ClientNetworkService.class);
+            connectActivity.startService(serverIntent);
 
-            Intent playlistIntent = new Intent(ctx, PlaylistActivity.class);
+            Intent playlistIntent = new Intent(connectActivity, PlaylistActivity.class);
             playlistIntent.putExtra(MainActivity.KEY_CNETWORKSERVICE, serverIntent);
 
-            ctx.startActivity(playlistIntent);
-            ctx.finish();
-        } else {
-            Log.e(LOG_TAG, "Failed to establish a connection with host.");
-            if (clientNetworkService== null || !clientNetworkServiceBound) {
-                Log.w(LOG_TAG, "ClientNetworkService is either gone or not bound.");
-                if (!isDestroyed()) {
-                    showError(getString(R.string.view_error_service_dead));
-                }
-            }
+            connectActivity.startActivity(playlistIntent);
+            connectActivity.finish();
         }
     }
 }
+

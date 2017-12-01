@@ -73,7 +73,7 @@ public class IncomingMessageHandler implements Runnable {
             return;
         }
 
-        SessionModel activeSessionModel = StateSingleton.getInstance().activeSession;
+        final SessionModel activeSessionModel = StateSingleton.getInstance().activeSession;
 
         MessageType messageType = MessageType.valueOf(message.getType());
         Log.d(LOG_TAG, "Message processing (" + messageType + ")");
@@ -122,7 +122,16 @@ public class IncomingMessageHandler implements Runnable {
         }
 
         if (sessionHasChanged) {
-            new OutgoingMessageHandler().updateAllClients(activeSessionModel);
+            // Queue this on the  UI thread to avoid a race condition where updateAllClients
+            // would be called *before* the object actually gets updated in a previously posted
+            // UI task (e.g. in `requestSong`)
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    new OutgoingMessageHandler().updateAllClients(activeSessionModel);
+                }
+            });
+
             //adaptsLists()
         }
     }
@@ -183,14 +192,12 @@ public class IncomingMessageHandler implements Runnable {
         songModel.setSongStatus(SongStatus.IN_QUEUE);
         songModel.setOrder(sessionModel.getPlayQueue().size() + 1);
 
-        Runnable uiTask = new Runnable() {
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-
                 sessionModel.getPlayQueue().add(songModel);
             }
-        };
-        new Handler(Looper.getMainLooper()).post(uiTask);
+        });
         return true;
     }
 

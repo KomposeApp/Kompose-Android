@@ -16,20 +16,28 @@ import android.util.Log;
 import com.youview.tinydnssd.DiscoverResolver;
 import com.youview.tinydnssd.MDNSDiscover;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.data.JsonConverter;
+import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
+import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.enums.NSDUpdateType;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
+import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public class ClientNetworkService extends Service {
 
@@ -184,6 +192,15 @@ public class ClientNetworkService extends Service {
             return null;
         }
     }
+
+    public void registerClientOnHost(SimpleListener<Boolean, Void> listener, String clientName) throws SocketException{
+        // Send join request to the host.
+        // Listen for responses from the host. If we get a matching response, proceed to the playlist.
+        Log.d(LOG_TAG, "Sending a join request to the host");
+        new OutgoingMessageHandler().sendRegisterClient(clientName, clientServerSocket.getLocalPort());
+        new ClientRegistrationTask(clientServerSocket, listener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
 
     /*
      * Workaround library for API < 24: https://github.com/youviewtv/tinydnssd

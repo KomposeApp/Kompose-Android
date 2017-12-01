@@ -17,6 +17,7 @@ public class StateSingleton {
 
     // Client specific fields
     public SessionModel activeSession;
+    public String currentUsername;
     public SessionModel activeHistorySession;
     public UUID deviceUUID = UUID.randomUUID();
 
