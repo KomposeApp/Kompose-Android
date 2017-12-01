@@ -23,8 +23,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.WAITING) ? View.GONE : View.VISIBLE}"
-            tools:visibility="gone">
+            android:visibility="@{!viewModel.sessionModel.sessionStatus.equals(SessionStatus.WAITING) ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible">
 
 
             <RelativeLayout
@@ -120,6 +120,23 @@
             </RelativeLayout>
 
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="@{viewModel.sessionModel.playQueue.size() == 0 ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:padding="6pt"
+                    android:text="@string/add_more_songs" />
+
+
+            </LinearLayout>
+
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
@@ -139,37 +156,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.WAITING) ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible">
+            tools:visibility="gone">
 
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="@{viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}"
-                tools:visibility="gone">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:padding="6pt"
+                android:text="@string/add_songs" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@string/help_host" />
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="@{!viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}"
-                tools:visibility="visible">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:text="@string/wait_a_second" />
-
-            </LinearLayout>
         </LinearLayout>
+
     </LinearLayout>
 </layout>

@@ -28,6 +28,10 @@ public class SessionModel extends UniqueModel {
         super(uuid);
         this.hostUUID = hostUUID;
         this.isHost = isHost;
+        if (isHost) {
+            //host & session created; therefore
+            sessionStatus = SessionStatus.WAITING;
+        }
     }
 
     private String name;
