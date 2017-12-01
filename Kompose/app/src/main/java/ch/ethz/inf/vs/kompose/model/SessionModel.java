@@ -103,8 +103,10 @@ public class SessionModel extends UniqueModel {
     }
 
     public void setCurrentlyPlaying(SongModel currentlyPlaying) {
-        this.currentlyPlaying = currentlyPlaying;
-        notifyPropertyChanged(BR.currentlyPlaying);
+        if (currentlyPlaying != this.currentlyPlaying) {
+            this.currentlyPlaying = currentlyPlaying;
+            notifyPropertyChanged(BR.currentlyPlaying);
+        }
     }
 
     @Bindable

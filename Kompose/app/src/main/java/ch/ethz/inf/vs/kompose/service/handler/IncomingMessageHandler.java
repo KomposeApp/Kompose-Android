@@ -20,6 +20,7 @@ import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ClientConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.DownVoteModel;
@@ -114,7 +115,7 @@ public class IncomingMessageHandler implements Runnable {
                 //already handled by refreshClientTimeout before
                 break;
             case FINISH_SESSION:
-                finishSession();
+                finishSession(activeSessionModel);
                 break;
             case ERROR:
                 //not used so far
@@ -128,6 +129,7 @@ public class IncomingMessageHandler implements Runnable {
             new Handler(Looper.getMainLooper()).post(new Runnable() {
                 @Override
                 public void run() {
+                    adaptLists(activeSessionModel);
                     new OutgoingMessageHandler().updateAllClients(activeSessionModel);
                 }
             });
@@ -136,8 +138,30 @@ public class IncomingMessageHandler implements Runnable {
         }
     }
 
+    private void adaptLists(SessionModel sessionModel) {
+        for (SongModel songModel :
+                sessionModel.getAllSongList()) {
+            if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED)) {
+                //in played queue
+                if (!sessionModel.getPlayedSongs().contains(songModel)) {
+                    sessionModel.getPlayedSongs().add(songModel);
+                }
+            } else if (songModel.getSongStatus().equals(SongStatus.PLAYING)) {
+                sessionModel.setCurrentlyPlaying(songModel);
+            } else if (songModel.getSongStatus().equals(SongStatus.IN_QUEUE)) {
+                if (songModel.getValidDownVoteCount() < sessionModel.getActiveDevices() / 2) {
+                    if (sessionModel.getPlayQueue().contains(songModel)) {
+                        sessionModel.getPlayQueue().add(songModel);
+                    }
+                }
+            }
+        }
+
+    }
+
     // TODO
-    private void finishSession() {
+    private void finishSession(SessionModel sessionModel) {
+        sessionModel.setSessionStatus(SessionStatus.FINISHED);
     }
 
     private boolean registerClient(Message message, SessionModel sessionModel) {
@@ -170,7 +194,7 @@ public class IncomingMessageHandler implements Runnable {
 
         // remove the client's downvotes
         UUID clientUUID = clientModel.getUUID();
-        for (SongModel songModel : sessionModel.getPlayQueue()) {
+        for (SongModel songModel : sessionModel.getAllSongList()) {
             for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
                 if (downVoteModel.getUuid().equals(clientUUID)) {
                     songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
@@ -190,12 +214,12 @@ public class IncomingMessageHandler implements Runnable {
         SongConverter songConverter = new SongConverter(sessionModel.getClients());
         final SongModel songModel = songConverter.convert(song);
         songModel.setSongStatus(SongStatus.IN_QUEUE);
-        songModel.setOrder(sessionModel.getPlayQueue().size() + 1);
+        songModel.setOrder(sessionModel.getAllSongList().size() + 1);
 
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                sessionModel.getPlayQueue().add(songModel);
+                sessionModel.getAllSongList().add(songModel);
             }
         });
         return true;
@@ -207,7 +231,7 @@ public class IncomingMessageHandler implements Runnable {
         String senderUUID = message.getSenderUuid();
 
         // find the song in the session model
-        for (SongModel song : activeSessionModel.getPlayQueue()) {
+        for (SongModel song : activeSessionModel.getAllSongList()) {
             String songUUID = song.getUUID().toString();
             if (requestedSongUUID.equals(songUUID)) {
 
@@ -241,8 +265,8 @@ public class IncomingMessageHandler implements Runnable {
 
     private boolean removeSkipSongVote(Message message, SessionModel activeSessionModel) {
         // find the song in the session
-        for (int i = 0; i < activeSessionModel.getPlayQueue().size(); i++) {
-            SongModel songModel = activeSessionModel.getPlayQueue().get(i);
+        for (int i = 0; i < activeSessionModel.getAllSongList().size(); i++) {
+            SongModel songModel = activeSessionModel.getAllSongList().get(i);
             String songUUID = songModel.getUUID().toString();
             String requestedSongUUID = message.getSongDetails().getUuid();
             if (songUUID.equals(requestedSongUUID)) {
@@ -301,16 +325,16 @@ public class IncomingMessageHandler implements Runnable {
                     }
                 }
 
-                for (SongModel updateSong : sessionModel.getPlayQueue()) {
+                for (SongModel updateSong : sessionModel.getAllSongList()) {
                     boolean updated = false;
-                    for (SongModel activeSong : activeSessionModel.getPlayQueue()) {
+                    for (SongModel activeSong : activeSessionModel.getAllSongList()) {
                         if (updateSong.getUUID().equals(activeSong.getUUID())) {
                             updateSong(updateSong, activeSong);
                             updated = true;
                         }
                     }
                     if (!updated) {
-                        activeSessionModel.getPlayQueue().add(updateSong);
+                        activeSessionModel.getAllSongList().add(updateSong);
                     }
                 }
             }
@@ -365,15 +389,15 @@ public class IncomingMessageHandler implements Runnable {
         int quorum = validClientCount / 2;
         if (songModel.getValidDownVoteCount() >= quorum) {
             //add to skipped if not played
-            if (sessionModel.getPlayQueue().contains(songModel)) {
-                sessionModel.getPlayQueue().remove(songModel);
+            if (sessionModel.getAllSongList().contains(songModel)) {
+                sessionModel.getAllSongList().remove(songModel);
                 sessionModel.getSkippedSongs().add(songModel);
             }
         } else {
             //add to queue if not skipped and still allows to be added
             if (sessionModel.getSkippedSongs().contains(songModel) && songModel.getOrder() < sessionModel.getCurrentlyPlaying().getOrder()) {
                 sessionModel.getSkippedSongs().remove(songModel);
-                sessionModel.getPlayQueue().add(songModel);
+                sessionModel.getAllSongList().add(songModel);
             }
         }
     }
