@@ -47,13 +47,14 @@
             android:text="@{title}" />
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="126dp"
+            android:layout_height="93dp"
             android:layout_gravity="center"
-            android:layout_marginTop="15dp"
             android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp"
             android:adjustViewBounds="true"
             android:maxHeight="160dp"
+            android:scaleType="fitXY"
             android:src="@drawable/ic_kompose_group" />
 
         <TextView
@@ -72,21 +73,21 @@
             android:text="@{subText1}" />
 
         <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_width="332dp"
+            android:layout_height="80dp"
             android:orientation="horizontal">
 
             <Button
                 android:id="@+id/button_main_join"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginRight="30dp"
                 android:layout_gravity="center_vertical"
+                android:layout_marginRight="30dp"
                 android:background="@color/buttonColor"
-                android:textColor="@color/buttonTextColor"
                 android:fontFamily="@font/russoone_regular"
                 android:onClick="callConnectActivity"
-                android:text="Join Party" />
+                android:text="Join Party"
+                android:textColor="@color/buttonTextColor" />
 
             <ImageView
                 android:layout_width="wrap_content"
@@ -133,8 +134,8 @@
             <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="-15dp"
                 android:layout_marginBottom="-10dp"
+                android:layout_marginTop="-15dp"
                 android:adjustViewBounds="true"
                 android:maxHeight="120dp"
                 android:scaleType="fitXY"

@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 
 import org.joda.time.DateTime;
 
@@ -28,11 +29,14 @@ public class PartyCreationActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_party_creation);
+        this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        //setContentView(R.layout.activity_party_creation);
+
 
         //get binding & bind viewmodel to view
         ActivityPartyCreationBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_party_creation);
         binding.setViewModel(viewModel);
+
     }
 
     public void confirmParty(View v) {

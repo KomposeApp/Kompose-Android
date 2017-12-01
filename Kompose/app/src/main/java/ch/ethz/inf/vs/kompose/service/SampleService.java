@@ -41,7 +41,7 @@ public class SampleService {
                 sessionModel.getPlayedSongs().add(getSampleSong(sessionModel, clientModel, order++));
             }
             sessionModel.setCurrentlyPlaying(getSampleSong(sessionModel, clientModel, order++));
-            sessionModel.getCurrentlyPlaying().downloadThumbnail();
+            //sessionModel.getCurrentlyPlaying().downloadThumbnail();
 
             for (int j = 0; j < 5; j++) {
                 sessionModel.getPlayQueue().add(getSampleSong(sessionModel, clientModel, order++));

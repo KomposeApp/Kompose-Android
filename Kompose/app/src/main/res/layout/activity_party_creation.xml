@@ -10,42 +10,89 @@
     </data>
 
     <LinearLayout
+        android:background="@color/colorAccent"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:padding="15dp"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="-20dp"
+            android:layout_marginBottom="-10dp"
+            android:adjustViewBounds="true"
+            android:maxHeight="512dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_logo_wide" />
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:layout_marginBottom="15dp"
+            android:layout_marginTop="15dp"
+            android:adjustViewBounds="true"
+            android:maxHeight="367px"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_kompose_create" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/opensans_regular"
             android:labelFor="@id/client_name"
-            android:text="@string/client_name" />
+            android:text="@string/client_name"
+            android:textColor="@color/buttonColor"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/client_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/opensans_regular"
             android:inputType="textNoSuggestions"
-            android:text="@={viewModel.clientName}" />
+            android:singleLine="false"
+            android:text="@={viewModel.clientName}"
+            android:textColor="@color/buttonColor"
+            android:backgroundTint="@color/buttonColor"/>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/opensans_regular"
             android:labelFor="@id/session_name"
-            android:text="@string/session_name" />
+            android:text="@string/session_name"
+            android:textColor="@color/buttonColor"
+            android:textSize="20sp" />
 
         <EditText
             android:id="@+id/session_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/opensans_regular"
             android:inputType="textNoSuggestions"
-            android:text="@={viewModel.sessionName}" />
+            android:text="@={viewModel.sessionName}"
+            android:textColor="@color/buttonColor"
+            android:backgroundTint="@color/buttonColor"/>
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center"
+            android:layout_marginTop="50dp"
+            android:background="@color/buttonColor"
+            android:baselineAligned="false"
+            android:fontFamily="@font/russo_one"
             android:onClick="confirmParty"
-            android:text="@string/create_party" />
+            android:text="@string/create_party"
+            android:textColor="@color/buttonTextColor"
+            android:textSize="20sp"
+            android:bottomRightRadius="8dp"
+            android:bottomLeftRadius="8dp"
+            android:topRightRadius="8dp"
+            android:topLeftRadius="8dp"/>
 
     </LinearLayout>
 </layout>
