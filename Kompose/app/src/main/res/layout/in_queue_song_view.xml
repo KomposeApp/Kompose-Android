@@ -41,14 +41,16 @@
 
         </LinearLayout>
 
-        <Button
+        <ImageButton
             android:id="@+id/down_vote_button"
-            android:layout_width="wrap_content"
+            android:layout_width="50pt"
             android:layout_height="20pt"
             android:layout_alignParentEnd="true"
+            android:background="@color/buttonTextColor"
+            android:backgroundTint="@color/buttonTextColor"
             android:onClick="@{viewHolder.onDownVoteClick}"
-            android:text="@string/down_vote" />
-
+            android:tint="@color/buttonColor"
+            app:srcCompat="@android:drawable/arrow_down_float" />
 
     </RelativeLayout>
 </layout>

@@ -165,6 +165,27 @@
                 android:padding="6pt"
                 android:text="@string/add_songs" />
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/help_host" />
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="@{!viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="@string/wait_a_second" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
