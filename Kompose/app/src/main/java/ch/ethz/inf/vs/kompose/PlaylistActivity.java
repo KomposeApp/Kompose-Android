@@ -16,6 +16,7 @@ import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SampleService;
@@ -190,6 +191,11 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     @Override
     public void playClicked(View v) {
-        //todo: play/pause session
+        StateSingleton.getInstance().activeSession.setSessionStatus(SessionStatus.PLAYING);
+    }
+
+    @Override
+    public void pauseClicked(View v) {
+        StateSingleton.getInstance().activeSession.setSessionStatus(SessionStatus.PAUSED);
     }
 }

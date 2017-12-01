@@ -24,14 +24,21 @@ public class SessionModel extends UniqueModel {
         this.hostUUID = hostUUID;
     }
 
+    public SessionModel(UUID uuid, UUID hostUUID, boolean isHost) {
+        super(uuid);
+        this.hostUUID = hostUUID;
+        this.isHost = isHost;
+    }
+
     private String name;
-    private SessionStatus sessionStatus;
+    private SessionStatus sessionStatus = SessionStatus.WAITING;
     private UUID hostUUID;
     private String hostName;
     private DateTime creationDateTime;
     private ServerConnectionDetails connectionDetails;
     private SongModel currentlyPlaying;
     private int activeDevices;
+    private boolean isHost;
 
     private final ObservableList<ClientModel> clients = new ObservableArrayList<>();
 
@@ -153,5 +160,10 @@ public class SessionModel extends UniqueModel {
     public void setActiveDevices(int activeDevices) {
         this.activeDevices = activeDevices;
         notifyPropertyChanged(BR.activeDevices);
+    }
+
+    @Bindable
+    public boolean getIsHost() {
+        return isHost;
     }
 }

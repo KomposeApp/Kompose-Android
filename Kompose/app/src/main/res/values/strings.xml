@@ -40,4 +40,7 @@
     <string name="down_vote">down vote</string>
     <string name="play">play</string>
     <string name="songs_contained">songs contained</string>
+    <string name="pause">pause</string>
+    <string name="help_host">tell others to join your party, or add songs yourself from youtube using the menu top right</string>
+    <string name="wait_a_second">please wait</string>
 </resources>

@@ -20,9 +20,6 @@ public class StateSingleton {
     public SessionModel activeHistorySession;
     public UUID deviceUUID = UUID.randomUUID();
 
-    // Host specific fields
-    public boolean deviceIsHost;
-
     /* * Initialization on-demand holder idiom for Singleton Pattern * */
 
     private StateSingleton() {
