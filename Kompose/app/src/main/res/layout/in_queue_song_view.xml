@@ -14,10 +14,10 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="3pt"
         android:background="#efefef"
         android:orientation="horizontal"
-        android:padding="3pt"
-        android:layout_marginBottom="3pt">
+        android:padding="3pt">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -50,7 +50,8 @@
             android:backgroundTint="@color/buttonTextColor"
             android:onClick="@{viewHolder.onDownVoteClick}"
             android:tint="@color/buttonColor"
-            app:srcCompat="@android:drawable/arrow_down_float" />
+            app:srcCompat="@android:drawable/btn_dialog"
+            android:contentDescription="@string/downvote_button" />
 
     </RelativeLayout>
 </layout>

@@ -44,4 +44,5 @@
     <string name="add_songs">tell others to join your party, or add songs yourself from youtube using the menu top right</string>
     <string name="add_more_songs">add more songs, the play queue is empty!</string>
     <string name="wait_a_second">please wait</string>
+    <string name="downvote_button">downvote button</string>
 </resources>
