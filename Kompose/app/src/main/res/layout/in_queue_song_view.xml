@@ -50,7 +50,7 @@
             android:backgroundTint="@color/buttonTextColor"
             android:onClick="@{viewHolder.onDownVoteClick}"
             android:tint="@color/buttonColor"
-            app:srcCompat="@android:drawable/btn_dialog"
+            app:srcCompat="@android:drawable/arrow_down_float"
             android:contentDescription="@string/downvote_button" />
 
     </RelativeLayout>
