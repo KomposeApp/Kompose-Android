@@ -30,14 +30,14 @@
             android:layout_width="wrap_content"
             android:layout_height="1dp"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.46" />
+            app:layout_constraintGuide_percent="0.42" />
 
         <android.support.constraint.Guideline
             android:id="@+id/guideline3"
             android:layout_width="wrap_content"
             android:layout_height="1dp"
             android:orientation="horizontal"
-            app:layout_constraintGuide_percent="0.62" />
+            app:layout_constraintGuide_percent="0.6" />
 
         <ImageView
             android:id="@+id/imageView9"
@@ -60,7 +60,6 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginBottom="8dp"
-            android:layout_marginTop="8dp"
             android:adjustViewBounds="true"
             android:maxHeight="160dp"
             android:scaleType="fitXY"
@@ -73,27 +72,32 @@
             tools:layout_conversion_absoluteHeight="93dp"
             tools:layout_conversion_absoluteWidth="126dp" />
 
-
         <TextView
             android:id="@+id/textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:fontFamily="@font/opensans_regular"
             android:labelFor="@id/client_name"
             android:text="@string/client_name"
+            android:textColor="@color/buttonColor"
+            android:textSize="20sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/guideline2" />
+            app:layout_constraintTop_toBottomOf="@+id/imageView10" />
 
         <EditText
             android:id="@+id/client_name"
             android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="16dp"
+            android:layout_height="wrap_content"
             android:layout_marginEnd="16dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/buttonColor"
+            android:fontFamily="@font/opensans_regular"
             android:inputType="textNoSuggestions"
+            android:singleLine="false"
             android:text="@={viewModel.clientName}"
+            android:textColor="@color/buttonColor"
             app:layout_constraintBottom_toTopOf="@+id/guideline3"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"

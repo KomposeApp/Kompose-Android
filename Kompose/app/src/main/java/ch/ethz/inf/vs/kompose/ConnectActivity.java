@@ -78,9 +78,9 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
 
         if (MainActivity.DESIGN_MODE) {
             SampleService sampleService = new SampleService();
-            viewModel.getSessionModels().add(sampleService.getSampleSession("design session"));
-            viewModel.getSessionModels().add(sampleService.getSampleSession("design session 1"));
-            viewModel.getSessionModels().add(sampleService.getSampleSession("design session 2"));
+            for (int i = 0; i < 15; i++) {
+                viewModel.getSessionModels().add(sampleService.getSampleSession("design session " + i));
+            }
         }
     }
 
