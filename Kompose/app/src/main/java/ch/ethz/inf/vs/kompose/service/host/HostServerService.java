@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.service;
+package ch.ethz.inf.vs.kompose.service.host;
 
 import android.app.Service;
 import android.content.Context;
@@ -12,11 +12,12 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.net.ServerSocket;
-import java.net.Socket;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
-import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
+
+import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_NAME;
+import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE;
 
 /**
  * Android service that starts the server.
@@ -27,33 +28,33 @@ public class HostServerService extends Service {
 
     private static final String LOG_TAG = "## HostServerService";
 
-    public static final String FOUND_SERVICE = "HostServerService.FOUND_SERVICE";
-    private static final String SERVICE_NAME = "Kompose";
-    private static final String SERVICE_TYPE = "_kompose._tcp";
-
-    private ServerSocket serverSocket;
-    private int localPort;
-    private String serviceName;
     private NsdManager nsdManager;
     private NsdManager.RegistrationListener nsdRegistrationListener;
     private ServerTask serverTask;
+    private ServerSocket serverSocket;
 
+    @Nullable
     @Override
-    public void onCreate() {
-        super.onCreate();
-        Log.d(LOG_TAG, "created");
+    public IBinder onBind(Intent intent) {
+        return null;
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(LOG_TAG, "started");
 
+        int actualPort;
         try {
-            serverSocket = new ServerSocket(StateSingleton.getInstance().getPreferenceUtility().getCurrentHostPort());
-            localPort = serverSocket.getLocalPort();
+            int hostPort = StateSingleton.getInstance().getPreferenceUtility().getCurrentHostPort();
+            serverSocket = new ServerSocket(hostPort);
+
+            // Required in case the port in preferences is 0
+            actualPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(LOG_TAG, "SOCKET ERROR FOUND, FIX THIS DEVS");
+            //TODO: Find a way to stop the PartyCreationActivity from advancing should this happen
+            Log.e(LOG_TAG, "Failed to set up the ServerSocket");
             stopSelf();
             return START_STICKY;
         }
@@ -63,30 +64,37 @@ public class HostServerService extends Service {
         serviceInfo.setServiceName(SERVICE_NAME);
         serviceInfo.setServiceType(SERVICE_TYPE);
 
+        // Retrieve active session and components
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
         String sessionName = activeSession.getName();
         String uuid = activeSession.getUUID().toString();
         String hostUuid = activeSession.getHostUUID().toString();
         String hostName = StateSingleton.getInstance().getPreferenceUtility().getCurrentUsername();
 
+        //Safety restrictions
         sessionName = sessionName.substring(0, Math.min(255, sessionName.length()));
         uuid = uuid.substring(0, Math.min(255, uuid.length()));
         hostUuid = hostUuid.substring(0, Math.min(255, hostUuid.length()));
 
+        // Set ServiceInfo attributes for NSD
         serviceInfo.setAttribute("session", sessionName);
         serviceInfo.setAttribute("uuid", uuid);
         serviceInfo.setAttribute("host_uuid", hostUuid);
         serviceInfo.setAttribute("host_name", hostName);
 
-        Log.d(LOG_TAG, "using port: " + localPort);
-        serviceInfo.setPort(localPort);
-
+        // Prepare NSD sender
+        Log.d(LOG_TAG, "using port: " + actualPort);
+        serviceInfo.setPort(actualPort);
         nsdRegistrationListener = new ServerRegistrationListener();
         nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
-        nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
+        if (nsdManager != null)
+            nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
+        else{
+            //TODO: Failure case if this happens, same issue as above
+        }
 
         // start server task
-        serverTask = new ServerTask(this);
+        serverTask = new ServerTask(this, serverSocket);
         serverTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         return START_STICKY;
@@ -95,80 +103,54 @@ public class HostServerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(LOG_TAG, "destroyed");
-        nsdManager.unregisterService(nsdRegistrationListener);
-        serverTask.cancel(true);
+        if (nsdManager!= null) {
+            Log.d(LOG_TAG, "Shutting down the NSD Sender");
+            nsdManager.unregisterService(nsdRegistrationListener);
+        }
+        if (serverTask != null && !serverTask.isCancelled()) {
+            Log.d(LOG_TAG, "Shutting down the Message Server");
+            serverTask.cancel(true);
+            try {
+                serverSocket.close();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Closing the ServerSocket failed.");
+                e.printStackTrace();
+            }
+            serverTask = null;
+        }
     }
 
+    //TODO: Decide whether this can be removed or not
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         Log.d(LOG_TAG, "task removed");
         stopSelf();
     }
 
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
+    /**
+     * Listener for the registration of the NSD Service
+     */
     private class ServerRegistrationListener implements NsdManager.RegistrationListener {
 
         @Override
-        public void onServiceRegistered(NsdServiceInfo NsdServiceInfo) {
-            serviceName = NsdServiceInfo.getServiceName();
-
-            Intent intent = new Intent(FOUND_SERVICE);
-            intent.putExtra("info", NsdServiceInfo);
-            sendBroadcast(intent);
-
-            Log.d(LOG_TAG, "Service registered: " + serviceName);
+        public void onServiceRegistered(NsdServiceInfo arg0) {
+            Log.d(LOG_TAG, "Service registered: " + arg0.getServiceName());
         }
 
         @Override
         public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
             Log.d(LOG_TAG, "Service registration failed: " + errorCode);
+            //TODO: Error handling in conjunction with the activity
         }
 
         @Override
         public void onServiceUnregistered(NsdServiceInfo arg0) {
-            Log.d(LOG_TAG, "Service unregistered: " + serviceName);
+            Log.d(LOG_TAG, "Service unregistered: " + arg0.getServiceName());
         }
 
         @Override
         public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
             Log.d(LOG_TAG, "Service unregistration failed: " + errorCode);
-        }
-    }
-
-    private class ServerTask extends AsyncTask<Void, Void, Void> {
-
-        private static final String LOG_TAG = "## ServerTask";
-
-        private Context context;
-
-        public ServerTask(Context context) {
-            this.context = context;
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            Log.d(LOG_TAG, "Server ready to receive connections");
-
-            while (!this.isCancelled()) {
-                try {
-                    final Socket connection = serverSocket.accept();
-
-                    Log.d(LOG_TAG, "message received");
-
-                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(context, connection);
-                    Thread msgHandler = new Thread(messageHandler);
-                    msgHandler.start();
-                } catch (Exception e) {
-                    Log.d(LOG_TAG, "could not process message; exception occurred! " + e.toString());
-                }
-            }
-            return null;
         }
     }
 }

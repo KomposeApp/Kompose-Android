@@ -20,8 +20,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String KEY_NETWORKSERVICE = "ClientNetworkService";
     public static final String KEY_SERVERSERVICE = "HostServerService";
-    public static final String SERVICE_TYPE_WORKAROUND = "_kompose._tcp";
+    public static final String SERVICE_NAME = "Kompose";
+    public static final String SERVICE_TYPE = "_kompose._tcp";
     public static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
+    public static final String FOUND_SERVICE = "HostServerService.FOUND_SERVICE";
 
     public static final boolean DESIGN_MODE = false;
     public static final boolean EMULATOR_MODE = false;

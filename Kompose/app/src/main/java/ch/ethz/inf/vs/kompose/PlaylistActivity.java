@@ -127,7 +127,11 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         super.onDestroy();
         if (clientNetworkServiceIntent != null) {
             stopService(clientNetworkServiceIntent);
-            Log.d(LOG_TAG, "ClientNetworkService successfully stopped");
+            Log.d(LOG_TAG, "Stopping ClientNetworkService");
+        }
+        if (hostServerServiceIntent != null){
+            stopService(hostServerServiceIntent);
+            Log.d(LOG_TAG, "Stopping HostServerService");
         }
         if (audioServiceBound) {
             unbindService(audioServiceConnection);

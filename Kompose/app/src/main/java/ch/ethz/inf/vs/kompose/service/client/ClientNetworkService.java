@@ -24,7 +24,7 @@ import ch.ethz.inf.vs.kompose.service.client.listeners.KomposeResolveListenerWor
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE_NSD;
-import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE_WORKAROUND;
+import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE;
 
 public class ClientNetworkService extends Service {
 
@@ -111,7 +111,16 @@ public class ClientNetworkService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (clientListenerTask != null) clientListenerTask.cancel(true);
+        if (clientListenerTask != null){
+            Log.d(LOG_TAG, "Shutting down the Message Receiver");
+            clientListenerTask.cancel(true);
+            try {
+                closeClientSocket();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Closing the ServerSocket failed.");
+                e.printStackTrace();
+            }
+        }
         Log.d(LOG_TAG, "Service killed for real.");
     }
 
@@ -127,7 +136,7 @@ public class ClientNetworkService extends Service {
         if (android.os.Build.VERSION.SDK_INT < 24) {
             Log.d(LOG_TAG, "using workaround library for service discovery on outdated devices");
 
-            resolver = new DiscoverResolver(this, SERVICE_TYPE_WORKAROUND,
+            resolver = new DiscoverResolver(this, SERVICE_TYPE,
                     new KomposeResolveListenerWorkaround(sessionModels));
             resolver.start();
 

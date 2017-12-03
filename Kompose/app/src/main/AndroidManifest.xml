@@ -55,7 +55,7 @@
             android:screenOrientation="portrait" />
 
         <service
-            android:name=".service.HostServerService"
+            android:name=".service.host.HostServerService"
             android:stopWithTask="true" />
         <service android:name=".service.client.ClientNetworkService" />
         <service android:name=".service.AudioService" />
