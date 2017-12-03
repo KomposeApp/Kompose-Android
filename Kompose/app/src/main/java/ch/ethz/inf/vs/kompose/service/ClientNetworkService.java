@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.net.nsd.NsdManager;
@@ -54,9 +55,11 @@ public class ClientNetworkService extends Service {
     private NsdManager nsdManager;
     private ClientServiceListener clientServiceListener;
 
-    private  ClientListenerTask clientListenerTask;
+    private ClientListenerTask clientListenerTask;
 
-    /** Prepare for onStartCommand **/
+    /**
+     * Prepare for onStartCommand
+     **/
     public void initSocketListener() {
         try {
             this.clientServerSocket = new ServerSocket(0);
@@ -82,7 +85,7 @@ public class ClientNetworkService extends Service {
             return START_STICKY;
         }
 
-        clientListenerTask = new ClientListenerTask(clientServerSocket, localPort);
+        clientListenerTask = new ClientListenerTask(this, clientServerSocket, localPort);
         clientListenerTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         return START_STICKY;
     }
@@ -102,17 +105,20 @@ public class ClientNetworkService extends Service {
         }
     }
 
-    /** Handles breakdown of client socket listener **/
+    /**
+     * Handles breakdown of client socket listener
+     **/
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        if (clientListenerTask!=null) clientListenerTask.cancel(true);
-        Log.d(LOG_TAG,"Service killed for real.");
+        if (clientListenerTask != null) clientListenerTask.cancel(true);
+        Log.d(LOG_TAG, "Service killed for real.");
     }
 
     /**
      * Add Network services to the provided ObservableList
      * Started when the service is BOUND
+     *
      * @param sessionModels List which the NetworkServices are to be added to
      */
     public void findNetworkServices(final ObservableList<SessionModel> sessionModels) {
@@ -137,20 +143,22 @@ public class ClientNetworkService extends Service {
         }
     }
 
-    /** Handles breakdown of NSD listener **/
+    /**
+     * Handles breakdown of NSD listener
+     **/
     @Override
-    public boolean onUnbind(Intent intent){
+    public boolean onUnbind(Intent intent) {
         Log.d(LOG_TAG, "Service has been unbound!");
 
         // use workaround library for older android versions
         if (android.os.Build.VERSION.SDK_INT < 24) {
             Log.d(LOG_TAG, "Breaking down NSD Service for outdated devices...");
-            if (resolver!=null) resolver.stop();
+            if (resolver != null) resolver.stop();
         }
         // use standard android API for up-to-date versions
         else {
             Log.d(LOG_TAG, "Breaking down NSD Service for newer devices...");
-            if (nsdManager!=null && clientServiceListener != null)
+            if (nsdManager != null && clientServiceListener != null)
                 nsdManager.stopServiceDiscovery(clientServiceListener);
         }
 
@@ -168,8 +176,10 @@ public class ClientNetworkService extends Service {
 
         private ServerSocket serverSocket;
         private int localPort;
+        private Context context;
 
-        ClientListenerTask(ServerSocket serverSocket, int port) {
+        ClientListenerTask(Context context, ServerSocket serverSocket, int port) {
+            this.context = context;
             this.serverSocket = serverSocket;
             this.localPort = port;
         }
@@ -181,7 +191,7 @@ public class ClientNetworkService extends Service {
                 try {
                     final Socket connection = serverSocket.accept();
                     Log.d(LOG_TAG, "message received");
-                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(connection);
+                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(context, connection);
                     Thread msgHandler = new Thread(messageHandler);
                     msgHandler.start();
                 } catch (Exception e) {
@@ -193,12 +203,12 @@ public class ClientNetworkService extends Service {
         }
     }
 
-    public void registerClientOnHost(SimpleListener<Boolean, Void> listener, String clientName) throws SocketException{
+    public void registerClientOnHost(SimpleListener<Boolean, Void> listener, String clientName) throws SocketException {
         // Send join request to the host.
         // Listen for responses from the host. If we get a matching response, proceed to the playlist.
         Log.d(LOG_TAG, "Sending a join request to the host");
-        new OutgoingMessageHandler().sendRegisterClient(clientName, clientServerSocket.getLocalPort());
-        new ClientRegistrationTask(clientServerSocket, listener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        new OutgoingMessageHandler(this).sendRegisterClient(clientName, clientServerSocket.getLocalPort());
+        new ClientRegistrationTask(this, clientServerSocket, listener).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
 
@@ -242,7 +252,6 @@ public class ClientNetworkService extends Service {
                 sessionModel.setHostName(hostName);
                 sessionModel.setConnectionDetails(new ServerConnectionDetails(host, port));
                 newSessions.add(sessionModel);
-
             }
 
             // Replace all found services in the ObservableList
@@ -265,7 +274,10 @@ public class ClientNetworkService extends Service {
      * Private classes for android API service discovery with NSD.
      * This only works correctly for API >= 24
      */
-    /** If the DiscoveryListener hears anything, something in here is called **/
+
+    /**
+     * If the DiscoveryListener hears anything, something in here is called
+     **/
     private class ClientServiceListener implements NsdManager.DiscoveryListener {
 
         private ObservableList<SessionModel> sessionModels;
@@ -340,14 +352,15 @@ public class ClientNetworkService extends Service {
         public void onServiceResolved(NsdServiceInfo serviceInfo) {
             Log.d(LOG_TAG, "Resolve Succeeded. " + serviceInfo);
 
-            Map<String,byte[]> attributes = serviceInfo.getAttributes();
+            Map<String, byte[]> attributes = serviceInfo.getAttributes();
 
             UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
             UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
 
-            final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);;
+            final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
+            ;
             Runnable uiTask = null;
-            switch (updateType){
+            switch (updateType) {
                 case FOUND:
 
                     int port = serviceInfo.getPort();

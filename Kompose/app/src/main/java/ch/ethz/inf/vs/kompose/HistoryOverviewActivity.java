@@ -11,6 +11,7 @@ import android.view.View;
 import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryOverviewBinding;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.service.handler.StorageHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.PastSessionAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.PastSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryOverviewViewModel;
@@ -38,6 +39,9 @@ public class HistoryOverviewActivity extends AppCompatActivity implements PastSe
             viewModel.getSessionModels().add(sampleService.getSampleSession("session 1"));
             viewModel.getSessionModels().add(sampleService.getSampleSession("session 2"));
             viewModel.getSessionModels().add(sampleService.getSampleSession("session 3"));
+        } else {
+            StorageHandler storageHandler = new StorageHandler(this);
+            storageHandler.load(viewModel.getSessionModels());
         }
     }
 

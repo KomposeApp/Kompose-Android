@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -25,14 +26,16 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Boolean> {
     private ServerSocket clientServerSocket;
     private UUID sessionUUID;
     private SimpleListener<Boolean, Void> callbackListener;
+    private Context context;
 
-    public ClientRegistrationTask(ServerSocket clientServerSocket,
+    public ClientRegistrationTask(Context context, ServerSocket clientServerSocket,
                                   SimpleListener<Boolean, Void> callbackListener) throws SocketException {
         //Retrieve connection details of active session:
         SessionModel session = StateSingleton.getInstance().activeSession;
         if (session == null || session.getUUID() == null) {
             throw new IllegalStateException("Session or its UUID were null.");
         }
+        this.context = context;
         this.sessionUUID = session.getUUID();
         this.clientServerSocket = clientServerSocket;
         this.callbackListener = callbackListener;
@@ -51,7 +54,7 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Boolean> {
         try {
             Socket connection = clientServerSocket.accept();
             Log.d(LOG_TAG, "message received");
-            IncomingMessageHandler messageHandler = new IncomingMessageHandler(connection);
+            IncomingMessageHandler messageHandler = new IncomingMessageHandler(context, connection);
             Thread msgHandler = new Thread(messageHandler);
             msgHandler.start();
             return true;
@@ -61,13 +64,13 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Boolean> {
     }
 
     @Override
-    protected void onPostExecute(Boolean success){
+    protected void onPostExecute(Boolean success) {
         try {
             clientServerSocket.setSoTimeout(0);
         } catch (SocketException e) {
             e.printStackTrace();
-            callbackListener.onEvent(false,null);
+            callbackListener.onEvent(false, null);
         }
-        callbackListener.onEvent(success,null);
+        callbackListener.onEvent(success, null);
     }
 }

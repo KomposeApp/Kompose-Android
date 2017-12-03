@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose.service.handler;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -29,6 +30,12 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 public class OutgoingMessageHandler {
 
     private static final String LOG_TAG = "## OutMessageHandler";
+
+    private Context context;
+
+    public OutgoingMessageHandler(Context context) {
+        this.context = context;
+    }
 
     /**
      * Retrieves the base structure for a message
@@ -102,6 +109,7 @@ public class OutgoingMessageHandler {
             message.setSession(session);
 
             sendMessageToClients(message);
+            new StorageHandler(context).persist(message.getSession());
         } else {
             Log.d(LOG_TAG, "tried to send session update but not host ");
         }
@@ -126,17 +134,12 @@ public class OutgoingMessageHandler {
         sendMessageToHost(msg);
     }
 
-    public void sendFinishSession() {
-        Message msg = getBaseMessageHost(MessageType.FINISH_SESSION);
-        sendMessageToHost(msg);
-    }
-
     // send a message to the globally stored host via IP/port
     private void sendMessageToHost(Message message) {
         // if this device is host, call message handler directly
         if (StateSingleton.getInstance().activeSession.getIsHost()) {
             Log.d(LOG_TAG, "device is host, don't send message to network");
-            Thread handler = new Thread(new IncomingMessageHandler(message));
+            Thread handler = new Thread(new IncomingMessageHandler(context, message));
             handler.start();
             return;
         }

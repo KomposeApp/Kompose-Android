@@ -86,7 +86,7 @@ public class AndroidServerService extends Service {
         nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
 
         // start server task
-        serverTask = new ServerTask();
+        serverTask = new ServerTask(this);
         serverTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 
         return START_STICKY;
@@ -145,6 +145,12 @@ public class AndroidServerService extends Service {
 
         private static final String LOG_TAG = "## ServerTask";
 
+        private Context context;
+
+        public ServerTask(Context context) {
+            this.context = context;
+        }
+
         @Override
         protected Void doInBackground(Void... voids) {
             Log.d(LOG_TAG, "Server ready to receive connections");
@@ -155,7 +161,7 @@ public class AndroidServerService extends Service {
 
                     Log.d(LOG_TAG, "message received");
 
-                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(connection);
+                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(context, connection);
                     Thread msgHandler = new Thread(messageHandler);
                     msgHandler.start();
                 } catch (Exception e) {

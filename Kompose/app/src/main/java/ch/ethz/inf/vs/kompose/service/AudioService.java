@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.media.MediaPlayer;
@@ -54,7 +55,7 @@ public class AudioService extends Service {
                     mediaPlayer.pause();
                     currentSong.setSongStatus(SongStatus.PAUSED);
 
-                    new OutgoingMessageHandler().sendSessionUpdate();
+                    new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
                 }
             });
         }
@@ -71,7 +72,7 @@ public class AudioService extends Service {
                         mediaPlayer.start();
                         currentSong.setSongStatus(SongStatus.PLAYING);
 
-                        new OutgoingMessageHandler().sendSessionUpdate();
+                        new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
                     }
                 });
             }
@@ -138,7 +139,7 @@ public class AudioService extends Service {
                     }
                 }
 
-                new OutgoingMessageHandler().sendSessionUpdate();
+                new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
             }
         });
     }
@@ -176,7 +177,7 @@ public class AudioService extends Service {
         @Override
         public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
             Log.d(LOG_TAG, (i1 - i) + " new items in play queue");
-            audioService.goToNextSong();
+            audioService.checkOnCurrentSong();
             notifier.register();
         }
 
@@ -265,7 +266,7 @@ public class AudioService extends Service {
                             });
                         }
 
-                        new OutgoingMessageHandler().sendSessionUpdate();
+                        new OutgoingMessageHandler(context.get()).sendSessionUpdate();
                     } else {
                         numDownloaded++;
                     }

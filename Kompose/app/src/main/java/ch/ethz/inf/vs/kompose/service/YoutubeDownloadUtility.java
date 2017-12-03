@@ -107,7 +107,8 @@ public class YoutubeDownloadUtility {
                 }
             }
         };
-        youTubeExtractor.extract(sourceUrl, true, false);
+        String parsedSource = sourceUrl.replace("m.youtube", "youtube");
+        youTubeExtractor.extract(parsedSource, true, false);
     }
 
     /**
@@ -115,7 +116,7 @@ public class YoutubeDownloadUtility {
      * The notifier will carry a MediaPlayer that can be used to play the file.
      *
      * @param directURL WARNING: THIS IS NOT THE BROWSER URL. USE {@link #resolveSong(String, SessionModel, ClientModel, SimpleListener)} AND A LISTENER.
-     * @param fileName file to store the song in
+     * @param fileName  file to store the song in
      * @return true if the download succeeded, false otherwise
      */
     public File downloadSong(String directURL, String fileName) {

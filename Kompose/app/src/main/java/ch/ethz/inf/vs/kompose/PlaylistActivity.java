@@ -67,7 +67,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             sampleService.fillSampleSession(viewModel.getSessionModel());
         }
 
-        responseHandler = new OutgoingMessageHandler();
+        responseHandler = new OutgoingMessageHandler(this);
         clientNetworkServiceIntent = this.getIntent().getParcelableExtra(MainActivity.KEY_CNETWORKSERVICE);
         Log.d(LOG_TAG, "Client NetworkServiceIntent is null : " + (clientNetworkServiceIntent == null));
 
