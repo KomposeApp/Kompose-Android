@@ -6,12 +6,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.SocketException;
+
 import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 
-/**
- * DONE
- * (unless more settings are required)
- */
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -77,7 +78,8 @@ public class SettingsActivity extends AppCompatActivity {
             commitChanges = false;
         }
 
-        if (Integer.valueOf(port_text) > 65535){
+        boolean valid_port = checkPortValidity(port_text);
+        if (!valid_port){
             port_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
             error_text += getString(R.string.setting_error_port) + "\n";
             commitChanges = false;
@@ -94,4 +96,25 @@ public class SettingsActivity extends AppCompatActivity {
             finish();
         }
     }
+
+    /**
+     * Checks whether the given port is not reserved or already in use.
+     * Note that 0 tells the app to use a random open port.
+     * @param port_text String representation of the port to check
+     * @return true iff port is usable
+     */
+    private boolean checkPortValidity(String port_text){
+        int port = Integer.valueOf(port_text);
+        boolean goahead = (0 == port) || ((1024 < port) && (port < 65535));
+        if (goahead){
+            try{
+                new ServerSocket(port).close();
+                return true;
+            }catch(IOException io){
+                return false;
+            }
+        }
+        return false;
+    }
+
 }
