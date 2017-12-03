@@ -49,7 +49,7 @@ public class HistoryOverviewActivity extends AppCompatActivity implements PastSe
     public void onClick(View v, int position) {
         Log.d(LOG_TAG, "model selected at position " + position);
 
-        StateSingleton.getInstance().activeHistorySession = viewModel.getSessionModels().get(position);
+        StateSingleton.getInstance().setActiveHistorySession(viewModel.getSessionModels().get(position));
 
         Intent playlistIntent = new Intent(this, HistoryDetailsActivity.class);
         startActivity(playlistIntent);

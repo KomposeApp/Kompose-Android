@@ -38,7 +38,7 @@ public class AudioService extends Service {
         super.onCreate();
 
         Log.d(LOG_TAG, "started");
-        sessionModel = StateSingleton.getInstance().activeSession;
+        sessionModel = StateSingleton.getInstance().getActiveSession();
 
         // start the download worker
         DownloadWorker downloadWorker = new DownloadWorker(this, sessionModel);
@@ -203,7 +203,7 @@ public class AudioService extends Service {
             this.context = new WeakReference<AudioService>(context);
             this.sessionModel = sessionModel;
 
-            this.numSongsPreload = PreferenceUtility.getCurrentPreload(context);
+            this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getCurrentPreload();
             this.notifier = new Phaser(1);
             sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(notifier, context));
         }

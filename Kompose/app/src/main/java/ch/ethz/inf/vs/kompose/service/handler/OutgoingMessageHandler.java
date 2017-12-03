@@ -45,7 +45,7 @@ public class OutgoingMessageHandler {
      */
     private Message getBaseMessageHost(MessageType type) {
         Message msg = new Message();
-        String uuid = StateSingleton.getInstance().activeClient.getUUID().toString();
+        String uuid = StateSingleton.getInstance().getActiveClient().getUUID().toString();
         msg.setSenderUuid(uuid);
         msg.setType(type.toString());
         return msg;
@@ -117,7 +117,7 @@ public class OutgoingMessageHandler {
 
     private void sendMessageToClients(Message message) {// send message to all clients, but not to itself
         for (ClientModel c : getSession().getClients()) {
-            if (!c.getUUID().equals(StateSingleton.getInstance().deviceUUID)) {
+            if (!c.getUUID().equals(StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID())) {
                 Log.d(LOG_TAG, "sending session update to: " + c.getName()
                         + " (" + c.getUUID().toString() + ")");
                 InetAddress clientIP = c.getClientConnectionDetails().getIp();
@@ -137,7 +137,7 @@ public class OutgoingMessageHandler {
     // send a message to the globally stored host via IP/port
     private void sendMessageToHost(Message message) {
         // if this device is host, call message handler directly
-        if (StateSingleton.getInstance().activeSession.getIsHost()) {
+        if (StateSingleton.getInstance().getActiveSession().getIsHost()) {
             Log.d(LOG_TAG, "device is host, don't send message to network");
             Thread handler = new Thread(new IncomingMessageHandler(context, message));
             handler.start();
@@ -145,7 +145,7 @@ public class OutgoingMessageHandler {
         }
 
         // otherwise, send the message over network
-        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().activeSession
+        ServerConnectionDetails connectionDetails = StateSingleton.getInstance().getActiveSession()
                 .getConnectionDetails();
         if (connectionDetails == null) {
             Log.d(LOG_TAG, "tried to send message but no active connection");
@@ -157,7 +157,7 @@ public class OutgoingMessageHandler {
     }
 
     private SessionModel getSession() {
-        return StateSingleton.getInstance().activeSession;
+        return StateSingleton.getInstance().getActiveSession();
     }
 
     private static class AsyncSender extends AsyncTask<Void, Void, Void> {

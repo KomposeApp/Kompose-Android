@@ -34,16 +34,42 @@
                 app:layout_constraintVertical_bias="0.04" />
 
             <TextView
-                android:id="@+id/textview_setting_preload"
+                android:id="@+id/textview_setting_sessionname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
                 android:layout_marginTop="15dp"
-                android:text="@string/setting_preload"
+                android:text="@string/setting_sessionname"
                 android:textColor="@color/colorBlack"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="@id/textview_category_host"
                 app:layout_constraintTop_toBottomOf="@id/textview_category_host" />
+
+            <EditText
+                android:id="@+id/edittext_setting_sessionname"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions"
+                android:maxLength="50"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@id/textview_setting_sessionname"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintLeft_toRightOf="@id/textview_setting_sessionname"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_setting_sessionname" />
+
+            <TextView
+                android:id="@+id/textview_setting_preload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="@string/setting_preload"
+                android:textColor="@color/colorBlack"
+                android:textSize="16sp"
+                app:layout_constraintLeft_toLeftOf="@id/textview_setting_sessionname"
+                app:layout_constraintTop_toBottomOf="@id/textview_setting_sessionname"  />
 
             <EditText
                 android:id="@+id/edittext_setting_preload"
@@ -61,19 +87,19 @@
                 app:layout_constraintTop_toTopOf="@id/textview_setting_preload" />
 
             <TextView
-                android:id="@+id/textview_setting_port"
+                android:id="@+id/textview_setting_hostport"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="40dp"
                 android:layout_marginTop="15dp"
-                android:text="@string/setting_port"
+                android:text="@string/setting_hostport"
                 android:textColor="@color/colorBlack"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="@id/textview_category_host"
                 app:layout_constraintTop_toBottomOf="@id/textview_setting_preload" />
 
             <EditText
-                android:id="@+id/edittext_setting_port"
+                android:id="@+id/edittext_setting_hostport"
                 android:layout_width="75dp"
                 android:layout_height="wrap_content"
                 android:inputType="number"
@@ -81,11 +107,11 @@
                 android:maxLines="1"
                 android:selectAllOnFocus="true"
                 android:textAlignment="center"
-                app:layout_constraintBottom_toBottomOf="@id/textview_setting_port"
+                app:layout_constraintBottom_toBottomOf="@id/textview_setting_hostport"
                 app:layout_constraintHorizontal_bias="0.1"
-                app:layout_constraintLeft_toRightOf="@id/textview_setting_port"
+                app:layout_constraintLeft_toRightOf="@id/textview_setting_hostport"
                 app:layout_constraintRight_toRightOf="parent"
-                app:layout_constraintTop_toTopOf="@id/textview_setting_port" />
+                app:layout_constraintTop_toTopOf="@id/textview_setting_hostport" />
 
 
             <TextView
@@ -97,7 +123,7 @@
                 android:textColor="@color/colorAccent"
                 android:textStyle="bold"
                 app:layout_constraintLeft_toLeftOf="@id/textview_category_host"
-                app:layout_constraintTop_toBottomOf="@id/textview_setting_port" />
+                app:layout_constraintTop_toBottomOf="@id/textview_setting_hostport" />
 
             <TextView
                 android:id="@+id/textview_setting_username"
@@ -125,6 +151,33 @@
                 app:layout_constraintLeft_toRightOf="@id/textview_setting_username"
                 app:layout_constraintRight_toRightOf="parent"
                 app:layout_constraintTop_toTopOf="@id/textview_setting_username" />
+
+            <TextView
+                android:id="@+id/textview_setting_clientport"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="15dp"
+                android:text="@string/setting_clientport"
+                android:textColor="@color/colorBlack"
+                android:textSize="16sp"
+                app:layout_constraintLeft_toLeftOf="@id/textview_category_client"
+                app:layout_constraintTop_toBottomOf="@id/textview_setting_username" />
+
+            <EditText
+                android:id="@+id/edittext_setting_clientport"
+                android:layout_width="75dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="5"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@id/textview_setting_clientport"
+                app:layout_constraintHorizontal_bias="0.08"
+                app:layout_constraintLeft_toRightOf="@id/textview_setting_clientport"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_setting_clientport" />
 
         </android.support.constraint.ConstraintLayout>
     </ScrollView>

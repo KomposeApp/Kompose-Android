@@ -23,11 +23,11 @@ import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
  * First the service is registered on the network, then an AsyncTask
  * that accepts connections is started.
  */
-public class AndroidServerService extends Service {
+public class HostServerService extends Service {
 
-    private static final String LOG_TAG = "## AndroidServerService";
+    private static final String LOG_TAG = "## HostServerService";
 
-    public static final String FOUND_SERVICE = "AndroidServerService.FOUND_SERVICE";
+    public static final String FOUND_SERVICE = "HostServerService.FOUND_SERVICE";
     private static final String SERVICE_NAME = "Kompose";
     private static final String SERVICE_TYPE = "_kompose._tcp";
 
@@ -49,7 +49,7 @@ public class AndroidServerService extends Service {
         Log.d(LOG_TAG, "started");
 
         try {
-            serverSocket = new ServerSocket(PreferenceUtility.getCurrentPort(this));
+            serverSocket = new ServerSocket(StateSingleton.getInstance().getPreferenceUtility().getCurrentHostPort());
             localPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,11 +63,11 @@ public class AndroidServerService extends Service {
         serviceInfo.setServiceName(SERVICE_NAME);
         serviceInfo.setServiceType(SERVICE_TYPE);
 
-        SessionModel activeSession = StateSingleton.getInstance().activeSession;
+        SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
         String sessionName = activeSession.getName();
         String uuid = activeSession.getUUID().toString();
         String hostUuid = activeSession.getHostUUID().toString();
-        String hostName = PreferenceUtility.getCurrentUsername(this);
+        String hostName = StateSingleton.getInstance().getPreferenceUtility().getCurrentUsername();
 
         sessionName = sessionName.substring(0, Math.min(255, sessionName.length()));
         uuid = uuid.substring(0, Math.min(255, uuid.length()));
