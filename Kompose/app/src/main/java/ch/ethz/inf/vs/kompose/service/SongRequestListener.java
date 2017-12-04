@@ -13,7 +13,6 @@ public class SongRequestListener implements SimpleListener<Integer, SongModel> {
     private static final String LOG_TAG = "## SongRequestListener";
 
     private Context ctx;
-    private OutgoingMessageHandler sender;
 
     public SongRequestListener(Context ctx) {
         this.ctx = ctx;

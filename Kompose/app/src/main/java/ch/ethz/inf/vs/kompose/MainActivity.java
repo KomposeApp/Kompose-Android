@@ -13,7 +13,6 @@ import android.view.Window;
 import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## Main Activity";
@@ -23,10 +22,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String SERVICE_NAME = "Kompose";
     public static final String SERVICE_TYPE = "_kompose._tcp";
     public static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
-    public static final String FOUND_SERVICE = "HostServerService.FOUND_SERVICE";
 
     public static final boolean DESIGN_MODE = false;
-    public static final boolean EMULATOR_MODE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,12 +64,9 @@ public class MainActivity extends AppCompatActivity {
      * Navigation to the History Activity
      */
     public void viewHistoryFromTitle(View view) {
-        Intent settings = new Intent(this, SettingsActivity.class);
-        this.startActivity(settings);
-        //TODO: Restore
-        //Log.d(LOG_TAG, "History button pressed");
-        //Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
-        //startActivity(historyIntent);
+        Log.d(LOG_TAG, "History button pressed");
+        Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
+        startActivity(historyIntent);
     }
 
     /**

@@ -19,8 +19,7 @@ import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
 public class ShareActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = "## ShareActivity";
-    //Time until process is killed
-    private static final int TIME_UNTIL_DEATH = 3000;
+    private static final int TIME_UNTIL_DEATH = 3000; // Time until process is killed
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +33,7 @@ public class ShareActivity extends AppCompatActivity {
             throw new IllegalStateException("ShareActivity was called from an illegal source");
         }
 
-        // Check whether there is a currently active session. If not, immediately stop and display an error.
+        // Check whether there is a currently active session. If not, stop and display an error.
         // Additionally, kill the process if Kompose hasn't been started beforehand.
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
         if (activeSession == null || !StateSingleton.getInstance().getPlaylistIsActive()) {
@@ -52,7 +51,6 @@ public class ShareActivity extends AppCompatActivity {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    // Intentional data race here
                     // If Kompose has not been started properly, kill the process.
                     if (!StateSingleton.getInstance().isStartedFromMainActivity()) {
                         Log.d(LOG_TAG, "Kompose has dekomposed. *badum tish*");

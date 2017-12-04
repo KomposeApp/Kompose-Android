@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.media.MediaPlayer;
@@ -23,7 +22,6 @@ import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public class AudioService extends Service {
@@ -210,7 +208,7 @@ public class AudioService extends Service {
         private SessionModel sessionModel;
 
         DownloadWorker(AudioService context, SessionModel sessionModel) {
-            this.context = new WeakReference<AudioService>(context);
+            this.context = new WeakReference<>(context);
             this.sessionModel = sessionModel;
 
             this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getCurrentPreload();

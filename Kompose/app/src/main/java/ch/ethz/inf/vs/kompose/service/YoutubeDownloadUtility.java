@@ -1,29 +1,21 @@
 package ch.ethz.inf.vs.kompose.service;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.SparseArray;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.youtube.VideoMeta;
 import ch.ethz.inf.vs.kompose.service.youtube.YouTubeExtractor;
-import ch.ethz.inf.vs.kompose.service.youtube.YtFile;
 
 
 public class YoutubeDownloadUtility {

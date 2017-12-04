@@ -13,7 +13,7 @@ public class StateSingleton {
     private final String LOG_TAG = "## SINGLETON HUB:";
 
     private SessionModel activeSession;
-    private ClientModel activeClient;  //TODO: Do we actually need this?
+    private ClientModel activeClient;
     private SessionModel activeHistorySession;
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
     private boolean hasMainActivity; //Required for the Share Activity.

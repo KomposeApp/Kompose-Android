@@ -38,6 +38,6 @@ dependencies {
 
     compile 'joda-time:joda-time:2.9.9'
 
-    // fuck Googles buggy DNS-SD implementation
+    // screw Google's buggy DNS-SD implementation
     compile 'com.youview:tinydnssd:1.2.7'
 }

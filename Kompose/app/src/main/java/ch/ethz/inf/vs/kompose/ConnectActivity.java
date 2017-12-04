@@ -164,7 +164,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         @Override
         public void onEvent(Boolean success, Void v) {
             try {
-                //TODO: Check whether closing the socket works as intended
                 if (!success) {
                     Log.e(LOG_TAG, "Failed to establish connection with host");
                     if (!connectActivity.isDestroyed()) {

@@ -24,15 +24,11 @@ public class HistoryOverviewActivity extends AppCompatActivity implements PastSe
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_history_overview);
-
-
         ActivityHistoryOverviewBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_history_overview);
 
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new PastSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
-
 
         if (MainActivity.DESIGN_MODE) {
             SampleService sampleService = new SampleService();
@@ -54,25 +50,4 @@ public class HistoryOverviewActivity extends AppCompatActivity implements PastSe
         Intent playlistIntent = new Intent(this, HistoryDetailsActivity.class);
         startActivity(playlistIntent);
     }
-
-
-    /**
-     * gets all sessions which are persisted on storage
-     *
-     * @return collection of all saves sessions
-     */
-//    public ObservableList<SessionModel> getPastSessions() {
-//        String[] pastSessionStrings = getStorageService().retrieveAllFiles(DIRECTORY_ARCHIVE);
-//        for (String pastSession : pastSessionStrings) {
-//            try {
-//                SessionConverter sessionConverter = new SessionConverter();
-//                SessionModel sessionModel = sessionConverter.convert(
-//                        JsonConverter.fromSessionJsonString(pastSession)
-//                );
-//                pastSessions.add(sessionModel);
-//            } catch (IOException e) {
-//            }
-//        }
-//        return pastSessions;
-//    }
 }
