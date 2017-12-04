@@ -123,8 +123,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
         songModel.setSourceUrl(URI.create(youtubeUrl));
 
-        activeSession.getPlayQueue().add(songModel);
-
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(songModel, new SongRequestListener(this));
     }
@@ -179,7 +177,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
                 songRequestDialog.setContentView(binding.getRoot());
                 binding.setViewModel(viewModel);
-                viewModel.setSearchLink("https://www.youtube.com/watch?v=nFZP8zQ5kzk");
                 songRequestDialog.show();
                 return true;
             case R.id.leave_session:
