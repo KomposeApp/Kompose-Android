@@ -66,6 +66,10 @@ public class HostServerService extends Service {
 
         // Retrieve active session and components
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
+        if (activeSession == null) {
+            //idk what to do here
+            return Service.START_REDELIVER_INTENT;
+        }
         String sessionName = activeSession.getName();
         String uuid = activeSession.getUUID().toString();
         String hostUuid = activeSession.getHostUUID().toString();
@@ -89,7 +93,7 @@ public class HostServerService extends Service {
         nsdManager = (NsdManager) this.getSystemService(Context.NSD_SERVICE);
         if (nsdManager != null)
             nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
-        else{
+        else {
             //TODO: Failure case if this happens, same issue as above
         }
 
@@ -103,7 +107,7 @@ public class HostServerService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (nsdManager!= null) {
+        if (nsdManager != null) {
             Log.d(LOG_TAG, "Shutting down the NSD Sender");
             nsdManager.unregisterService(nsdRegistrationListener);
         }

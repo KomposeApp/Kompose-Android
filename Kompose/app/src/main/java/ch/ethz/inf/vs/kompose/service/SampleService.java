@@ -5,6 +5,7 @@ import android.databinding.ObservableList;
 import org.joda.time.DateTime;
 
 import java.net.URI;
+import java.util.Iterator;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
@@ -59,8 +60,13 @@ public class SampleService {
         }
         sessionModel.getAllSongList().add(sessionModel.getCurrentlyPlaying());
 
-        for (SongModel songModel : sessionModel.getPlayQueue()) {
-            sessionModel.getPlayQueue().add(songModel);
+
+        Iterator<SongModel> iterator = sessionModel.getPlayQueue().iterator();
+        if (iterator.hasNext()) {
+            do {
+                SongModel songModel = iterator.next();
+                sessionModel.getPlayQueue().add(songModel);
+            } while (iterator.hasNext());
         }
     }
 

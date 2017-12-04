@@ -18,6 +18,7 @@ import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
@@ -82,6 +83,7 @@ public class OutgoingMessageHandler {
     }
 
     public void sendRequestSong(SongModel songModel) {
+        songModel.setSongStatus(SongStatus.REQUESTED);
         SongConverter songConverter = new SongConverter(getSession().getClients());
         Song song = songConverter.convert(songModel);
 

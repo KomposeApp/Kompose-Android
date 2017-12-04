@@ -186,7 +186,7 @@ public class IncomingMessageHandler implements Runnable {
                 if (sessionModel.getPlayQueueWithDislikedSongs().contains(songModel)) {
                     sessionModel.getPlayQueueWithDislikedSongs().remove(songModel);
                 }
-            } else if (songModel.getSongStatus().equals(SongStatus.PLAYING)) {
+            } else if (songModel.getSongStatus().equals(SongStatus.PLAYING) || songModel.getSongStatus().equals(SongStatus.PAUSED)) {
                 playingSet = true;
                 sessionModel.setCurrentlyPlaying(songModel);
                 if (sessionModel.getPlayQueue().contains(songModel)) {
@@ -387,6 +387,7 @@ public class IncomingMessageHandler implements Runnable {
             public void run() {
                 activeSessionModel.setName(sessionModel.getName());
                 activeSessionModel.setCreationDateTime(sessionModel.getCreationDateTime());
+                activeSessionModel.setSessionStatus(sessionModel.getSessionStatus());
 
 
                 for (ClientModel updateClient : sessionModel.getClients()) {

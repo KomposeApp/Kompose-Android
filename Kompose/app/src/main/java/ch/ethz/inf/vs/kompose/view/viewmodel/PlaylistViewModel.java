@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.kompose.view.viewmodel;
 import android.databinding.Bindable;
 import android.view.View;
 
+import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
@@ -29,6 +30,7 @@ public class PlaylistViewModel extends BaseViewModel {
 
     public void setSearchLink(String searchLink) {
         this.searchLink = searchLink;
+        notifyPropertyChanged(BR.searchLink);
     }
 
     public void onLinkAddClicked(View view) {

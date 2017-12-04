@@ -5,12 +5,15 @@ import android.databinding.ObservableList;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.json.Client;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
@@ -72,12 +75,21 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
         //convert song models to data
         SongConverter songConverter = new SongConverter(clientModels);
-        ObservableList<SongModel> songModels = sessionModel.getAllSongList();
-        session.setSongs(new Song[songModels.size()]);
-        for (int i = 0; i < songModels.size(); i++) {
-            session.getSongs()[i] = songConverter.convert(songModels.get(i));
+        List<Song> songs = new ArrayList<>();
+        for (int i = 0; i < sessionModel.getAllSongList().size(); i++) {
+            //explude resolving songs as they only should exist temporary
+            if (sessionModel.getAllSongList().get(i).getSongStatus() != SongStatus.RESOLVING) {
+                songs.add(songConverter.convert(sessionModel.getAllSongList().get(i)));
+            }
         }
-
+        if (songs.size() > 0) {
+            session.setSongs(new Song[songs.size()]);
+            for (int i = 0; i < songs.size(); i++) {
+                session.getSongs()[i] = songs.get(i);
+            }
+        } else {
+            session.setSongs(new Song[0]);
+        }
         //set remaining contents
         session.setHostUuid(sessionModel.getHostUUID().toString());
         session.setSessionName(sessionModel.getName());

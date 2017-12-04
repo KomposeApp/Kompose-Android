@@ -18,15 +18,12 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.UUID;
 
-import at.huber.youtubeExtractor.VideoMeta;
-import at.huber.youtubeExtractor.YouTubeExtractor;
-import at.huber.youtubeExtractor.YtFile;
-import ch.ethz.inf.vs.kompose.data.json.Song;
-import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
-import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
+import ch.ethz.inf.vs.kompose.service.youtube.VideoMeta;
+import ch.ethz.inf.vs.kompose.service.youtube.YouTubeExtractor;
+import ch.ethz.inf.vs.kompose.service.youtube.YtFile;
 
 
 public class YoutubeDownloadUtility {
@@ -49,68 +46,11 @@ public class YoutubeDownloadUtility {
      * Resolve song metadata, including HTTP URL, Download URL, Download Thumbnail,
      * Title of the Video and Video Length.
      *
-     * @param sourceUrl Youtube URL as seen in the browser
      * @param listener  Listener which will be notified upon completion
      */
-    public void resolveSong(final String sourceUrl, final SessionModel sessionModel, final ClientModel clientModel, final SimpleListener<Integer, SongModel> listener) {
-        @SuppressLint("StaticFieldLeak")
-        YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context) {
-            @Override
-            protected void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta) {
-                if (ytFiles != null) {
-                    // find the best audio track
-                    int iTag = -1;
-                    int maxBitrate = 0;
-                    for (int i = 0, temp_itag; i < ytFiles.size(); i++) {
-
-                        temp_itag = ytFiles.keyAt(i);
-                        YtFile file = ytFiles.get(temp_itag);
-
-                        int fBitrate = file.getFormat().getAudioBitrate();
-                        if ((file.getFormat().getHeight() == -1) && (fBitrate > maxBitrate)) {
-                            iTag = temp_itag;
-                            maxBitrate = fBitrate;
-                        }
-                    }
-
-                    Log.d(LOG_TAG, "Selected itag: " + iTag);
-
-                    if (iTag == -1) {
-                        Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
-                        listener.onEvent(RESOLVE_FAILED, null);
-                        return;
-                    }
-
-                    // get URI & title
-                    String downloadUrl = ytFiles.get(iTag).getUrl();
-                    String thumbnailUrl = videoMeta.getThumbUrl();
-                    String title = videoMeta.getTitle();
-                    long length = videoMeta.getVideoLength();
-
-                    if (downloadUrl.isEmpty() || length <= 0) {
-                        Log.e(LOG_TAG, "Download link was empty or length was too short");
-                        listener.onEvent(RESOLVE_FAILED, null);
-                        return;
-                    }
-
-                    // construct song model
-                    SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, sessionModel);
-                    songModel.setTitle(title);
-                    songModel.setDownloadUrl(URI.create(downloadUrl));
-                    songModel.setThumbnailUrl(URI.create(thumbnailUrl));
-                    songModel.setSourceUrl(URI.create(sourceUrl));
-                    songModel.setSecondsLength((int) length);
-
-                    // notify listener
-                    listener.onEvent(RESOLVE_SUCCESS, songModel);
-                } else {
-                    Log.w(LOG_TAG, "Failed to resolve youtube URL -- possible malformed link");
-                    listener.onEvent(RESOLVE_FAILED, null);
-                }
-            }
-        };
-        String parsedSource = sourceUrl.replace("m.youtube", "youtube");
-        youTubeExtractor.extract(parsedSource, true, false);
+    public void resolveSong(final SongModel songModel, final SimpleListener<Integer, SongModel> listener) {
+        YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context, songModel, listener);
+        youTubeExtractor.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     /**

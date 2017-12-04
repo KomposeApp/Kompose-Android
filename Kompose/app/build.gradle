@@ -35,7 +35,6 @@ dependencies {
             [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.0']
     )
     compile 'com.github.evgenyneu:js-evaluator-for-android:v3.0.0'
-    compile 'com.github.HaarigerHarald:android-youtubeExtractor:master-SNAPSHOT'
 
     compile 'joda-time:joda-time:2.9.9'
 

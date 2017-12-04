@@ -86,9 +86,9 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         //TODO: Remove once done testing
         if (MainActivity.DESIGN_MODE) {
             SampleService sampleService = new SampleService();
-            viewModel.getSessionModels().add(sampleService.getSampleSession("design session"));
-            viewModel.getSessionModels().add(sampleService.getSampleSession("design session 1"));
-            viewModel.getSessionModels().add(sampleService.getSampleSession("design session 2"));
+            for (int i = 0; i < 15; i++) {
+                viewModel.getSessionModels().add(sampleService.getSampleSession("design session " + i));
+            }
         }
     }
 
@@ -115,8 +115,7 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         }
         clientName = clientName.trim();
 
-        //TODO: Is adding ourselves (the client) to the session required for the app to function properly?
-        //TODO: Does the client even need to know about what other clients there are?
+
         // Add ourselves to the current session locally
         UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
         ClientModel clientModel = new ClientModel(deviceUUID, pressedSession);
@@ -125,7 +124,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
         pressedSession.getClients().add(clientModel);
 
         StateSingleton.getInstance().setActiveSession(pressedSession);
-        //TODO: Check whether storing the active client is really a necessity (prefer doing everything through preferences)
         StateSingleton.getInstance().setActiveClient(clientModel);
         try {
             if (!clientNetworkServiceBound && clientNetworkService == null)
@@ -134,7 +132,6 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
             RegistrationListener listener = new RegistrationListener(this);
             clientNetworkService.initSocketListener();
             clientNetworkService.registerClientOnHost(listener, clientName);
-            //TODO: DESIGN: Display visual elements while registration is ongoing
         } catch(SocketException s){
             s.printStackTrace();
             try {

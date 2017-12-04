@@ -69,7 +69,6 @@ public class PartyCreationActivity extends BaseActivity {
         clientModel.setIsActive(true);
         newSession.getClients().add(clientModel);
 
-        //TODO: Decide whether having ActiveClient is really necessary
         StateSingleton.getInstance().setActiveClient(clientModel);
         StateSingleton.getInstance().setActiveSession(newSession);
 

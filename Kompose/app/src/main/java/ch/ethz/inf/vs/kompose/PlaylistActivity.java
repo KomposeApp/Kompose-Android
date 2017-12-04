@@ -15,10 +15,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.net.URI;
+import java.util.UUID;
+
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.AudioService;
@@ -109,15 +113,20 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private void resolveAndRequestSong(String youtubeUrl) {
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
-
+        ClientModel clientModel = StateSingleton.getInstance().getActiveClient();
+        
         //set session to active if host
         if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
             activeSession.setSessionStatus(SessionStatus.ACTIVE);
         }
 
+        SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
+        songModel.setSourceUrl(URI.create(youtubeUrl));
+
+        activeSession.getPlayQueue().add(songModel);
+
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(youtubeUrl, activeSession,
-                StateSingleton.getInstance().getActiveClient(), new SongRequestListener(this));
+        youtubeService.resolveSong(songModel, new SongRequestListener(this));
     }
 
 
@@ -170,6 +179,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
                 songRequestDialog.setContentView(binding.getRoot());
                 binding.setViewModel(viewModel);
+                viewModel.setSearchLink("https://www.youtube.com/watch?v=nFZP8zQ5kzk");
                 songRequestDialog.show();
                 return true;
             case R.id.leave_session:
