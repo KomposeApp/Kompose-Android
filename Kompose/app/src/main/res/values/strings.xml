@@ -49,4 +49,5 @@
     <string name="add_more_songs">add more songs, the play queue is empty!</string>
     <string name="wait_a_second">please wait</string>
     <string name="downvote_button">downvote button</string>
+    <string name="song_is_resolved">please wait, we try to fetch the song…</string>
 </resources>

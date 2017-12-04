@@ -233,46 +233,50 @@ public class AudioService extends Service {
 
                 int index = 0;
                 while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
-                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
-                    if (nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
-                        Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
+                    try {
+                        final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
+                        if (nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
+                            Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
 
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                nextDownload.setDownloadStatus(DownloadStatus.STARTED);
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    nextDownload.setDownloadStatus(DownloadStatus.STARTED);
+                                }
+                            });
+
+                            final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
+
+                            if (storedFile != null) {
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        nextDownload.setDownloadPath(storedFile);
+                                        nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
+                                        nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
+
+                                        context.get().checkOnCurrentSong();
+                                    }
+                                });
+                                numDownloaded++;
+
+                            } else {
+                                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        nextDownload.setDownloadStatus(DownloadStatus.FAILED);
+                                    }
+                                });
                             }
-                        });
 
-                        final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
-
-                        if (storedFile != null) {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    nextDownload.setDownloadPath(storedFile);
-                                    nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
-                                    nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
-
-                                    context.get().checkOnCurrentSong();
-                                }
-                            });
-                            numDownloaded++;
-
+                            new OutgoingMessageHandler(context.get()).sendSessionUpdate();
+                            index = 0;
                         } else {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    nextDownload.setDownloadStatus(DownloadStatus.FAILED);
-                                }
-                            });
+                            numDownloaded++;
+                            index++;
                         }
-
-                        new OutgoingMessageHandler(context.get()).sendSessionUpdate();
-                        index = 0;
-                    } else {
-                        numDownloaded++;
-                        index++;
+                    } catch (Exception ex) {
+                        //error occurs when playlist is empty because .size() is retarded (return > 0 even though its 0)
                     }
                 }
             }
