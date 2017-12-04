@@ -31,7 +31,7 @@ public class AudioService extends Service {
     private final IBinder binder = new LocalBinder();
 
     private SessionModel sessionModel;
-    //private ObservableUniqueSortedList<SongModel> playQueue;
+    private DownloadWorker downloadWorker;
 
     @Override
     public void onCreate() {
@@ -41,8 +41,16 @@ public class AudioService extends Service {
         sessionModel = StateSingleton.getInstance().getActiveSession();
 
         // start the download worker
-        DownloadWorker downloadWorker = new DownloadWorker(this, sessionModel);
+        downloadWorker = new DownloadWorker(this, sessionModel);
         downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (downloadWorker != null) {
+            downloadWorker.cancel(true);
+        }
     }
 
     public void stopPlaying() {
