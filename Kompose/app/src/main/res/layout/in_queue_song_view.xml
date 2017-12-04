@@ -5,53 +5,78 @@
 
     <data>
 
+        <import type="android.view.View" />
+        <import type="ch.ethz.inf.vs.kompose.enums.DownloadStatus" />
+
         <variable
             name="viewHolder"
             type="ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder" />
     </data>
 
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3pt"
-        android:background="#efefef"
-        android:orientation="horizontal"
-        android:padding="3pt">
+        android:orientation="vertical">
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_toStartOf="@id/down_vote_button"
-            android:orientation="vertical">
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3pt"
+            android:background="#efefef"
+            android:orientation="horizontal"
+            android:padding="3pt">
 
-            <TextView
-                android:id="@+id/currently_playing_title"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{viewHolder.item.title}"
-                android:textColor="#000"
-                tools:text="example text of video" />
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/down_vote_button"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/currently_playing_seconds_length"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{String.valueOf(viewHolder.item.secondsLength)}" />
+                <TextView
+                    android:id="@+id/currently_playing_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewHolder.item.title}"
+                    android:textColor="#000"
+                    tools:text="example text of video" />
 
-        </LinearLayout>
+                <TextView
+                    android:id="@+id/currently_playing_seconds_length"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="300"
+                    android:text="@{String.valueOf(viewHolder.item.secondsLength)}" />
 
-        <ImageButton
-            android:id="@+id/down_vote_button"
-            android:layout_width="50pt"
-            android:layout_height="20pt"
-            android:layout_alignParentEnd="true"
-            android:background="@color/buttonTextColor"
-            android:backgroundTint="@color/buttonTextColor"
-            android:onClick="@{viewHolder.onDownVoteClick}"
-            android:tint="@color/buttonColor"
-            app:srcCompat="@android:drawable/arrow_down_float"
-            android:contentDescription="@string/downvote_button" />
+            </LinearLayout>
 
-    </RelativeLayout>
+            <ImageButton
+                android:id="@+id/down_vote_button"
+                android:layout_width="50pt"
+                android:layout_height="20pt"
+                android:layout_alignParentEnd="true"
+                android:background="@color/buttonTextColor"
+                android:backgroundTint="@color/buttonTextColor"
+                android:onClick="@{viewHolder.onDownVoteClick}"
+                android:tint="@color/buttonColor"
+                app:srcCompat="@android:drawable/arrow_down_float"
+                android:contentDescription="@string/downvote_button" />
+
+        </RelativeLayout>
+
+        <ProgressBar
+            android:visibility="@{viewHolder.item.downloadStatus == DownloadStatus.STARTED ? View.VISIBLE : View.GONE}"
+            android:id="@+id/my_seek"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:progress="@{viewHolder.item.downloadProgress}"
+            tools:progress="25"
+            tools:visibility="visible"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:indeterminateOnly="false"
+            android:max="100"
+            />
+
+    </LinearLayout>
+
 </layout>

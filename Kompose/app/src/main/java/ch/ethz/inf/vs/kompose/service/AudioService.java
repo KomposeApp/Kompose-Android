@@ -223,12 +223,9 @@ public class AudioService extends Service {
 
                 int numDownloaded = 0;
 
-                //todo:
-                //make error handling better; and allow parallel downloads
-                //simply create a thread for each song, instead of this weird loop; helps to better account for failures
                 int index = 0;
                 while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
-                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index++);
+                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
                     if (nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
                         Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
 
@@ -239,10 +236,7 @@ public class AudioService extends Service {
                             }
                         });
 
-
-                        final File storedFile = youtubeDownloadUtility.downloadSong(
-                                nextDownload.getDownloadUrl().toString(),
-                                nextDownload.getTitle() + ".m4a");
+                        final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
 
                         if (storedFile != null) {
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -267,8 +261,10 @@ public class AudioService extends Service {
                         }
 
                         new OutgoingMessageHandler(context.get()).sendSessionUpdate();
+                        index = 0;
                     } else {
                         numDownloaded++;
+                        index++;
                     }
                 }
             }

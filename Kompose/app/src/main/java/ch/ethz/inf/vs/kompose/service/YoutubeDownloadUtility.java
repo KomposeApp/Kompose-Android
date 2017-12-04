@@ -3,6 +3,8 @@ package ch.ethz.inf.vs.kompose.service;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -115,24 +117,35 @@ public class YoutubeDownloadUtility {
      * Download the file from the specified URL and notify observers when done.
      * The notifier will carry a MediaPlayer that can be used to play the file.
      *
-     * @param directURL WARNING: THIS IS NOT THE BROWSER URL. USE {@link #resolveSong(String, SessionModel, ClientModel, SimpleListener)} AND A LISTENER.
-     * @param fileName  file to store the song in
      * @return true if the download succeeded, false otherwise
      */
-    public File downloadSong(String directURL, String fileName) {
+    public File downloadSong(final SongModel songModel) {
         try {
-            URL url = new URL(directURL);
+            URL url = new URL(songModel.getDownloadUrl().toString());
             URLConnection connection = url.openConnection();
             connection.connect();
 
-            InputStream input = new BufferedInputStream(connection.getInputStream());
-            File storedFile = new File(context.getCacheDir(), fileName);
-            OutputStream output = new FileOutputStream(storedFile);
+            // Detect the file lenghth
+            final int fileLength = connection.getContentLength();
+
+            final InputStream input = new BufferedInputStream(connection.getInputStream());
+            final File storedFile = new File(context.getCacheDir(), songModel.getFileName());
+            final OutputStream output = new FileOutputStream(storedFile);
 
             byte[] buffer = new byte[1024];
             int count;
+            int total = 0;
             while ((count = input.read(buffer)) != -1) {
                 output.write(buffer, 0, count);
+                total += count;
+
+                final int currentTotal = total;
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        songModel.setDownloadProgress((int) (currentTotal * 100 / fileLength));
+                    }
+                });
             }
 
             input.close();
