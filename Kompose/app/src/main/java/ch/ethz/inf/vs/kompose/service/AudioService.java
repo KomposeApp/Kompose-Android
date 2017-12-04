@@ -184,7 +184,7 @@ public class AudioService extends Service {
 
         @Override
         public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
-            Log.d(LOG_TAG, (i1 - i) + " new items in play queue");
+            Log.d(LOG_TAG, i1 + " new items in play queue");
             audioService.checkOnCurrentSong();
             notifier.register();
         }
@@ -195,7 +195,7 @@ public class AudioService extends Service {
 
         @Override
         public void onItemRangeRemoved(ObservableList observableList, int i, int i1) {
-            Log.d(LOG_TAG, (i1 - i) + " items removed from play queue");
+            Log.d(LOG_TAG, i1 + " items removed from play queue");
             notifier.register();
         }
     }
