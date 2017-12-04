@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.youtube.YouTubeExtractor;
@@ -29,7 +31,6 @@ public class YoutubeDownloadUtility {
 
     private Context context;
 
-    //Constructor
     public YoutubeDownloadUtility(Context ctx) {
         context = ctx;
     }
@@ -52,44 +53,57 @@ public class YoutubeDownloadUtility {
      * @return true if the download succeeded, false otherwise
      */
     public File downloadSong(final SongModel songModel) {
-        try {
-            URL url = new URL(songModel.getDownloadUrl().toString());
-            URLConnection connection = url.openConnection();
-            connection.connect();
 
-            // Detect the file lenghth
-            final int fileLength = connection.getContentLength();
-
-            final InputStream input = new BufferedInputStream(connection.getInputStream());
-            final File storedFile = new File(context.getCacheDir(), songModel.getFileName());
-            final OutputStream output = new FileOutputStream(storedFile);
-
-            byte[] buffer = new byte[1024];
-            int count;
-            int total = 0;
-            while ((count = input.read(buffer)) != -1) {
-                output.write(buffer, 0, count);
-                total += count;
-
-                final int currentTotal = total;
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        songModel.setDownloadProgress((int) (currentTotal * 100 / fileLength));
-                    }
-                });
-            }
-
-            input.close();
-            output.close();
-
-            return storedFile;
-
-        } catch (Exception e) {
+        String videoID = songModel.getVideoID();
+        if (videoID == null){
             Log.e(LOG_TAG, "File download failed");
-            e.printStackTrace();
+            return null;
         }
 
-        return null;
+        final File storedFile;
+        if (StateSingleton.getInstance().checkCacheByKey(videoID)) {
+            storedFile = StateSingleton.getInstance().retrieveSongFromCache(videoID);
+        }
+        else{
+            //Song not found in cache:
+            try {
+                Log.d(LOG_TAG, "Video ID: " + songModel.getVideoID());
+                URL url = new URL(songModel.getDownloadUrl().toString());
+                URLConnection connection = url.openConnection();
+                connection.connect();
+
+                // Detect the file length
+                final int fileLength = connection.getContentLength();
+
+                final InputStream input = new BufferedInputStream(connection.getInputStream());
+                storedFile = new File(context.getCacheDir(), songModel.getFileName());
+                final OutputStream output = new FileOutputStream(storedFile);
+
+                byte[] buffer = new byte[1024];
+                int count;
+                int total = 0;
+                while ((count = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, count);
+                    total += count;
+
+                    final int currentTotal = total;
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            songModel.setDownloadProgress((int) (currentTotal * 100 / fileLength));
+                        }
+                    });
+                }
+                input.close();
+                output.close();
+
+                StateSingleton.getInstance().addSongToCache(videoID, storedFile);
+            } catch (Exception e) {
+                Log.e(LOG_TAG, "File download failed");
+                e.printStackTrace();
+                return null;
+            }
+        }
+        return storedFile;
     }
 }

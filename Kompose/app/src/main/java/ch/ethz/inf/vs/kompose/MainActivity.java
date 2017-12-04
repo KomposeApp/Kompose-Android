@@ -42,6 +42,12 @@ public class MainActivity extends AppCompatActivity {
         StateSingleton.getInstance().setStartedFromMainActivity();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        StateSingleton.getInstance().clearCache();
+    }
+
     /**
      * Navigation to the ConnectActivity, where clients join existing parties
      */

@@ -193,6 +193,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
 
             // get URI & title
             String downloadUrl = ytFiles.get(iTag).getUrl();
+            String videoID = videoMeta.getVideoId();
             String thumbnailUrl = videoMeta.getThumbUrl();
             String title = videoMeta.getTitle();
             long length = videoMeta.getVideoLength();
@@ -205,6 +206,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
 
             // add content to song model
             songModel.setTitle(title);
+            songModel.setVideoID(videoID);
             songModel.setDownloadUrl(URI.create(downloadUrl));
             songModel.setThumbnailUrl(URI.create(thumbnailUrl));
             songModel.setSecondsLength((int) length);

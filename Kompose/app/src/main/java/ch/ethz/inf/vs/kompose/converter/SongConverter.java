@@ -57,6 +57,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         //create song model
         SongModel songModel = new SongModel(UUID.fromString(song.getUuid()), proposedBy, sessionModel);
         songModel.setTitle(song.getTitle());
+        songModel.setVideoID(song.getVideoID());
         songModel.setSecondsLength(song.getLengthInSeconds());
 
         songModel.setOrder(song.getOrder());
@@ -92,6 +93,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         song.setUuid(songModel.getUUID().toString());
         song.setOrder(songModel.getOrder());
         song.setTitle(songModel.getTitle());
+        song.setVideoID(songModel.getVideoID());
         song.setLengthInSeconds(songModel.getSecondsLength());
 
         song.setDownloadUrl(songModel.getDownloadUrl().toString());

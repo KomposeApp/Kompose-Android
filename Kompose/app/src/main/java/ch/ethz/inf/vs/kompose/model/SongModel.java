@@ -27,6 +27,7 @@ public class SongModel extends UniqueModel {
     }
 
     private String title;
+    private String videoID;
     private int secondsLength;
     private int order;
 
@@ -35,9 +36,9 @@ public class SongModel extends UniqueModel {
     private ClientModel proposedBy;
     private SessionModel partOfSession;
 
+    private URI sourceUrl;
     private URI downloadUrl;
     private URI thumbnailUrl;
-    private URI sourceUrl;
 
     private boolean skipVoteCasted;
     private DateTime creationDateTime;
@@ -201,6 +202,13 @@ public class SongModel extends UniqueModel {
 
     public void setMediaPlayer(MediaPlayer mediaPlayer) {
         this.mediaPlayer = mediaPlayer;
+    }
+
+    public String getVideoID(){
+        return videoID;
+    }
+    public void setVideoID(String id){
+        this.videoID = id;
     }
 
     @Bindable

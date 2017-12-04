@@ -16,6 +16,7 @@ public class Song implements Parcelable {
     private String downloadStatus;
     private String thumbnailUrl;
     private String title;
+    private String videoID;
     private int lengthInSeconds;
     private String uuid;
 
@@ -32,6 +33,7 @@ public class Song implements Parcelable {
         downloadStatus = in.readString();
         thumbnailUrl = in.readString();
         title = in.readString();
+        videoID = in.readString();
         lengthInSeconds = in.readInt();
         uuid = in.readString();
     }
@@ -47,6 +49,7 @@ public class Song implements Parcelable {
         dest.writeString(downloadStatus);
         dest.writeString(thumbnailUrl);
         dest.writeString(title);
+        dest.writeString(videoID);
         dest.writeInt(lengthInSeconds);
         dest.writeString(uuid);
     }
@@ -141,6 +144,15 @@ public class Song implements Parcelable {
     @JsonProperty("title")
     public String getTitle() {
         return title;
+    }
+
+    @JsonProperty("videoID")
+    public void setVideoID(String value) {
+        this.videoID = value;
+    }
+    @JsonProperty("videoID")
+    public String getVideoID() {
+        return videoID;
     }
 
     @JsonProperty("title")
