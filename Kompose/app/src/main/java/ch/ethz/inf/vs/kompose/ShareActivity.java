@@ -33,7 +33,7 @@ public class ShareActivity extends AppCompatActivity {
         // Check whether there is a currently active session. If not, immediately stop and display an error.
         // Additionally, kill the process if Kompose hasn't been started beforehand.
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
-        if (activeSession == null) {
+        if (activeSession == null || !StateSingleton.getInstance().getPlaylistIsActive()) {
             Toast.makeText(this, "Kompose is not connected to a host!", Toast.LENGTH_SHORT).show();
             Log.d(LOG_TAG, "Failed to send given URL. Reason: Not connected to host.");
 

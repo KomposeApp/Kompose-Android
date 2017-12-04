@@ -144,12 +144,10 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
                 e.printStackTrace();
             }
             showError("Failed to set up connection.");
-            StateSingleton.getInstance().setActiveSession(null);
         }
         catch (IllegalStateException | IOException io) {
             io.printStackTrace();
             showError("Failed to set up connection.");
-            StateSingleton.getInstance().setActiveSession(null);
         }
     }
 
@@ -175,14 +173,12 @@ public class ConnectActivity extends BaseActivity implements JoinSessionViewHold
                     if (!connectActivity.isDestroyed()) {
                         connectActivity.showError(getString(R.string.view_error_connection_failed));
                     }
-                    StateSingleton.getInstance().setActiveSession(null);
                     clientNetworkService.closeClientSocket();
                     return;
                 }
 
                 // In case we closed the activity while waiting for a connection, stop here.
                 if (connectActivity.isDestroyed()) {
-                    StateSingleton.getInstance().setActiveSession(null);
                     clientNetworkService.closeClientSocket();
                     return;
                 }

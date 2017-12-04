@@ -24,10 +24,9 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.AudioService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.SongRequestListener;
-import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
-import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
+import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
@@ -36,26 +35,43 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     private static final String LOG_TAG = "## Playlist Activity";
 
+    //View
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().getActiveSession(), this);
     private Dialog songRequestDialog;
 
+    //Networking
     private OutgoingMessageHandler responseHandler;
+
+    /* Intents of Services originating from the preceeding Activities
+     * Only one of the two should be non-null at any given point */
+    private Intent clientNetworkServiceIntent;
+    private Intent hostServerServiceIntent;
 
     // Audio Service
     private AudioService audioService;
     private boolean audioServiceBound = false;
+    private ServiceConnection audioServiceConnection = new ServiceConnection() {
 
-    /* Intents of Services originating from the preceeding Activities
-     * Only one of the two should be non-null at any given point
-    */
-    private Intent clientNetworkServiceIntent;
-    private Intent hostServerServiceIntent;
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "AudioService connected");
+            audioServiceBound = true;
+            audioService = ((AudioService.LocalBinder) service).getService();
+        }
 
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.d(LOG_TAG, "AudioService disconnected");
+            audioServiceBound = false;
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
+
+        StateSingleton.getInstance().setPlaylistIsActive(true);
 
         if (MainActivity.DESIGN_MODE) {
             viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
@@ -68,7 +84,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         hostServerServiceIntent = intent.getParcelableExtra(MainActivity.KEY_SERVERSERVICE);
         clientNetworkServiceIntent = intent.getParcelableExtra(MainActivity.KEY_NETWORKSERVICE);
 
-        if(((hostServerServiceIntent==null) == (clientNetworkServiceIntent== null))){
+        if (((hostServerServiceIntent == null) == (clientNetworkServiceIntent == null))) {
             throw new IllegalStateException("Application managed to simultaneously be host and client, or neither.");
         }
 
@@ -90,22 +106,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         }
     }
 
-    private ServiceConnection audioServiceConnection = new ServiceConnection() {
-
-        @Override
-        public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d(LOG_TAG, "AudioService connected");
-            audioServiceBound = true;
-            audioService = ((AudioService.LocalBinder) service).getService();
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName arg0) {
-            Log.d(LOG_TAG, "AudioService disconnected");
-            audioServiceBound = false;
-        }
-    };
-
     private void resolveAndRequestSong(String youtubeUrl) {
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
@@ -116,7 +116,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         }
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-
         youtubeService.resolveSong(youtubeUrl, activeSession,
                 StateSingleton.getInstance().getActiveClient(), new SongRequestListener(this));
     }
@@ -125,11 +124,14 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        responseHandler.sendUnRegisterClient();
+
         if (clientNetworkServiceIntent != null) {
             stopService(clientNetworkServiceIntent);
             Log.d(LOG_TAG, "Stopping ClientNetworkService");
         }
-        if (hostServerServiceIntent != null){
+        if (hostServerServiceIntent != null) {
             stopService(hostServerServiceIntent);
             Log.d(LOG_TAG, "Stopping HostServerService");
         }
@@ -137,7 +139,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             unbindService(audioServiceConnection);
             audioServiceBound = false;
         }
-        StateSingleton.getInstance().setActiveSession(null);
+
+        StateSingleton.getInstance().setPlaylistIsActive(false);
     }
 
     @Override
@@ -170,30 +173,19 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 songRequestDialog.show();
                 return true;
             case R.id.leave_session:
-                leaveSession();
+                Log.d(LOG_TAG, "Left the party by pressing the button");
                 finish();
                 return true;
             case R.id.show_history:
-                showHistory();
-                finish();
+                Log.d(LOG_TAG, "History button pressed from Playlist Activity");
+                Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
+                startActivity(historyIntent);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    public void showHistory() {
-        Log.d(LOG_TAG, "History button pressed from Playlist Activity");
-        Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
-        startActivity(historyIntent);
-    }
-
-    private void leaveSession() {
-        Log.d(LOG_TAG, "Left the party by pressing the button");
-        // unregister the client
-        responseHandler.sendUnRegisterClient();
-        this.finish();
-    }
 
     @Override
     public void downVoteClicked(View v, int position) {

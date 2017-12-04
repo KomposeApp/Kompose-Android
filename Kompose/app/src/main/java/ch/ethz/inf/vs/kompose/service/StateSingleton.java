@@ -12,13 +12,17 @@ public class StateSingleton {
 
     private final String LOG_TAG = "## SINGLETON HUB:";
 
-    private SessionModel activeSession; // ABSOLUTELY MAKE SURE THIS IS NULL IF THERE IS ACTIVE SESSION
+    private SessionModel activeSession;
     private ClientModel activeClient;  //TODO: Do we actually need this?
     private SessionModel activeHistorySession;
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
     private boolean hasMainActivity; //Required for the Share Activity.
+    private boolean playlistIsActive;
 
-    private StateSingleton() { hasMainActivity = false;}
+    private StateSingleton() {
+        hasMainActivity = false;
+        playlistIsActive = false;
+    }
 
     private static class LazyHolder {
         static final StateSingleton INSTANCE = new StateSingleton();
@@ -60,6 +64,12 @@ public class StateSingleton {
     }
     public void setStartedFromMainActivity(){
         hasMainActivity = true;
+    }
+    public boolean getPlaylistIsActive(){
+        return playlistIsActive;
+    }
+    public void setPlaylistIsActive(boolean value){
+        playlistIsActive = value;
     }
 
 }
