@@ -11,6 +11,7 @@
     <string name="setting_sessionname">Default Session Name:</string>
     <string name="setting_username">Default Username:</string>
     <string name="settings_confirm">Confirm Changes</string>
+
     <!-- Error Strings -->
     <string name="setting_error_preload">Maximum preload count is 10</string>
     <string name="setting_error_username">Please choose a valid username</string>
@@ -22,9 +23,14 @@
     <string name="view_error_connection_failed">Failed to establish connection to host.</string>
     <string name="view_error_socket_dead">Establishing connection failed: Host is unreachable.</string>
     <string name="view_error_socket_closed">Establishing connection failed: Host socket port is closed.</string>
+
+    <!-- Android Developer Icons -->
+    <string name="icons_ai_halt">\ue829</string>
+    <string name="icons_ai_arrow_down">\ue874</string>
+    <string name="icons_ai_playback_play">\ue87e</string>
+    <string name="icons_ai_playback_pause">\ue87f</string>
+
     <!-- Uncategorized -->
-    <string name="downvote_icon_arrow">\ue829</string>
-    <string name="downvote_icon_cross">\ue874</string>
     <string name="join">join</string>
     <string name="client_name">My name</string>
     <string name="create_party">create party</string>

@@ -87,7 +87,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:onClick="@{viewHolder.onDownVoteClick}"
-                    android:text="@string/downvote_icon_cross"
+                    android:text="@string/icons_ai_halt"
                     android:fontFamily="@font/androidicons" />
 
             </RelativeLayout>
