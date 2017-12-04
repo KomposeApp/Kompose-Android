@@ -1,21 +1,15 @@
-package ch.ethz.inf.vs.kompose.service;
+package ch.ethz.inf.vs.kompose.service.client;
 
 import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
-import java.util.UUID;
 
-import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.Message;
-import ch.ethz.inf.vs.kompose.enums.MessageType;
-import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
 
 public class ClientRegistrationTask extends AsyncTask<Void, Void, Boolean> {
@@ -24,30 +18,24 @@ public class ClientRegistrationTask extends AsyncTask<Void, Void, Boolean> {
     private static final int TEMPORARY_SOCKET_TIMEOUT = 5000;
 
     private ServerSocket clientServerSocket;
-    private UUID sessionUUID;
     private SimpleListener<Boolean, Void> callbackListener;
     private Context context;
 
-    public ClientRegistrationTask(Context context, ServerSocket clientServerSocket,
-                                  SimpleListener<Boolean, Void> callbackListener) throws SocketException {
-        //Retrieve connection details of active session:
-        SessionModel session = StateSingleton.getInstance().activeSession;
-        if (session == null || session.getUUID() == null) {
-            throw new IllegalStateException("Session or its UUID were null.");
-        }
+    ClientRegistrationTask(Context context, ServerSocket clientServerSocket,
+                           SimpleListener<Boolean, Void> callbackListener) throws SocketException {
+
         this.context = context;
-        this.sessionUUID = session.getUUID();
         this.clientServerSocket = clientServerSocket;
         this.callbackListener = callbackListener;
 
+        // Set a temporary timeout for the ServerSocket
         clientServerSocket.setSoTimeout(TEMPORARY_SOCKET_TIMEOUT);
     }
 
     /**
-     * Wait for a connection from the host, then accept and verify whether it is a proper response to the registration.
-     * Yes I know, the try/catch blocks are ugly as sin, but alas, it's Java Sockets.
-     *
-     * @return Connection to the host
+     * Wait for a response from the host. If we got one, return true.
+     * TODO: Maybe add better security somehow, e.g. UUID check, MessageType check
+     * @return true iff response received
      */
     @Override
     protected Boolean doInBackground(Void... voids) {

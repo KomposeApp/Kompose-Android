@@ -16,7 +16,7 @@ public class HistoryDetailsActivity extends AppCompatActivity implements PlayedS
     private static final String LOG_TAG = "## Details Activity";
 
     private final HistoryDetailsViewModel viewModel = new HistoryDetailsViewModel(
-            StateSingleton.getInstance().activeHistorySession
+            StateSingleton.getInstance().getActiveHistorySession()
     );
 
     @Override

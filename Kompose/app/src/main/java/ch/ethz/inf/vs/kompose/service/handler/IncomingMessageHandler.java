@@ -88,7 +88,7 @@ public class IncomingMessageHandler implements Runnable {
             return;
         }
 
-        final SessionModel activeSessionModel = StateSingleton.getInstance().activeSession;
+        final SessionModel activeSessionModel = StateSingleton.getInstance().getActiveSession();
 
         final MessageType messageType = MessageType.valueOf(message.getType());
         Log.d(LOG_TAG, "Message processing (" + messageType + ")");
@@ -159,7 +159,7 @@ public class IncomingMessageHandler implements Runnable {
                     }
 
                     //only persist if not host; host already saves after the session update (so we don't need to convert twice)
-                    boolean isHost = StateSingleton.getInstance().activeSession.getIsHost();
+                    boolean isHost = StateSingleton.getInstance().getActiveSession().getIsHost();
                     if (!isHost && messageType == MessageType.SESSION_UPDATE) {
                         Thread t = new Thread(new Runnable() {
                             @Override

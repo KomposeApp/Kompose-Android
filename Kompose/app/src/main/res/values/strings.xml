@@ -6,14 +6,18 @@
     <string name="setting_category_host">Host Settings</string>
     <string name="setting_category_client">Client Settings</string>
     <string name="setting_preload">Number of songs to preload:</string>
-    <string name="setting_port">Host Server Port:</string>
+    <string name="setting_hostport">Host Server Port:</string>
+    <string name="setting_clientport">Client Port:</string>
+    <string name="setting_sessionname">Default Session Name:</string>
     <string name="setting_username">Default Username:</string>
     <string name="settings_confirm">Confirm Changes</string>
     <!-- Error Strings -->
     <string name="setting_error_preload">Maximum preload count is 10</string>
     <string name="setting_error_username">Please choose a valid username</string>
-    <string name="setting_error_port">Please choose a valid port</string>
-    <string name="view_error_clientname">please choose a non-empty client name</string>
+    <string name="setting_error_sessionname">Please choose a valid session name</string>
+    <string name="setting_error_hostport">Please choose a valid port for the host session</string>
+    <string name="setting_error_clientport">Please choose a valid port for the client session</string>
+    <string name="view_error_clientname">please choose a non-empty  username</string>
     <string name="view_error_sessionname">please choose a non-empty session name</string>
     <string name="view_error_connection_failed">Failed to establish connection to host.</string>
     <string name="view_error_socket_dead">Establishing connection failed: Host is unreachable.</string>

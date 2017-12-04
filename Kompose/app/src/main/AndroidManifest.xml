@@ -12,37 +12,62 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-
         android:theme="@style/KomposeTheme">
-
-        <activity android:name=".MainActivity"
+        <activity
+            android:name=".MainActivity"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
             android:name=".PartyCreationActivity"
-            android:label="Create your own Party"
             android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait"/>
-
+            android:label="Create your own Party"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ConnectActivity"
-            android:label="Choose a Party"
             android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait"/>
-
+            android:label="Choose a Party"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".PlaylistActivity"
-            android:label="@string/title_activity_playlist"
             android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait">
+            android:label="@string/title_activity_playlist"
+            android:screenOrientation="portrait"/>
+        <activity
+            android:name=".HistoryOverviewActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="Overview of past Playlists"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".HistoryDetailsActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="Playlist History"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SettingsActivity"
+            android:configChanges="orientation|screenSize"
+            android:label="Settings"
+            android:screenOrientation="portrait" />
 
-            <!--youtube link share intents-->
+        <service
+            android:name=".service.host.HostServerService"
+            android:stopWithTask="true" />
+        <service android:name=".service.client.ClientNetworkService" />
+        <service android:name=".service.AudioService" />
+
+        <activity android:name=".DesignActivity" />
+
+        <!-- Activity used exclusively to share songs -->
+        <activity
+            android:name=".ShareActivity"
+            android:label="Kompose"
+            android:theme="@android:style/Theme.NoDisplay">
+            <!-- youtube link share intents -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -50,33 +75,6 @@
             </intent-filter>
         </activity>
 
-        <activity
-            android:name=".HistoryOverviewActivity"
-            android:label="Overview of past Playlists"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".HistoryDetailsActivity"
-            android:label="Playlist History"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait"/>
-
-        <activity
-            android:name=".SettingsActivity"
-            android:label="Settings"
-            android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait"/>
-
-        <service
-            android:name=".service.AndroidServerService"
-            android:stopWithTask="true" />
-
-        <service android:name=".service.ClientNetworkService" />
-
-        <service android:name=".service.AudioService" />
-
-        <activity android:name=".DesignActivity" />
     </application>
 
 </manifest>

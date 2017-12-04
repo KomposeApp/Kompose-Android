@@ -5,7 +5,6 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,7 +14,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageButton;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
@@ -25,6 +23,7 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.AudioService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
+import ch.ethz.inf.vs.kompose.service.SongRequestListener;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
@@ -33,33 +32,30 @@ import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
-public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener, SimpleListener<Integer, SongModel> {
+public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
 
     private static final String LOG_TAG = "## Playlist Activity";
-    private OutgoingMessageHandler responseHandler;
 
-    private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().activeSession, this);
-    private Intent clientNetworkServiceIntent;
-
+    private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().getActiveSession(), this);
     private Dialog songRequestDialog;
 
+    private OutgoingMessageHandler responseHandler;
+
+    // Audio Service
     private AudioService audioService;
     private boolean audioServiceBound = false;
+
+    /* Intents of Services originating from the preceeding Activities
+     * Only one of the two should be non-null at any given point
+    */
+    private Intent clientNetworkServiceIntent;
+    private Intent hostServerServiceIntent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
-
-        // share links
-        Intent intent = getIntent();
-        String action = intent.getAction();
-        String type = intent.getType();
-        if (Intent.ACTION_SEND.equals(action) && type != null) {
-            if ("text/plain".equals(type)) {
-                handleSendText(intent);
-            }
-        }
 
         if (MainActivity.DESIGN_MODE) {
             viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
@@ -67,9 +63,14 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             sampleService.fillSampleSession(viewModel.getSessionModel());
         }
 
+        Intent intent = getIntent();
         responseHandler = new OutgoingMessageHandler(this);
-        clientNetworkServiceIntent = this.getIntent().getParcelableExtra(MainActivity.KEY_CNETWORKSERVICE);
-        Log.d(LOG_TAG, "Client NetworkServiceIntent is null : " + (clientNetworkServiceIntent == null));
+        hostServerServiceIntent = intent.getParcelableExtra(MainActivity.KEY_SERVERSERVICE);
+        clientNetworkServiceIntent = intent.getParcelableExtra(MainActivity.KEY_NETWORKSERVICE);
+
+        if(((hostServerServiceIntent==null) == (clientNetworkServiceIntent== null))){
+            throw new IllegalStateException("Application managed to simultaneously be host and client, or neither.");
+        }
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
@@ -82,7 +83,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         super.onStart();
 
         // bind to audio service
-        if (StateSingleton.getInstance().activeSession.getIsHost()) {
+        if (StateSingleton.getInstance().getActiveSession().getIsHost()) {
             Log.d(LOG_TAG, "binding AudioService");
             Intent audioServiceIntent = new Intent(this.getBaseContext(), AudioService.class);
             bindService(audioServiceIntent, audioServiceConnection, BIND_AUTO_CREATE);
@@ -105,21 +106,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         }
     };
 
-    private void handleSendText(Intent intent) {
-        SessionModel activeSession = StateSingleton.getInstance().activeSession;
-        if (activeSession == null) {
-            showError("Not connected to a session!");
-            return;
-        }
-        String sharedText = intent.getStringExtra(Intent.EXTRA_TEXT);
-        if (sharedText != null) {
-            resolveAndRequestSong(sharedText);
-        }
-    }
-
     private void resolveAndRequestSong(String youtubeUrl) {
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
-        SessionModel activeSession = StateSingleton.getInstance().activeSession;
+        SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
 
         //set session to active if host
         if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
@@ -128,18 +117,27 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
 
-        youtubeService.resolveSong(youtubeUrl, activeSession, StateSingleton.getInstance().activeClient, this);
+        youtubeService.resolveSong(youtubeUrl, activeSession,
+                StateSingleton.getInstance().getActiveClient(), new SongRequestListener(this));
     }
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         if (clientNetworkServiceIntent != null) {
             stopService(clientNetworkServiceIntent);
-            Log.d(LOG_TAG, "ClientNetworkService successfully stopped");
+            Log.d(LOG_TAG, "Stopping ClientNetworkService");
         }
-        unbindService(audioServiceConnection);
-        audioServiceBound = false;
+        if (hostServerServiceIntent != null){
+            stopService(hostServerServiceIntent);
+            Log.d(LOG_TAG, "Stopping HostServerService");
+        }
+        if (audioServiceBound) {
+            unbindService(audioServiceConnection);
+            audioServiceBound = false;
+        }
+        StateSingleton.getInstance().setActiveSession(null);
     }
 
     @Override
@@ -231,14 +229,5 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         }
     }
 
-    @Override
-    public void onEvent(Integer status, SongModel value) {
-        if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
-            Log.d(LOG_TAG, "resolved download url: " + value.getDownloadUrl());
-            responseHandler.sendRequestSong(value);
-        } else {
-            Log.e(LOG_TAG, "resolving url failed");
-            showError("Failed to resolve Youtube URL");
-        }
-    }
+
 }
