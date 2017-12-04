@@ -67,7 +67,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/currently_playing_title"
-                        android:text="@{String.valueOf(viewModel.sessionModel.currentlyPlaying.secondsLength)}"
+                        android:text="@{viewModel.sessionModel.currentlyPlaying.songLengthMinSec}"
                         tools:text="300" />
 
                     <LinearLayout

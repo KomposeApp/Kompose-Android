@@ -29,6 +29,7 @@ public class SongModel extends UniqueModel {
     private String title;
     private String videoID;
     private int secondsLength;
+    private String getSongLengthMinSec;
     private int order;
 
     private int validDownVoteCount;
@@ -151,7 +152,17 @@ public class SongModel extends UniqueModel {
 
     public void setSecondsLength(int secondsLength) {
         this.secondsLength = secondsLength;
+
+        int sec = secondsLength % 60;
+        int min = (secondsLength - sec) / 60;
+        this.getSongLengthMinSec = min + ":" + (sec < 10 ? "0" : "") + sec;
+
         notifyPropertyChanged(BR.secondsLength);
+    }
+
+    @Bindable
+    public String getSongLengthMinSec() {
+        return getSongLengthMinSec;
     }
 
     public SessionModel getPartOfSession() {

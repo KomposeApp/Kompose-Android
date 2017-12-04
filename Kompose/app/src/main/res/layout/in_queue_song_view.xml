@@ -71,7 +71,7 @@
                         android:id="@+id/currently_playing_seconds_length"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@{String.valueOf(viewHolder.item.secondsLength)}"
+                        android:text="@{viewHolder.item.songLengthMinSec}"
                         tools:text="300" />
 
                 </LinearLayout>
