@@ -22,7 +22,6 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/russoone_regular"
             android:onClick="@{viewHolder.onJoinClick}"
-            android:textColor="@color/buttonTextColor"
             android:text="@string/join" />
 
         <LinearLayout
@@ -42,7 +41,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="@{viewHolder.item.name}"
-                android:textColor="@color/textColorGray"
+                android:textColor="@color/textColor"
                 tools:text="margareth" />
 
         </LinearLayout>

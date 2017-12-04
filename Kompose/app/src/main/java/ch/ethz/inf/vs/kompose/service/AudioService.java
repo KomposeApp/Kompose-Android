@@ -213,7 +213,7 @@ public class AudioService extends Service {
             this.context = new WeakReference<AudioService>(context);
             this.sessionModel = sessionModel;
 
-            this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getCurrentPreload();
+            this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
             this.notifier = new Phaser(1);
             sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(notifier, context));
         }

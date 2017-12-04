@@ -25,4 +25,9 @@
 
     <style name="KomposeTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+    <style name="FlatButton" parent="@style/Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">@color/colorWhite</item>
+        <item name="android:background">@color/colorPrimary</item>
+    </style>
+
 </resources>

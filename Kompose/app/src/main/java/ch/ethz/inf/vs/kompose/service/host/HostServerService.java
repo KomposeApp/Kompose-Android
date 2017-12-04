@@ -46,14 +46,14 @@ public class HostServerService extends Service {
 
         int actualPort;
         try {
-            int hostPort = StateSingleton.getInstance().getPreferenceUtility().getCurrentHostPort();
+            int hostPort = StateSingleton.getInstance().getPreferenceUtility().getHostPort();
             serverSocket = new ServerSocket(hostPort);
 
             // Required in case the port in preferences is 0
             actualPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
-            //TODO: Find a way to stop the PartyCreationActivity from advancing should this happen
+            //TODO: Find a way to stop the MainActivity from advancing should this happen
             Log.e(LOG_TAG, "Failed to set up the ServerSocket");
             stopSelf();
             return START_STICKY;
@@ -73,7 +73,7 @@ public class HostServerService extends Service {
         String sessionName = activeSession.getName();
         String uuid = activeSession.getUUID().toString();
         String hostUuid = activeSession.getHostUUID().toString();
-        String hostName = StateSingleton.getInstance().getPreferenceUtility().getCurrentUsername();
+        String hostName = StateSingleton.getInstance().getPreferenceUtility().getUsername();
 
         //Safety restrictions
         sessionName = sessionName.substring(0, Math.min(255, sessionName.length()));

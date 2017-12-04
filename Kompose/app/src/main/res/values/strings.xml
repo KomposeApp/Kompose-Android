@@ -50,4 +50,6 @@
     <string name="wait_a_second">please wait</string>
     <string name="downvote_button">downvote button</string>
     <string name="song_is_resolved">please wait, we try to fetch the song…</string>
+    <string name="your_name">your name</string>
+    <string name="join_party">join party</string>
 </resources>
