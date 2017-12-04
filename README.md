@@ -28,15 +28,9 @@ Tobias Brodmann (brotobia) 15-934-565
 
 ## TODO
 
+### Known bugs
 
-Task | Assigned | Status
----|---|---
-Add a service for audio playback | Lukas | TODO
-MessageHandler: `sessionUpdate` | Tobias? | TODO
-Implement a way for clients to listen for session updates | Lukas | DONE
-Unit test for `SessionConverter` | Flo | *DONE*
-Unit test for `ObservableSortedList` | Lukas | *DONE*
-Settings: display selected username | Dino | *DONE*
-Deal with App lifecylce: onPause etc. must disable NSD broadcasts | Lukas | TODO
-Design: Replace the placeholder layouts with actual designs based on the mockup | - | TODO
-Design: Figure out how to dynamically add Fragments that include a downvote button & text into a listview | - | TODO
+- Pressing 'ADD SONG' with an empty text field crashes the app
+- Sometimes app crashes with `Illegal character in query` when calling `URI.create` when the URL from the YouTubeExtractor contains a `"` (double quote) (??)
+- Currently playing song can't be downvoted
+
