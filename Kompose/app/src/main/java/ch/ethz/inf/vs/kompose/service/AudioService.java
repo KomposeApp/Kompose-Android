@@ -16,6 +16,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.concurrent.Phaser;
 
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
@@ -114,7 +115,8 @@ public class AudioService extends Service {
 
                 if (sessionModel.getPlayQueue().size() > 0) {
                     SongModel chosenSong = null;
-                    for (SongModel songModel : sessionModel.getPlayQueue()) {
+
+                    for (SongModel songModel : new ArrayList<>(sessionModel.getPlayQueue())) {
                         if (songModel.getDownloadStatus() == DownloadStatus.FINISHED) {
                             chosenSong = songModel;
                             break;

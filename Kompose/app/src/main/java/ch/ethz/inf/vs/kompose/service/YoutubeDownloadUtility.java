@@ -46,15 +46,9 @@ public class YoutubeDownloadUtility {
      * Resolve song metadata, including HTTP URL, Download URL, Download Thumbnail,
      * Title of the Video and Video Length.
      *
-     * @param sourceUrl Youtube URL as seen in the browser
      * @param listener  Listener which will be notified upon completion
      */
-    public void resolveSong(final String sourceUrl, final SessionModel sessionModel, final ClientModel clientModel, final SimpleListener<Integer, SongModel> listener) {
-        SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, sessionModel);
-        songModel.setSourceUrl(URI.create(sourceUrl));
-
-        //sessionModel.getPlayQueue().add(songModel);
-
+    public void resolveSong(final SongModel songModel, final SimpleListener<Integer, SongModel> listener) {
         YouTubeExtractor youTubeExtractor = new YouTubeExtractor(context, songModel, listener);
         youTubeExtractor.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }

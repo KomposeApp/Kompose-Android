@@ -6,8 +6,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.net.URI;
+import java.util.UUID;
+
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SongRequestListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
@@ -26,7 +30,7 @@ public class ShareActivity extends AppCompatActivity {
 
         // Check whether this Activity was correctly called through sharing a link.
         String action = intent.getAction();
-        if (!Intent.ACTION_SEND.equals(action)){
+        if (!Intent.ACTION_SEND.equals(action)) {
             throw new IllegalStateException("ShareActivity was called from an illegal source");
         }
 
@@ -50,10 +54,10 @@ public class ShareActivity extends AppCompatActivity {
                     }
                     // Intentional data race here
                     // If Kompose has not been started properly, kill the process.
-                    if(!StateSingleton.getInstance().isStartedFromMainActivity()){
+                    if (!StateSingleton.getInstance().isStartedFromMainActivity()) {
                         Log.d(LOG_TAG, "Kompose has dekomposed. *badum tish*");
                         android.os.Process.killProcess(pid);
-                    } else{
+                    } else {
                         Log.d(LOG_TAG, "Kompose gets to live another day.");
                     }
                 }
@@ -74,10 +78,13 @@ public class ShareActivity extends AppCompatActivity {
             activeSession.setSessionStatus(SessionStatus.ACTIVE);
         }
 
-        //TODO: Please check this for correctness, I copied it from PlaylistActivity.
+        SongModel songModel = new SongModel(UUID.randomUUID(), StateSingleton.getInstance().getActiveClient(), activeSession);
+        songModel.setSourceUrl(URI.create(requestURL));
+
+        activeSession.getPlayQueue().add(songModel);
+
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(requestURL, activeSession,
-                StateSingleton.getInstance().getActiveClient(), new SongRequestListener(this));
+        youtubeService.resolveSong(songModel, new SongRequestListener(this));
 
         //Make sure everything is cleaned up. Don't remove this or it will cause an exception.
         finish();

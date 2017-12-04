@@ -15,10 +15,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.net.URI;
+import java.util.UUID;
+
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.AudioService;
@@ -68,7 +72,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         hostServerServiceIntent = intent.getParcelableExtra(MainActivity.KEY_SERVERSERVICE);
         clientNetworkServiceIntent = intent.getParcelableExtra(MainActivity.KEY_NETWORKSERVICE);
 
-        if(((hostServerServiceIntent==null) == (clientNetworkServiceIntent== null))){
+        if (((hostServerServiceIntent == null) == (clientNetworkServiceIntent == null))) {
             throw new IllegalStateException("Application managed to simultaneously be host and client, or neither.");
         }
 
@@ -109,16 +113,20 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private void resolveAndRequestSong(String youtubeUrl) {
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
-
+        ClientModel clientModel = StateSingleton.getInstance().getActiveClient();
+        
         //set session to active if host
         if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
             activeSession.setSessionStatus(SessionStatus.ACTIVE);
         }
 
-        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
+        SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
+        songModel.setSourceUrl(URI.create(youtubeUrl));
 
-        youtubeService.resolveSong(youtubeUrl, activeSession,
-                StateSingleton.getInstance().getActiveClient(), new SongRequestListener(this));
+        activeSession.getPlayQueue().add(songModel);
+
+        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
+        youtubeService.resolveSong(songModel, new SongRequestListener(this));
     }
 
 
@@ -129,7 +137,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             stopService(clientNetworkServiceIntent);
             Log.d(LOG_TAG, "Stopping ClientNetworkService");
         }
-        if (hostServerServiceIntent != null){
+        if (hostServerServiceIntent != null) {
             stopService(hostServerServiceIntent);
             Log.d(LOG_TAG, "Stopping HostServerService");
         }
