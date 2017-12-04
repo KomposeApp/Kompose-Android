@@ -44,6 +44,7 @@ public class SongModel extends UniqueModel {
 
     private SongStatus songStatus = SongStatus.REQUESTED;
     private DownloadStatus downloadStatus = DownloadStatus.NOT_STARTED;
+    private int downloadProgress = 0;
 
     private Drawable thumbnail;
     private File downloadPath;
@@ -106,6 +107,10 @@ public class SongModel extends UniqueModel {
     public void setDownloadUrl(URI downloadUrl) {
         this.downloadUrl = downloadUrl;
         notifyPropertyChanged(BR.downloadUrl);
+    }
+
+    public String getFileName() {
+        return getUUID().toString() + ".m4a";
     }
 
     @Bindable
@@ -196,5 +201,20 @@ public class SongModel extends UniqueModel {
 
     public void setMediaPlayer(MediaPlayer mediaPlayer) {
         this.mediaPlayer = mediaPlayer;
+    }
+
+    @Bindable
+    public int getDownloadProgress() {
+        return downloadProgress;
+    }
+
+    /**
+     * value from 0 to 100
+     *
+     * @param downloadProgress the current download progress
+     */
+    public void setDownloadProgress(int downloadProgress) {
+        this.downloadProgress = downloadProgress;
+        notifyPropertyChanged(BR.downloadProgress);
     }
 }

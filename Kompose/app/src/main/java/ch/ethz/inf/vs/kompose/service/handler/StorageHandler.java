@@ -1,8 +1,12 @@
-package ch.ethz.inf.vs.kompose.service;
+package ch.ethz.inf.vs.kompose.service.handler;
 
 import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -14,16 +18,53 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import ch.ethz.inf.vs.kompose.converter.SessionConverter;
+import ch.ethz.inf.vs.kompose.data.JsonConverter;
+import ch.ethz.inf.vs.kompose.data.json.Session;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
+
 /**
  * Service that handles loading/storing data to storage.
  */
 public class StorageHandler {
 
     private static final String LOG_TAG = "## StorageHandler";
+    private static final String SESSION_FOLDER = "sessions";
     private Context context;
 
     public StorageHandler(Context context) {
         this.context = context;
+    }
+
+    public void persist(Session session) {
+        try {
+            String content = JsonConverter.toJsonString(session);
+            persist(SESSION_FOLDER, session.getCreationDateTime(), content);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void load(final List<SessionModel> sessionList) {
+        String[] files = retrieveAllFiles(SESSION_FOLDER);
+        SessionConverter sessionConverter = new SessionConverter();
+        if (files != null) {
+            for (String file :
+                    files) {
+                try {
+                    Session content = JsonConverter.fromSessionJsonString(file);
+                    final SessionModel model = sessionConverter.convert(content);
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            sessionList.add(model);
+                        }
+                    });
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -34,10 +75,10 @@ public class StorageHandler {
      * @param directory where the file is stored relative to the app path (automatic creation)
      * @return boolean indication whether the operation has succeeded or not
      */
-    public boolean persist(String directory, String fileName, String content) {
+    private boolean persist(String directory, String fileName, String content) {
         String child = fileName;
 
-        if(fileName.isEmpty()){
+        if (fileName.isEmpty()) {
             Log.e(LOG_TAG, "Filename was empty");
             return false;
         }
@@ -77,16 +118,16 @@ public class StorageHandler {
 
         FileInputStream input;
         // Load file into inputstream
-        try{
+        try {
             input = new FileInputStream(file);
-        } catch(FileNotFoundException fnf){
+        } catch (FileNotFoundException fnf) {
             Log.e(LOG_TAG, "Malformed file passed to method.", fnf);
             return null;
         }
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(input));
         StringBuilder stringBuilder = new StringBuilder();
-        String line = null;
+        String line;
 
         //Try reading from InputStream
         try {
@@ -94,7 +135,7 @@ public class StorageHandler {
                 stringBuilder.append(line).append("\n");
             }
             input.close();
-        }catch(IOException io){
+        } catch (IOException io) {
             Log.e(LOG_TAG, "Reading from InputStream failed.", io);
             return null;
         }
@@ -108,7 +149,7 @@ public class StorageHandler {
      * @param directory the directory to be traversed
      * @return an array of strings with the file contents
      */
-    public String[] retrieveAllFiles(String directory) {
+    private String[] retrieveAllFiles(String directory) {
         File file = new File(context.getFilesDir(), directory);
         if (!file.exists() || !file.isDirectory()) {
             return null;
@@ -143,7 +184,7 @@ public class StorageHandler {
      * @param directory the directory in which the requested file resides
      * @return a string with the file content
      */
-    public String retrieveFile(String directory, String fileName) {
+    private String retrieveFile(String directory, String fileName) {
         try {
             String child = fileName;
             if (directory != null && directory.length() > 0) {

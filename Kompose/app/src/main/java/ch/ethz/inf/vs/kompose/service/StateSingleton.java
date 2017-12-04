@@ -1,32 +1,24 @@
 package ch.ethz.inf.vs.kompose.service;
 
-import android.content.SharedPreferences;
-import android.databinding.ObservableList;
-
-import java.util.Comparator;
-import java.util.UUID;
+import android.content.Context;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.model.comparators.SessionComparator;
-import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
-import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
+import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
+
+/** Stores all relevant information for the active application **/
 
 public class StateSingleton {
 
     private final String LOG_TAG = "## SINGLETON HUB:";
-    private final String DIRECTORY_ARCHIVE = "session_archive";
 
-    // Client specific fields
-    public SessionModel activeSession;
-    public ClientModel activeClient;
-    public SessionModel activeHistorySession;
-    public UUID deviceUUID;
+    private SessionModel activeSession; // ABSOLUTELY MAKE SURE THIS IS NULL IF THERE IS ACTIVE SESSION
+    private ClientModel activeClient;  //TODO: Do we actually need this?
+    private SessionModel activeHistorySession;
+    private PreferenceUtility preferenceUtility; // Main access point for all preferences
+    private boolean hasMainActivity; //Required for the Share Activity.
 
-    /* * Initialization on-demand holder idiom for Singleton Pattern * */
-
-    private StateSingleton() {
-    }
+    private StateSingleton() { hasMainActivity = false;}
 
     private static class LazyHolder {
         static final StateSingleton INSTANCE = new StateSingleton();
@@ -36,5 +28,38 @@ public class StateSingleton {
         return LazyHolder.INSTANCE;
     }
 
-    /* *********************************************************************** */
+
+    public SessionModel getActiveSession(){
+        return activeSession;
+    }
+    public ClientModel getActiveClient(){
+        return activeClient;
+    }
+    public SessionModel getActiveHistorySession(){
+        return activeHistorySession;
+    }
+    public PreferenceUtility getPreferenceUtility(){
+        return preferenceUtility;
+    }
+
+    public void setActiveSession(SessionModel session){
+        this.activeSession = session;
+    }
+    public void setActiveClient(ClientModel client){
+        this.activeClient = client;
+    }
+    public void setActiveHistorySession(SessionModel historySession){
+        this.activeHistorySession = historySession;
+    }
+    public void setPreferenceUtility(Context ctx){
+        preferenceUtility = new PreferenceUtility(ctx);
+    }
+
+    public boolean isStartedFromMainActivity(){
+        return hasMainActivity;
+    }
+    public void setStartedFromMainActivity(){
+        hasMainActivity = true;
+    }
+
 }

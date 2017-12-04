@@ -1,8 +1,11 @@
 package ch.ethz.inf.vs.kompose.service.handler;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.util.StateSet;
 
 import org.joda.time.DateTime;
 
@@ -33,15 +36,23 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 public class IncomingMessageHandler implements Runnable {
     private static final String LOG_TAG = "## InMessageHandler";
+    public static final String SESSION_UPDATED_EVENT = "IncomingMessageHandler.SESSION_UPDATED_EVENT";
 
     private Socket socket;
     private Message message;
+    private Context context;
 
-    public IncomingMessageHandler(Socket socket) {
+    private IncomingMessageHandler(Context context) {
+        this.context = context;
+    }
+
+    public IncomingMessageHandler(Context context, Socket socket) {
+        this(context);
         this.socket = socket;
     }
 
-    public IncomingMessageHandler(Message message) {
+    public IncomingMessageHandler(Context context, Message message) {
+        this(context);
         this.message = message;
     }
 
@@ -77,7 +88,7 @@ public class IncomingMessageHandler implements Runnable {
             return;
         }
 
-        final SessionModel activeSessionModel = StateSingleton.getInstance().activeSession;
+        final SessionModel activeSessionModel = StateSingleton.getInstance().getActiveSession();
 
         final MessageType messageType = MessageType.valueOf(message.getType());
         Log.d(LOG_TAG, "Message processing (" + messageType + ")");
@@ -141,7 +152,19 @@ public class IncomingMessageHandler implements Runnable {
                         Thread t = new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                new OutgoingMessageHandler().sendSessionUpdate();
+                                new OutgoingMessageHandler(context).sendSessionUpdate();
+                            }
+                        });
+                        t.run();
+                    }
+
+                    //only persist if not host; host already saves after the session update (so we don't need to convert twice)
+                    boolean isHost = StateSingleton.getInstance().getActiveSession().getIsHost();
+                    if (!isHost && messageType == MessageType.SESSION_UPDATE) {
+                        Thread t = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                new StorageHandler(context).persist(message.getSession());
                             }
                         });
                         t.run();

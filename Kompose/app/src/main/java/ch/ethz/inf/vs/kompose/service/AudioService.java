@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.media.MediaPlayer;
@@ -30,18 +31,26 @@ public class AudioService extends Service {
     private final IBinder binder = new LocalBinder();
 
     private SessionModel sessionModel;
-    //private ObservableUniqueSortedList<SongModel> playQueue;
+    private DownloadWorker downloadWorker;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
         Log.d(LOG_TAG, "started");
-        sessionModel = StateSingleton.getInstance().activeSession;
+        sessionModel = StateSingleton.getInstance().getActiveSession();
 
         // start the download worker
-        DownloadWorker downloadWorker = new DownloadWorker(this, sessionModel);
+        downloadWorker = new DownloadWorker(this, sessionModel);
         downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (downloadWorker != null) {
+            downloadWorker.cancel(true);
+        }
     }
 
     public void stopPlaying() {
@@ -54,7 +63,7 @@ public class AudioService extends Service {
                     mediaPlayer.pause();
                     currentSong.setSongStatus(SongStatus.PAUSED);
 
-                    new OutgoingMessageHandler().sendSessionUpdate();
+                    new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
                 }
             });
         }
@@ -71,7 +80,7 @@ public class AudioService extends Service {
                         mediaPlayer.start();
                         currentSong.setSongStatus(SongStatus.PLAYING);
 
-                        new OutgoingMessageHandler().sendSessionUpdate();
+                        new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
                     }
                 });
             }
@@ -138,7 +147,7 @@ public class AudioService extends Service {
                     }
                 }
 
-                new OutgoingMessageHandler().sendSessionUpdate();
+                new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
             }
         });
     }
@@ -176,7 +185,7 @@ public class AudioService extends Service {
         @Override
         public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
             Log.d(LOG_TAG, (i1 - i) + " new items in play queue");
-            audioService.goToNextSong();
+            audioService.checkOnCurrentSong();
             notifier.register();
         }
 
@@ -202,7 +211,7 @@ public class AudioService extends Service {
             this.context = new WeakReference<AudioService>(context);
             this.sessionModel = sessionModel;
 
-            this.numSongsPreload = PreferenceUtility.getCurrentPreload(context);
+            this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getCurrentPreload();
             this.notifier = new Phaser(1);
             sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(notifier, context));
         }
@@ -222,12 +231,9 @@ public class AudioService extends Service {
 
                 int numDownloaded = 0;
 
-                //todo:
-                //make error handling better; and allow parallel downloads
-                //simply create a thread for each song, instead of this weird loop; helps to better account for failures
                 int index = 0;
                 while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
-                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index++);
+                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
                     if (nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
                         Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
 
@@ -238,10 +244,7 @@ public class AudioService extends Service {
                             }
                         });
 
-
-                        final File storedFile = youtubeDownloadUtility.downloadSong(
-                                nextDownload.getDownloadUrl().toString(),
-                                nextDownload.getTitle() + ".m4a");
+                        final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
 
                         if (storedFile != null) {
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -265,9 +268,11 @@ public class AudioService extends Service {
                             });
                         }
 
-                        new OutgoingMessageHandler().sendSessionUpdate();
+                        new OutgoingMessageHandler(context.get()).sendSessionUpdate();
+                        index = 0;
                     } else {
                         numDownloaded++;
+                        index++;
                     }
                 }
             }
