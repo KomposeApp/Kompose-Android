@@ -79,8 +79,6 @@ public class ShareActivity extends AppCompatActivity {
         SongModel songModel = new SongModel(UUID.randomUUID(), StateSingleton.getInstance().getActiveClient(), activeSession);
         songModel.setSourceUrl(URI.create(requestURL));
 
-        activeSession.getPlayQueue().add(songModel);
-
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(songModel, new SongRequestListener(this));
 

@@ -23,6 +23,8 @@
     <string name="view_error_socket_dead">Establishing connection failed: Host is unreachable.</string>
     <string name="view_error_socket_closed">Establishing connection failed: Host socket port is closed.</string>
     <!-- Uncategorized -->
+    <string name="downvote_icon_arrow">\ue829</string>
+    <string name="downvote_icon_cross">\ue874</string>
     <string name="join">join</string>
     <string name="client_name">My name</string>
     <string name="create_party">create party</string>
