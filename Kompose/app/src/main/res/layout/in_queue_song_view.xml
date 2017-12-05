@@ -18,9 +18,9 @@
 
 
     <LinearLayout
-        android:layout_marginBottom="3dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="3dp"
         android:background="#efefef"
         android:orientation="vertical">
 
@@ -29,8 +29,7 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="@{viewHolder.item.songStatus == SongStatus.RESOLVING ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible">
-        </LinearLayout>
+            tools:visibility="visible"></LinearLayout>
 
 
         <LinearLayout
@@ -74,17 +73,16 @@
                     android:id="@+id/down_vote_button"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
                     android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     android:layout_marginEnd="8sp"
-                    android:textSize="24sp"
                     android:clickable="true"
                     android:focusable="true"
+                    android:fontFamily="@font/androidicons"
                     android:onClick="@{viewHolder.onDownVoteClick}"
                     android:text="@string/icons_ai_halt"
-                    android:fontFamily="@font/androidicons"
-                    tools:visibility="visible"
-                    />
+                    android:textSize="24sp"
+                    tools:visibility="visible" />
 
             </RelativeLayout>
 

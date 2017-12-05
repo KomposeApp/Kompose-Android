@@ -17,6 +17,7 @@
     </data>
 
     <LinearLayout
+        style="@style/RootLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -48,6 +49,7 @@
                     android:layout_marginStart="0sp"
                     android:contentDescription="@string/thumbnail"
                     android:src="@{viewModel.sessionModel.currentlyPlaying.thumbnail}"
+                    tools:layout_width="100dp"
                     tools:src="@drawable/sample_thumbnail" />
 
                 <RelativeLayout
@@ -60,12 +62,12 @@
 
                     <TextView
                         android:id="@+id/currently_playing_title"
-                        android:singleLine="true"
-                        android:ellipsize="marquee"
-                        android:marqueeRepeatLimit ="marquee_forever"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentEnd="true"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit="marquee_forever"
+                        android:singleLine="true"
                         android:text="@{viewModel.sessionModel.currentlyPlaying.title}"
                         android:textColor="#000"
                         android:textSize="18sp"
@@ -101,17 +103,12 @@
                 </RelativeLayout>
 
                 <TextView
+                    style="@style/SmallIconButtonTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_toStartOf="@id/play_button_wrapper"
                     android:layout_alignParentBottom="true"
-                    android:layout_marginRight="7sp"
-                    android:layout_marginBottom="4sp"
-                    android:fontFamily="@font/androidicons"
-                    android:text="@string/icons_ai_halt"
-                    android:textSize="24sp"
-                    android:clickable="true"
-                    android:focusable="true" />
+                    android:layout_toStartOf="@id/play_button_wrapper"
+                    android:text="@string/icons_ai_halt" />
 
                 <RelativeLayout
                     android:id="@+id/play_button_wrapper"
@@ -122,10 +119,7 @@
                     <!--play button-->
                     <TextView
                         android:id="@+id/play_button"
-                        android:fontFamily="@font/androidicons"
-                        android:textSize="32sp"
-                        android:clickable="true"
-                        android:focusable="true"
+                        style="@style/SmallIconButtonTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
@@ -133,23 +127,24 @@
                         android:enabled="@{viewModel.sessionModel.isHost}"
                         android:onClick="@{viewModel.onPlayClicked}"
                         android:text="@string/icons_ai_playback_play"
+                        android:textSize="26sp"
                         android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PAUSED) ? View.VISIBLE : View.GONE}" />
 
                     <!--pause button-->
                     <TextView
                         android:id="@+id/pause_button"
-                        android:fontFamily="@font/androidicons"
-                        android:textSize="32sp"
-                        android:clickable="true"
-                        android:focusable="true"
+                        style="@style/SmallIconButtonTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentStart="true"
                         android:enabled="@{viewModel.sessionModel.isHost}"
+                        android:fontFamily="@font/androidicons"
                         android:onClick="@{viewModel.onPauseClicked}"
                         android:text="@string/icons_ai_playback_pause"
-                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING) ? View.VISIBLE : View.GONE}" />
+                        android:textSize="26sp"
+                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING) ? View.VISIBLE : View.GONE}"
+                        tools:visibility="gone" />
 
                 </RelativeLayout>
 
@@ -157,16 +152,17 @@
 
 
             <LinearLayout
+                style="@style/TextContentLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:visibility="@{viewModel.sessionModel.playQueue.size() == 0 ? View.VISIBLE : View.GONE}"
-                tools:visibility="visible">
+                tools:visibility="gone">
 
                 <TextView
+                    style="@style/SecondaryTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:padding="6pt"
                     android:text="@string/add_more_songs" />
 
 
@@ -188,6 +184,7 @@
 
 
         <LinearLayout
+            style="@style/TextContentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -196,15 +193,16 @@
 
 
             <TextView
+                style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:padding="6pt"
                 android:text="@string/add_songs" />
 
 
         </LinearLayout>
 
         <LinearLayout
+            style="@style/TextContentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -212,6 +210,7 @@
             tools:visibility="visible">
 
             <TextView
+                style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/wait_a_second" />

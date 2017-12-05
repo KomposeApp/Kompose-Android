@@ -82,6 +82,13 @@
         <item name="android:fontFamily">@font/androidicons</item>
         <item name="android:textSize">5.7pt</item>
         <item name="android:padding">7.4pt</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="SmallIconButtonTextView" parent="IconButtonTextView">
+        <item name="android:textSize">24sp</item>
+        <item name="android:padding">2dp</item>
     </style>
 
 
