@@ -6,7 +6,6 @@ import android.os.Parcelable;
 import org.joda.time.DateTime;
 
 import java.net.InetAddress;
-import java.net.Socket;
 
 public class ClientConnectionDetails implements Parcelable {
 

@@ -7,7 +7,6 @@ import android.view.View;
 import java.util.Comparator;
 
 import ch.ethz.inf.vs.kompose.BR;
-import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;

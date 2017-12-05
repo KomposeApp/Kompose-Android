@@ -6,7 +6,6 @@ import android.databinding.ObservableList;
 
 import org.joda.time.DateTime;
 
-import java.util.Comparator;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;

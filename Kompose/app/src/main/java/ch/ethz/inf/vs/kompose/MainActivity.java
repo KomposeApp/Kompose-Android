@@ -5,14 +5,11 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -32,11 +29,7 @@ import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.client.ClientNetworkService;
 import ch.ethz.inf.vs.kompose.service.host.HostServerService;
-import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
-import ch.ethz.inf.vs.kompose.view.mainactivity.CreateSessionFragment;
-import ch.ethz.inf.vs.kompose.view.mainactivity.JoinSessionFragment;
 import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
-import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
 public class MainActivity extends BaseActivity implements MainViewModel.ClickListener {

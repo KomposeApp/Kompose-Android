@@ -9,9 +9,7 @@ import android.media.MediaPlayer;
 import org.joda.time.DateTime;
 
 import java.io.File;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.BR;

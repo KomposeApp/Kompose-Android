@@ -1,11 +1,9 @@
 package ch.ethz.inf.vs.kompose.service.handler;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.util.StateSet;
 
 import org.joda.time.DateTime;
 
@@ -20,7 +18,6 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.converter.SongConverter;
 import ch.ethz.inf.vs.kompose.data.JsonConverter;
-import ch.ethz.inf.vs.kompose.data.json.DownVote;
 import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;

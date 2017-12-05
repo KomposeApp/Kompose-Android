@@ -1,8 +1,6 @@
 package ch.ethz.inf.vs.kompose.view.mainactivity;
 
-import android.content.Context;
 import android.databinding.DataBindingUtil;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -11,10 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import ch.ethz.inf.vs.kompose.R;
-import ch.ethz.inf.vs.kompose.databinding.FragmentCreateSessionBinding;
 import ch.ethz.inf.vs.kompose.databinding.FragmentJoinSessionBinding;
 import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
-import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
 

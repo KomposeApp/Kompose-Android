@@ -15,7 +15,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 

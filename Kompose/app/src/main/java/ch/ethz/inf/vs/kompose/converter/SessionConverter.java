@@ -16,7 +16,6 @@ import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.model.SongModel;
 
 /**
  * Convert Session data representation to model representation, and vice-versa.

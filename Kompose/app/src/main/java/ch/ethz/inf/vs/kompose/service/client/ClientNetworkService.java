@@ -23,8 +23,8 @@ import ch.ethz.inf.vs.kompose.service.client.listeners.ClientServiceListener;
 import ch.ethz.inf.vs.kompose.service.client.listeners.KomposeResolveListenerWorkaround;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
-import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE_NSD;
 import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE;
+import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE_NSD;
 
 public class ClientNetworkService extends Service {
 
