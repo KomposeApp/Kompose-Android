@@ -40,7 +40,7 @@ import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
 
-public class MainActivity extends BaseActivity implements JoinSessionViewHolder.ClickListener, JoinSessionFragment.OnFragmentInteractionListener, MainViewModel.ClickListener {
+public class MainActivity extends BaseActivity implements MainViewModel.ClickListener {
 
     private static final String LOG_TAG = "## Main Activity";
 
@@ -58,7 +58,6 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-
 
         //hide top bar
         View decorView = getWindow().getDecorView();
@@ -78,17 +77,14 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
 
 
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        binding.setViewModel(viewModel);
 
-        /*
-        binding.list.setLayoutManager(new LinearLayoutManager(this));
-        binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
         if (MainActivity.DESIGN_MODE) {
             SampleService sampleService = new SampleService();
             for (int i = 0; i < 15; i++) {
                 viewModel.getSessionModels().add(sampleService.getSampleSession("design session " + i));
             }
         }
-        */
 
         final TabLayout tabLayout = findViewById(R.id.tabLayout);
         final ViewPager viewPager = findViewById(R.id.viewPager);
@@ -111,6 +107,10 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
 
             }
         });
+
+        //bind client network service
+        Intent intent = new Intent(this.getBaseContext(), ClientNetworkService.class);
+        bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
     }
 
 
@@ -159,10 +159,8 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
     }
 
     @Override
-    public void joinButtonClicked(View v, int position) {
-        Log.d(LOG_TAG, "pressed join button of item number " + position);
+    public void joinSessionClicked(SessionModel sessionModel) {
 
-        SessionModel pressedSession = viewModel.getSessionModels().get(position);
         String clientName = viewModel.getClientName();
 
         // Client's name must not be empty
@@ -175,12 +173,12 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
 
         // Add ourselves to the current session locally
         UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
-        ClientModel clientModel = new ClientModel(deviceUUID, pressedSession);
+        ClientModel clientModel = new ClientModel(deviceUUID, sessionModel);
         clientModel.setName(clientName);
         clientModel.setIsActive(true);
-        pressedSession.getClients().add(clientModel);
+        sessionModel.getClients().add(clientModel);
 
-        StateSingleton.getInstance().setActiveSession(pressedSession);
+        StateSingleton.getInstance().setActiveSession(sessionModel);
         StateSingleton.getInstance().setActiveClient(clientModel);
         try {
             if (!clientNetworkServiceBound && clientNetworkService == null)
@@ -202,11 +200,6 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
             io.printStackTrace();
             showError("Failed to set up connection.");
         }
-    }
-
-    @Override
-    public void joinSessionPressed() {
-
     }
 
     @Override

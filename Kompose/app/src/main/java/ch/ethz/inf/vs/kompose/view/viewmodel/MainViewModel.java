@@ -6,13 +6,16 @@ import android.view.View;
 
 import java.util.Comparator;
 
+import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
+import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
 
-public class MainViewModel extends BaseViewModel {
+public class MainViewModel extends BaseViewModel implements JoinSessionViewHolder.ClickListener {
     private ObservableList<SessionModel> sessionModels;
     private ClickListener clickListener;
 
@@ -43,6 +46,7 @@ public class MainViewModel extends BaseViewModel {
 
     public void setClientName(String clientName) {
         this.clientName = clientName;
+        notifyPropertyChanged(BR.clientName);
     }
 
     private String sessionName;
@@ -54,6 +58,7 @@ public class MainViewModel extends BaseViewModel {
 
     public void setSessionName(String sessionName) {
         this.sessionName = sessionName;
+        notifyPropertyChanged(BR.sessionName);
     }
 
     public void createSession(View view) {
@@ -62,7 +67,21 @@ public class MainViewModel extends BaseViewModel {
         }
     }
 
+    @Override
+    public void joinButtonClicked(View v, int position) {
+        if (clickListener != null) {
+            if (getSessionModels().size() > position) {
+                SessionModel pressedSession = getSessionModels().get(position);
+                if (pressedSession != null) {
+                    clickListener.joinSessionClicked(pressedSession);
+                }
+            }
+        }
+    }
+
     public interface ClickListener {
         void createSessionClicked();
+
+        void joinSessionClicked(SessionModel sessionModel);
     }
 }

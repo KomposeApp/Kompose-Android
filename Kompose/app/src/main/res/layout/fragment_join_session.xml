@@ -1,24 +1,57 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context="ch.ethz.inf.vs.kompose.view.mainactivity.JoinSessionFragment">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
+    <data>
 
-    <EditText
-        android:id="@+id/editText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/your_name"
-        android:inputType="textPersonName" />
+        <import type="android.view.View" />
 
+        <variable
+            name="viewModel"
+            type="ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel" />
+    </data>
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/list"
+    <LinearLayout
+        style="@style/RootLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:listitem="@layout/session_join_view">
+        android:orientation="vertical">
 
-    </android.support.v7.widget.RecyclerView>
-</LinearLayout>
+        <TextView
+            style="@style/LabelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/your_name" />
+
+        <EditText
+            style="@style/DefaultEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10pt"
+            android:hint="@string/your_name"
+            android:inputType="textPersonName"
+            android:text="@={viewModel.clientName}" />
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="@{viewModel.sessionModels.size() == 0 ? View.VISIBLE : View.GONE}"
+            tools:visibility="visible">
+
+            <TextView
+                style="@style/SecondaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/looking_for_parties" />
+
+        </LinearLayout>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:listitem="@layout/session_join_view">
+
+        </android.support.v7.widget.RecyclerView>
+    </LinearLayout>
+</layout>

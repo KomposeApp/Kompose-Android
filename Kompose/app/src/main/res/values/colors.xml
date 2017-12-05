@@ -9,4 +9,7 @@
     <color name="colorWhite">#FFFFFF</color>
     <color name="buttonColor">#EFEFEF</color>
     <color name="textColor">#4B4B4B</color>
+
+    <color name="greyBackground">#EFEFEF</color>
+    <color name="shadowColor">#9f9f9f</color>
 </resources>

@@ -36,7 +36,6 @@ dependencies {
             [group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.0']
     )
     compile 'com.github.evgenyneu:js-evaluator-for-android:v3.0.0'
-    compile 'com.beardedhen:androidbootstrap:2.3.2'
 
     compile 'joda-time:joda-time:2.9.9'
 

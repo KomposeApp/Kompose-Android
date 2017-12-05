@@ -30,13 +30,6 @@ public class PastSessionViewHolder<TModelViewBinding extends ViewDataBinding> ex
         this.listener = listener;
     }
 
-    public void onJoinClick(View v) {
-        int pos = this.getAdapterPosition();
-        if (listener != null) {
-            listener.onClick(v, pos);
-        }
-    }
-
     @Override
     public void onClick(View v) {
         int position = this.getAdapterPosition();

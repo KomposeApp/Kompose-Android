@@ -25,9 +25,40 @@
 
     <style name="KomposeTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
-    <style name="FlatButton" parent="@style/Widget.AppCompat.Button.Borderless">
-        <item name="android:textColor">@color/colorWhite</item>
-        <item name="android:background">@color/colorPrimary</item>
+
+    <style name="RootLayout">
+        <item name="android:padding">3pt</item>
+    </style>
+
+    <style name="TileLayout">
+        <item name="android:padding">5pt</item>
+        <item name="android:background">@color/greyBackground</item>
+    </style>
+
+
+    <style name="BaseTextView">
+        <item name="android:fontFamily">@font/opensans_regular</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textSize">7pt</item>
+    </style>
+
+    <style name="PrimaryTextView" parent="BaseTextView">
+        <item name="android:fontFamily">@font/russo_one</item>
+        <item name="android:textSize">10pt</item>
+    </style>
+
+    <style name="SecondaryTextView" parent="BaseTextView">
+
+    </style>
+
+
+    <style name="DefaultEditText">
+        <item name="android:paddingStart">0pt</item>
+        <item name="android:paddingEnd">0pt</item>
+    </style>
+
+    <style name="LabelTextView" parent="BaseTextView">
+
     </style>
 
 </resources>
