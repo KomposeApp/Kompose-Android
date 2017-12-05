@@ -167,58 +167,62 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
 
 
     protected void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta, SongModel songModel) {
-        if (ytFiles != null) {
-            // find the best audio track
-            int iTag = -1;
-            int maxBitrate = 0;
-            for (int i = 0, temp_itag; i < ytFiles.size(); i++) {
+        try {
 
-                temp_itag = ytFiles.keyAt(i);
-                YtFile file = ytFiles.get(temp_itag);
+            if (ytFiles != null) {
+                // find the best audio track
+                int iTag = -1;
+                int maxBitrate = 0;
+                for (int i = 0, temp_itag; i < ytFiles.size(); i++) {
 
-                int fBitrate = file.getFormat().getAudioBitrate();
-                if ((file.getFormat().getHeight() == -1) && (fBitrate > maxBitrate)) {
-                    iTag = temp_itag;
-                    maxBitrate = fBitrate;
+                    temp_itag = ytFiles.keyAt(i);
+                    YtFile file = ytFiles.get(temp_itag);
+
+                    int fBitrate = file.getFormat().getAudioBitrate();
+                    if ((file.getFormat().getHeight() == -1) && (fBitrate > maxBitrate)) {
+                        iTag = temp_itag;
+                        maxBitrate = fBitrate;
+                    }
                 }
-            }
 
-            Log.d(LOG_TAG, "Selected itag: " + iTag);
+                Log.d(LOG_TAG, "Selected itag: " + iTag);
 
-            if (iTag == -1) {
-                Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
-                listener.onEvent(RESOLVE_FAILED, null);
+                if (iTag == -1) {
+                    Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
+                    listener.onEvent(RESOLVE_FAILED, null);
+                    return;
+                }
+
+                // get URI & title
+                String downloadUrl = ytFiles.get(iTag).getUrl();
+                String videoID = videoMeta.getVideoId();
+                String thumbnailUrl = videoMeta.getHqImageUrl();
+                String title = videoMeta.getTitle();
+                long length = videoMeta.getVideoLength();
+
+                if (downloadUrl.isEmpty() || length <= 0) {
+                    Log.e(LOG_TAG, "Download link was empty or length was too short");
+                    listener.onEvent(RESOLVE_FAILED, null);
+                    return;
+                }
+
+                // add content to song model
+                songModel.setTitle(title);
+                songModel.setVideoID(videoID);
+
+                songModel.setDownloadUrl(URI.create(downloadUrl));
+                songModel.setThumbnailUrl(URI.create(thumbnailUrl));
+                songModel.setSecondsLength((int) length);
+
+                // notify listener
+                listener.onEvent(RESOLVE_SUCCESS, songModel);
                 return;
             }
-
-            // get URI & title
-            String downloadUrl = ytFiles.get(iTag).getUrl();
-            String videoID = videoMeta.getVideoId();
-            String thumbnailUrl = videoMeta.getHqImageUrl();
-            String title = videoMeta.getTitle();
-            long length = videoMeta.getVideoLength();
-
-            if (downloadUrl.isEmpty() || length <= 0) {
-                Log.e(LOG_TAG, "Download link was empty or length was too short");
-                listener.onEvent(RESOLVE_FAILED, null);
-                return;
-            }
-
-            // add content to song model
-            songModel.setTitle(title);
-            songModel.setVideoID(videoID);
-            // TODO: Crash report at this stage:
-            //TODO: java.lang.IllegalArgumentException: Illegal character in query at index 624: https://r1---sn-uxax10b-1gie.googlevideo.com/videoplayback?keepalive=yes&ei=amMmWvTADM2oVvjfiMgO&initcwndbps=1593750&source=youtube&id=o-AHJYZSXqfj0Qgvqy3Al0Jrca6z_GH7I4kLbUoH--36oI&pl=19&mm=31&mn=sn-uxax10b-1gie&ip=212.4.87.151&requiressl=yes&ms=au&mt=1512465164&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&mv=m&ipbits=0&dur=8.001&expire=1512486858&signature=03C9B3805EC42D067DBD0B054FDE9D057DCFBF13.D2EFE84A53A5044C56A925909D82DC1257751BF3&lmt=1496278530345421&clen=138663&itag=251&mime=audio%2Fwebm&gir=yes&key=yt6"
-            songModel.setDownloadUrl(URI.create(downloadUrl));
-            songModel.setThumbnailUrl(URI.create(thumbnailUrl));
-            songModel.setSecondsLength((int) length);
-
-            // notify listener
-            listener.onEvent(RESOLVE_SUCCESS, songModel);
-        } else {
-            Log.w(LOG_TAG, "Failed to resolve youtube URL -- possible malformed link");
-            listener.onEvent(RESOLVE_FAILED, null);
+        } catch (Exception ex) {
+            Log.e(LOG_TAG, ex.toString());
         }
+        Log.w(LOG_TAG, "Failed to resolve youtube URL -- possible malformed link");
+        listener.onEvent(RESOLVE_FAILED, null);
     }
 
     @Override
