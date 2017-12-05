@@ -47,7 +47,7 @@ public class YoutubeDownloadUtility {
     /**
      * Download the file from the specified URL and notify observers when done.
      * The notifier will carry a MediaPlayer that can be used to play the file.
-     *
+     * TODO: BUG: Find out why this is sometimes called 10+ times in a row
      * @return true if the download succeeded, false otherwise
      */
     public File downloadSong(final SongModel songModel) {
