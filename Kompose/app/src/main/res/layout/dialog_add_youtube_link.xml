@@ -10,30 +10,49 @@
     </data>
 
     <RelativeLayout
+        style="@style/DialogContentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="5pt">
+        android:orientation="vertical">
 
 
         <TextView
-            android:id="@+id/youtube_link_label"
+            android:id="@+id/help_text"
+            style="@style/SecondaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="@string/past_link" />
+
+        <LinearLayout
+            android:id="@+id/divider"
+            style="@style/HorizontalDividerLayout"
+            android:layout_below="@id/help_text"
+            android:orientation="vertical" />
+
+        <TextView
+            android:id="@+id/youtube_label"
+            style="@style/LabelTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/help_text"
+            android:layout_marginTop="10pt"
             android:labelFor="@id/youtube_link"
             android:text="@string/youtube_link" />
 
         <EditText
             android:id="@+id/youtube_link"
+            style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/youtube_link_label"
+            android:layout_below="@id/youtube_label"
             android:inputType="textNoSuggestions"
             android:text="@={viewModel.searchLink}" />
 
         <Button
-            android:layout_width="match_parent"
+            style="@style/PrimaryButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
             android:layout_below="@id/youtube_link"
             android:onClick="@{viewModel.onLinkAddClicked}"
             android:text="@string/add_song" />

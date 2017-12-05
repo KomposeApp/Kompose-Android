@@ -1,35 +1,85 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-xmlns:app="http://schemas.android.com/apk/res-auto">
-<data>
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <variable
-        name="viewModel"
-        type="ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel" />
-</data>
+    <data>
 
-<RelativeLayout
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="5pt">
+        <variable
+            name="viewModel"
+            type="ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel" />
+    </data>
 
 
-    <TextView
-        android:id="@+id/host_ip_info"
+    <RelativeLayout
+        style="@style/DialogContentLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:labelFor="@id/youtube_link"
-        android:text="@{`IP: ` + String.valueOf(viewModel.sessionModel.connectionDetails.hostIP).substring(1)}" />
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_below="@+id/host_ip_info"
-        android:layout_marginTop="5sp"
-        android:id="@+id/host_port_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:labelFor="@id/youtube_link"
-        android:text="@{`Port: ` + String.valueOf(viewModel.sessionModel.connectionDetails.hostPort)}" />
+        <TextView
+            style="@style/SecondaryTextView"
+            android:id="@+id/help_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/use_to_manually_connect" />
 
-</RelativeLayout>
+        <LinearLayout
+            android:id="@+id/divider"
+            style="@style/HorizontalDividerLayout"
+            android:layout_below="@id/help_text"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:id="@+id/ip_and_port"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/help_text"
+            android:layout_marginTop="10pt"
+            android:baselineAligned="false">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/LabelTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/ip_address" />
+
+                <TextView
+                    style="@style/SecondaryTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{String.valueOf(viewModel.sessionModel.connectionDetails.hostIP).substring(1)}"
+                    tools:text="20.10.0.221" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/LabelTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/port" />
+
+                <TextView
+                    style="@style/SecondaryTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{String.valueOf(viewModel.sessionModel.connectionDetails.hostPort)}"
+                    tools:text="7261" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+    </RelativeLayout>
 </layout>

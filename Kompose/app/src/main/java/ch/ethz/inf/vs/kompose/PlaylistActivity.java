@@ -119,7 +119,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
         ClientModel clientModel = StateSingleton.getInstance().getActiveClient();
-        
+
         //set session to active if host
         if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
             activeSession.setSessionStatus(SessionStatus.ACTIVE);
@@ -172,8 +172,23 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         return true;
     }
 
+    private void setDialogSize(Dialog dialog) {
+        //set display size
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int width = (int) (displaymetrics.widthPixels * 0.9);
+        int height = (int) (displaymetrics.heightPixels * 0.7);
+        dialog.getWindow().setLayout(width, height);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        //set display size
+        DisplayMetrics displaymetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
+        int width = (int) (displaymetrics.widthPixels * 0.9);
+        int height = (int) (displaymetrics.heightPixels * 0.7);
+
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.add_link:
@@ -183,12 +198,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 DialogAddYoutubeLinkBinding binding = DataBindingUtil.inflate(
                         getLayoutInflater().from(this), R.layout.dialog_add_youtube_link,
                         null, false);
-
-                DisplayMetrics displaymetrics = new DisplayMetrics();
-                getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-                int width = (int) (displaymetrics.widthPixels * 0.9);
-                int height = (int) (displaymetrics.heightPixels * 0.7);
-                songRequestDialog.getWindow().setLayout(width, height);
 
                 songRequestDialog.setContentView(binding.getRoot());
                 binding.setViewModel(viewModel);
@@ -210,12 +219,13 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 Dialog hostInfoDialog = new Dialog(this);
                 hostInfoDialog.setCancelable(true);
                 DialogHostInfoBinding hostInfoBinding = DataBindingUtil.inflate(
-                    getLayoutInflater().from(this), R.layout.dialog_host_info,
+                        getLayoutInflater().from(this), R.layout.dialog_host_info,
                         null, false);
+
                 hostInfoDialog.setContentView(hostInfoBinding.getRoot());
                 hostInfoBinding.setViewModel(viewModel);
                 hostInfoDialog.show();
-
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }

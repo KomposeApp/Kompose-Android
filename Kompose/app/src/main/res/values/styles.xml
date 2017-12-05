@@ -31,11 +31,20 @@
     </style>
 
     <style name="TextContentLayout">
-        <item name="android:padding">3pt</item>
+        <item name="android:paddingTop">3pt</item>
+        <item name="android:paddingBottom">3pt</item>
+        <item name="android:paddingLeft">1pt</item>
+        <item name="android:paddingRight">1pt</item>
     </style>
 
-    <style name="TileLayout">
-        <item name="android:padding">5pt</item>
+    <style name="DialogContentLayout">
+        <item name="android:paddingTop">5pt</item>
+        <item name="android:paddingBottom">5pt</item>
+        <item name="android:paddingLeft">3pt</item>
+        <item name="android:paddingRight">3pt</item>
+    </style>
+
+    <style name="TileLayout" parent="DialogContentLayout">
         <item name="android:background">@color/greyBackground</item>
         <item name="android:layout_marginLeft">3pt</item>
         <item name="android:layout_marginRight">3pt</item>
@@ -46,11 +55,17 @@
         <item name="android:elevation">1pt</item>
     </style>
 
+    <style name="TextContentBase">
+
+    </style>
+
 
     <style name="BaseTextView">
         <item name="android:fontFamily">@font/opensans_regular</item>
         <item name="android:textColor">@color/textColor</item>
         <item name="android:textSize">7pt</item>
+        <item name="android:layout_marginLeft">2pt</item>
+        <item name="android:layout_marginRight">2pt</item>
     </style>
 
     <style name="PrimaryTextView" parent="BaseTextView">
@@ -71,13 +86,15 @@
 
 
     <style name="DefaultEditText">
-        <item name="android:layout_marginStart">-3pt</item>
+        <item name="android:layout_marginStart">0pt</item>
     </style>
 
     <style name="LabelTextView" parent="BaseTextView">
         <item name="android:layout_marginBottom">-2pt</item>
         <item name="android:textColor">#000</item>
         <item name="android:textSize">4.375pt</item>
+        <item name="android:layout_marginLeft">2pt</item>
+        <item name="android:layout_marginRight">2pt</item>
     </style>
 
     <style name="PrimaryButton">
@@ -86,6 +103,8 @@
         <item name="android:background">@color/colorAccent</item>
         <item name="android:padding">6pt</item>
         <item name="android:textColor">#fff</item>
+        <item name="android:layout_marginLeft">2pt</item>
+        <item name="android:layout_marginRight">2pt</item>
     </style>
 
     <style name="HorizontalDividerLayout">
@@ -94,6 +113,9 @@
         <item name="android:background">@color/colorAccent</item>
         <item name="android:layout_marginTop">4pt</item>
         <item name="android:layout_marginBottom">4pt</item>
+        <item name="android:layout_marginLeft">2pt</item>
+        <item name="android:layout_marginRight">2pt</item>
+
     </style>
 
     <style name="VerticalDividerLayout">
@@ -101,6 +123,7 @@
         <item name="android:layout_height">match_parent</item>
         <item name="android:background">@color/colorAccent</item>
         <item name="android:layout_marginStart">6pt</item>
-        <item name="android:layout_marginEnd">6pt</item></style>
+        <item name="android:layout_marginEnd">6pt</item>
+    </style>
 
 </resources>
