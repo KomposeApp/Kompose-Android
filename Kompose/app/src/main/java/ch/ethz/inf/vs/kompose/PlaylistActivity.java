@@ -98,6 +98,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         //TODO:  java.lang.RuntimeException: Unable to start activity ComponentInfo{ch.ethz.inf.vs.kompose/ch.ethz.inf.vs.kompose.PlaylistActivity}: java.lang.NullPointerException: Attempt to invoke virtual method 'ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList ch.ethz.inf.vs.kompose.model.SessionModel.getPlayQueue()' on a null object reference
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getPlayQueue(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
+
+        findViewById(R.id.currently_playing_title).setSelected(true);
     }
 
     @Override
