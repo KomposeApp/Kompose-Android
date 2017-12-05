@@ -15,7 +15,7 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "## Main Activity";
+    private final String LOG_TAG = "## Main Activity";
 
     public static final String KEY_NETWORKSERVICE = "ClientNetworkService";
     public static final String KEY_SERVERSERVICE = "HostServerService";
@@ -38,8 +38,12 @@ public class MainActivity extends AppCompatActivity {
         binding.setSubText2("... because I am connected to the music station");
 
         // Initialize the preference utility, and sets a flag to prevent ShareActivity from killing Kompose
-        StateSingleton.getInstance().setPreferenceUtility(this);
         StateSingleton.getInstance().setStartedFromMainActivity();
+        StateSingleton.getInstance().setPreferenceUtility(this);
+
+        int currentPreload = StateSingleton.getInstance().getPreferenceUtility().getCurrentPreload();
+        int currentCacheSize = StateSingleton.getInstance().getPreferenceUtility().getCurrentCacheSize();
+        StateSingleton.getInstance().initializeSongCache(currentPreload, currentCacheSize);
     }
 
     @Override
@@ -71,8 +75,10 @@ public class MainActivity extends AppCompatActivity {
      */
     public void viewHistoryFromTitle(View view) {
         Log.d(LOG_TAG, "History button pressed");
-        Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
-        startActivity(historyIntent);
+        //Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
+        //startActivity(historyIntent);
+        Intent settings = new Intent(this, SettingsActivity.class);
+        this.startActivity(settings);
     }
 
     /**

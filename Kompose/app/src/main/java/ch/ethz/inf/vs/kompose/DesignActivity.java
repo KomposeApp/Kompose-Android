@@ -15,7 +15,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.DesignViewModel;
 
 public class DesignActivity extends AppCompatActivity implements DesignClientViewHolder.ClickListener {
 
-    private static final String LOG_TAG = "## Design Activity";
+    private final String LOG_TAG = "## Design Activity";
 
     private SampleService sampleService = new SampleService();
     private final DesignViewModel viewModel = new DesignViewModel(sampleService.getClients());

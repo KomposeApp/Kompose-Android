@@ -21,7 +21,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.PartyCreationViewModel;
 
 public class PartyCreationActivity extends BaseActivity {
 
-    private static final String LOG_TAG = "## Party Activity";
+    private final String LOG_TAG = "## Party Activity";
     private final PartyCreationViewModel viewModel = new PartyCreationViewModel();
 
     @Override

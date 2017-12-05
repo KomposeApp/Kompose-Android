@@ -14,7 +14,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel;
 
 public class HistoryDetailsActivity extends AppCompatActivity implements PlayedSongViewHolder.ClickListener {
 
-    private static final String LOG_TAG = "## Details Activity";
+    private final String LOG_TAG = "## Details Activity";
 
     private final HistoryDetailsViewModel viewModel = new HistoryDetailsViewModel(
             StateSingleton.getInstance().getActiveHistorySession()

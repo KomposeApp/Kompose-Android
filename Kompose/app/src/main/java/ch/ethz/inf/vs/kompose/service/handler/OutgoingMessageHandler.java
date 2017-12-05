@@ -30,7 +30,7 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
  */
 public class OutgoingMessageHandler {
 
-    private static final String LOG_TAG = "## OutMessageHandler";
+    private final String LOG_TAG = "## OutMessageHandler";
 
     private Context context;
 

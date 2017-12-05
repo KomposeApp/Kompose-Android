@@ -26,7 +26,7 @@ import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE;
  */
 public class HostServerService extends Service {
 
-    private static final String LOG_TAG = "## HostServerService";
+    private final String LOG_TAG = "## HostServerService";
 
     private NsdManager nsdManager;
     private NsdManager.RegistrationListener nsdRegistrationListener;

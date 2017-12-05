@@ -18,8 +18,8 @@ import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
 
 public class ShareActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "## ShareActivity";
-    private static final int TIME_UNTIL_DEATH = 3000; // Time until process is killed
+    private final String LOG_TAG = "## ShareActivity";
+    private final int TIME_UNTIL_DEATH = 3000; // Time until process is killed
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

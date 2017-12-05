@@ -4,8 +4,6 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -15,7 +13,7 @@ import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 
 public class StateSingleton {
 
-    private final String LOG_TAG = "## SINGLETON HUB:";
+    private final String LOG_TAG = "## State Singleton:";
 
     private SessionModel activeSession;
     private ClientModel activeClient;
@@ -36,49 +34,6 @@ public class StateSingleton {
     public static StateSingleton getInstance() {
         return LazyHolder.INSTANCE;
     }
-
-    /** Song Cache stuff **/
-    private int maxCacheSize = 10;
-    private final LinkedHashMap<String, File> songCache = new LinkedHashMap<String, File>(){
-        @Override
-        protected boolean removeEldestEntry(final Map.Entry eldest) {
-            boolean result = (size() > maxCacheSize);
-            if (result){
-                File file = (File) eldest.getValue();
-                Log.d(LOG_TAG, "Evicting file " + file.getName() + " from cache");
-                if (!file.delete()){
-                    Log.e(LOG_TAG, "Failed to delete file: " + file.getName());
-                } else{
-                    Log.d(LOG_TAG, "Successfully deleted file");
-                }
-            }
-            return result;
-        }
-
-        @Override
-        public void clear(){
-            for (File f: this.values()){
-                if (!f.delete()){
-                    Log.e(LOG_TAG, "Failed to delete file: " + f.getAbsolutePath());
-                } else{
-                    Log.d(LOG_TAG, "Successfully deleted file: " + f.getAbsolutePath());
-                }
-            }
-            super.clear();
-        }
-    };
-    public void addSongToCache(String id, File file){
-        Log.d(LOG_TAG, "Added file: " + file.getName() + " - from VideoID: " + id + "- to the cache");
-        songCache.put(id, file);
-    }
-    public File retrieveSongFromCache(String id){
-        Log.d(LOG_TAG, "Retrieving file with VideoID: " + id + " from the cache");
-        return songCache.get(id);
-    }
-    public boolean checkCacheByKey(String id){ return songCache.containsKey(id);}
-    public boolean checkCacheByValue(File file){ return songCache.containsValue(file);}
-    public void clearCache(){songCache.clear();}
-
 
     public SessionModel getActiveSession(){
         return activeSession;
@@ -118,5 +73,51 @@ public class StateSingleton {
     public void setPlaylistIsActive(boolean value){
         playlistIsActive = value;
     }
+
+    /** Song Cache stuff **/
+
+    //The Song Cache itself (initially null)
+    private SongCacheMap songCache;
+
+    /**
+     * Set up a new empty song cache, and clears the old one.
+     * Cache size is the maximum of preload size and desired cache size.
+     * @param preloadSize Number of songs we'd like to preload
+     * @param cacheSize Number of songs we want to cache
+     */
+    public void initializeSongCache(int preloadSize, int cacheSize){
+        if (songCache!= null) songCache.clear();
+        songCache = new SongCacheMap(Math.max(preloadSize+1,cacheSize));
+        Log.d("## SongCacheMap", "Song cache initialized.");
+    }
+
+    /**
+     * Add a song to the cache, the identifier being the Youtube VideoID
+     * @param id VideoID that uniquely identifies the song
+     * @param file File that points to the Song in the hardware cache
+     */
+    public void addSongToCache(String id, File file){
+        Log.d("## SongCacheMap", "Added file: " + file.getName() + " - from VideoID: " + id + "- to the cache");
+        songCache.put(id, file);
+    }
+
+    /**
+     * Retrieve a previously cached song by its VideoID
+     * @param id VideoID of the Youtube video that corresponds to the song
+     * @return File descriptor of the song in cache
+     */
+    public File retrieveSongFromCache(String id){
+        Log.d("## SongCacheMap", "Retrieving file with VideoID: " + id + " from the cache");
+        return songCache.get(id);
+    }
+
+    // Simple check accessor functions
+    public boolean checkCacheByKey(String id){ return songCache.containsKey(id);}
+    public boolean checkCacheByValue(File file){ return songCache.containsValue(file);}
+    public void clearCache(){
+        songCache.clear();
+        Log.d("## SongCacheMap", "Cache cleared");
+    }
+
 
 }

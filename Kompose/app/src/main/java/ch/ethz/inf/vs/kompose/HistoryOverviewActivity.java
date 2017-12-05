@@ -18,7 +18,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryOverviewViewModel;
 
 public class HistoryOverviewActivity extends AppCompatActivity implements PastSessionViewHolder.ClickListener {
 
-    private static final String LOG_TAG = "## History Activity";
+    private final String LOG_TAG = "## History Activity";
     private final HistoryOverviewViewModel viewModel = new HistoryOverviewViewModel();
 
     @Override

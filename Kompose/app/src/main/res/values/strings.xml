@@ -5,7 +5,8 @@
     <string name="settings_menu">Settings</string>
     <string name="setting_category_host">Host Settings</string>
     <string name="setting_category_client">Client Settings</string>
-    <string name="setting_preload">Number of songs to preload:</string>
+    <string name="setting_preload">Preload Size:</string>
+    <string name="setting_cache">Cache Size:</string>
     <string name="setting_hostport">Host Server Port:</string>
     <string name="setting_clientport">Client Port:</string>
     <string name="setting_sessionname">Default Session Name:</string>
@@ -13,7 +14,8 @@
     <string name="settings_confirm">Confirm Changes</string>
 
     <!-- Error Strings -->
-    <string name="setting_error_preload">Maximum preload count is 10</string>
+    <string name="setting_error_preload">Maximum preload size is </string>
+    <string name="setting_error_cache">Maximum cache size is </string>
     <string name="setting_error_username">Please choose a valid username</string>
     <string name="setting_error_sessionname">Please choose a valid session name</string>
     <string name="setting_error_hostport">Please choose a valid port for the host session</string>

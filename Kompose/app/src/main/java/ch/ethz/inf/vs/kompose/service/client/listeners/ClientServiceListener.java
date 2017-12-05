@@ -15,7 +15,7 @@ import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE_NSD;
      */
     public class ClientServiceListener implements NsdManager.DiscoveryListener {
 
-        private static final String LOG_TAG = "## DiscoveryListener";
+        private final String LOG_TAG = "## DiscoveryListener";
 
         private ObservableList<SessionModel> sessionModels;
         private NsdManager nsdManager;

@@ -28,7 +28,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.ConnectViewModel;
 
 public class ConnectActivity extends BaseActivity implements JoinSessionViewHolder.ClickListener {
 
-    private static final String LOG_TAG = "## Connect Activity";
+    private final String LOG_TAG = "## Connect Activity";
 
     private final ConnectViewModel viewModel = new ConnectViewModel();
 

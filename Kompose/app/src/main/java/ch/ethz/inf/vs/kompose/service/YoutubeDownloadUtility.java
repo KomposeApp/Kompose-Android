@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.LinkedHashMap;
-import java.util.Map;
 
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.youtube.YouTubeExtractor;
@@ -22,7 +20,7 @@ import ch.ethz.inf.vs.kompose.service.youtube.YouTubeExtractor;
 
 public class YoutubeDownloadUtility {
 
-    private static final String LOG_TAG = "## Download Utility";
+    private final String LOG_TAG = "## Download Utility";
 
     public static final int RESOLVE_SUCCESS = 0x1;
     public static final int RESOLVE_FAILED = 0x2;

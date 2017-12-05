@@ -207,6 +207,8 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
             // add content to song model
             songModel.setTitle(title);
             songModel.setVideoID(videoID);
+            // TODO: Crash report at this stage:
+            //TODO: java.lang.IllegalArgumentException: Illegal character in query at index 624: https://r1---sn-uxax10b-1gie.googlevideo.com/videoplayback?keepalive=yes&ei=amMmWvTADM2oVvjfiMgO&initcwndbps=1593750&source=youtube&id=o-AHJYZSXqfj0Qgvqy3Al0Jrca6z_GH7I4kLbUoH--36oI&pl=19&mm=31&mn=sn-uxax10b-1gie&ip=212.4.87.151&requiressl=yes&ms=au&mt=1512465164&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Ckeepalive%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Crequiressl%2Csource%2Cexpire&mv=m&ipbits=0&dur=8.001&expire=1512486858&signature=03C9B3805EC42D067DBD0B054FDE9D057DCFBF13.D2EFE84A53A5044C56A925909D82DC1257751BF3&lmt=1496278530345421&clen=138663&itag=251&mime=audio%2Fwebm&gir=yes&key=yt6"
             songModel.setDownloadUrl(URI.create(downloadUrl));
             songModel.setThumbnailUrl(URI.create(thumbnailUrl));
             songModel.setSecondsLength((int) length);

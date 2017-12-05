@@ -12,7 +12,7 @@ import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
 
 public class ServerTask extends AsyncTask<Void, Void, Void> {
 
-    private static final String LOG_TAG = "## ServerTask";
+    private final String LOG_TAG = "## ServerTask";
 
     private Context context;
     private ServerSocket serverSocket;

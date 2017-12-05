@@ -87,6 +87,33 @@
                 app:layout_constraintTop_toTopOf="@id/textview_setting_preload" />
 
             <TextView
+                android:id="@+id/textview_setting_cachesize"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="40dp"
+                android:layout_marginTop="15dp"
+                android:text="@string/setting_cache"
+                android:textColor="@color/colorBlack"
+                android:textSize="16sp"
+                app:layout_constraintLeft_toLeftOf="@id/textview_category_host"
+                app:layout_constraintTop_toBottomOf="@id/textview_setting_preload"  />
+
+            <EditText
+                android:id="@+id/edittext_setting_cachesize"
+                android:layout_width="50dp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:maxLength="2"
+                android:maxLines="1"
+                android:selectAllOnFocus="true"
+                android:textAlignment="center"
+                app:layout_constraintBottom_toBottomOf="@id/textview_setting_cachesize"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintLeft_toRightOf="@id/textview_setting_cachesize"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="@id/textview_setting_cachesize" />
+
+            <TextView
                 android:id="@+id/textview_setting_hostport"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -96,7 +123,7 @@
                 android:textColor="@color/colorBlack"
                 android:textSize="16sp"
                 app:layout_constraintLeft_toLeftOf="@id/textview_category_host"
-                app:layout_constraintTop_toBottomOf="@id/textview_setting_preload" />
+                app:layout_constraintTop_toBottomOf="@id/textview_setting_cachesize" />
 
             <EditText
                 android:id="@+id/edittext_setting_hostport"

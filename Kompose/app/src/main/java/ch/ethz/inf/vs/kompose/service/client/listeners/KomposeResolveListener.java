@@ -20,7 +20,7 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
  */
 public class KomposeResolveListener implements NsdManager.ResolveListener {
 
-    private static final String LOG_TAG = "## Resolver";
+    private final String LOG_TAG = "## Resolver";
 
     private ObservableList<SessionModel> sessionModels;
 
