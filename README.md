@@ -31,7 +31,7 @@ Tobias Brodmann (brotobia) 15-934-565
 ### Known bugs
 
 - ~~Pressing 'ADD SONG' with an empty text field crashes the app~~
-- 'ADD SONG' does not parse alternative URLs correctly, like m.youtube or youtu.be or even links originating from Youtube playlists. 
+- 'ADD SONG' does not parse alternative URLs correctly, like m.youtube or youtu.be or even links originating from Youtube playlists. (POSSIBLY FIXED)
   Idea: Parse out the Video ID (?v=...) and handle everything else from there. (SongModels now support the ID as a field)
 - Sometimes app crashes with `Illegal character in query` when calling `URI.create` when the URL from the YouTubeExtractor contains a `"` (double quote) (??) (YouTubeExtractor issue?)
 - PlaylistActivity sometimes calls onCreate more than once, which leads to the following exception:
