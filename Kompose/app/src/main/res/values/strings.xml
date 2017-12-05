@@ -43,7 +43,7 @@
     <string name="downvote">downvote</string>
     <string name="youtube_service.download_failed">could not resolve the song details :(</string>
     <string name="title_activity_test_frontend">TestFrontendActivity</string>
-    <string name="title_activity_playlist">PlaylistActivity</string>
+    <string name="title_activity_playlist">Kompose</string>
     <string name="leave_session">leave session</string>
     <string name="show_history">show history</string>
     <string name="youtube_link">youtube link</string>

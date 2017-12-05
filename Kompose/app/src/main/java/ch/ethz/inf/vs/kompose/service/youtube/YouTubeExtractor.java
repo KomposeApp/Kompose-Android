@@ -194,7 +194,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
             // get URI & title
             String downloadUrl = ytFiles.get(iTag).getUrl();
             String videoID = videoMeta.getVideoId();
-            String thumbnailUrl = videoMeta.getThumbUrl();
+            String thumbnailUrl = videoMeta.getHqImageUrl();
             String title = videoMeta.getTitle();
             long length = videoMeta.getVideoLength();
 

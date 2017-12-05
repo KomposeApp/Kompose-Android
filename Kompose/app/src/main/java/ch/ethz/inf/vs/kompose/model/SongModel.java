@@ -203,7 +203,7 @@ public class SongModel extends UniqueModel {
     }
 
     public void setThumbnail(Drawable drawable) {
-        this.thumbnail = thumbnail;
+        this.thumbnail = drawable;
         notifyPropertyChanged(BR.thumbnail);
     }
 

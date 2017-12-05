@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.kompose.service;
 import android.app.Service;
 import android.content.Intent;
 import android.databinding.ObservableList;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -248,6 +249,7 @@ public class AudioService extends Service {
                             });
 
                             final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
+                            final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
 
                             if (storedFile != null) {
                                 new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -256,6 +258,10 @@ public class AudioService extends Service {
                                         nextDownload.setDownloadPath(storedFile);
                                         nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
                                         nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
+                                        if (thumbDrawable != null) {
+                                            Log.d(LOG_TAG, "thumbnail downloaded " + thumbDrawable.isVisible());
+                                            nextDownload.setThumbnail(thumbDrawable);
+                                        }
 
                                         context.get().checkOnCurrentSong();
                                     }

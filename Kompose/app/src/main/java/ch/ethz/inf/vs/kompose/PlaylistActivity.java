@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -98,6 +99,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         //TODO:  java.lang.RuntimeException: Unable to start activity ComponentInfo{ch.ethz.inf.vs.kompose/ch.ethz.inf.vs.kompose.PlaylistActivity}: java.lang.NullPointerException: Attempt to invoke virtual method 'ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList ch.ethz.inf.vs.kompose.model.SessionModel.getPlayQueue()' on a null object reference
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getPlayQueue(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
+
+        findViewById(R.id.currently_playing_title).setSelected(true);
     }
 
     @Override
@@ -122,8 +125,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             activeSession.setSessionStatus(SessionStatus.ACTIVE);
         }
 
+        URI youtubeURI;
+        try {
+            youtubeURI = URI.create(youtubeUrl);
+        } catch (IllegalArgumentException e) {
+            showError("Invalid URL");
+            return;
+        } catch (NullPointerException e) {
+            showError("Invalid URL");
+            return;
+        }
         SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
-        songModel.setSourceUrl(URI.create(youtubeUrl));
+        songModel.setSourceUrl(youtubeURI);
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(songModel, new SongRequestListener(this));

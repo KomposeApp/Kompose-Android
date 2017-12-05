@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -103,5 +104,33 @@ public class YoutubeDownloadUtility {
             }
         }
         return storedFile;
+    }
+
+    public Drawable downloadThumb(SongModel songModel) {
+        try {
+
+            URL url = new URL(songModel.getThumbnailUrl().toString());
+            URLConnection connection = url.openConnection();
+            connection.connect();
+
+            final InputStream input = new BufferedInputStream(connection.getInputStream());
+            File thumbFile = new File(context.getCacheDir(), "thumb_" + songModel.getUUID() + ".jpg");
+            final OutputStream output = new FileOutputStream(thumbFile);
+
+            byte[] buffer = new byte[1024];
+            int count;
+            int total = 0;
+            while ((count = input.read(buffer)) != -1) {
+                output.write(buffer, 0, count);
+                total += count;
+            }
+            input.close();
+            output.close();
+
+            return Drawable.createFromPath(thumbFile.getAbsolutePath());
+
+        } catch (Exception e) {
+            return null;
+        }
     }
 }

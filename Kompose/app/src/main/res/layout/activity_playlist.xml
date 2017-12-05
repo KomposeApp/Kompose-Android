@@ -33,7 +33,8 @@
                 android:id="@+id/currently_playing"
                 android:layout_width="match_parent"
                 android:layout_height="40pt"
-                android:layout_margin="3pt"
+                android:layout_marginLeft="0pt"
+                android:layout_marginRight="0pt"
                 android:background="#efefef"
                 android:padding="3pt"
                 android:visibility="@{viewModel.sessionModel.currentlyPlaying != null ? View.VISIBLE : View.GONE}">
@@ -41,10 +42,13 @@
                 <ImageView
                     android:id="@+id/image"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
+                    android:layout_height="wrap_content"
                     android:layout_alignParentStart="true"
+                    android:layout_marginEnd="10sp"
+                    android:layout_marginStart="0sp"
                     android:contentDescription="@string/thumbnail"
-                    android:src="@{viewModel.sessionModel.currentlyPlaying.thumbnail}" />
+                    android:src="@{viewModel.sessionModel.currentlyPlaying.thumbnail}"
+                    tools:src="@drawable/sample_thumbnail" />
 
                 <RelativeLayout
                     android:id="@+id/currently_playing_description"
@@ -56,10 +60,15 @@
 
                     <TextView
                         android:id="@+id/currently_playing_title"
+                        android:singleLine="true"
+                        android:ellipsize="marquee"
+                        android:marqueeRepeatLimit ="marquee_forever"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentEnd="true"
                         android:text="@{viewModel.sessionModel.currentlyPlaying.title}"
                         android:textColor="#000"
+                        android:textSize="18sp"
                         tools:text="George Ezra - Listen to the Man" />
 
                     <TextView
@@ -68,7 +77,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/currently_playing_title"
                         android:text="@{viewModel.sessionModel.currentlyPlaying.songLengthMinSec}"
-                        tools:text="300" />
+                        tools:text="4:20" />
 
                     <LinearLayout
                         android:layout_width="wrap_content"
@@ -91,6 +100,19 @@
                     </LinearLayout>
                 </RelativeLayout>
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toStartOf="@id/play_button_wrapper"
+                    android:layout_alignParentBottom="true"
+                    android:layout_marginRight="7sp"
+                    android:layout_marginBottom="4sp"
+                    android:fontFamily="@font/androidicons"
+                    android:text="@string/icons_ai_halt"
+                    android:textSize="24sp"
+                    android:clickable="true"
+                    android:focusable="true" />
+
                 <RelativeLayout
                     android:id="@+id/play_button_wrapper"
                     android:layout_width="wrap_content"
@@ -99,8 +121,9 @@
 
                     <!--play button-->
                     <TextView
+                        android:id="@+id/play_button"
                         android:fontFamily="@font/androidicons"
-                        android:textSize="38sp"
+                        android:textSize="32sp"
                         android:clickable="true"
                         android:focusable="true"
                         android:layout_width="wrap_content"
@@ -114,8 +137,9 @@
 
                     <!--pause button-->
                     <TextView
+                        android:id="@+id/pause_button"
                         android:fontFamily="@font/androidicons"
-                        android:textSize="38sp"
+                        android:textSize="32sp"
                         android:clickable="true"
                         android:focusable="true"
                         android:layout_width="wrap_content"
@@ -153,8 +177,8 @@
                 android:id="@+id/list"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="3pt"
-                android:layout_marginRight="3pt"
+                android:layout_marginLeft="0pt"
+                android:layout_marginRight="0pt"
                 android:layout_marginTop="10pt"
                 tools:listitem="@layout/in_queue_song_view">
 
