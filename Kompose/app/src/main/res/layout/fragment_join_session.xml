@@ -23,19 +23,28 @@
             android:orientation="vertical">
 
             <TextView
+                style="@style/SecondaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/join_existing_party" />
+
+
+            <LinearLayout style="@style/DividerLayout" />
+
+            <TextView
                 style="@style/LabelTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/your_name" />
+                android:text="@string/your_name"/>
 
             <EditText
                 style="@style/DefaultEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="10pt"
                 android:hint="@string/your_name"
                 android:inputType="textPersonName"
-                android:text="@={viewModel.clientName}" />
+                android:text="@={viewModel.clientName}"
+                tools:text="hi mom"/>
 
 
             <LinearLayout

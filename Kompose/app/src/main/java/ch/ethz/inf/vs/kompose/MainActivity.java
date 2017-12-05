@@ -47,15 +47,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
-
-        //hide top bar
-        View decorView = getWindow().getDecorView();
-        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
-        ActionBar actionBar = getActionBar();
-        if (actionBar != null) {
-            actionBar.hide();
-        }
 
         // Initialize the preference utility, and sets a flag to prevent ShareActivity from killing Kompose
         StateSingleton.getInstance().setStartedFromMainActivity();

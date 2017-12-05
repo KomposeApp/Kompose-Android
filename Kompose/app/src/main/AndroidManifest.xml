@@ -15,6 +15,7 @@
         android:theme="@style/KomposeTheme">
         <activity
             android:name=".MainActivity"
+            android:label="Komposer"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -27,7 +28,7 @@
             android:name=".PlaylistActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_playlist"
-            android:screenOrientation="portrait"/>
+            android:screenOrientation="portrait" />
         <activity
             android:name=".HistoryOverviewActivity"
             android:configChanges="orientation|screenSize"
@@ -55,14 +56,16 @@
             android:name=".ShareActivity"
             android:label="Kompose"
             android:theme="@android:style/Theme.NoDisplay">
+
             <!-- youtube link share intents -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

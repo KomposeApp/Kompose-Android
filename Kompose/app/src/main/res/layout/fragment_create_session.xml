@@ -17,22 +17,48 @@
         android:orientation="vertical">
 
 
-        <EditText
+        <TextView
+            style="@style/SecondaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/your_name"
-            android:inputType="textPersonName"
-            android:text="@={viewModel.clientName}" />
+            android:text="@string/start_own_party" />
+
+        <LinearLayout style="@style/DividerLayout" />
+
+
+        <TextView
+            style="@style/LabelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/your_name" />
 
         <EditText
+            style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/your_name"
             android:inputType="textPersonName"
-            android:text="@={viewModel.sessionName}" />
+            android:text="@={viewModel.clientName}"
+            tools:text="hi mom" />
+
+        <TextView
+            style="@style/LabelTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/session_name" />
+
+        <EditText
+            style="@style/DefaultEditText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/session_name"
+            android:inputType="textPersonName"
+            android:text="@={viewModel.sessionName}"
+            tools:text="hi mom" />
 
         <Button
-            android:layout_width="match_parent"
+            style="@style/PrimaryButton"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{viewModel.createSession}"
             android:text="@string/create_party" />
