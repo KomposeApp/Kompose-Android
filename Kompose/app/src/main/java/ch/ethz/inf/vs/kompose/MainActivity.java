@@ -5,8 +5,12 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.support.design.widget.TabLayout;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
@@ -29,11 +33,14 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.client.ClientNetworkService;
 import ch.ethz.inf.vs.kompose.service.host.HostServerService;
 import ch.ethz.inf.vs.kompose.view.adapter.JoinSessionAdapter;
+import ch.ethz.inf.vs.kompose.view.mainactivity.CreateSessionFragment;
+import ch.ethz.inf.vs.kompose.view.mainactivity.JoinSessionFragment;
+import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
 
-public class MainActivity extends BaseActivity implements JoinSessionViewHolder.ClickListener {
+public class MainActivity extends BaseActivity implements JoinSessionViewHolder.ClickListener, JoinSessionFragment.OnFragmentInteractionListener, MainViewModel.ClickListener {
 
     private static final String LOG_TAG = "## Main Activity";
 
@@ -71,6 +78,8 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
 
 
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+
+        /*
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
         if (MainActivity.DESIGN_MODE) {
@@ -79,10 +88,33 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
                 viewModel.getSessionModels().add(sampleService.getSampleSession("design session " + i));
             }
         }
+        */
+
+        final TabLayout tabLayout = findViewById(R.id.tabLayout);
+        final ViewPager viewPager = findViewById(R.id.viewPager);
+        final PagerAdapter adapter = new MainActivityPagerAdapter(getSupportFragmentManager(), viewModel);
+        viewPager.setAdapter(adapter);
+        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                viewPager.setCurrentItem(tab.getPosition());
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
 
-    private final MainViewModel viewModel = new MainViewModel();
+    private final MainViewModel viewModel = new MainViewModel(this);
 
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
@@ -157,7 +189,7 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
             MainActivity.RegistrationListener listener = new MainActivity.RegistrationListener(this);
             clientNetworkService.initSocketListener();
             clientNetworkService.registerClientOnHost(listener, clientName);
-        } catch(SocketException s){
+        } catch (SocketException s) {
             s.printStackTrace();
             try {
                 clientNetworkService.closeClientSocket();
@@ -166,11 +198,57 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
                 e.printStackTrace();
             }
             showError("Failed to set up connection.");
-        }
-        catch (IllegalStateException | IOException io) {
+        } catch (IllegalStateException | IOException io) {
             io.printStackTrace();
             showError("Failed to set up connection.");
         }
+    }
+
+    @Override
+    public void joinSessionPressed() {
+
+    }
+
+    @Override
+    public void createSessionClicked() {
+        String clientName = viewModel.getClientName();
+        if (clientName == null || clientName.trim().isEmpty()) {
+            showError(getString(R.string.view_error_clientname));
+            return;
+        }
+        String sessionName = viewModel.getSessionName();
+        if (sessionName == null || sessionName.trim().isEmpty()) {
+            showError(getString(R.string.view_error_sessionname));
+            return;
+        }
+
+        //Remove trailing whitespaces
+        clientName = clientName.trim();
+        sessionName = sessionName.trim();
+
+        //Retrieve device UUID from preferences
+        UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
+
+        // create a new session
+        SessionModel newSession = new SessionModel(UUID.randomUUID(), deviceUUID, true);
+        newSession.setName(sessionName);
+        newSession.setCreationDateTime(DateTime.now());
+
+        ClientModel clientModel = new ClientModel(deviceUUID, newSession);
+        clientModel.setName(clientName);
+        clientModel.setIsActive(true);
+        newSession.getClients().add(clientModel);
+
+        StateSingleton.getInstance().setActiveClient(clientModel);
+        StateSingleton.getInstance().setActiveSession(newSession);
+
+        // start the server service
+        Intent serverIntent = new Intent(this, HostServerService.class);
+        startService(serverIntent);
+
+        Intent playlistIntent = new Intent(this, PlaylistActivity.class);
+        playlistIntent.putExtra(MainActivity.KEY_SERVERSERVICE, serverIntent);
+        startActivity(playlistIntent);
     }
 
     /**
@@ -218,50 +296,6 @@ public class MainActivity extends BaseActivity implements JoinSessionViewHolder.
             connectActivity.startActivity(playlistIntent);
             connectActivity.finish();
         }
-    }
-
-    private void startParty()
-    {
-        Log.d(LOG_TAG, "Confirmation button pressed");
-
-        String clientName = viewModel.getClientName();
-        if (clientName == null || clientName.trim().isEmpty()) {
-            showError(getString(R.string.view_error_clientname));
-            return;
-        }
-        String sessionName = viewModel.getSessionName();
-        if (sessionName == null || sessionName.trim().isEmpty()) {
-            showError(getString(R.string.view_error_sessionname));
-            return;
-        }
-
-        //Remove trailing whitespaces
-        clientName = clientName.trim();
-        sessionName = sessionName.trim();
-
-        //Retrieve device UUID from preferences
-        UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
-
-        // create a new session
-        SessionModel newSession = new SessionModel(UUID.randomUUID(), deviceUUID, true);
-        newSession.setName(sessionName);
-        newSession.setCreationDateTime(DateTime.now());
-
-        ClientModel clientModel = new ClientModel(deviceUUID, newSession);
-        clientModel.setName(clientName);
-        clientModel.setIsActive(true);
-        newSession.getClients().add(clientModel);
-
-        StateSingleton.getInstance().setActiveClient(clientModel);
-        StateSingleton.getInstance().setActiveSession(newSession);
-
-        // start the server service
-        Intent serverIntent = new Intent(this, HostServerService.class);
-        startService(serverIntent);
-
-        Intent playlistIntent = new Intent(this, PlaylistActivity.class);
-        playlistIntent.putExtra(MainActivity.KEY_SERVERSERVICE, serverIntent);
-        startActivity(playlistIntent);
     }
 
     /**

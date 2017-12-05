@@ -10,38 +10,38 @@
             type="ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel" />
     </data>
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/your_name"
-            android:inputType="textPersonName" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="3">
 
-            <Button
-                android:layout_width="0dp"
+        <android.support.design.widget.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <android.support.design.widget.TabItem
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="1" />
+                android:text="Join Session" />
 
-        </LinearLayout>
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/list"
+            <android.support.design.widget.TabItem
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Center" />
+
+        </android.support.design.widget.TabLayout>
+
+        <android.support.v4.view.ViewPager
+            android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:listitem="@layout/session_join_view">
+            android:layout_height="wrap_content">
 
-        </android.support.v7.widget.RecyclerView>
-
+        </android.support.v4.view.ViewPager>
 
     </LinearLayout>
 </layout>

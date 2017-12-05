@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.kompose.view.viewmodel;
 
 import android.databinding.Bindable;
 import android.databinding.ObservableList;
+import android.view.View;
 
 import java.util.Comparator;
 
@@ -13,8 +14,10 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
 public class MainViewModel extends BaseViewModel {
     private ObservableList<SessionModel> sessionModels;
+    private ClickListener clickListener;
 
-    public MainViewModel() {
+    public MainViewModel(ClickListener clickListener) {
+        this.clickListener = clickListener;
         this.sessionModels = new ObservableUniqueSortedList<>(
                 new Comparator<SessionModel>() {
                     @Override
@@ -51,5 +54,15 @@ public class MainViewModel extends BaseViewModel {
 
     public void setSessionName(String sessionName) {
         this.sessionName = sessionName;
+    }
+
+    public void createSession(View view) {
+        if (clickListener != null) {
+            clickListener.createSessionClicked();
+        }
+    }
+
+    public interface ClickListener {
+        void createSessionClicked();
     }
 }
