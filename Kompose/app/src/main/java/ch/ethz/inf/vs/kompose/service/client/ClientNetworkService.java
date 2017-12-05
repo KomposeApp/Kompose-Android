@@ -28,7 +28,7 @@ import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE;
 
 public class ClientNetworkService extends Service {
 
-    private static final String LOG_TAG = "## ClientNetworkService";
+    private final String LOG_TAG = "## ClientNetworkService";
 
     private IBinder binder = new LocalBinder();
     private boolean initialized = false;

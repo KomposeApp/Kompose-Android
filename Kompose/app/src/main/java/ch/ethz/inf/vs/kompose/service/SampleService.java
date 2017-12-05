@@ -70,7 +70,7 @@ public class SampleService {
         }
     }
 
-    public ClientModel getSampleClient(SessionModel sessionModel, String clientName) {
+    private ClientModel getSampleClient(SessionModel sessionModel, String clientName) {
         ClientModel clientModel = new ClientModel(UUID.randomUUID(), sessionModel);
         clientModel.setIsActive(true);
         clientModel.setName(clientName);
@@ -78,7 +78,7 @@ public class SampleService {
         return clientModel;
     }
 
-    public SongModel getSampleSong(SessionModel sessionModel, ClientModel model, Integer integer) {
+    private SongModel getSampleSong(SessionModel sessionModel, ClientModel model, Integer integer) {
         SongModel songModel = new SongModel(UUID.randomUUID(), model, sessionModel);
         songModel.setOrder(integer);
         songModel.setSongStatus(SongStatus.REQUESTED);

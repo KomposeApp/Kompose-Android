@@ -67,7 +67,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/currently_playing_title"
-                        android:text="@{String.valueOf(viewModel.sessionModel.currentlyPlaying.secondsLength)}"
+                        android:text="@{viewModel.sessionModel.currentlyPlaying.songLengthMinSec}"
                         tools:text="300" />
 
                     <LinearLayout
@@ -97,24 +97,34 @@
                     android:layout_height="match_parent"
                     android:layout_alignParentEnd="true">
 
-                    <Button
+                    <!--play button-->
+                    <TextView
+                        android:fontFamily="@font/androidicons"
+                        android:textSize="38sp"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentStart="true"
                         android:enabled="@{viewModel.sessionModel.isHost}"
                         android:onClick="@{viewModel.onPlayClicked}"
-                        android:text="@string/play"
+                        android:text="@string/icons_ai_playback_play"
                         android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PAUSED) ? View.VISIBLE : View.GONE}" />
 
-                    <Button
+                    <!--pause button-->
+                    <TextView
+                        android:fontFamily="@font/androidicons"
+                        android:textSize="38sp"
+                        android:clickable="true"
+                        android:focusable="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_alignParentStart="true"
                         android:enabled="@{viewModel.sessionModel.isHost}"
                         android:onClick="@{viewModel.onPauseClicked}"
-                        android:text="@string/pause"
+                        android:text="@string/icons_ai_playback_pause"
                         android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING) ? View.VISIBLE : View.GONE}" />
 
                 </RelativeLayout>

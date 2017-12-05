@@ -28,8 +28,8 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
  */
 public class StorageHandler {
 
-    private static final String LOG_TAG = "## StorageHandler";
-    private static final String SESSION_FOLDER = "sessions";
+    private final String LOG_TAG = "## StorageHandler";
+    private final String SESSION_FOLDER = "sessions";
     private Context context;
 
     public StorageHandler(Context context) {

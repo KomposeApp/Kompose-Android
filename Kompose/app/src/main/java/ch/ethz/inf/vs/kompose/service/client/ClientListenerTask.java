@@ -17,7 +17,7 @@ import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
      */
 public class ClientListenerTask extends AsyncTask<Void, Void, Void> {
 
-    private static final String LOG_TAG = "## ClientListenerTask";
+    private final String LOG_TAG = "## ClientListenerTask";
 
     private ServerSocket serverSocket;
     private int localPort;

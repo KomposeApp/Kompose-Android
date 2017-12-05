@@ -71,20 +71,24 @@
                         android:id="@+id/currently_playing_seconds_length"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@{String.valueOf(viewHolder.item.secondsLength)}"
+                        android:text="@{viewHolder.item.songLengthMinSec}"
                         tools:text="300" />
 
                 </LinearLayout>
 
-                <ImageButton
+                <TextView
                     android:id="@+id/down_vote_button"
-                    android:layout_width="50pt"
-                    android:layout_height="20pt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
                     android:layout_alignParentEnd="true"
-                    android:contentDescription="@string/downvote_button"
+                    android:layout_marginEnd="8sp"
+                    android:textSize="24sp"
+                    android:clickable="true"
+                    android:focusable="true"
                     android:onClick="@{viewHolder.onDownVoteClick}"
-                    android:tint="@color/buttonColor"
-                    app:srcCompat="@android:drawable/arrow_down_float" />
+                    android:text="@string/icons_ai_halt"
+                    android:fontFamily="@font/androidicons" />
 
             </RelativeLayout>
 

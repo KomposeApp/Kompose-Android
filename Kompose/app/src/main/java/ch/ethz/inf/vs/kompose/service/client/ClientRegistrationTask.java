@@ -14,8 +14,8 @@ import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
 
 public class ClientRegistrationTask extends AsyncTask<Void, Void, Boolean> {
 
-    private static final String LOG_TAG = "## RegistrationTask";
-    private static final int TEMPORARY_SOCKET_TIMEOUT = 5000;
+    private final String LOG_TAG = "## RegistrationTask";
+    private final int TEMPORARY_SOCKET_TIMEOUT = 5000;
 
     private ServerSocket clientServerSocket;
     private SimpleListener<Boolean, Void> callbackListener;

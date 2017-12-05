@@ -39,20 +39,17 @@ import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
-
 public class MainActivity extends BaseActivity implements MainViewModel.ClickListener {
 
-    private static final String LOG_TAG = "## Main Activity";
+    private final String LOG_TAG = "## Main Activity";
 
     public static final String KEY_NETWORKSERVICE = "ClientNetworkService";
     public static final String KEY_SERVERSERVICE = "HostServerService";
     public static final String SERVICE_NAME = "Kompose";
     public static final String SERVICE_TYPE = "_kompose._tcp";
     public static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
-    public static final String FOUND_SERVICE = "HostServerService.FOUND_SERVICE";
 
     public static final boolean DESIGN_MODE = false;
-    public static final boolean EMULATOR_MODE = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +65,12 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
 
         // Initialize the preference utility, and sets a flag to prevent ShareActivity from killing Kompose
-        StateSingleton.getInstance().setPreferenceUtility(this);
         StateSingleton.getInstance().setStartedFromMainActivity();
+        StateSingleton.getInstance().setPreferenceUtility(this);
+
+        int currentPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
+        int currentCacheSize = StateSingleton.getInstance().getPreferenceUtility().getCurrentCacheSize();
+        StateSingleton.getInstance().initializeSongCache(currentPreload, currentCacheSize);
 
         // Insert default username
         viewModel.setClientName(StateSingleton.getInstance().getPreferenceUtility().getUsername());
@@ -119,6 +120,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
 
+
     /*
       Note on unbinding the ClientNetworkService:
         * If it occurs before we join a room, it simply kills the service and the NSD Listener
@@ -156,11 +158,12 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             unbindService(cNetServiceConnection);
             clientNetworkServiceBound = false;
         }
+        StateSingleton.getInstance().clearCache();
     }
+
 
     @Override
     public void joinSessionClicked(SessionModel sessionModel) {
-
         String clientName = viewModel.getClientName();
 
         // Client's name must not be empty
@@ -184,10 +187,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             if (!clientNetworkServiceBound && clientNetworkService == null)
                 throw new IllegalStateException("Failed to properly set up Client Network Service");
 
-            MainActivity.RegistrationListener listener = new MainActivity.RegistrationListener(this);
+            RegistrationListener listener = new RegistrationListener(this);
             clientNetworkService.initSocketListener();
             clientNetworkService.registerClientOnHost(listener, clientName);
-        } catch (SocketException s) {
+        } catch(SocketException s){
             s.printStackTrace();
             try {
                 clientNetworkService.closeClientSocket();
@@ -196,7 +199,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                 e.printStackTrace();
             }
             showError("Failed to set up connection.");
-        } catch (IllegalStateException | IOException io) {
+        }
+        catch (IllegalStateException | IOException io) {
             io.printStackTrace();
             showError("Failed to set up connection.");
         }
@@ -244,6 +248,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         startActivity(playlistIntent);
     }
 
+
     /**
      * Listener which allows us to start the next Activity.
      * Always make sure this is started on the main thread.
@@ -260,7 +265,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         @Override
         public void onEvent(Boolean success, Void v) {
             try {
-                //TODO: Check whether closing the socket works as intended
                 if (!success) {
                     Log.e(LOG_TAG, "Failed to establish connection with host");
                     if (!connectActivity.isDestroyed()) {
@@ -285,7 +289,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
             // Initialize Playlist
             Intent playlistIntent = new Intent(connectActivity, PlaylistActivity.class);
-            playlistIntent.putExtra(MainActivity.KEY_NETWORKSERVICE, serverIntent);
+            playlistIntent.putExtra(ch.ethz.inf.vs.kompose.MainActivity.KEY_NETWORKSERVICE, serverIntent);
             connectActivity.startActivity(playlistIntent);
             connectActivity.finish();
         }

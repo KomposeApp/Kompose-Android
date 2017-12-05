@@ -31,7 +31,7 @@
         <activity
             android:name=".HistoryOverviewActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Overview of past Playlists"
+            android:label="Playlist History"
             android:screenOrientation="portrait" />
         <activity
             android:name=".HistoryDetailsActivity"

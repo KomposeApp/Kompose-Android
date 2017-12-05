@@ -15,12 +15,16 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 public class SettingsActivity extends AppCompatActivity {
 
+    private static int MAXPRELOAD = 10;
+    private static int MAXCACHE = 20;
+
     // View elements that matter to us
     private TextView error_display;
 
     private EditText username_input;
     private EditText sessionname_input;
     private EditText preload_input;
+    private EditText cachesize_input;
     private EditText hostport_input;
     private EditText clientport_input;
 
@@ -43,15 +47,16 @@ public class SettingsActivity extends AppCompatActivity {
         clientport_input = findViewById(R.id.edittext_setting_clientport);
         hostport_input = findViewById(R.id.edittext_setting_hostport);
         preload_input = findViewById(R.id.edittext_setting_preload);
+        cachesize_input = findViewById(R.id.edittext_setting_cachesize);
 
         // Display current values
         util = StateSingleton.getInstance().getPreferenceUtility();
+        cachesize_input.setText(String.valueOf(util.getCurrentCacheSize()));
         username_input.setText(util.getUsername());
         sessionname_input.setText(util.getSessionName());
         hostport_input.setText(String.valueOf(util.getHostPort()));
         clientport_input.setText(String.valueOf(util.getClientPort()));
         preload_input.setText(String.valueOf(util.getPreload()));
-
     }
 
     /**
@@ -64,6 +69,7 @@ public class SettingsActivity extends AppCompatActivity {
         boolean commitChanges = true;
 
         String preload_text = preload_input.getText().toString();
+        String cachesize_text = cachesize_input.getText().toString();
         String username_text = username_input.getText().toString();
         String sessionname_text = sessionname_input.getText().toString();
         String hostport_text = hostport_input.getText().toString();
@@ -77,6 +83,7 @@ public class SettingsActivity extends AppCompatActivity {
         username_input.setTextColor(getResources().getColor(R.color.colorBlack));
         sessionname_input.setTextColor(getResources().getColor(R.color.colorBlack));
         preload_input.setTextColor(getResources().getColor(R.color.colorBlack));
+        cachesize_input.setTextColor(getResources().getColor(R.color.colorBlack));
         hostport_input.setTextColor(getResources().getColor(R.color.colorBlack));
         clientport_input.setTextColor(getResources().getColor(R.color.colorBlack));
 
@@ -95,9 +102,15 @@ public class SettingsActivity extends AppCompatActivity {
             commitChanges = false;
         }
 
-        if (Integer.valueOf(preload_text) > 10) {
-            preload_input.setTextColor(getResources().getColor(R.color.colorAccent));
-            error_text += getString(R.string.setting_error_preload) + "\n";
+        if (Integer.valueOf(preload_text) > MAXPRELOAD) {
+            preload_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            error_text += getString(R.string.setting_error_preload) + ": " + MAXPRELOAD + "\n";
+            commitChanges = false;
+        }
+
+        if (Integer.valueOf(cachesize_text) > MAXCACHE) {
+            cachesize_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            error_text += getString(R.string.setting_error_cache) + ": "+ MAXCACHE + "\n";
             commitChanges = false;
         }
 
@@ -120,12 +133,19 @@ public class SettingsActivity extends AppCompatActivity {
         /* END Invalid input check */
 
         if (commitChanges) {
-            util.setUsername(username_text);
-            util.setSessionName(sessionname_text);
-            util.setHostPort(Integer.valueOf(hostport_text));
-            util.setClientPort(Integer.valueOf(clientport_text));
-            util.setPreload(Integer.valueOf(preload_text));
+            int preload = Integer.valueOf(preload_text);
+            int cachesize = Integer.valueOf(cachesize_text);
+
+            util.setCurrentUsername(username_text);
+            util.setCurrentSessionName(sessionname_text);
+            util.setCurrentHostPort(Integer.valueOf(hostport_text));
+            util.setCurrentClientPort(Integer.valueOf(clientport_text));
+            util.setCurrentPreload(preload);
+            util.setCurrentCacheSize(cachesize);
             util.applyChanges();
+
+            //Reset Song Cache after making changes
+            StateSingleton.getInstance().initializeSongCache(preload,cachesize);
             finish();
         }
     }

@@ -27,7 +27,9 @@ public class SongModel extends UniqueModel {
     }
 
     private String title;
+    private String videoID;
     private int secondsLength;
+    private String getSongLengthMinSec;
     private int order;
 
     private int validDownVoteCount;
@@ -35,9 +37,9 @@ public class SongModel extends UniqueModel {
     private ClientModel proposedBy;
     private SessionModel partOfSession;
 
+    private URI sourceUrl;
     private URI downloadUrl;
     private URI thumbnailUrl;
-    private URI sourceUrl;
 
     private boolean skipVoteCasted;
     private DateTime creationDateTime;
@@ -150,7 +152,17 @@ public class SongModel extends UniqueModel {
 
     public void setSecondsLength(int secondsLength) {
         this.secondsLength = secondsLength;
+
+        int sec = secondsLength % 60;
+        int min = (secondsLength - sec) / 60;
+        this.getSongLengthMinSec = min + ":" + (sec < 10 ? "0" : "") + sec;
+
         notifyPropertyChanged(BR.secondsLength);
+    }
+
+    @Bindable
+    public String getSongLengthMinSec() {
+        return getSongLengthMinSec;
     }
 
     public SessionModel getPartOfSession() {
@@ -201,6 +213,13 @@ public class SongModel extends UniqueModel {
 
     public void setMediaPlayer(MediaPlayer mediaPlayer) {
         this.mediaPlayer = mediaPlayer;
+    }
+
+    public String getVideoID(){
+        return videoID;
+    }
+    public void setVideoID(String id){
+        this.videoID = id;
     }
 
     @Bindable

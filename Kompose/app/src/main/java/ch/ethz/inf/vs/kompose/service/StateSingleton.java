@@ -1,6 +1,9 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Context;
+import android.util.Log;
+
+import java.io.File;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -10,10 +13,10 @@ import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 
 public class StateSingleton {
 
-    private final String LOG_TAG = "## SINGLETON HUB:";
+    private final String LOG_TAG = "## State Singleton:";
 
     private SessionModel activeSession;
-    private ClientModel activeClient;  //TODO: Do we actually need this?
+    private ClientModel activeClient;
     private SessionModel activeHistorySession;
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
     private boolean hasMainActivity; //Required for the Share Activity.
@@ -31,7 +34,6 @@ public class StateSingleton {
     public static StateSingleton getInstance() {
         return LazyHolder.INSTANCE;
     }
-
 
     public SessionModel getActiveSession(){
         return activeSession;
@@ -71,5 +73,51 @@ public class StateSingleton {
     public void setPlaylistIsActive(boolean value){
         playlistIsActive = value;
     }
+
+    /** Song Cache stuff **/
+
+    //The Song Cache itself (initially null)
+    private SongCacheMap songCache;
+
+    /**
+     * Set up a new empty song cache, and clears the old one.
+     * Cache size is the maximum of preload size and desired cache size.
+     * @param preloadSize Number of songs we'd like to preload
+     * @param cacheSize Number of songs we want to cache
+     */
+    public void initializeSongCache(int preloadSize, int cacheSize){
+        if (songCache!= null) songCache.clear();
+        songCache = new SongCacheMap(Math.max(preloadSize+1,cacheSize));
+        Log.d("## SongCacheMap", "Song cache initialized.");
+    }
+
+    /**
+     * Add a song to the cache, the identifier being the Youtube VideoID
+     * @param id VideoID that uniquely identifies the song
+     * @param file File that points to the Song in the hardware cache
+     */
+    public void addSongToCache(String id, File file){
+        Log.d("## SongCacheMap", "Added file: " + file.getName() + " - from VideoID: " + id + "- to the cache");
+        songCache.put(id, file);
+    }
+
+    /**
+     * Retrieve a previously cached song by its VideoID
+     * @param id VideoID of the Youtube video that corresponds to the song
+     * @return File descriptor of the song in cache
+     */
+    public File retrieveSongFromCache(String id){
+        Log.d("## SongCacheMap", "Retrieving file with VideoID: " + id + " from the cache");
+        return songCache.get(id);
+    }
+
+    // Simple check accessor functions
+    public boolean checkCacheByKey(String id){ return songCache.containsKey(id);}
+    public boolean checkCacheByValue(File file){ return songCache.containsValue(file);}
+    public void clearCache(){
+        songCache.clear();
+        Log.d("## SongCacheMap", "Cache cleared");
+    }
+
 
 }

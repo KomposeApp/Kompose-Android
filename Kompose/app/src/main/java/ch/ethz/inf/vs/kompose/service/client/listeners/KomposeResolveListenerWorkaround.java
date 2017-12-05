@@ -24,7 +24,7 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 */
 public class KomposeResolveListenerWorkaround implements DiscoverResolver.Listener {
 
-    private static final String LOG_TAG = "## Workaround Resolver";
+    private final String LOG_TAG = "## Workaround Resolver";
 
     // Observable list obtained from View
     private ObservableList<SessionModel> sessionModels;

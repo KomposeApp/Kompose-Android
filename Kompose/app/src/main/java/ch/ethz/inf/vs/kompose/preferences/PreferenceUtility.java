@@ -8,12 +8,13 @@ import java.util.UUID;
 
 public class PreferenceUtility {
 
-    private static final String LOG_TAG = "## Preference Repo";
+    private final String LOG_TAG = "## Preference Repo";
 
     private static final String PREFERENCE_FILENAME = "kompose.prefs";
 
     private static final String KEY_UUID = "device_uuid";
     private static final String KEY_PRELOAD = "k_preload";
+    private static final String KEY_CACHESIZE = "k_cachesize";
     private static final String KEY_USERNAME = "k_user";
     private static final String KEY_SESSIONNAME = "k_session";
     private static final String KEY_HPORT = "k_host_port";
@@ -56,6 +57,9 @@ public class PreferenceUtility {
     public void setPreload( int preload){
         sEdits.putInt(KEY_PRELOAD, preload);
     }
+    public void setCurrentCacheSize( int cacheSize){
+        sEdits.putInt(KEY_CACHESIZE, cacheSize);
+    }
 
     public String getUsername(){
         return sPrefs.getString(KEY_USERNAME, DEFAULT_USERNAME);
@@ -71,6 +75,9 @@ public class PreferenceUtility {
     }
     public int getPreload(){
         return sPrefs.getInt(KEY_PRELOAD, DEFAULT_PRELOAD);
+    }
+    public int getCurrentCacheSize(){
+        return sPrefs.getInt(KEY_CACHESIZE, DEFAULT_PRELOAD);
     }
 
     /**

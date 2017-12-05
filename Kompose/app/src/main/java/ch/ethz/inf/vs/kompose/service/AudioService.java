@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.media.MediaPlayer;
@@ -23,12 +22,11 @@ import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public class AudioService extends Service {
 
-    private static final String LOG_TAG = "## AudioService";
+    private final String LOG_TAG = "## AudioService";
     private final IBinder binder = new LocalBinder();
 
     private SessionModel sessionModel;
@@ -168,6 +166,7 @@ public class AudioService extends Service {
 
     private static class PlaylistListener extends ObservableList.OnListChangedCallback {
 
+        private final String LOG_TAG = "## PlaylistListener";
         private Phaser notifier;
         AudioService audioService;
 
@@ -204,13 +203,14 @@ public class AudioService extends Service {
 
     private static class DownloadWorker extends AsyncTask<Void, Void, Void> {
 
+        private final String LOG_TAG ="## DownloadWorker";
         private Phaser notifier;
         private int numSongsPreload;
         private WeakReference<AudioService> context;
         private SessionModel sessionModel;
 
         DownloadWorker(AudioService context, SessionModel sessionModel) {
-            this.context = new WeakReference<AudioService>(context);
+            this.context = new WeakReference<>(context);
             this.sessionModel = sessionModel;
 
             this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
@@ -234,7 +234,7 @@ public class AudioService extends Service {
                 int numDownloaded = 0;
 
                 int index = 0;
-                while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
+                while (numDownloaded <= numSongsPreload && index < sessionModel.getPlayQueue().size()) {
                     try {
                         final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
                         if (nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {

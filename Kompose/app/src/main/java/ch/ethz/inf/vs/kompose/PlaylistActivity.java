@@ -37,7 +37,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
 public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
 
-    private static final String LOG_TAG = "## Playlist Activity";
+    private final String LOG_TAG = "## Playlist Activity";
 
     //View
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().getActiveSession(), this);
@@ -94,6 +94,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
+        //TODO: Crash report:
+        //TODO:  java.lang.RuntimeException: Unable to start activity ComponentInfo{ch.ethz.inf.vs.kompose/ch.ethz.inf.vs.kompose.PlaylistActivity}: java.lang.NullPointerException: Attempt to invoke virtual method 'ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList ch.ethz.inf.vs.kompose.model.SessionModel.getPlayQueue()' on a null object reference
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getPlayQueue(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
     }
@@ -122,8 +124,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
         songModel.setSourceUrl(URI.create(youtubeUrl));
-
-        activeSession.getPlayQueue().add(songModel);
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(songModel, new SongRequestListener(this));
@@ -179,7 +179,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
                 songRequestDialog.setContentView(binding.getRoot());
                 binding.setViewModel(viewModel);
-                viewModel.setSearchLink("https://www.youtube.com/watch?v=nFZP8zQ5kzk");
                 songRequestDialog.show();
                 return true;
             case R.id.leave_session:

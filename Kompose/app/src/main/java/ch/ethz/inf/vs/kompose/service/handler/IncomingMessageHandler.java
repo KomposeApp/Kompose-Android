@@ -35,8 +35,8 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 public class IncomingMessageHandler implements Runnable {
-    private static final String LOG_TAG = "## InMessageHandler";
-    public static final String SESSION_UPDATED_EVENT = "IncomingMessageHandler.SESSION_UPDATED_EVENT";
+    private final String LOG_TAG = "## InMessageHandler";
+    public final String SESSION_UPDATED_EVENT = "IncomingMessageHandler.SESSION_UPDATED_EVENT";
 
     private Socket socket;
     private Message message;
