@@ -11,8 +11,13 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.util.Collections;
+import java.util.List;
 
+import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
@@ -70,6 +75,15 @@ public class HostServerService extends Service {
             //idk what to do here
             return Service.START_REDELIVER_INTENT;
         }
+
+        // set connection details for "Host info" in PlaylistActivity
+        try {
+            activeSession.setConnectionDetails(new ServerConnectionDetails(
+                    InetAddress.getByName(getIPAddress(true)), serverSocket.getLocalPort()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
         String sessionName = activeSession.getName();
         String uuid = activeSession.getUUID().toString();
         String hostUuid = activeSession.getHostUUID().toString();
@@ -156,5 +170,33 @@ public class HostServerService extends Service {
         public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
             Log.d(LOG_TAG, "Service unregistration failed: " + errorCode);
         }
+    }
+
+    private String getIPAddress(boolean useIPv4) {
+        try {
+            List<NetworkInterface> interfaces = Collections.list(NetworkInterface.getNetworkInterfaces());
+            for (NetworkInterface intf : interfaces) {
+                List<InetAddress> addrs = Collections.list(intf.getInetAddresses());
+                for (InetAddress addr : addrs) {
+                    if (!addr.isLoopbackAddress()) {
+                        String sAddr = addr.getHostAddress();
+                        boolean isIPv4 = sAddr.indexOf(':') < 0;
+
+                        if (useIPv4) {
+                            if (isIPv4)
+                                return sAddr;
+                        } else {
+                            if (!isIPv4) {
+                                int delim = sAddr.indexOf('%'); // drop ip6 zone suffix
+                                return delim < 0 ? sAddr.toUpperCase() : sAddr.substring(0, delim).toUpperCase();
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }
