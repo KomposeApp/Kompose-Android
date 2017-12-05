@@ -12,23 +12,20 @@
 
 
     <LinearLayout
+        style="@style/TileLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3pt"
-        android:background="#efefef"
-        android:orientation="vertical"
-        android:padding="3pt">
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/currently_playing_title"
+            style="@style/PrimaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{viewHolder.item.title}"
-            android:textColor="#000"
             tools:text="example text of video" />
 
         <TextView
-            android:id="@+id/currently_playing_seconds_length"
+            style="@style/SecondaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{String.valueOf(viewHolder.item.secondsLength)}"

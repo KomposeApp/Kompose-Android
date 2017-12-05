@@ -11,6 +11,7 @@
     </data>
 
     <LinearLayout
+        style="@style/TextContentLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -20,21 +21,21 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/your_name"
-            android:text="@={viewModel.clientName}"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:text="@={viewModel.clientName}" />
 
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/your_name"
-            android:text="@={viewModel.sessionName}"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName"
+            android:text="@={viewModel.sessionName}" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/create_party"
-            android:onClick="@{viewModel.createSession}"/>
+            android:onClick="@{viewModel.createSession}"
+            android:text="@string/create_party" />
 
     </LinearLayout>
 </layout>

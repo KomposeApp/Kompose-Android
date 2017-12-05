@@ -27,12 +27,23 @@
 
 
     <style name="RootLayout">
+
+    </style>
+
+    <style name="TextContentLayout">
         <item name="android:padding">3pt</item>
     </style>
 
     <style name="TileLayout">
-        <item name="android:padding">5pt</item>
+        <item name="android:padding">3pt</item>
         <item name="android:background">@color/greyBackground</item>
+        <item name="android:layout_marginLeft">3pt</item>
+        <item name="android:layout_marginRight">3pt</item>
+
+        <item name="android:layout_marginBottom">1.5pt</item>
+        <item name="android:layout_marginTop">1.5pt</item>
+
+        <item name="android:elevation">1pt</item>
     </style>
 
 
@@ -43,8 +54,9 @@
     </style>
 
     <style name="PrimaryTextView" parent="BaseTextView">
-        <item name="android:fontFamily">@font/russo_one</item>
+        <item name="android:fontFamily">@font/opensans_regular</item>
         <item name="android:textSize">10pt</item>
+        <item name="android:textColor">#000</item>
     </style>
 
     <style name="SecondaryTextView" parent="BaseTextView">
@@ -64,6 +76,7 @@
 
     <style name="LabelTextView" parent="BaseTextView">
         <item name="android:layout_marginBottom">-2pt</item>
+        <item name="android:textColor">#000</item>
     </style>
 
 </resources>

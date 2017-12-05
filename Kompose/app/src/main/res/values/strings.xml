@@ -39,7 +39,7 @@
     <string name="join">join</string>
     <string name="client_name">My name</string>
     <string name="create_party">create party</string>
-    <string name="session_name">Name of the session</string>
+    <string name="session_name">session name</string>
     <string name="downvote">downvote</string>
     <string name="youtube_service.download_failed">could not resolve the song details :(</string>
     <string name="title_activity_test_frontend">TestFrontendActivity</string>
@@ -76,4 +76,6 @@
     <string name="port_placeholder">7261</string>
     <string name="port">port</string>
     <string name="join_manually">join manually</string>
+    <string name="host">hosted by</string>
+    <string name="creation_date_time">created at</string>
 </resources>

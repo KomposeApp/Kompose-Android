@@ -12,25 +12,24 @@
 
 
     <LinearLayout
+        style="@style/TileLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        style="@style/TileLayout"
-        android:layout_marginBottom="3pt">
+        android:orientation="vertical">
 
         <TextView
+            style="@style/PrimaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{viewHolder.item.name}"
-            tools:text="margeths session"
-            style="@style/PrimaryTextView"/>
+            tools:text="margeths session" />
 
         <TextView
+            style="@style/SecondaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{viewHolder.item.name}"
-            tools:text="margareth"
-            style="@style/SecondaryTextView" />
+            tools:text="margareth" />
 
     </LinearLayout>
 

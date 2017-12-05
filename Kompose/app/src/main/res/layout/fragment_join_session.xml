@@ -13,37 +13,44 @@
     <LinearLayout
         style="@style/RootLayout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            style="@style/LabelTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/your_name" />
-
-        <EditText
-            style="@style/DefaultEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10pt"
-            android:hint="@string/your_name"
-            android:inputType="textPersonName"
-            android:text="@={viewModel.clientName}" />
-
-
         <LinearLayout
+            style="@style/TextContentLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:visibility="@{viewModel.sessionModels.size() == 0 ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible">
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
             <TextView
-                style="@style/SecondaryTextView"
+                style="@style/LabelTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/your_name" />
+
+            <EditText
+                style="@style/DefaultEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/looking_for_parties" />
+                android:layout_marginBottom="10pt"
+                android:hint="@string/your_name"
+                android:inputType="textPersonName"
+                android:text="@={viewModel.clientName}" />
 
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="@{viewModel.sessionModels.size() == 0 ? View.VISIBLE : View.GONE}"
+                tools:visibility="visible">
+
+                <TextView
+                    style="@style/SecondaryTextView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/looking_for_parties" />
+
+            </LinearLayout>
         </LinearLayout>
 
         <android.support.v7.widget.RecyclerView
@@ -54,4 +61,5 @@
 
         </android.support.v7.widget.RecyclerView>
     </LinearLayout>
+
 </layout>
