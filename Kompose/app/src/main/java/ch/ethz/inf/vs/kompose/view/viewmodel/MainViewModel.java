@@ -61,6 +61,30 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         notifyPropertyChanged(BR.sessionName);
     }
 
+    private String ipAddress;
+
+    private String port;
+
+    @Bindable
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+        notifyPropertyChanged(BR.ipAddress);
+    }
+
+    @Bindable
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
+        notifyPropertyChanged(BR.port);
+    }
+
     public void createSession(View view) {
         if (clickListener != null) {
             clickListener.createSessionClicked();
@@ -79,9 +103,33 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         }
     }
 
+    public void joinManualClicked(View v) {
+        if (clickListener != null) {
+            clickListener.joinManualClicked();
+        }
+    }
+
+    public void openHelpClicked(View v) {
+        if (clickListener != null) {
+            clickListener.openHelpClicked();
+        }
+    }
+
+    public void openHistoryClicked(View v) {
+        if (clickListener != null) {
+            clickListener.openHistoryClicked();
+        }
+    }
+
     public interface ClickListener {
         void createSessionClicked();
 
         void joinSessionClicked(SessionModel sessionModel);
+
+        void joinManualClicked();
+
+        void openHelpClicked();
+
+        void openHistoryClicked();
     }
 }

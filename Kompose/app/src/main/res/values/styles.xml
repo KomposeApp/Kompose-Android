@@ -51,14 +51,19 @@
 
     </style>
 
+    <style name="IconTextView" parent="BaseTextView">
+        <item name="android:fontFamily">@font/androidicons</item>
+        <item name="android:textSize">5.7pt</item>
+        <item name="android:padding">7.4pt</item>
+    </style>
+
 
     <style name="DefaultEditText">
-        <item name="android:paddingStart">0pt</item>
-        <item name="android:paddingEnd">0pt</item>
+        <item name="android:layout_marginStart">-2pt</item>
     </style>
 
     <style name="LabelTextView" parent="BaseTextView">
-
+        <item name="android:layout_marginBottom">-2pt</item>
     </style>
 
 </resources>

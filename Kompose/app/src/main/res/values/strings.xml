@@ -31,6 +31,9 @@
     <string name="icons_ai_arrow_down">\ue829</string>
     <string name="icons_ai_playback_play">\ue87e</string>
     <string name="icons_ai_playback_pause">\ue87f</string>
+    <string name="icons_ai_settings">\ue807</string>
+    <string name="icons_ai_database">\ue842</string>
+    <string name="icons_ai_help">\ue84e</string>
 
     <!-- Uncategorized -->
     <string name="join">join</string>
@@ -66,4 +69,11 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="looking_for_parties">we are looking for parties…</string>
     <string name="create">create</string>
+    <string name="manual">manual</string>
+    <string name="history">history</string>
+    <string name="ip_address">IP address</string>
+    <string name="ip_address_placeholder">192.168.1.1</string>
+    <string name="port_placeholder">7261</string>
+    <string name="port">port</string>
+    <string name="join_manually">join manually</string>
 </resources>

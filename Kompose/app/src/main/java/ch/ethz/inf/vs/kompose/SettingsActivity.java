@@ -103,13 +103,13 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         if (Integer.valueOf(preload_text) > MAXPRELOAD) {
-            preload_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            preload_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_preload) + ": " + MAXPRELOAD + "\n";
             commitChanges = false;
         }
 
         if (Integer.valueOf(cachesize_text) > MAXCACHE) {
-            cachesize_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            cachesize_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_cache) + ": "+ MAXCACHE + "\n";
             commitChanges = false;
         }
@@ -136,11 +136,11 @@ public class SettingsActivity extends AppCompatActivity {
             int preload = Integer.valueOf(preload_text);
             int cachesize = Integer.valueOf(cachesize_text);
 
-            util.setCurrentUsername(username_text);
-            util.setCurrentSessionName(sessionname_text);
-            util.setCurrentHostPort(Integer.valueOf(hostport_text));
-            util.setCurrentClientPort(Integer.valueOf(clientport_text));
-            util.setCurrentPreload(preload);
+            util.setUsername(username_text);
+            util.setSessionName(sessionname_text);
+            util.setHostPort(Integer.valueOf(hostport_text));
+            util.setClientPort(Integer.valueOf(clientport_text));
+            util.setPreload(preload);
             util.setCurrentCacheSize(cachesize);
             util.applyChanges();
 

@@ -190,7 +190,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             RegistrationListener listener = new RegistrationListener(this);
             clientNetworkService.initSocketListener();
             clientNetworkService.registerClientOnHost(listener, clientName);
-        } catch(SocketException s){
+        } catch (SocketException s) {
             s.printStackTrace();
             try {
                 clientNetworkService.closeClientSocket();
@@ -199,11 +199,27 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                 e.printStackTrace();
             }
             showError("Failed to set up connection.");
-        }
-        catch (IllegalStateException | IOException io) {
+        } catch (IllegalStateException | IOException io) {
             io.printStackTrace();
             showError("Failed to set up connection.");
         }
+    }
+
+    @Override
+    public void joinManualClicked() {
+        //todo: join manually
+
+    }
+
+    @Override
+    public void openHelpClicked() {
+        //todo: open help
+    }
+
+    @Override
+    public void openHistoryClicked() {
+        Intent playlistIntent = new Intent(this, HistoryOverviewActivity.class);
+        startActivity(playlistIntent);
     }
 
     @Override

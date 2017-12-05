@@ -22,6 +22,8 @@ public class MainActivityPagerAdapter extends FragmentStatePagerAdapter {
                 return JoinSessionFragment.newInstance(mainViewModel);
             case 1:
                 return CreateSessionFragment.newInstance(mainViewModel);
+            case 2:
+                return ManualFragment.newInstance(mainViewModel);
             default:
                 return CreateSessionFragment.newInstance(mainViewModel);
         }
@@ -29,6 +31,6 @@ public class MainActivityPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 }

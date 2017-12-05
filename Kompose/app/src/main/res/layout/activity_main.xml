@@ -21,25 +21,52 @@
             android:layout_height="wrap_content">
 
             <android.support.design.widget.TabLayout
-                app:tabMinWidth="90dp"
                 android:id="@+id/tabLayout"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:tabMinWidth="90dp">
 
                 <android.support.design.widget.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:text="@string/join"
-                    android:minWidth="60dp"/>
-
+                    android:minWidth="60dp"
+                    android:text="@string/join" />
 
                 <android.support.design.widget.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/create" />
 
+                <android.support.design.widget.TabItem
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/manual" />
+
             </android.support.design.widget.TabLayout>
-            
+
+
+            <TextView
+                style="@style/IconTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_toStartOf="@+id/press_help_button"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="@{viewModel.openHistoryClicked}"
+                android:text="@string/icons_ai_database" />
+
+            <TextView
+                android:id="@+id/press_help_button"
+                style="@style/IconTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:clickable="true"
+                android:focusable="true"
+                android:onClick="@{viewModel.openHelpClicked}"
+                android:text="@string/icons_ai_help" />
+
+
         </RelativeLayout>
 
         <android.support.v4.view.ViewPager
