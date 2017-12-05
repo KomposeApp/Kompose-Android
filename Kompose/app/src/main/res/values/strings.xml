@@ -44,10 +44,14 @@
     <string name="youtube_service.download_failed">could not resolve the song details :(</string>
     <string name="title_activity_test_frontend">TestFrontendActivity</string>
     <string name="title_activity_playlist">Kompose</string>
-    <string name="leave_session">leave session</string>
-    <string name="show_history">show history</string>
     <string name="youtube_link">youtube link</string>
-    <string name="add_link">add youtube link</string>
+
+    <!--Playlist context menu-->
+    <string name="add_link">Add youtube link</string>
+    <string name="show_history">History</string>
+    <string name="leave_session">Leave session</string>
+    <string name="host_info">Host info</string>
+
     <string name="add_youtube_link">add youtube link</string>
     <string name="confirm">confirm</string>
     <string name="close">close</string>

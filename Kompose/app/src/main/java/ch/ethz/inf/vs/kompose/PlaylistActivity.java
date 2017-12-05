@@ -21,6 +21,7 @@ import java.util.UUID;
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
+import ch.ethz.inf.vs.kompose.databinding.DialogHostInfoBinding;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -193,15 +194,28 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 binding.setViewModel(viewModel);
                 songRequestDialog.show();
                 return true;
+
             case R.id.leave_session:
                 Log.d(LOG_TAG, "Left the party by pressing the button");
                 finish();
                 return true;
+
             case R.id.show_history:
                 Log.d(LOG_TAG, "History button pressed from Playlist Activity");
                 Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
                 startActivity(historyIntent);
                 return true;
+
+            case R.id.host_info:
+                Dialog hostInfoDialog = new Dialog(this);
+                hostInfoDialog.setCancelable(true);
+                DialogHostInfoBinding hostInfoBinding = DataBindingUtil.inflate(
+                    getLayoutInflater().from(this), R.layout.dialog_host_info,
+                        null, false);
+                hostInfoDialog.setContentView(hostInfoBinding.getRoot());
+                hostInfoBinding.setViewModel(viewModel);
+                hostInfoDialog.show();
+
             default:
                 return super.onOptionsItemSelected(item);
         }

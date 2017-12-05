@@ -6,4 +6,6 @@
         android:title="@string/show_history" />
     <item android:id="@+id/leave_session"
         android:title="@string/leave_session" />
+    <item android:id="@+id/host_info"
+        android:title="@string/host_info" />
 </menu>
