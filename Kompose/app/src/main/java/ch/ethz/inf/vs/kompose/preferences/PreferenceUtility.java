@@ -42,38 +42,38 @@ public class PreferenceUtility {
         sEdits.commit();
     }
 
-    public void setCurrentUsername(String username){
+    public void setUsername(String username){
         sEdits.putString(KEY_USERNAME, username);
     }
-    public void setCurrentSessionName(String sessionName){
+    public void setSessionName(String sessionName){
         sEdits.putString(KEY_SESSIONNAME, sessionName);
     }
-    public void setCurrentHostPort(int port){
+    public void setHostPort(int port){
         sEdits.putInt(KEY_HPORT, port);
     }
-    public void setCurrentClientPort(int port) {
+    public void setClientPort(int port) {
         sEdits.putInt(KEY_CPORT, port);
     }
-    public void setCurrentPreload( int preload){
+    public void setPreload( int preload){
         sEdits.putInt(KEY_PRELOAD, preload);
     }
     public void setCurrentCacheSize( int cacheSize){
         sEdits.putInt(KEY_CACHESIZE, cacheSize);
     }
 
-    public String getCurrentUsername(){
+    public String getUsername(){
         return sPrefs.getString(KEY_USERNAME, DEFAULT_USERNAME);
     }
-    public String getCurrentSessionName(){
+    public String getSessionName(){
         return sPrefs.getString(KEY_SESSIONNAME, DEFAULT_SESSIONNAME);
     }
-    public int getCurrentHostPort(){
+    public int getHostPort(){
         return sPrefs.getInt(KEY_HPORT, DEFAULT_PORT);
     }
-    public int getCurrentClientPort(){
+    public int getClientPort(){
         return sPrefs.getInt(KEY_CPORT, DEFAULT_PORT);
     }
-    public int getCurrentPreload(){
+    public int getPreload(){
         return sPrefs.getInt(KEY_PRELOAD, DEFAULT_PRELOAD);
     }
     public int getCurrentCacheSize(){

@@ -51,12 +51,12 @@ public class SettingsActivity extends AppCompatActivity {
 
         // Display current values
         util = StateSingleton.getInstance().getPreferenceUtility();
-        username_input.setText(util.getCurrentUsername());
-        sessionname_input.setText(util.getCurrentSessionName());
-        hostport_input.setText(String.valueOf(util.getCurrentHostPort()));
-        clientport_input.setText(String.valueOf(util.getCurrentClientPort()));
-        preload_input.setText(String.valueOf(util.getCurrentPreload()));
         cachesize_input.setText(String.valueOf(util.getCurrentCacheSize()));
+        username_input.setText(util.getUsername());
+        sessionname_input.setText(util.getSessionName());
+        hostport_input.setText(String.valueOf(util.getHostPort()));
+        clientport_input.setText(String.valueOf(util.getClientPort()));
+        preload_input.setText(String.valueOf(util.getPreload()));
     }
 
     /**
@@ -91,39 +91,39 @@ public class SettingsActivity extends AppCompatActivity {
         boolean valid_port;
         String error_text = "";
         if (username_text.isEmpty()){
-            username_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            username_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_username) + "\n";
             commitChanges = false;
         }
 
         if (sessionname_text.isEmpty()){
-            username_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            username_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_sessionname) + "\n";
             commitChanges = false;
         }
 
         if (Integer.valueOf(preload_text) > MAXPRELOAD) {
-            preload_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            preload_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_preload) + ": " + MAXPRELOAD + "\n";
             commitChanges = false;
         }
 
         if (Integer.valueOf(cachesize_text) > MAXCACHE) {
-            cachesize_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            cachesize_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_cache) + ": "+ MAXCACHE + "\n";
             commitChanges = false;
         }
 
         valid_port = checkPortValidity(hostport_text);
         if (!valid_port){
-            hostport_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            hostport_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_hostport) + "\n";
             commitChanges = false;
         }
 
         valid_port = checkPortValidity(clientport_text);
         if (!valid_port){
-            clientport_input.setTextColor(getResources().getColor(R.color.colorRedFlat));
+            clientport_input.setTextColor(getResources().getColor(R.color.colorAccent));
             error_text += getString(R.string.setting_error_clientport) + "\n";
             commitChanges = false;
         }
@@ -136,11 +136,11 @@ public class SettingsActivity extends AppCompatActivity {
             int preload = Integer.valueOf(preload_text);
             int cachesize = Integer.valueOf(cachesize_text);
 
-            util.setCurrentUsername(username_text);
-            util.setCurrentSessionName(sessionname_text);
-            util.setCurrentHostPort(Integer.valueOf(hostport_text));
-            util.setCurrentClientPort(Integer.valueOf(clientport_text));
-            util.setCurrentPreload(preload);
+            util.setUsername(username_text);
+            util.setSessionName(sessionname_text);
+            util.setHostPort(Integer.valueOf(hostport_text));
+            util.setClientPort(Integer.valueOf(clientport_text));
+            util.setPreload(preload);
             util.setCurrentCacheSize(cachesize);
             util.applyChanges();
 

@@ -34,7 +34,7 @@ public class ClientNetworkService extends Service {
     private boolean initialized = false;
     private int actualLocalPort = 0;
 
-    //NOTE: This Socket is closed in two locations: From the ConnectActivity during Registration,
+    //NOTE: This Socket is closed in two locations: From the MainActivity during Registration,
     //      and during onPostExecute() of the ClientListenerTask.
     private ServerSocket clientServerSocket;
 
@@ -48,7 +48,7 @@ public class ClientNetworkService extends Service {
      * Prepare for onStartCommand
      **/
     public void initSocketListener() throws IOException {
-        int clientPort = StateSingleton.getInstance().getPreferenceUtility().getCurrentClientPort();
+        int clientPort = StateSingleton.getInstance().getPreferenceUtility().getClientPort();
         this.clientServerSocket = new ServerSocket(clientPort);
         this.initialized = true;
 

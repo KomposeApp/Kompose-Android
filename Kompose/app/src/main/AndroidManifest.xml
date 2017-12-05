@@ -24,16 +24,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".PartyCreationActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="Create your own Party"
-            android:screenOrientation="portrait" />
-        <activity
-            android:name=".ConnectActivity"
-            android:configChanges="orientation|screenSize"
-            android:label="Choose a Party"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".PlaylistActivity"
             android:configChanges="orientation|screenSize"
             android:label="@string/title_activity_playlist"
@@ -59,8 +49,6 @@
             android:stopWithTask="true" />
         <service android:name=".service.client.ClientNetworkService" />
         <service android:name=".service.AudioService" />
-
-        <activity android:name=".DesignActivity" />
 
         <!-- Activity used exclusively to share songs -->
         <activity

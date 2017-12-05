@@ -12,40 +12,25 @@
 
 
     <LinearLayout
+        style="@style/TileLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        android:orientation="horizontal">
-
-        <Button
-            android:layout_width="wrap_content"
+        <TextView
+            style="@style/PrimaryTextView"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/russoone_regular"
-            android:onClick="@{viewHolder.onJoinClick}"
-            android:textColor="@color/buttonTextColor"
-            android:text="@string/join" />
+            android:text="@{viewHolder.item.name}"
+            tools:text="margeths session" />
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="3pt">
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{viewHolder.item.name}"
-                android:textColor="@color/textColor"
-                tools:text="margeths session" />
-
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@{viewHolder.item.name}"
-                android:textColor="@color/textColorGray"
-                tools:text="margareth" />
-
-        </LinearLayout>
+        <TextView
+            style="@style/SecondaryTextView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@{viewHolder.item.name}"
+            tools:text="margareth" />
 
     </LinearLayout>
+
 </layout>

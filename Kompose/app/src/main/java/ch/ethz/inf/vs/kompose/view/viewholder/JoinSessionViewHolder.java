@@ -30,16 +30,16 @@ public class JoinSessionViewHolder<TModelViewBinding extends ViewDataBinding> ex
         this.listener = listener;
     }
 
-    public void onJoinClick(View v) {
-        int pos = this.getAdapterPosition();
+
+    @Override
+    public void onClick(View v) {
+        int position = this.getAdapterPosition();
         if (listener != null) {
-            listener.joinButtonClicked(v, pos);
+            listener.joinButtonClicked(v, position);
         }
     }
 
-
-    public interface ClickListener
-    {
+    public interface ClickListener {
         void joinButtonClicked(View v, int position);
     }
 }

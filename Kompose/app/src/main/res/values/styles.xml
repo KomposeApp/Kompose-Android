@@ -25,4 +25,58 @@
 
     <style name="KomposeTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+
+    <style name="RootLayout">
+
+    </style>
+
+    <style name="TextContentLayout">
+        <item name="android:padding">3pt</item>
+    </style>
+
+    <style name="TileLayout">
+        <item name="android:padding">3pt</item>
+        <item name="android:background">@color/greyBackground</item>
+        <item name="android:layout_marginLeft">3pt</item>
+        <item name="android:layout_marginRight">3pt</item>
+
+        <item name="android:layout_marginBottom">1.5pt</item>
+        <item name="android:layout_marginTop">1.5pt</item>
+
+        <item name="android:elevation">1pt</item>
+    </style>
+
+
+    <style name="BaseTextView">
+        <item name="android:fontFamily">@font/opensans_regular</item>
+        <item name="android:textColor">@color/textColor</item>
+        <item name="android:textSize">7pt</item>
+    </style>
+
+    <style name="PrimaryTextView" parent="BaseTextView">
+        <item name="android:fontFamily">@font/opensans_regular</item>
+        <item name="android:textSize">10pt</item>
+        <item name="android:textColor">#000</item>
+    </style>
+
+    <style name="SecondaryTextView" parent="BaseTextView">
+
+    </style>
+
+    <style name="IconTextView" parent="BaseTextView">
+        <item name="android:fontFamily">@font/androidicons</item>
+        <item name="android:textSize">5.7pt</item>
+        <item name="android:padding">7.4pt</item>
+    </style>
+
+
+    <style name="DefaultEditText">
+        <item name="android:layout_marginStart">-2pt</item>
+    </style>
+
+    <style name="LabelTextView" parent="BaseTextView">
+        <item name="android:layout_marginBottom">-2pt</item>
+        <item name="android:textColor">#000</item>
+    </style>
+
 </resources>

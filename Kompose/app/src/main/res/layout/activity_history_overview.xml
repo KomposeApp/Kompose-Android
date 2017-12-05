@@ -11,6 +11,7 @@
     </data>
 
     <LinearLayout
+        style="@style/RootLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -18,8 +19,9 @@
         <android.support.v7.widget.RecyclerView
             android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="3pt"
+            android:layout_height="match_parent"
+            android:paddingBottom="1.5pt"
+            android:paddingTop="1.5pt"
             tools:listitem="@layout/past_session_view">
 
         </android.support.v7.widget.RecyclerView>

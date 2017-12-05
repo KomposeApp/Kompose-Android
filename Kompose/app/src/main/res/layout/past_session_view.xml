@@ -14,16 +14,14 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3pt"
-        android:background="#efefef"
         android:orientation="vertical"
-        android:padding="3pt">
+        style="@style/TileLayout">
 
         <TextView
+            style="@style/PrimaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@{viewHolder.item.name}"
-            android:textColor="#000"
             tools:text="example name of session" />
 
 
@@ -33,16 +31,19 @@
             android:orientation="horizontal">
 
             <TextView
+                style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@{String.valueOf(viewHolder.item.allSongList.size())}"
                 tools:text="300" />
 
             <TextView
+                style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="2pt"
                 android:text="@string/songs_contained"
-                tools:text=" songs contained" />
+                tools:text="songs contained" />
 
         </LinearLayout>
 
