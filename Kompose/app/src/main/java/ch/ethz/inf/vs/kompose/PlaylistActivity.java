@@ -15,6 +15,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.UUID;
 
@@ -124,8 +125,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             activeSession.setSessionStatus(SessionStatus.ACTIVE);
         }
 
+        URI youtubeURI;
+        try {
+            youtubeURI = URI.create(youtubeUrl);
+        } catch (IllegalArgumentException e) {
+            showError("Invalid URL");
+            return;
+        } catch (NullPointerException e) {
+            showError("Invalid URL");
+            return;
+        }
         SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
-        songModel.setSourceUrl(URI.create(youtubeUrl));
+        songModel.setSourceUrl(youtubeURI);
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(songModel, new SongRequestListener(this));
