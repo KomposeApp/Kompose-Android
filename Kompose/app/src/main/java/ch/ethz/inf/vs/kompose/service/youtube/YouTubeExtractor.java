@@ -210,6 +210,9 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
                 songModel.setTitle(title);
                 songModel.setVideoID(videoID);
 
+                if (downloadUrl.contains("\"")) {
+                    downloadUrl = downloadUrl.replace("\"", "");
+                }
                 songModel.setDownloadUrl(URI.create(downloadUrl));
                 songModel.setThumbnailUrl(URI.create(thumbnailUrl));
                 songModel.setSecondsLength((int) length);
