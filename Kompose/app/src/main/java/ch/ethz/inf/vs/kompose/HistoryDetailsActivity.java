@@ -29,7 +29,7 @@ public class HistoryDetailsActivity extends AppCompatActivity implements PlayedS
         ActivityHistoryDetailsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_history_details);
 
         binding.list.setLayoutManager(new LinearLayoutManager(this));
-        binding.list.setAdapter(new PlayedSongAdapter(viewModel.getSessionModel().getAllSongList(), getLayoutInflater(), this));
+        binding.list.setAdapter(new PlayedSongAdapter(viewModel.getSessionModel().getAllSongs(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
     }
 }

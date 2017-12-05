@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="@string/connect_manually" />
 
-        <LinearLayout style="@style/DividerLayout" />
+        <LinearLayout style="@style/HorizontalDividerLayout" />
 
         <TextView
             style="@style/LabelTextView"

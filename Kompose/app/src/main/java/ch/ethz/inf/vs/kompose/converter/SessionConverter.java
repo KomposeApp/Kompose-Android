@@ -16,6 +16,7 @@ import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
 /**
  * Convert Session data representation to model representation, and vice-versa.
@@ -43,7 +44,11 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         if (session.getClients() != null) {
             ClientConverter clientConverter = new ClientConverter(sessionModel);
             for (Client client : session.getClients()) {
-                sessionModel.getClients().add(clientConverter.convert(client));
+                ClientModel clientModel = clientConverter.convert(client);
+                if (client.getUuid().equals(session.getHostUuid())) {
+                    sessionModel.setHostName(clientModel.getName());
+                }
+                sessionModel.getClients().add(clientModel);
             }
         }
 
@@ -51,7 +56,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         if (session.getSongs() != null) {
             SongConverter songConverter = new SongConverter(sessionModel.getClients());
             for (Song song : session.getSongs()) {
-                sessionModel.getAllSongList().add(songConverter.convert(song));
+                sessionModel.getAllSongs().add(songConverter.convert(song));
             }
         }
 
@@ -75,10 +80,10 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         //convert song models to data
         SongConverter songConverter = new SongConverter(clientModels);
         List<Song> songs = new ArrayList<>();
-        for (int i = 0; i < sessionModel.getAllSongList().size(); i++) {
+        for (int i = 0; i < sessionModel.getAllSongs().size(); i++) {
             //explude resolving songs as they only should exist temporary
-            if (sessionModel.getAllSongList().get(i).getSongStatus() != SongStatus.RESOLVING) {
-                songs.add(songConverter.convert(sessionModel.getAllSongList().get(i)));
+            if (sessionModel.getAllSongs().get(i).getSongStatus() != SongStatus.RESOLVING) {
+                songs.add(songConverter.convert(sessionModel.getAllSongs().get(i)));
             }
         }
         if (songs.size() > 0) {

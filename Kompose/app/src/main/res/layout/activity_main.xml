@@ -50,7 +50,7 @@
 
 
             <TextView
-                style="@style/IconTextView"
+                style="@style/IconButtonTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_toStartOf="@+id/press_help_button"
@@ -61,7 +61,7 @@
 
             <TextView
                 android:id="@+id/press_help_button"
-                style="@style/IconTextView"
+                style="@style/IconButtonTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"

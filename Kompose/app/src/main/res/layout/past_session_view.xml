@@ -11,41 +11,60 @@
     </data>
 
 
-    <LinearLayout
+    <RelativeLayout
+        style="@style/TileLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        style="@style/TileLayout">
-
-        <TextView
-            style="@style/PrimaryTextView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@{viewHolder.item.name}"
-            tools:text="example name of session" />
-
+        android:layout_height="wrap_content">
 
         <LinearLayout
+            android:id="@+id/session_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/PrimaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{viewHolder.item.name}"
+                tools:text="example name of session" />
 
             <TextView
                 style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{String.valueOf(viewHolder.item.allSongList.size())}"
+                android:text="@{viewHolder.item.creationDateTime.toString(`dd.MM.yyyy HH:mm`)}"
+                tools:text="30.01.2017 05:30" />
+        </LinearLayout>
+
+        <LinearLayout
+            style="@style/VerticalDividerLayout"
+            android:layout_height="match_parent"
+            android:layout_toEndOf="@id/session_container"
+            android:layout_toStartOf="@+id/songs_container"
+            tools:layout_height="50dp"/>
+
+        <LinearLayout
+            android:id="@+id/songs_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/PrimaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{String.valueOf(viewHolder.item.allSongs.size())}"
+                android:textAlignment="center"
                 tools:text="300" />
 
             <TextView
                 style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="2pt"
-                android:text="@string/songs_contained"
-                tools:text="songs contained" />
-
+                android:text="@string/songs" />
         </LinearLayout>
 
-    </LinearLayout>
+    </RelativeLayout>
 </layout>

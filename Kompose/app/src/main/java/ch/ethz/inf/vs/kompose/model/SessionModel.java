@@ -78,7 +78,7 @@ public class SessionModel extends UniqueModel {
     /**
      * @return all songs from this session, weather played, not yet played or skipped
      */
-    public ObservableUniqueSortedList<SongModel> getAllSongList() {
+    public ObservableUniqueSortedList<SongModel> getAllSongs() {
         return allSongList;
     }
 

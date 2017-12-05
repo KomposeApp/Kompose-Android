@@ -173,7 +173,7 @@ public class IncomingMessageHandler implements Runnable {
 
     private void adaptLists(SessionModel sessionModel) {
         boolean playingSet = false;
-        for (SongModel songModel : sessionModel.getAllSongList()) {
+        for (SongModel songModel : sessionModel.getAllSongs()) {
             if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_ERROR)) {
                 //in played queue
                 sessionModel.getPastSongs().add(songModel);
@@ -268,7 +268,7 @@ public class IncomingMessageHandler implements Runnable {
 
                 // remove the client's downvotes
                 UUID clientUUID = clientModel.getUUID();
-                for (SongModel songModel : sessionModel.getAllSongList()) {
+                for (SongModel songModel : sessionModel.getAllSongs()) {
                     for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
                         if (downVoteModel.getUuid().equals(clientUUID)) {
                             songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
@@ -289,12 +289,12 @@ public class IncomingMessageHandler implements Runnable {
         SongConverter songConverter = new SongConverter(sessionModel.getClients());
         final SongModel songModel = songConverter.convert(song);
         songModel.setSongStatus(SongStatus.IN_QUEUE);
-        songModel.setOrder(sessionModel.getAllSongList().size() + 1);
+        songModel.setOrder(sessionModel.getAllSongs().size() + 1);
 
         return new Runnable() {
             @Override
             public void run() {
-                sessionModel.getAllSongList().add(songModel);
+                sessionModel.getAllSongs().add(songModel);
             }
         };
     }
@@ -306,7 +306,7 @@ public class IncomingMessageHandler implements Runnable {
         UUID senderUUIDAsUUID = UUID.fromString(senderUUID);
 
         // find the song in the session model
-        for (SongModel song : activeSessionModel.getAllSongList()) {
+        for (SongModel song : activeSessionModel.getAllSongs()) {
             String songUUID = song.getUUID().toString();
             if (requestedSongUUID.equals(songUUID)) {
 
@@ -344,8 +344,8 @@ public class IncomingMessageHandler implements Runnable {
 
     private Runnable removeSkipSongVote(Message message, SessionModel activeSessionModel) {
         // find the song in the session
-        for (int i = 0; i < activeSessionModel.getAllSongList().size(); i++) {
-            final SongModel songModel = activeSessionModel.getAllSongList().get(i);
+        for (int i = 0; i < activeSessionModel.getAllSongs().size(); i++) {
+            final SongModel songModel = activeSessionModel.getAllSongs().get(i);
             String songUUID = songModel.getUUID().toString();
             String requestedSongUUID = message.getSongDetails().getUuid();
             if (songUUID.equals(requestedSongUUID)) {
@@ -401,9 +401,9 @@ public class IncomingMessageHandler implements Runnable {
                     }
                 }
 
-                for (SongModel updateSong : sessionModel.getAllSongList()) {
+                for (SongModel updateSong : sessionModel.getAllSongs()) {
                     boolean found = false;
-                    for (SongModel activeSong : activeSessionModel.getAllSongList()) {
+                    for (SongModel activeSong : activeSessionModel.getAllSongs()) {
                         if (updateSong.getUUID().equals(activeSong.getUUID())) {
                             updateSong(updateSong, activeSong);
                             found = true;
@@ -433,7 +433,7 @@ public class IncomingMessageHandler implements Runnable {
                         }
                     }
                     if (!found) {
-                        activeSessionModel.getAllSongList().add(updateSong);
+                        activeSessionModel.getAllSongs().add(updateSong);
                     }
                 }
             }

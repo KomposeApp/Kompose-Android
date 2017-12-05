@@ -56,9 +56,9 @@ public class SampleService {
         }
 
         for (SongModel songModel : sessionModel.getPastSongs()) {
-            sessionModel.getAllSongList().add(songModel);
+            sessionModel.getAllSongs().add(songModel);
         }
-        sessionModel.getAllSongList().add(sessionModel.getCurrentlyPlaying());
+        sessionModel.getAllSongs().add(sessionModel.getCurrentlyPlaying());
 
 
         Iterator<SongModel> iterator = sessionModel.getPlayQueue().iterator();

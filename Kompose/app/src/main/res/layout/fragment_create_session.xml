@@ -23,8 +23,7 @@
             android:layout_height="wrap_content"
             android:text="@string/start_own_party" />
 
-        <LinearLayout style="@style/DividerLayout" />
-
+        <LinearLayout style="@style/HorizontalDividerLayout" />
 
         <TextView
             style="@style/LabelTextView"

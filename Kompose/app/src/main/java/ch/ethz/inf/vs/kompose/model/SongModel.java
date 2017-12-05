@@ -213,10 +213,11 @@ public class SongModel extends UniqueModel {
         this.mediaPlayer = mediaPlayer;
     }
 
-    public String getVideoID(){
+    public String getVideoID() {
         return videoID;
     }
-    public void setVideoID(String id){
+
+    public void setVideoID(String id) {
         this.videoID = id;
     }
 

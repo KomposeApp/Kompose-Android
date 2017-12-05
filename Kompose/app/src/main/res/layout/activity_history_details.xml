@@ -58,7 +58,7 @@
                     style="@style/SecondaryTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{viewModel.sessionModel.creationDateTime.toString()}"
+                    android:text="@{viewModel.sessionModel.creationDateTime.toString(`dd.MM.yyyy HH:mm`)}"
                     tools:text="20.08.2015" />
 
             </LinearLayout>
@@ -94,7 +94,7 @@
                     style="@style/SecondaryTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@{String.valueOf(viewModel.sessionModel.allSongList.size())}"
+                    android:text="@{String.valueOf(viewModel.sessionModel.allSongs.size())}"
                     tools:text="3" />
 
             </LinearLayout>

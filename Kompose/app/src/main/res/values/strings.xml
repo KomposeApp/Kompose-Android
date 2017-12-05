@@ -176,4 +176,5 @@
     <string name="join_existing_party">join an existing party and add your own songs to the playlist</string>
     <string name="start_own_party">connect your device to the music station, and start your own party</string>
     <string name="connect_manually">having trouble connecting to the party host? connect here manually</string>
+    <string name="songs">songs</string>
 </resources>
