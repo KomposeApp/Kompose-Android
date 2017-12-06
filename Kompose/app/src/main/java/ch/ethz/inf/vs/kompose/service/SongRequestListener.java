@@ -27,8 +27,7 @@ public class SongRequestListener implements SimpleListener<Integer, SongModel> {
             Log.e(LOG_TAG, "resolving url failed");
             Toast.makeText(ctx, "Failed to resolve Youtube URL", Toast.LENGTH_LONG).show();
 
-            SessionModel sessionModel =
-                    StateSingleton.getInstance().getActiveSession();
+            SessionModel sessionModel = StateSingleton.getInstance().getActiveSession();
             if (sessionModel != null && sessionModel.getPlayQueue().contains(value)) {
                 sessionModel.getPlayQueue().remove(value);
             }
