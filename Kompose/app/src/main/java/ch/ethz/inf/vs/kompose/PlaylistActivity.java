@@ -8,6 +8,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
@@ -100,6 +101,10 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         binding.setViewModel(viewModel);
 
         findViewById(R.id.currently_playing_title).setSelected(true);
+
+        // setup toolbar
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.kompose_toolbar_playlist);
+        setSupportActionBar(mainToolbar);
     }
 
     @Override
