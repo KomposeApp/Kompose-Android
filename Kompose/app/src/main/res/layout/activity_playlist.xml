@@ -81,20 +81,39 @@
                         tools:text="4:20 (Added by: Big Shaq)" />
 
                     <!--<TextView-->
-                        <!--android:id="@+id/currently_playing_seconds_proposed_by_name"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:text="@{`Added by: ` + viewModel.sessionModel.currentlyPlaying.proposedBy.name}"-->
-                        <!--tools:text="Added by: Big Shaq" />-->
+                    <!--android:id="@+id/currently_playing_seconds_proposed_by_name"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="@{`Added by: ` + viewModel.sessionModel.currentlyPlaying.proposedBy.name}"-->
+                    <!--tools:text="Added by: Big Shaq" />-->
+
+                    <!-- DO NOT REMOVE ? PROGRESS STYLE. MINUTES WAISTED: 20 -->
+                    <ProgressBar
+                        android:id="@+id/my_seek"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/content_wrapper"
+                        android:indeterminateOnly="false"
+                        android:max="100"
+                        android:progress="@{viewModel.sessionModel.currentlyPlaying.playbackProgress}"
+                        tools:progress="25"
+                        tools:visibility="visible"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignEnd="@id/down_vote_button"
+                        android:layout_marginEnd="17pt"/>
 
                     <!--Down vote button-->
                     <TextView
+                        android:id="@+id/down_vote_button"
                         style="@style/SmallIconButtonTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:layout_toStartOf="@id/play_button_wrapper"
-                        android:text="@string/icons_ai_halt" />
+                        android:onClick="@{viewModel.onDownVoteClicked}"
+                        android:text="@string/icons_ai_halt"
+                        android:textColor="@{viewModel.sessionModel.currentlyPlaying.skipVoteCasted ? @color/colorAccent : @color/textColor}" />
 
                     <!--Play button wrapper-->
                     <RelativeLayout
@@ -159,7 +178,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/list"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_marginLeft="0pt"
                 android:layout_marginRight="0pt"
                 android:layout_marginTop="10pt"

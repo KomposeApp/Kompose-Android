@@ -174,6 +174,7 @@ public class IncomingMessageHandler implements Runnable {
 
     private void adaptLists(SessionModel sessionModel) {
         boolean playingSet = false;
+        int quorum = sessionModel.getActiveDevices() / 2;
         for (SongModel songModel : sessionModel.getAllSongs()) {
             if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_ERROR)) {
                 //in played queue
@@ -186,7 +187,6 @@ public class IncomingMessageHandler implements Runnable {
                 }
             } else if (songModel.getSongStatus().equals(SongStatus.PLAYING) || songModel.getSongStatus().equals(SongStatus.PAUSED)) {
                 playingSet = true;
-                sessionModel.setCurrentlyPlaying(songModel);
                 if (sessionModel.getPlayQueue().contains(songModel)) {
                     sessionModel.getPlayQueue().remove(songModel);
                 }
@@ -196,13 +196,19 @@ public class IncomingMessageHandler implements Runnable {
                 if (sessionModel.getPastSongs().contains(songModel)) {
                     sessionModel.getPastSongs().remove(songModel);
                 }
+                if (songModel.getValidDownVoteCount() > quorum) {
+                    songModel.setSongStatus(SongStatus.SKIPPED_BY_POPULAR_VOTE);
+                    sessionModel.setCurrentlyPlaying(null);
+                } else {
+                    sessionModel.setCurrentlyPlaying(songModel);
+                }
             } else if (songModel.getSongStatus().equals(SongStatus.IN_QUEUE) || songModel.getSongStatus().equals(SongStatus.REQUESTED)) {
                 if (sessionModel.getPastSongs().contains(songModel)) {
                     sessionModel.getPastSongs().remove(songModel);
                 }
 
-                int quorum = sessionModel.getActiveDevices() / 2;
                 if (songModel.getValidDownVoteCount() > quorum) {
+                    songModel.setSongStatus(SongStatus.SKIPPED_BY_POPULAR_VOTE);
                     //add to skipped if not played
                     if (sessionModel.getPlayQueue().contains(songModel)) {
                         sessionModel.getPlayQueue().remove(songModel);

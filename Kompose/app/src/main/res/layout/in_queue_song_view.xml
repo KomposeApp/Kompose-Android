@@ -83,7 +83,7 @@
                 </LinearLayout>
             </LinearLayout>
 
-            <!-- DO NOT REMOVE PROGRESS STYLE. MINUTES WAISTED: 20 -->
+            <!-- DO NOT REMOVE ? PROGRESS STYLE. MINUTES WAISTED: 20 -->
             <ProgressBar
                 android:id="@+id/my_seek"
                 style="?android:attr/progressBarStyleHorizontal"

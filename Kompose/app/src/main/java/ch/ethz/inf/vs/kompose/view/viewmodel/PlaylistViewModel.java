@@ -51,6 +51,12 @@ public class PlaylistViewModel extends BaseViewModel {
         }
     }
 
+    public void onDownVoteClicked(View view) {
+        if (listener != null) {
+            listener.downVoteCurrentlyClicked(view);
+        }
+    }
+
 
     public interface ClickListener {
         void addSongClicked(View v);
@@ -58,5 +64,7 @@ public class PlaylistViewModel extends BaseViewModel {
         void playClicked(View v);
 
         void pauseClicked(View v);
+
+        void downVoteCurrentlyClicked(View v);
     }
 }

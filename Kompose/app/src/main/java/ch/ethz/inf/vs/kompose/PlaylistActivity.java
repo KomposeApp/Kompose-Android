@@ -227,10 +227,16 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     @Override
     public void downVoteClicked(View v, int position) {
         SongModel songModel = viewModel.getSessionModel().getPlayQueue().get(position);
-        if (songModel.getSkipVoteCasted()) {
-            responseHandler.sendRemoveSkipSongVote(songModel);
-        } else {
-            responseHandler.sendCastSkipSongVote(songModel);
+        toggleDownVote(songModel);
+    }
+
+    private void toggleDownVote(SongModel songModel) {
+        if (songModel != null) {
+            if (songModel.getSkipVoteCasted()) {
+                responseHandler.sendRemoveSkipSongVote(songModel);
+            } else {
+                responseHandler.sendCastSkipSongVote(songModel);
+            }
         }
     }
 
@@ -257,5 +263,8 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         }
     }
 
-
+    @Override
+    public void downVoteCurrentlyClicked(View v) {
+        toggleDownVote(viewModel.getSessionModel().getCurrentlyPlaying());
+    }
 }

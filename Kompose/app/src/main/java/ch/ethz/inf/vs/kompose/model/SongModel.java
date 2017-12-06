@@ -27,7 +27,6 @@ public class SongModel extends UniqueModel {
     private String title;
     private String videoID;
     private int secondsLength;
-    private String getSongLengthMinSec;
     private int order;
 
     private int validDownVoteCount;
@@ -45,6 +44,7 @@ public class SongModel extends UniqueModel {
     private SongStatus songStatus = SongStatus.REQUESTED;
     private DownloadStatus downloadStatus = DownloadStatus.NOT_STARTED;
     private int downloadProgress = 0;
+    private int playbackProgress = 0;
 
     private Drawable thumbnail;
     private File downloadPath;
@@ -233,5 +233,15 @@ public class SongModel extends UniqueModel {
     public void setDownloadProgress(int downloadProgress) {
         this.downloadProgress = downloadProgress;
         notifyPropertyChanged(BR.downloadProgress);
+    }
+
+    @Bindable
+    public int getPlaybackProgress() {
+        return playbackProgress;
+    }
+
+    public void setPlaybackProgress(int playbackProgress) {
+        this.playbackProgress = playbackProgress;
+        this.notifyPropertyChanged(BR.playbackProgress);
     }
 }

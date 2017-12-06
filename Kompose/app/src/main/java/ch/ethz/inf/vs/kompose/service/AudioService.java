@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
 import android.content.Intent;
+import android.databinding.Observable;
 import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
@@ -13,12 +14,15 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.util.StateSet;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.concurrent.Phaser;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -39,11 +43,43 @@ public class AudioService extends Service {
 
         Log.d(LOG_TAG, "started");
         sessionModel = StateSingleton.getInstance().getActiveSession();
+        sessionModel.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+
+            @Override
+            public void onPropertyChanged(Observable observable, int i) {
+                if (i == BR.currentlyPlaying) {
+                    SessionModel sessionModel = (SessionModel) observable;
+                    if (connectedSongModel != sessionModel.getCurrentlyPlaying()) {
+                        if (connectedSongModel != null) {
+                            connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
+                            connectedSongModel = null;
+                        }
+                        if (sessionModel.getCurrentlyPlaying() != null) {
+                            connectedSongModel = sessionModel.getCurrentlyPlaying();
+                            sessionModel.getCurrentlyPlaying().addOnPropertyChangedCallback(songModelCallback);
+                        }
+                    }
+                }
+            }
+        });
 
         // start the download worker
         downloadWorker = new DownloadWorker(this, sessionModel);
         downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
+
+    private SongModel connectedSongModel;
+    private Observable.OnPropertyChangedCallback songModelCallback = new Observable.OnPropertyChangedCallback() {
+        @Override
+        public void onPropertyChanged(Observable observable, int i) {
+            if (i == BR.songStatus) {
+                SongModel songModel = (SongModel) observable;
+                if (songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE)) {
+                    goToNextSong();
+                }
+            }
+        }
+    };
 
     @Override
     public void onDestroy() {
@@ -88,70 +124,113 @@ public class AudioService extends Service {
     }
 
     private void checkOnCurrentSong() {
-        if (sessionModel.getCurrentlyPlaying() == null) {
-            goToNextSong();
+        synchronized (StateSingleton.getInstance()) {
+            if (sessionModel.getCurrentlyPlaying() == null) {
+                goToNextSong();
+            }
         }
     }
 
-    private synchronized void goToNextSong() {
+    private void goToNextSong() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Log.d(LOG_TAG, "updating currently playing song");
-                if (sessionModel.getCurrentlyPlaying() != null) {
-                    MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
-                    mp.stop();
-                    mp.release();
+                synchronized (StateSingleton.getInstance()) {
+                    Log.d(LOG_TAG, "updating currently playing song");
+                    if (sessionModel.getCurrentlyPlaying() != null) {
+                        MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
+                        mp.stop();
+                        mp.release();
 
-                    SongModel songModel = sessionModel.getCurrentlyPlaying();
-                    songModel.setSongStatus(SongStatus.PLAYED);
-                    sessionModel.getCurrentlyPlaying().setMediaPlayer(null);
+                        SongModel songModel = sessionModel.getCurrentlyPlaying();
+                        songModel.setSongStatus(SongStatus.PLAYED);
+                        sessionModel.getCurrentlyPlaying().setMediaPlayer(null);
 
-                    sessionModel.setCurrentlyPlaying(null);
-                    Log.d(LOG_TAG, "stopping & removing current song");
-                }
+                        sessionModel.setCurrentlyPlaying(null);
+                        Log.d(LOG_TAG, "stopping & removing current song");
+                    }
 
+                    if (sessionModel.getPlayQueue().size() > 0) {
+                        SongModel chosenSong = null;
 
-                if (sessionModel.getPlayQueue().size() > 0) {
-                    SongModel chosenSong = null;
+                        for (SongModel songModel : new ArrayList<>(sessionModel.getPlayQueue())) {
+                            if (songModel.getDownloadStatus() == DownloadStatus.FINISHED) {
+                                chosenSong = songModel;
+                                break;
+                            } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
+                                //directly to trash :P
+                                sessionModel.getPlayQueue().remove(songModel);
+                                sessionModel.getPastSongs().add(songModel);
+                                songModel.setSongStatus(SongStatus.SKIPPED_BY_ERROR);
+                            } else {
+                                //else wait for download to finish
+                                break;
+                            }
+                        }
+                        if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
+                            sessionModel.getPlayQueue().remove(chosenSong);
 
-                    for (SongModel songModel : new ArrayList<>(sessionModel.getPlayQueue())) {
-                        if (songModel.getDownloadStatus() == DownloadStatus.FINISHED) {
-                            chosenSong = songModel;
-                            break;
-                        } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
-                            //directly to trash :P
-                            sessionModel.getPlayQueue().remove(songModel);
-                            sessionModel.getPastSongs().add(songModel);
-                            songModel.setSongStatus(SongStatus.SKIPPED_BY_ERROR);
-                        } else {
-                            //else wait for download to finish
-                            break;
+                            chosenSong.setSongStatus(SongStatus.PLAYING);
+                            sessionModel.setCurrentlyPlaying(chosenSong);
+
+                            MediaPlayer mediaPlayer = chosenSong.getMediaPlayer();
+                            mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                @Override
+                                public void onCompletion(MediaPlayer mp) {
+                                    goToNextSong();
+                                }
+                            });
+                            mediaPlayer.start();
+
+                            PlaybackProgressObserver observer = new PlaybackProgressObserver(chosenSong, mediaPlayer);
+                            new Thread(observer).start();
+
+                            Log.d(LOG_TAG, "now playing song: " + sessionModel.getCurrentlyPlaying().getTitle());
                         }
                     }
-                    if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
-                        sessionModel.getPlayQueue().remove(chosenSong);
 
-                        chosenSong.setSongStatus(SongStatus.PLAYING);
-                        sessionModel.setCurrentlyPlaying(chosenSong);
-
-                        MediaPlayer mediaPlayer = chosenSong.getMediaPlayer();
-                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                goToNextSong();
-                            }
-                        });
-                        mediaPlayer.start();
-
-                        Log.d(LOG_TAG, "now playing song: " + sessionModel.getCurrentlyPlaying().getTitle());
-                    }
+                    new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
                 }
-
-                new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
             }
         });
     }
+
+    private class PlaybackProgressObserver implements Runnable {
+        private AtomicBoolean stop = new AtomicBoolean(false);
+        private SongModel songModel;
+        private MediaPlayer mediaPlayer;
+
+        PlaybackProgressObserver(SongModel songModel, MediaPlayer mediaPlayer) {
+            this.songModel = songModel;
+            this.mediaPlayer = mediaPlayer;
+        }
+
+        @Override
+        public void run() {
+            while (true) {
+                if (!songModel.getSongStatus().equals(SongStatus.PAUSED) && !songModel.getSongStatus().equals(SongStatus.PLAYING)) {
+                    break;
+                }
+
+                final int position = mediaPlayer.getCurrentPosition();
+                final int duration = mediaPlayer.getDuration();
+
+                new Handler(Looper.getMainLooper()).post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Double dounb = (double) position / duration * 100;
+                        songModel.setPlaybackProgress(dounb.intValue());
+                    }
+                });
+                try {
+                    Thread.sleep(200);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
 
     public class LocalBinder extends Binder {
         public AudioService getService() {
