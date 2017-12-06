@@ -26,10 +26,10 @@
             android:id="@+id/kompose_toolbar_playlist"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
             android:elevation="4dp"
             android:theme="@style/ToolbarStyle"
-            android:background="@color/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -41,8 +41,9 @@
 
             <RelativeLayout
                 android:id="@+id/currently_playing"
+                style="@style/TileLayout"
                 android:layout_width="match_parent"
-                android:layout_height="40pt"
+                android:layout_height="50pt"
                 android:layout_marginLeft="0pt"
                 android:layout_marginRight="0pt"
                 android:background="#efefef"
@@ -51,14 +52,14 @@
 
                 <ImageView
                     android:id="@+id/image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="100dp"
+                    android:layout_height="match_parent"
                     android:layout_alignParentStart="true"
                     android:layout_marginEnd="10sp"
                     android:layout_marginStart="0sp"
                     android:contentDescription="@string/thumbnail"
+                    android:scaleType="centerCrop"
                     android:src="@{viewModel.sessionModel.currentlyPlaying.thumbnail}"
-                    tools:layout_width="100dp"
                     tools:src="@drawable/sample_thumbnail" />
 
                 <RelativeLayout
@@ -102,15 +103,48 @@
                         style="?android:attr/progressBarStyleHorizontal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
                         android:layout_below="@id/content_wrapper"
+                        android:layout_marginEnd="110dp"
                         android:indeterminateOnly="false"
                         android:max="100"
                         android:progress="@{viewModel.sessionModel.currentlyPlaying.playbackProgress}"
                         tools:progress="25"
-                        tools:visibility="visible"
+                        tools:visibility="visible" />
+
+
+                    <!--Play button wrapper-->
+
+                    <!--play button-->
+                    <TextView
+                        android:id="@+id/play_button"
+                        style="@style/SmallIconButtonTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/currently_playing_title"
                         android:layout_alignParentBottom="true"
-                        android:layout_alignEnd="@id/down_vote_button"
-                        android:layout_marginEnd="17pt"/>
+                        android:layout_toStartOf="@id/down_vote_button"
+                        android:enabled="@{viewModel.sessionModel.isHost}"
+                        android:onClick="@{viewModel.onPlayClicked}"
+                        android:text="@string/icons_ai_playback_play"
+                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PAUSED) ? View.VISIBLE : View.GONE}"
+                        tools:visibility="gone" />
+
+                    <!--pause button-->
+                    <TextView
+                        android:id="@+id/pause_button"
+                        style="@style/SmallIconButtonTextView"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/currently_playing_title"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toStartOf="@id/down_vote_button"
+                        android:enabled="@{viewModel.sessionModel.isHost}"
+                        android:fontFamily="@font/androidicons"
+                        android:onClick="@{viewModel.onPauseClicked}"
+                        android:text="@string/icons_ai_playback_pause"
+                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING) ? View.VISIBLE : View.GONE}"
+                        tools:visibility="visible" />
 
                     <!--Down vote button-->
                     <TextView
@@ -118,49 +152,13 @@
                         style="@style/SmallIconButtonTextView"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:layout_alignBottom="@id/currently_playing_title"
                         android:layout_alignParentBottom="true"
-                        android:layout_toStartOf="@id/play_button_wrapper"
+                        android:layout_alignParentEnd="true"
                         android:onClick="@{viewModel.onDownVoteClicked}"
                         android:text="@string/icons_ai_halt"
                         android:textColor="@{viewModel.sessionModel.currentlyPlaying.skipVoteCasted ? @color/colorAccent : @color/textColor}" />
 
-                    <!--Play button wrapper-->
-                    <RelativeLayout
-                        android:id="@+id/play_button_wrapper"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:layout_alignParentEnd="true">
-
-                        <!--play button-->
-                        <TextView
-                            android:id="@+id/play_button"
-                            style="@style/SmallIconButtonTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentStart="true"
-                            android:enabled="@{viewModel.sessionModel.isHost}"
-                            android:onClick="@{viewModel.onPlayClicked}"
-                            android:text="@string/icons_ai_playback_play"
-                            android:textSize="26sp"
-                            android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PAUSED) ? View.VISIBLE : View.GONE}" />
-
-                        <!--pause button-->
-                        <TextView
-                            android:id="@+id/pause_button"
-                            style="@style/SmallIconButtonTextView"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentStart="true"
-                            android:enabled="@{viewModel.sessionModel.isHost}"
-                            android:fontFamily="@font/androidicons"
-                            android:onClick="@{viewModel.onPauseClicked}"
-                            android:text="@string/icons_ai_playback_pause"
-                            android:textSize="26sp"
-                            android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING) ? View.VISIBLE : View.GONE}"
-                            tools:visibility="gone" />
-                    </RelativeLayout>
                 </RelativeLayout>
 
             </RelativeLayout>

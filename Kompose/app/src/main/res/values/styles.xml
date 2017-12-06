@@ -92,7 +92,7 @@
     </style>
 
     <style name="SmallIconButtonTextView" parent="IconButtonTextView">
-        <item name="android:textSize">24sp</item>
+        <item name="android:textSize">35sp</item>
         <item name="android:padding">2dp</item>
     </style>
 
