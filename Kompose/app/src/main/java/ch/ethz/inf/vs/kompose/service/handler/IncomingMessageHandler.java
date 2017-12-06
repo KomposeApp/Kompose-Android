@@ -86,6 +86,7 @@ public class IncomingMessageHandler implements Runnable {
         }
 
         final SessionModel activeSessionModel = StateSingleton.getInstance().getActiveSession();
+        final ClientModel myClientModel = StateSingleton.getInstance().getActiveClient();
 
         final MessageType messageType = MessageType.valueOf(message.getType());
         Log.d(LOG_TAG, "Message processing (" + messageType + ")");
@@ -111,7 +112,7 @@ public class IncomingMessageHandler implements Runnable {
                 sessionUIChanges = unregisterClient(message, activeSessionModel);
                 break;
             case SESSION_UPDATE:
-                sessionUIChanges = sessionUpdate(message, activeSessionModel);
+                sessionUIChanges = sessionUpdate(message, activeSessionModel, myClientModel);
                 break;
             case REQUEST_SONG:
                 sessionUIChanges = requestSong(message, activeSessionModel);
@@ -201,6 +202,7 @@ public class IncomingMessageHandler implements Runnable {
                 }
 
                 int quorum = sessionModel.getActiveDevices() / 2;
+                //todo: remove false
                 if (songModel.getValidDownVoteCount() > quorum && false) {
                     //add to skipped if not played
                     if (sessionModel.getPlayQueue().contains(songModel)) {
@@ -337,6 +339,7 @@ public class IncomingMessageHandler implements Runnable {
         return new Runnable() {
             @Override
             public void run() {
+                finalDownVoteTarget.setSkipVoteCasted(true);
                 finalDownVoteTarget.getDownVotes().add(downVoteModel);
             }
         };
@@ -361,6 +364,7 @@ public class IncomingMessageHandler implements Runnable {
                         return new Runnable() {
                             @Override
                             public void run() {
+                                songModel.setSkipVoteCasted(false);
                                 songModel.getDownVotes().remove(finalDownVoteModel);
                             }
                         };
@@ -372,7 +376,7 @@ public class IncomingMessageHandler implements Runnable {
         return null;
     }
 
-    private Runnable sessionUpdate(Message message, final SessionModel activeSessionModel) {
+    private Runnable sessionUpdate(Message message, final SessionModel activeSessionModel, final ClientModel myClientModel) {
         Session receivedSession = message.getSession();
 
         SessionConverter converter = new SessionConverter();
@@ -414,13 +418,20 @@ public class IncomingMessageHandler implements Runnable {
                                 for (int i = 0; i < activeDownVotes.size(); i++) {
                                     if (activeDownVotes.get(i).getUuid().equals(updateDownVote.getUuid())) {
                                         //found; remove it from the list
-                                        activeDownVotes.remove(activeDownVotes.get(i));
+                                        DownVoteModel downVoteModel = activeDownVotes.get(i);
+                                        if (downVoteModel.getClientModel().getUUID().equals(myClientModel.getUUID())) {
+                                            updateSong.setSkipVoteCasted(false);
+                                        }
+                                        activeDownVotes.remove(downVoteModel);
                                         downVoteFound = true;
                                         break;
                                     }
                                 }
                                 if (!downVoteFound) {
                                     DownVoteModel model = new DownVoteModel(updateDownVote.getUuid(), updateDownVote.getClientModel(), updateDownVote.getDownVoteFor());
+                                    if (model.getClientModel().getUUID().equals(myClientModel.getUUID())) {
+                                        updateSong.setSkipVoteCasted(true);
+                                    }
                                     activeSong.getDownVotes().add(model);
                                 }
                             }
