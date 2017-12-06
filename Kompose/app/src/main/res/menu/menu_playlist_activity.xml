@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.MainActivity">
+
     <item android:id="@+id/add_link"
-        android:title="@string/add_link" />
+        android:title="@string/add_link"
+        app:showAsAction="never" />
+
     <item android:id="@+id/show_history"
-        android:title="@string/show_history" />
+        android:title="@string/show_history"
+        app:showAsAction="never" />
+
     <item android:id="@+id/leave_session"
-        android:title="@string/leave_session" />
+        android:title="@string/leave_session"
+        app:showAsAction="never" />
+
     <item android:id="@+id/host_info"
-        android:title="@string/host_info" />
+        android:title="@string/host_info"
+        app:showAsAction="never" />
 </menu>
