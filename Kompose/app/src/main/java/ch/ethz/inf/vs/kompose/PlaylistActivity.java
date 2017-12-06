@@ -132,6 +132,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         }
         SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
         songModel.setSourceUrl(youtubeURI);
+        songModel.setTitle("downloading info...");
 
         activeSession.getPlayQueue().add(songModel);
 
