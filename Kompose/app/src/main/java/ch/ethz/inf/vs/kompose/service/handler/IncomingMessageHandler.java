@@ -201,7 +201,7 @@ public class IncomingMessageHandler implements Runnable {
                     sessionModel.getPastSongs().remove(songModel);
                 }
 
-                int quorum = sessionModel.getActiveDevices() / 2 + 1;
+                int quorum = sessionModel.getActiveDevices() / 2;
                 if (songModel.getValidDownVoteCount() > quorum) {
                     //add to skipped if not played
                     if (sessionModel.getPlayQueue().contains(songModel)) {
@@ -376,6 +376,7 @@ public class IncomingMessageHandler implements Runnable {
                             @Override
                             public void run() {
                                 songModel.setSkipVoteCasted(false);
+                                songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
                                 songModel.getDownVotes().remove(finalDownVoteModel);
                             }
                         };

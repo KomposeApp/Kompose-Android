@@ -83,7 +83,6 @@ public class OutgoingMessageHandler {
     }
 
     public void sendRequestSong(SongModel songModel) {
-        songModel.setSongStatus(SongStatus.REQUESTED);
         SongConverter songConverter = new SongConverter(getSession().getClients());
         Song song = songConverter.convert(songModel);
 

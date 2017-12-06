@@ -83,9 +83,10 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <!-- DO NOT REMOVE PROGRESS STYLE. MINUTES WAISTED: 20 -->
             <ProgressBar
                 android:id="@+id/my_seek"
-                style="android:attr/progressBarStyleHorizontal"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@id/content_wrapper"
