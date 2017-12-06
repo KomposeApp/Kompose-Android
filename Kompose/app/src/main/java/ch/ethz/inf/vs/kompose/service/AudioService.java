@@ -93,7 +93,7 @@ public class AudioService extends Service {
         }
     }
 
-    private void goToNextSong() {
+    private synchronized void goToNextSong() {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
@@ -204,7 +204,7 @@ public class AudioService extends Service {
 
     private static class DownloadWorker extends AsyncTask<Void, Void, Void> {
 
-        private final String LOG_TAG ="## DownloadWorker";
+        private final String LOG_TAG = "## DownloadWorker";
         private Phaser notifier;
         private int numSongsPreload;
         private WeakReference<AudioService> context;
@@ -238,7 +238,7 @@ public class AudioService extends Service {
                 while (numDownloaded <= numSongsPreload && index < sessionModel.getPlayQueue().size()) {
                     try {
                         final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
-                        if (nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
+                        if (nextDownload.getSongStatus().equals(SongStatus.IN_QUEUE) && nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
                             Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
 
                             new Handler(Looper.getMainLooper()).post(new Runnable() {
@@ -288,6 +288,7 @@ public class AudioService extends Service {
                     }
                 }
             }
+
             return null;
         }
     }
