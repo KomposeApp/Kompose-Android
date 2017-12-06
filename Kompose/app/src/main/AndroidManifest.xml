@@ -12,10 +12,11 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/KomposeTheme">
+        android:theme="@style/AppTheme">
+
         <activity
             android:name=".MainActivity"
-            android:label="Komposer"
+            android:label="Kompose"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait">
             <intent-filter>

@@ -1,0 +1,23 @@
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activity.MainActivity">
+
+    <item
+        android:id="@+id/main_toolbar_history"
+        android:icon="@drawable/ic_action_database"
+        android:title="@string/action_history"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/main_toolbar_help"
+        android:icon="@drawable/ic_action_help"
+        android:title="@string/action_help"
+        app:showAsAction="ifRoom"/>
+
+    <item android:id="@+id/main_toolbar_settings"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+
+</menu>

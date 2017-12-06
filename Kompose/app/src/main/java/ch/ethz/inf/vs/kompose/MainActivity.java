@@ -10,7 +10,11 @@ import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 
@@ -64,6 +68,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setViewModel(viewModel);
 
+        // setup toolbar
+        Toolbar mainToolbar = (Toolbar) findViewById(R.id.kompose_toolbar);
+        setSupportActionBar(mainToolbar);
+
         if (MainActivity.DESIGN_MODE) {
             SampleService sampleService = new SampleService();
             for (int i = 0; i < 15; i++) {
@@ -98,6 +106,33 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_toolbar_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.main_toolbar_settings:
+                return true;
+
+            case R.id.main_toolbar_history:
+                viewModel.openHistoryClicked(null);
+                return true;
+
+            case R.id.main_toolbar_help:
+                viewModel.openHelpClicked(null);
+                return true;
+
+            default:
+                // If we got here, the user's action was not recognized.
+                // Invoke the superclass to handle it.
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private final MainViewModel viewModel = new MainViewModel(this);
 
