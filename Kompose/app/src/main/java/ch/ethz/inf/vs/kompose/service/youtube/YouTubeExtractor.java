@@ -189,7 +189,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
 
                 if (iTag == -1) {
                     Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
-                    listener.onEvent(RESOLVE_FAILED, null);
+                    listener.onEvent(RESOLVE_FAILED, songModel);
                     return;
                 }
 
@@ -202,7 +202,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
 
                 if (downloadUrl.isEmpty() || length <= 0) {
                     Log.e(LOG_TAG, "Download link was empty or length was too short");
-                    listener.onEvent(RESOLVE_FAILED, null);
+                    listener.onEvent(RESOLVE_FAILED, songModel);
                     return;
                 }
 
@@ -225,7 +225,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
             Log.e(LOG_TAG, ex.toString());
         }
         Log.w(LOG_TAG, "Failed to resolve youtube URL -- possible malformed link");
-        listener.onEvent(RESOLVE_FAILED, null);
+        listener.onEvent(RESOLVE_FAILED, songModel);
     }
 
     @Override

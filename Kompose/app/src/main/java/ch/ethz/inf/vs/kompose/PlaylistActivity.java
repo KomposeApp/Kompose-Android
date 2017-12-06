@@ -23,6 +23,7 @@ import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogHostInfoBinding;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
@@ -95,8 +96,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
-        //TODO: Crash report:
-        //TODO:  java.lang.RuntimeException: Unable to start activity ComponentInfo{ch.ethz.inf.vs.kompose/ch.ethz.inf.vs.kompose.PlaylistActivity}: java.lang.NullPointerException: Attempt to invoke virtual method 'ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList ch.ethz.inf.vs.kompose.model.SessionModel.getPlayQueue()' on a null object reference
         binding.list.setAdapter(new InQueueSongAdapter(viewModel.getSessionModel().getPlayQueue(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
 
@@ -128,15 +127,17 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         URI youtubeURI;
         try {
             youtubeURI = URI.create(youtubeUrl);
-        } catch (IllegalArgumentException e) {
-            showError("Invalid URL");
-            return;
-        } catch (NullPointerException e) {
+        } catch (Exception e) {
             showError("Invalid URL");
             return;
         }
         SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
         songModel.setSourceUrl(youtubeURI);
+        songModel.setTitle("downloading info...");
+        songModel.setSongStatus(SongStatus.RESOLVING);
+
+        activeSession.getPlayQueue().add(songModel);
+        activeSession.getAllSongs().add(songModel);
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(songModel, new SongRequestListener(this));
@@ -170,15 +171,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_playlist_activity, menu);
         return true;
-    }
-
-    private void setDialogSize(Dialog dialog) {
-        //set display size
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int width = (int) (displaymetrics.widthPixels * 0.9);
-        int height = (int) (displaymetrics.heightPixels * 0.7);
-        dialog.getWindow().setLayout(width, height);
     }
 
     @Override
@@ -235,7 +227,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     @Override
     public void downVoteClicked(View v, int position) {
         SongModel songModel = viewModel.getSessionModel().getPlayQueue().get(position);
-
         if (songModel.getSkipVoteCasted()) {
             responseHandler.sendRemoveSkipSongVote(songModel);
         } else {

@@ -18,79 +18,78 @@
 
 
     <LinearLayout
+        style="@style/TileLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="3dp"
-        android:background="#efefef"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        tools:layout_height="30pt">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="@{viewHolder.item.songStatus == SongStatus.RESOLVING ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible"></LinearLayout>
+            tools:visibility="gone">
+
+            <TextView
+                android:id="@+id/help_text"
+                style="@style/SecondaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/resolving_song" />
+
+        </LinearLayout>
 
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:visibility="@{viewHolder.item.songStatus != SongStatus.RESOLVING ? View.VISIBLE : View.GONE}"
             tools:visibility="visible">
 
-            <RelativeLayout
+            <LinearLayout
+                android:id="@+id/content_wrapper"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="3pt"
-                android:orientation="horizontal"
-                android:padding="3pt">
+                android:layout_height="match_parent"
+                android:layout_toStartOf="@id/down_vote_button"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/currently_playing_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewHolder.item.title}"
+                    android:textColor="#000"
+                    tools:text="example text of video" />
 
                 <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_toStartOf="@id/down_vote_button"
-                    android:orientation="vertical">
+                    android:id="@+id/currently_playing_seconds_length"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
                     <TextView
-                        android:id="@+id/currently_playing_title"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:text="@{viewHolder.item.title}"
-                        android:textColor="#000"
-                        tools:text="example text of video" />
-
-                    <TextView
-                        android:id="@+id/currently_playing_seconds_length"
-                        android:layout_width="match_parent"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@{viewHolder.item.songLengthMinSec}"
                         tools:text="300" />
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@{`, proposed by ` + viewHolder.item.proposedBy.name}"
+                        tools:text=", proposed by Kompose" />
                 </LinearLayout>
+            </LinearLayout>
 
-                <TextView
-                    android:id="@+id/down_vote_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:layout_marginEnd="8sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:fontFamily="@font/androidicons"
-                    android:onClick="@{viewHolder.onDownVoteClick}"
-                    android:text="@string/icons_ai_halt"
-                    android:textSize="24sp"
-                    tools:visibility="visible" />
-
-            </RelativeLayout>
-
+            <!-- DO NOT REMOVE PROGRESS STYLE. MINUTES WAISTED: 20 -->
             <ProgressBar
                 android:id="@+id/my_seek"
                 style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_below="@id/content_wrapper"
                 android:indeterminateOnly="false"
                 android:max="100"
                 android:progress="@{viewHolder.item.downloadProgress}"
@@ -98,8 +97,21 @@
                 tools:progress="25"
                 tools:visibility="visible" />
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/down_vote_button"
+                style="@style/SmallIconButtonTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:onClick="@{viewHolder.onDownVoteClick}"
+                android:text="@string/icons_ai_halt"
+                android:textColor="@{viewHolder.item.skipVoteCasted ? @color/colorAccent : @color/textColor}"
+                tools:textColor="@color/colorAccent"
+                tools:visibility="visible" />
+
+
+
+        </RelativeLayout>
     </LinearLayout>
-
-
 </layout>

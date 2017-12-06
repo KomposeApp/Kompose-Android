@@ -202,8 +202,7 @@ public class IncomingMessageHandler implements Runnable {
                 }
 
                 int quorum = sessionModel.getActiveDevices() / 2;
-                //todo: remove false
-                if (songModel.getValidDownVoteCount() > quorum && false) {
+                if (songModel.getValidDownVoteCount() > quorum) {
                     //add to skipped if not played
                     if (sessionModel.getPlayQueue().contains(songModel)) {
                         sessionModel.getPlayQueue().remove(songModel);
@@ -290,6 +289,18 @@ public class IncomingMessageHandler implements Runnable {
 
         SongConverter songConverter = new SongConverter(sessionModel.getClients());
         final SongModel songModel = songConverter.convert(song);
+
+        for (final SongModel songModel1 : sessionModel.getAllSongs()) {
+            if (songModel1.getUUID().equals(songModel.getUUID())) {
+                return new Runnable() {
+                    @Override
+                    public void run() {
+                        updateSong(songModel, songModel1);
+                    }
+                };
+            }
+        }
+
         songModel.setSongStatus(SongStatus.IN_QUEUE);
         songModel.setOrder(sessionModel.getAllSongs().size() + 1);
 
@@ -365,6 +376,7 @@ public class IncomingMessageHandler implements Runnable {
                             @Override
                             public void run() {
                                 songModel.setSkipVoteCasted(false);
+                                songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
                                 songModel.getDownVotes().remove(finalDownVoteModel);
                             }
                         };

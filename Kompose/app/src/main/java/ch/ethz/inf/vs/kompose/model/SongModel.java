@@ -151,16 +151,15 @@ public class SongModel extends UniqueModel {
     public void setSecondsLength(int secondsLength) {
         this.secondsLength = secondsLength;
 
-        int sec = secondsLength % 60;
-        int min = (secondsLength - sec) / 60;
-        this.getSongLengthMinSec = min + ":" + (sec < 10 ? "0" : "") + sec;
-
+        notifyPropertyChanged(BR.songLengthMinSec);
         notifyPropertyChanged(BR.secondsLength);
     }
 
     @Bindable
     public String getSongLengthMinSec() {
-        return getSongLengthMinSec;
+        int sec = secondsLength % 60;
+        int min = (secondsLength - sec) / 60;
+        return min + ":" + (sec < 10 ? "0" : "") + sec;
     }
 
     public SessionModel getPartOfSession() {

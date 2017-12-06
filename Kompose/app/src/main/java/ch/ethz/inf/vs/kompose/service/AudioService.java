@@ -168,11 +168,9 @@ public class AudioService extends Service {
     private static class PlaylistListener extends ObservableList.OnListChangedCallback {
 
         private final String LOG_TAG = "## PlaylistListener";
-        private Phaser notifier;
         AudioService audioService;
 
-        PlaylistListener(Phaser notifier, AudioService audioService) {
-            this.notifier = notifier;
+        PlaylistListener(AudioService audioService) {
             this.audioService = audioService;
         }
 
@@ -188,7 +186,11 @@ public class AudioService extends Service {
         public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
             Log.d(LOG_TAG, i1 + " new items in play queue");
             audioService.checkOnCurrentSong();
-            notifier.register();
+            try {
+                StateSingleton.getInstance().getAudioServicePhaser().register();
+            } catch (Exception e) {
+                //whatever
+            }
         }
 
         @Override
@@ -198,14 +200,17 @@ public class AudioService extends Service {
         @Override
         public void onItemRangeRemoved(ObservableList observableList, int i, int i1) {
             Log.d(LOG_TAG, i1 + " items removed from play queue");
-            notifier.register();
+            try {
+                StateSingleton.getInstance().getAudioServicePhaser().register();
+            } catch (Exception e) {
+                //whatever
+            }
         }
     }
 
     private static class DownloadWorker extends AsyncTask<Void, Void, Void> {
 
         private final String LOG_TAG = "## DownloadWorker";
-        private Phaser notifier;
         private int numSongsPreload;
         private WeakReference<AudioService> context;
         private SessionModel sessionModel;
@@ -215,8 +220,8 @@ public class AudioService extends Service {
             this.sessionModel = sessionModel;
 
             this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
-            this.notifier = new Phaser(1);
-            sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(notifier, context));
+            StateSingleton.getInstance().setAudioServicePhaser(new Phaser(1));
+            sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(context));
         }
 
         private MediaPlayer mediaPlayerFromFile(File file) {
@@ -230,7 +235,8 @@ public class AudioService extends Service {
             while (!isCancelled()) {
                 // wait until the Phaser is unblocked (initially and when a new item enters
                 // the download queue)
-                notifier.arriveAndDeregister();
+                int registered = StateSingleton.getInstance().getAudioServicePhaser().getRegisteredParties();
+                StateSingleton.getInstance().getAudioServicePhaser().arriveAndDeregister();
 
                 int numDownloaded = 0;
 
@@ -238,7 +244,7 @@ public class AudioService extends Service {
                 while (numDownloaded <= numSongsPreload && index < sessionModel.getPlayQueue().size()) {
                     try {
                         final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
-                        if (nextDownload.getSongStatus().equals(SongStatus.IN_QUEUE) && nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
+                        if (!nextDownload.getSongStatus().equals(SongStatus.RESOLVING) && nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
                             Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
 
                             new Handler(Looper.getMainLooper()).post(new Runnable() {

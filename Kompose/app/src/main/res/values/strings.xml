@@ -90,4 +90,5 @@
     <string name="songs">songs</string>
     <string name="use_to_manually_connect">use the IP and the port to manually connect to the host if you cannot join the session normally</string>
     <string name="past_link">simply paste a link from youtube to include it into the playlist</string>
+    <string name="resolving_song">resolving url...</string>
 </resources>
