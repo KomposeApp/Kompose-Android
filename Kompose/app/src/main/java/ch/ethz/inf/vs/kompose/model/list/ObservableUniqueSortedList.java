@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.model.list;
 
 import android.databinding.ObservableArrayList;
+import android.util.Log;
 
 import java.util.Collection;
 import java.util.Comparator;
@@ -12,7 +13,7 @@ import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
  * Don't use any other method of adding elements than `add`.
  */
 public class ObservableUniqueSortedList<T extends UniqueModel> extends ObservableArrayList<T> {
-
+    private static final String LOG_TAG = "ObservableUniqueSortedL";
     private Comparator<T> orderComparator;
     private Comparator<T> uniqueComparator;
 
@@ -23,21 +24,33 @@ public class ObservableUniqueSortedList<T extends UniqueModel> extends Observabl
 
     @Override
     public boolean add(T object) {
-        boolean found = false;
+        boolean sameIdFound = false;
+        boolean sameInstanceFound = false;
         int insertPosition = 0;
         boolean positionFixed = false;
         for (int i = 0; i < super.size(); i++) {
-            if (uniqueComparator.compare(super.get(i), object) == 0) {
-                found = true;
+            T myGet = super.get(i);
+            if (myGet == object) {
+                sameInstanceFound = true;
                 break;
             }
-            if (!positionFixed && orderComparator.compare(object, get(i)) < 0) {
+            if (uniqueComparator.compare(object, myGet) == 0) {
+                sameIdFound = true;
+                break;
+            }
+            if (!positionFixed && orderComparator.compare(object, myGet) < 0) {
                 insertPosition = i;
                 positionFixed = true;
             }
         }
 
-        if (found) {
+        if (sameInstanceFound) {
+            //this is not so bad
+            return false;
+        }
+
+        if (sameIdFound) {
+            Log.wtf(LOG_TAG, "PANTS ON FIRE: tried to add duplicate object with same UUID!");
             return false;
         }
 

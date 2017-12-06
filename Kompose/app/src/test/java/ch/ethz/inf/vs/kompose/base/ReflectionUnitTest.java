@@ -55,7 +55,7 @@ public class ReflectionUnitTest {
                     if (parameterType.equals(String.class)) {
                         if (methodName.endsWith("DateTime")) {
                             method.invoke(obj, typeToValueDictionary.get(DateTime.class));
-                        } else if (methodName.endsWith("Uuid")) {
+                        } else if (methodName.toLowerCase().endsWith("uuid")) {
                             method.invoke(obj, typeToValueDictionary.get(UUID.class));
                         } else if (methodName.endsWith("Url")) {
                             method.invoke(obj, typeToValueDictionary.get(URI.class));
@@ -73,7 +73,7 @@ public class ReflectionUnitTest {
                     }
 
                 } catch (Exception ex) {
-                    Assert.fail(ex.toString());
+                    Assert.fail(method.getName() + " at " + ex.toString());
                 }
             }
         }

@@ -83,7 +83,6 @@
                 </LinearLayout>
             </LinearLayout>
 
-
             <ProgressBar
                 android:id="@+id/my_seek"
                 style="android:attr/progressBarStyleHorizontal"
@@ -106,9 +105,11 @@
                 android:layout_centerVertical="true"
                 android:onClick="@{viewHolder.onDownVoteClick}"
                 android:text="@string/icons_ai_halt"
-                android:textColor="@{viewHolder.item.skipVoteCasted ? @color/textColor : @color/colorAccent}"
+                android:textColor="@{viewHolder.item.skipVoteCasted ? @color/colorAccent : @color/textColor}"
                 tools:textColor="@color/colorAccent"
                 tools:visibility="visible" />
+
+
 
         </RelativeLayout>
     </LinearLayout>

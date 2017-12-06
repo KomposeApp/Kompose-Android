@@ -23,6 +23,7 @@ import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogHostInfoBinding;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
@@ -133,8 +134,10 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
         songModel.setSourceUrl(youtubeURI);
         songModel.setTitle("downloading info...");
+        songModel.setSongStatus(SongStatus.RESOLVING);
 
         activeSession.getPlayQueue().add(songModel);
+        activeSession.getAllSongs().add(songModel);
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
         youtubeService.resolveSong(songModel, new SongRequestListener(this));
@@ -229,7 +232,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         } else {
             responseHandler.sendCastSkipSongVote(songModel);
         }
-        //songModel.setSkipVoteCasted(!songModel.getSkipVoteCasted());
     }
 
     @Override
