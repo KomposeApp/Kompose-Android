@@ -16,31 +16,23 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.net.URI;
-import java.util.UUID;
-
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogHostInfoBinding;
-import ch.ethz.inf.vs.kompose.enums.SessionStatus;
-import ch.ethz.inf.vs.kompose.enums.SongStatus;
-import ch.ethz.inf.vs.kompose.model.ClientModel;
-import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.AudioService;
 import ch.ethz.inf.vs.kompose.service.SampleService;
-import ch.ethz.inf.vs.kompose.service.SongRequestListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
+import ch.ethz.inf.vs.kompose.service.handler.SongResolveHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
 public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
 
-    private final String LOG_TAG = "## Playlist Activity";
+    private static final String LOG_TAG = "## Playlist Activity";
 
     //View
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().getActiveSession(), this);
@@ -121,34 +113,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         }
     }
 
-    private void resolveAndRequestSong(String youtubeUrl) {
-        Log.d(LOG_TAG, "requesting URL: " + youtubeUrl);
-        SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
-        ClientModel clientModel = StateSingleton.getInstance().getActiveClient();
 
-        //set session to active if host
-        if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
-            activeSession.setSessionStatus(SessionStatus.ACTIVE);
-        }
-
-        URI youtubeURI;
-        try {
-            youtubeURI = URI.create(youtubeUrl);
-        } catch (Exception e) {
-            showError("Invalid URL");
-            return;
-        }
-        SongModel songModel = new SongModel(UUID.randomUUID(), clientModel, activeSession);
-        songModel.setSourceUrl(youtubeURI);
-        songModel.setTitle("downloading info...");
-        songModel.setSongStatus(SongStatus.RESOLVING);
-
-        activeSession.getPlayQueue().add(songModel);
-        activeSession.getAllSongs().add(songModel);
-
-        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(songModel, new SongRequestListener(this));
-    }
 
 
     @Override
@@ -252,7 +217,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         String youtubeUrl = viewModel.getSearchLink();
         viewModel.setSearchLink("");
         songRequestDialog.dismiss();
-        resolveAndRequestSong(youtubeUrl);
+        if (!SongResolveHandler.resolveAndRequestSong(this, youtubeUrl)){
+            showError("Invalid URL");
+        }
     }
 
 

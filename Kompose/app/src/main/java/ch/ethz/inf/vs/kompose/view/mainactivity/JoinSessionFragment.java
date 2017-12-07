@@ -47,6 +47,8 @@ public class JoinSessionFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         FragmentJoinSessionBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.fragment_join_session, container, false);
+        //TODO: Figure out why viewModel is null after a restart
+        if (viewModel == null) return binding.getRoot();
         binding.setViewModel(viewModel);
         binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), viewModel));

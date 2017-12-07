@@ -123,6 +123,9 @@ public class StateSingleton {
      * @param file File that points to the Song in the hardware cache
      */
     public void addSongToCache(String id, File file) {
+        if (songCache == null){
+            throw new IllegalStateException("Cache has not been initialized.");
+        }
         Log.d("## SongCacheMap", "Added file: " + file.getName() + " - from VideoID: " + id + "- to the cache");
         songCache.put(id, file);
     }
@@ -134,21 +137,30 @@ public class StateSingleton {
      * @return File descriptor of the song in cache
      */
     public File retrieveSongFromCache(String id) {
+        if (songCache == null){
+            throw new IllegalStateException("Cache has not been initialized.");
+        }
         Log.d("## SongCacheMap", "Retrieving file with VideoID: " + id + " from the cache");
         return songCache.get(id);
     }
 
-    // Simple check accessor functions
+
     public boolean checkCacheByKey(String id) {
+        if (songCache == null){
+            throw new IllegalStateException("Cache has not been initialized.");
+        }
         return songCache.containsKey(id);
     }
 
     public boolean checkCacheByValue(File file) {
+        if (songCache == null){
+            throw new IllegalStateException("Cache has not been initialized.");
+        }
         return songCache.containsValue(file);
     }
 
     public void clearCache() {
-        songCache.clear();
+        if (songCache!= null) songCache.clear();
         Log.d("## SongCacheMap", "Cache cleared");
     }
 

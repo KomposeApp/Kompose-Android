@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.Observable;
 import android.databinding.ObservableList;
@@ -18,20 +19,24 @@ import android.util.StateSet;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.net.URI;
 import java.util.ArrayList;
+import java.util.UUID;
 import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
+import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public class AudioService extends Service {
 
-    private final String LOG_TAG = "## AudioService";
+    private static final String LOG_TAG = "## AudioService";
     private final IBinder binder = new LocalBinder();
 
     private SessionModel sessionModel;
@@ -75,7 +80,7 @@ public class AudioService extends Service {
             if (i == BR.songStatus) {
                 SongModel songModel = (SongModel) observable;
                 if (songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE)) {
-                    goToNextSong();
+                    goToNextSong(connectedSongModel);
                 }
             }
         }
@@ -126,25 +131,33 @@ public class AudioService extends Service {
     private void checkOnCurrentSong() {
         synchronized (StateSingleton.getInstance()) {
             if (sessionModel.getCurrentlyPlaying() == null) {
-                goToNextSong();
+                goToNextSong(null);
             }
         }
     }
 
-    private void goToNextSong() {
+    private void goToNextSong(final SongModel localModel) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 synchronized (StateSingleton.getInstance()) {
                     Log.d(LOG_TAG, "updating currently playing song");
-                    if (sessionModel.getCurrentlyPlaying() != null) {
-                        MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
+                    SongModel songToStop = sessionModel.getCurrentlyPlaying();
+                    if (localModel != null) {
+                        songToStop = localModel;
+                    }
+
+                    if (songToStop != null) {
+                        MediaPlayer mp = songToStop.getMediaPlayer();
                         mp.stop();
                         mp.release();
 
+                        songToStop.setMediaPlayer(null);
+                    }
+
+                    if (sessionModel.getCurrentlyPlaying() != null) {
                         SongModel songModel = sessionModel.getCurrentlyPlaying();
                         songModel.setSongStatus(SongStatus.PLAYED);
-                        sessionModel.getCurrentlyPlaying().setMediaPlayer(null);
 
                         sessionModel.setCurrentlyPlaying(null);
                         Log.d(LOG_TAG, "stopping & removing current song");
@@ -177,7 +190,7 @@ public class AudioService extends Service {
                             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                 @Override
                                 public void onCompletion(MediaPlayer mp) {
-                                    goToNextSong();
+                                    goToNextSong(null);
                                 }
                             });
                             mediaPlayer.start();

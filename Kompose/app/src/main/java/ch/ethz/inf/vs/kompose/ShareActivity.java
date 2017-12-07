@@ -9,14 +9,16 @@ import android.widget.Toast;
 import java.net.URI;
 import java.util.UUID;
 
+import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SongRequestListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
+import ch.ethz.inf.vs.kompose.service.handler.SongResolveHandler;
 
-public class ShareActivity extends AppCompatActivity {
+public class ShareActivity extends BaseActivity {
 
     private final String LOG_TAG = "## ShareActivity";
     private final int TIME_UNTIL_DEATH = 3000; // Time until process is killed
@@ -37,7 +39,7 @@ public class ShareActivity extends AppCompatActivity {
         // Additionally, kill the process if Kompose hasn't been started beforehand.
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
         if (activeSession == null || !StateSingleton.getInstance().getPlaylistIsActive()) {
-            Toast.makeText(this, "Kompose is not connected to a host!", Toast.LENGTH_SHORT).show();
+            showError("Kompose is not connected to a host!");
             Log.d(LOG_TAG, "Failed to send given URL. Reason: Not connected to host.");
 
             //Prepare thread to clean up the process in case it is necessary.
@@ -71,16 +73,9 @@ public class ShareActivity extends AppCompatActivity {
         String requestURL = (String) intent.getCharSequenceExtra(Intent.EXTRA_TEXT);
         Log.d(LOG_TAG, "requesting URL: " + requestURL);
 
-        //set session to active if host
-        if (activeSession.getIsHost() && activeSession.getSessionStatus().equals(SessionStatus.WAITING)) {
-            activeSession.setSessionStatus(SessionStatus.ACTIVE);
+        if (!SongResolveHandler.resolveAndRequestSong(this, requestURL)){
+            showError("Invalid URL");
         }
-
-        SongModel songModel = new SongModel(UUID.randomUUID(), StateSingleton.getInstance().getActiveClient(), activeSession);
-        songModel.setSourceUrl(URI.create(requestURL));
-
-        YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(this);
-        youtubeService.resolveSong(songModel, new SongRequestListener(this));
 
         //Make sure everything is cleaned up. Don't remove this or it will cause an exception.
         finish();
