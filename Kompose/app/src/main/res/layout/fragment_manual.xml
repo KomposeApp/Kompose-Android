@@ -30,31 +30,86 @@
             style="@style/LabelTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ip_address" />
-
-        <EditText
-            style="@style/DefaultEditText"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/ip_address_placeholder"
-            android:inputType="textPersonName"
-            android:text="@={viewModel.ipAddress}" />
-
-        <TextView
-            style="@style/LabelTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/port" />
+            android:text="@string/your_name"/>
 
         <EditText
             style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="3sp"
-            android:hint="@string/port_placeholder"
+            android:hint="@string/your_name"
             android:inputType="textPersonName"
-            android:text="@={viewModel.ipAddress}" />
+            android:text="@={viewModel.clientName}"
+            tools:text="hi mom"/>
 
+        <!--IP / port container-->
+        <LinearLayout
+            android:id="@+id/ip_port_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="3sp"
+            android:baselineAligned="false"
+            android:orientation="horizontal">
+
+            <!--IP-->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="match_parent">
+
+                <TextView
+                    style="@style/LabelTextView"
+                    android:id="@+id/ip_text_box_desc"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@id/ip_text_box"
+
+                    android:text="@string/ip_address" />
+
+                <EditText
+                    android:id="@+id/ip_text_box"
+                    style="@style/DefaultEditText"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/ip_text_box_desc"
+
+                    android:hint="@string/ip_address_placeholder"
+                    android:inputType="textPersonName"
+                    android:text="@={viewModel.ipAddress}" />
+
+            </RelativeLayout>
+
+            <!--Port-->
+            <RelativeLayout
+                android:layout_width="0dp"
+                android:layout_weight="0.5"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/port_text_box_desc"
+                    style="@style/LabelTextView"
+
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@id/port_text_box"
+
+                    android:text="@string/port" />
+
+                <EditText
+                    android:id="@+id/port_text_box"
+                    style="@style/DefaultEditText"
+
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/port_text_box_desc"
+
+                    android:hint="@string/port_placeholder"
+                    android:inputType="textPersonName"
+                    android:text="@={viewModel.port}" />
+            </RelativeLayout>
+        </LinearLayout>
 
         <Button
             style="@style/PrimaryButton"
@@ -64,6 +119,5 @@
             android:text="@string/join_manually" />
 
     </LinearLayout>
-
 
 </layout>

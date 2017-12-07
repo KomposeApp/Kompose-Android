@@ -29,7 +29,6 @@
                 android:layout_height="wrap_content"
                 android:text="@string/join_existing_party" />
 
-
             <LinearLayout style="@style/HorizontalDividerLayout" />
 
             <TextView
@@ -47,7 +46,6 @@
                 android:inputType="textPersonName"
                 android:text="@={viewModel.clientName}"
                 tools:text="hi mom"/>
-
 
             <LinearLayout
                 android:layout_width="match_parent"

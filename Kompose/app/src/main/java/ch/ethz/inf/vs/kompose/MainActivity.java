@@ -18,10 +18,13 @@ import android.view.MenuItem;
 import org.joda.time.DateTime;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
+import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.databinding.ActivityMainBinding;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -45,11 +48,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     public static final boolean DESIGN_MODE = false;
 
-    private final MainViewModel viewModel = new MainViewModel(this);;
+    private final MainViewModel viewModel = new MainViewModel(this);
 
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,8 +155,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
     }
 
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -165,7 +165,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         //Clear song cache
         StateSingleton.getInstance().clearCache();
     }
-
 
     /**
      * Join tab -- join existing rooms by clicking on their fragment.
@@ -214,10 +213,62 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
     }
 
+    // TODO
     @Override
     public void joinManualClicked() {
-        //todo: join manually
+        String clientName = viewModel.getClientName();
 
+        // Client's name must not be empty
+        if (clientName == null || clientName.trim().isEmpty()) {
+            showError(getString(R.string.view_error_clientname));
+            return;
+        }
+        clientName = clientName.trim();
+
+        UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
+
+        // Create a stub session
+        SessionModel sessionModel = new SessionModel(deviceUUID, null, false);
+
+        ClientModel clientModel = new ClientModel(deviceUUID, sessionModel);
+        clientModel.setName(clientName);
+        clientModel.setIsActive(true);
+
+        // Get IP / port
+        try {
+            InetAddress inetAddress = InetAddress.getByName(viewModel.getIpAddress());
+            int port = Integer.parseInt(viewModel.getPort());
+            ServerConnectionDetails serverConnectionDetails = new ServerConnectionDetails(
+                    inetAddress, port);
+            sessionModel.setConnectionDetails(serverConnectionDetails);
+        } catch (UnknownHostException e) {
+            showError("Unknown host");
+            return;
+        }
+
+        // Set active session and our own active client
+        StateSingleton.getInstance().setActiveSession(sessionModel);
+        StateSingleton.getInstance().setActiveClient(clientModel);
+        try {
+            if (!clientNetworkServiceBound || clientNetworkService == null)
+                throw new IllegalStateException("Failed to properly set up Client Network Service");
+
+            RegistrationListener listener = new RegistrationListener(this);
+            clientNetworkService.initSocketListener();
+            clientNetworkService.registerClientOnHost(listener, clientName);
+        } catch (SocketException s) {
+            s.printStackTrace();
+            try {
+                clientNetworkService.closeClientSocket();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Cleaning up the Client Socket failed.");
+                e.printStackTrace();
+            }
+            showError("Failed to set up connection.");
+        } catch (IllegalStateException | IOException io) {
+            io.printStackTrace();
+            showError("Failed to set up connection.");
+        }
     }
 
     @Override
@@ -283,6 +334,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         playlistIntent.putExtra(MainActivity.KEY_SERVERSERVICE, serverIntent);
         startActivity(playlistIntent);
     }
+
 
     private final ServiceConnection cNetServiceConnection =  new ServiceConnection() {
         @Override
