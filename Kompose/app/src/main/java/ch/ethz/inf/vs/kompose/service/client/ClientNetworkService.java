@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.service.client;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.ObservableList;
 import android.net.nsd.NsdManager;
@@ -14,6 +15,7 @@ import com.youview.tinydnssd.DiscoverResolver;
 
 import java.io.IOException;
 import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.SocketException;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -21,6 +23,7 @@ import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.client.listeners.ClientServiceListener;
 import ch.ethz.inf.vs.kompose.service.client.listeners.KomposeResolveListenerWorkaround;
+import ch.ethz.inf.vs.kompose.service.handler.IncomingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE;
@@ -34,8 +37,6 @@ public class ClientNetworkService extends Service {
     private boolean initialized = false;
     private int actualLocalPort = 0;
 
-    //NOTE: This Socket is closed in two locations: From the MainActivity during Registration,
-    //      and during onPostExecute() of the ClientListenerTask.
     private ServerSocket clientServerSocket;
 
     private DiscoverResolver resolver;
@@ -68,7 +69,7 @@ public class ClientNetworkService extends Service {
 
     /**
      * Returns the actual Client Port as initialized by the ServerSocket.
-     * Differs from the one stored in preferences when using port 0. Make sure to use this ALWAYS.
+     * Differs from the one stored in preferences when using port 0.
      */
     public int getActualClientPort() {
         return actualLocalPort;
@@ -111,16 +112,24 @@ public class ClientNetworkService extends Service {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (clientListenerTask != null){
+
+        // cancel client task
+        if (clientListenerTask != null && !clientListenerTask.isCancelled()){
             Log.d(LOG_TAG, "Shutting down the Message Receiver");
             clientListenerTask.cancel(true);
+        }
+
+        // close the socket
+        if (clientServerSocket != null && !clientServerSocket.isClosed()){
             try {
+                Log.d(LOG_TAG, "Closing client server socket");
                 closeClientSocket();
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Closing the ServerSocket failed.");
+                Log.e(LOG_TAG, "Failed to close client socket");
                 e.printStackTrace();
             }
         }
+
         Log.d(LOG_TAG, "Service killed for real.");
     }
 
@@ -190,6 +199,43 @@ public class ClientNetworkService extends Service {
         new OutgoingMessageHandler(this).sendRegisterClient(clientName, clientServerSocket.getLocalPort());
         new ClientRegistrationTask(this, clientServerSocket, callbackListener)
                 .executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
+
+    /*
+     * This is where the client listens for messages from the host.
+     * Only started once we call startService() in ClientNetworkService.
+     */
+    private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
+
+        private final String LOG_TAG = "## ClientListenerTask";
+
+        private ServerSocket serverSocket;
+        private int localPort;
+        private Context context;
+
+        ClientListenerTask(Context context, ServerSocket serverSocket, int port) {
+            this.context = context;
+            this.serverSocket = serverSocket;
+            this.localPort = port;
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            Log.d(LOG_TAG, "started on port " + localPort);
+            while (!isCancelled()) {
+                try {
+                    final Socket connection = serverSocket.accept();
+                    Log.d(LOG_TAG, "message received");
+                    IncomingMessageHandler messageHandler = new IncomingMessageHandler(context, connection);
+                    Thread msgHandler = new Thread(messageHandler);
+                    msgHandler.start();
+                } catch (IOException io) {
+                    Log.d(LOG_TAG, "An exception occured: " + io.getMessage());
+                }
+            }
+            return null;
+        }
     }
 
 }

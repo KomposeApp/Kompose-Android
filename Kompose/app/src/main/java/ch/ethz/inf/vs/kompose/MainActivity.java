@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 
 import org.joda.time.DateTime;
 
@@ -45,6 +44,12 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     public static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
 
     public static final boolean DESIGN_MODE = false;
+
+    private final MainViewModel viewModel = new MainViewModel(this);
+
+    private ClientNetworkService clientNetworkService;
+    private boolean clientNetworkServiceBound = false;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,14 +106,14 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         });
 
         //bind client network service
-        Intent intent = new Intent(this.getBaseContext(), ClientNetworkService.class);
-        bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
+        Intent cnsIntent = new Intent(this.getBaseContext(), ClientNetworkService.class);
+        bindService(cnsIntent, cNetServiceConnection, BIND_AUTO_CREATE);
     }
 
     @Override
     public void onResume() {
+        // Reinsert default names if settings have changed
         if (StateSingleton.getInstance().getPreferenceUtility().hasChanged()) {
-            // Reinsert default names if we changed the settings
             viewModel.setClientName(StateSingleton.getInstance().getPreferenceUtility().getUsername());
             viewModel.setSessionName(StateSingleton.getInstance().getPreferenceUtility().getSessionName());
         }
@@ -143,17 +148,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             case R.id.main_toolbar_help:
                 viewModel.openHelpClicked(null);
                 return true;
-
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
-
-    private final MainViewModel viewModel = new MainViewModel(this);
-
-    private ClientNetworkService clientNetworkService;
-    private boolean clientNetworkServiceBound = false;
-
 
     /*
       Note on unbinding the ClientNetworkService:
@@ -175,13 +173,19 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
             Log.w(LOG_TAG, "ClientNetworkService died");
-            clientNetworkService = null;
+            breakdown();
         }
 
         @Override
         public void onBindingDied(ComponentName arg0) {
             Log.w(LOG_TAG, "Binding with ClientNetworkService died");
+            breakdown();
+        }
+
+        private void breakdown(){
+            showError("Discovery of Kompose Sessions has stopped unexpectedly.");
             clientNetworkService = null;
+            unbindService(this);
         }
     };
 
@@ -192,10 +196,15 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             unbindService(cNetServiceConnection);
             clientNetworkServiceBound = false;
         }
+        //Clear song cache
         StateSingleton.getInstance().clearCache();
     }
 
 
+    /**
+     * Join tab -- join existing rooms by clicking on their fragment.
+     * @param sessionModel Session to join
+     */
     @Override
     public void joinSessionClicked(SessionModel sessionModel) {
         String clientName = viewModel.getClientName();
@@ -207,7 +216,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
         clientName = clientName.trim();
 
-
         // Add ourselves to the current session locally
         UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
         ClientModel clientModel = new ClientModel(deviceUUID, sessionModel);
@@ -215,10 +223,11 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         clientModel.setIsActive(true);
         sessionModel.getClients().add(clientModel);
 
+        //Set active session and our own active client
         StateSingleton.getInstance().setActiveSession(sessionModel);
         StateSingleton.getInstance().setActiveClient(clientModel);
         try {
-            if (!clientNetworkServiceBound && clientNetworkService == null)
+            if (!clientNetworkServiceBound || clientNetworkService == null)
                 throw new IllegalStateException("Failed to properly set up Client Network Service");
 
             RegistrationListener listener = new RegistrationListener(this);
@@ -229,7 +238,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             try {
                 clientNetworkService.closeClientSocket();
             } catch (IOException e) {
-                Log.w(LOG_TAG, "Cleaning up the Client Socket failed.");
+                Log.e(LOG_TAG, "Cleaning up the Client Socket failed.");
                 e.printStackTrace();
             }
             showError("Failed to set up connection.");
@@ -303,6 +312,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         Intent serverIntent = new Intent(this, HostServerService.class);
         startService(serverIntent);
 
+        // Start the playlist activity
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         playlistIntent.putExtra(MainActivity.KEY_SERVERSERVICE, serverIntent);
         startActivity(playlistIntent);
@@ -310,8 +320,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
 
     /**
-     * Listener which allows us to start the next Activity.
-     * Always make sure this is started on the main thread.
+     * This listener is intended to be a callback for when we successfully join a session
      * Needs to close the ServerSocket in the client in case the connection fails
      */
     private class RegistrationListener implements SimpleListener<Boolean, Void> {
@@ -331,18 +340,11 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                     clientNetworkService.closeClientSocket();
                     return;
                 }
-
-                // In case we closed the activity while waiting for a connection, stop here.
-                if (mainActivity.isDestroyed()) {
-                    //TODO: Perhaps this is redundant now
-                    clientNetworkService.closeClientSocket();
-                    return;
-                }
             } catch (IOException e) {
                 throw new IllegalStateException("Closing the Client Server Socket failed");
             }
 
-            // start the client service again -- THIS IS INTENTIONAL
+            // start the client service through startService -- THIS IS INTENTIONAL
             // it will keep the service alive across different activities.
             Intent serverIntent = new Intent(mainActivity, ClientNetworkService.class);
             mainActivity.startService(serverIntent);
@@ -356,13 +358,5 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             playlistIntent.putExtra(ch.ethz.inf.vs.kompose.MainActivity.KEY_NETWORKSERVICE, serverIntent);
             mainActivity.startActivity(playlistIntent);
         }
-    }
-
-    /**
-     * Navigation to the History Activity
-     */
-    public void viewHistoryFromTitle(View view) {
-        Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
-        startActivity(historyIntent);
     }
 }

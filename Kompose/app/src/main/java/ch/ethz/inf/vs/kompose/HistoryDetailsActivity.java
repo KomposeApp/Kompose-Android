@@ -14,6 +14,8 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel;
 
 public class HistoryDetailsActivity extends AppCompatActivity implements PlayedSongViewHolder.ClickListener {
 
+    //TODO: If there's time, maybe allow expanding the song to see more details
+
     private final String LOG_TAG = "## Details Activity";
 
     private final HistoryDetailsViewModel viewModel = new HistoryDetailsViewModel(
