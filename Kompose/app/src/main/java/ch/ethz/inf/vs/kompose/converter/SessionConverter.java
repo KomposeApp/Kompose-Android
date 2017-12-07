@@ -87,7 +87,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
             }
         }
         if (songs.size() > 0) {
-            session.setSongs((Song[]) songs.toArray());
+            session.setSongs((Song[]) songs.toArray(new Song[0]));
         } else {
             session.setSongs(new Song[0]);
         }
