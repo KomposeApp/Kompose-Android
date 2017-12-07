@@ -8,10 +8,20 @@
     android:orientation="vertical"
     tools:context="ch.ethz.inf.vs.kompose.SettingsActivity">
 
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/settings_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:elevation="4dp"
+        android:theme="@style/ToolbarStyle"
+        android:background="@color/colorPrimary"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
     <ScrollView
         android:id="@+id/settingsScroller"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_below="@id/settings_toolbar"
         android:layout_above="@id/textview_settings_error"
         android:layout_marginTop="30dp">
 

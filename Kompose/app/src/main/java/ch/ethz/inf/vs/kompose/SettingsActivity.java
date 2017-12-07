@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.kompose;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -54,6 +55,10 @@ public class SettingsActivity extends AppCompatActivity {
         hostport_input.setText(String.valueOf(util.getHostPort()));
         clientport_input.setText(String.valueOf(util.getClientPort()));
         preload_input.setText(String.valueOf(util.getPreload()));
+
+        // setup toolbar
+        Toolbar toolbar = findViewById(R.id.settings_toolbar);
+        setSupportActionBar(toolbar);
     }
 
     /**
