@@ -28,7 +28,7 @@
             style="@style/SecondaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{viewHolder.item.name}"
+            android:text="@{viewHolder.item.hostName}"
             tools:text="margareth" />
 
     </LinearLayout>
