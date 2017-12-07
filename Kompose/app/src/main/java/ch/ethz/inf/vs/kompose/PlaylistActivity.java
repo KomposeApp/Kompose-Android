@@ -73,9 +73,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         // Signals to ShareActivity that the playlist is active and songs can be requested
         StateSingleton.getInstance().setPlaylistIsActive(true);
 
-        // Set title to active session's name
-        setTitle("Session: " + StateSingleton.getInstance().getActiveSession().getName());
-
         if (MainActivity.DESIGN_MODE) {
             viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
             SampleService sampleService = new SampleService();
@@ -109,7 +106,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             bindService(audioServiceIntent, audioServiceConnection, BIND_AUTO_CREATE);
         }
     }
-
 
     @Override
     public void onDestroy() {

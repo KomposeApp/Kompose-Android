@@ -4,11 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="android.view.View" />
-
         <import type="ch.ethz.inf.vs.kompose.enums.SessionStatus" />
-
         <import type="ch.ethz.inf.vs.kompose.enums.SongStatus" />
 
         <variable
@@ -29,6 +26,7 @@
             android:background="@color/colorPrimary"
             android:elevation="4dp"
             android:theme="@style/ToolbarStyle"
+            app:title="@{viewModel.sessionModel.name}"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
         <LinearLayout
