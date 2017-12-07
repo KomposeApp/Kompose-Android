@@ -18,6 +18,8 @@
 
         <TextView
             style="@style/SecondaryTextView"
+            android:layout_marginTop="3sp"
+            android:layout_marginBottom="3sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/start_own_party" />
@@ -49,6 +51,7 @@
             style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="3sp"
             android:hint="@string/session_name"
             android:inputType="textPersonName"
             android:text="@={viewModel.sessionName}"

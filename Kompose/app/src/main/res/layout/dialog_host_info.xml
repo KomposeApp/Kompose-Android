@@ -48,6 +48,7 @@
                     style="@style/LabelTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="2sp"
                     android:text="@string/ip_address" />
 
                 <TextView
@@ -69,6 +70,7 @@
                     style="@style/LabelTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginBottom="2sp"
                     android:text="@string/port" />
 
                 <TextView

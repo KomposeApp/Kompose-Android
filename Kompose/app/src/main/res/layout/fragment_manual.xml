@@ -18,6 +18,8 @@
 
         <TextView
             style="@style/SecondaryTextView"
+            android:layout_marginTop="3sp"
+            android:layout_marginBottom="3sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/connect_manually" />
@@ -48,6 +50,7 @@
             style="@style/DefaultEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginBottom="3sp"
             android:hint="@string/port_placeholder"
             android:inputType="textPersonName"
             android:text="@={viewModel.ipAddress}" />
