@@ -27,6 +27,7 @@ public class SessionModel extends UniqueModel {
         super(uuid);
         this.hostUUID = hostUUID;
         this.isHost = isHost;
+        //TODO: See below
         if (isHost) {
             //host & session created; therefore
             sessionStatus = SessionStatus.WAITING;
@@ -34,6 +35,7 @@ public class SessionModel extends UniqueModel {
     }
 
     private String name;
+    //TODO: Session Status set to same value inside constructor. What was the intention here?
     private SessionStatus sessionStatus = SessionStatus.WAITING;
     private UUID hostUUID;
     private String hostName;

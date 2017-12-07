@@ -7,7 +7,7 @@ import android.databinding.BaseObservable;
  *  Model classes are what is used by the application internally, for algorithms and interface representation. **/
 
 public interface IBaseConverter<TModel  extends BaseObservable, TEntity> {
-    public TModel convert(TEntity client);
+    TModel convert(TEntity client);
 
-    public TEntity convert(TModel entity);
+    TEntity convert(TModel entity);
 }

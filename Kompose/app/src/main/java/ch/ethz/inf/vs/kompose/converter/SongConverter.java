@@ -21,7 +21,7 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
 
 public class SongConverter implements IBaseConverter<SongModel, Song> {
 
-    //Client pool used to determine who the song was proposed by.
+    //Client pool
     private ClientModel[] clientModels;
 
     //Constructor for standard arrays (no transformation needed)
@@ -113,7 +113,6 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
             i++;
         }
         song.setDownVotes(downVotes);
-
 
         return song;
     }

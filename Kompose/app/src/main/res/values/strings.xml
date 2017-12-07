@@ -1,6 +1,13 @@
 <resources>
     <string name="app_name">Kompose</string>
 
+    <!-- Labels -->
+    <string name="label_main">Kompose</string>
+    <string name="label_settings">Settings</string>
+    <string name="label_playlist">Placeholder</string>
+    <string name="label_history">Playlist History</string>
+    <string name="label_details">Placeholder</string>
+
     <!-- Settings Strings -->
     <string name="settings_menu">Settings</string>
     <string name="setting_category_host">Host Settings</string>
@@ -54,7 +61,6 @@
     <string name="downvote">downvote</string>
     <string name="youtube_service.download_failed">could not resolve the song details :(</string>
     <string name="title_activity_test_frontend">TestFrontendActivity</string>
-    <string name="title_activity_playlist">Kompose</string>
     <string name="youtube_link">youtube link</string>
 
     <string name="add_youtube_link">add youtube link</string>

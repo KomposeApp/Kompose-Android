@@ -77,8 +77,10 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
-
         StateSingleton.getInstance().setPlaylistIsActive(true);
+
+        // Set title to active session's name
+        setTitle("Session: " + StateSingleton.getInstance().getActiveSession().getName());
 
         if (MainActivity.DESIGN_MODE) {
             viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");

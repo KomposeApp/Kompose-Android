@@ -16,7 +16,7 @@
 
         <activity
             android:name=".MainActivity"
-            android:label="Kompose"
+            android:label="@string/label_main"
             android:configChanges="orientation|screenSize"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -28,22 +28,22 @@
         <activity
             android:name=".PlaylistActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/title_activity_playlist"
+            android:label="@string/label_playlist"
             android:screenOrientation="portrait" />
         <activity
             android:name=".HistoryOverviewActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Playlist History"
+            android:label="@string/label_history"
             android:screenOrientation="portrait" />
         <activity
             android:name=".HistoryDetailsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Playlist History"
+            android:label="@string/label_details"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="Settings"
+            android:label="@string/label_settings"
             android:screenOrientation="portrait" />
 
         <service
@@ -55,15 +55,13 @@
         <!-- Activity used exclusively to share songs -->
         <activity
             android:name=".ShareActivity"
-            android:label="Kompose"
+            android:label="@string/app_name"
             android:theme="@android:style/Theme.NoDisplay">
 
             <!-- youtube link share intents -->
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
-
                 <category android:name="android.intent.category.DEFAULT" />
-
                 <data android:mimeType="text/plain" />
             </intent-filter>
         </activity>

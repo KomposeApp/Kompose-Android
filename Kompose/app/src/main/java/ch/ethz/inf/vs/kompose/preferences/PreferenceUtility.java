@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class PreferenceUtility {
 
-    private final String LOG_TAG = "## Preference Repo";
+    private final String LOG_TAG = "## Preferences";
 
     private static final String PREFERENCE_FILENAME = "kompose.prefs";
 
@@ -27,6 +27,7 @@ public class PreferenceUtility {
 
     private SharedPreferences sPrefs;
     private SharedPreferences.Editor sEdits;
+    private boolean hasChanged;
 
     @SuppressLint("CommitPrefEdits")
     public PreferenceUtility(Context ctx){
@@ -36,10 +37,18 @@ public class PreferenceUtility {
 
     public void applyChanges(){
         sEdits.apply();
+        hasChanged = true;
     }
 
     public void commitChanges(){
         sEdits.commit();
+        hasChanged = true;
+    }
+
+    public boolean hasChanged(){
+        boolean rvalue = hasChanged;
+        hasChanged = false;
+        return rvalue;
     }
 
     public void setUsername(String username){

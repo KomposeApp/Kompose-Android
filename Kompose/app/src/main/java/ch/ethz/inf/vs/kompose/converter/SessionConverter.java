@@ -16,7 +16,6 @@ import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
 /**
  * Convert Session data representation to model representation, and vice-versa.
@@ -52,7 +51,7 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
             }
         }
 
-        //convert songs (also converts all contained songs to models)
+        //convert songs
         if (session.getSongs() != null) {
             SongConverter songConverter = new SongConverter(sessionModel.getClients());
             for (Song song : session.getSongs()) {
@@ -81,16 +80,14 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         SongConverter songConverter = new SongConverter(clientModels);
         List<Song> songs = new ArrayList<>();
         for (int i = 0; i < sessionModel.getAllSongs().size(); i++) {
-            //explude resolving songs as they only should exist temporary
+            //TODO: I don't get it -- why are we skipping these in particular? Please discuss before removing this TODO.
+            //exclude resolving songs as they only should exist temporarily
             if (sessionModel.getAllSongs().get(i).getSongStatus() != SongStatus.RESOLVING) {
                 songs.add(songConverter.convert(sessionModel.getAllSongs().get(i)));
             }
         }
         if (songs.size() > 0) {
-            session.setSongs(new Song[songs.size()]);
-            for (int i = 0; i < songs.size(); i++) {
-                session.getSongs()[i] = songs.get(i);
-            }
+            session.setSongs((Song[]) songs.toArray());
         } else {
             session.setSongs(new Song[0]);
         }

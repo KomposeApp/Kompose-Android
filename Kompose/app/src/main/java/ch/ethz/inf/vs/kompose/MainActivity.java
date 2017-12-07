@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.kompose;
 
-import android.app.ActionBar;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 
 import org.joda.time.DateTime;
 
@@ -56,20 +54,17 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         StateSingleton.getInstance().setStartedFromMainActivity();
         StateSingleton.getInstance().setPreferenceUtility(this);
 
+        // Initialize the song cache
         int currentPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
         int currentCacheSize = StateSingleton.getInstance().getPreferenceUtility().getCurrentCacheSize();
         StateSingleton.getInstance().initializeSongCache(currentPreload, currentCacheSize);
 
-        // Insert default username
-        viewModel.setClientName(StateSingleton.getInstance().getPreferenceUtility().getUsername());
-        viewModel.setSessionName(StateSingleton.getInstance().getPreferenceUtility().getSessionName());
-
-
+        //Initialize Content View
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setViewModel(viewModel);
 
         // setup toolbar
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.kompose_toolbar);
+        Toolbar mainToolbar = findViewById(R.id.kompose_toolbar);
         setSupportActionBar(mainToolbar);
 
         if (MainActivity.DESIGN_MODE) {
@@ -78,6 +73,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                 viewModel.getSessionModels().add(sampleService.getSampleSession("design session " + i));
             }
         }
+
+        // Insert default names
+        viewModel.setClientName(StateSingleton.getInstance().getPreferenceUtility().getUsername());
+        viewModel.setSessionName(StateSingleton.getInstance().getPreferenceUtility().getSessionName());
 
         final TabLayout tabLayout = findViewById(R.id.tabLayout);
         final ViewPager viewPager = findViewById(R.id.viewPager);
@@ -107,6 +106,23 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     }
 
     @Override
+    public void onResume() {
+        if (StateSingleton.getInstance().getPreferenceUtility().hasChanged()) {
+            // Reinsert default names if we changed the settings
+            viewModel.setClientName(StateSingleton.getInstance().getPreferenceUtility().getUsername());
+            viewModel.setSessionName(StateSingleton.getInstance().getPreferenceUtility().getSessionName());
+        }
+
+        //rebind client network service if it's gone when returning
+        if (!clientNetworkServiceBound) {
+            Intent intent = new Intent(this.getBaseContext(), ClientNetworkService.class);
+            bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
+        }
+
+        super.onResume();
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main_toolbar_menu, menu);
@@ -117,6 +133,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.main_toolbar_settings:
+                viewModel.openSettingsClicked(null);
                 return true;
 
             case R.id.main_toolbar_history:
@@ -128,8 +145,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                 return true;
 
             default:
-                // If we got here, the user's action was not recognized.
-                // Invoke the superclass to handle it.
                 return super.onOptionsItemSelected(item);
         }
     }
@@ -236,9 +251,15 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     }
 
     @Override
+    public void openSettingsClicked(){
+        Intent settingsIntent = new Intent(this, SettingsActivity.class);
+        startActivity(settingsIntent);
+    }
+
+    @Override
     public void openHistoryClicked() {
-        Intent playlistIntent = new Intent(this, HistoryOverviewActivity.class);
-        startActivity(playlistIntent);
+        Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
+        startActivity(historyIntent);
     }
 
     @Override
@@ -274,6 +295,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         StateSingleton.getInstance().setActiveClient(clientModel);
         StateSingleton.getInstance().setActiveSession(newSession);
 
+        //Unbind the service discovery as we don't need it anymore
+        unbindService(cNetServiceConnection);
+        clientNetworkServiceBound = false;
+
         // start the server service
         Intent serverIntent = new Intent(this, HostServerService.class);
         startService(serverIntent);
@@ -291,10 +316,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
      */
     private class RegistrationListener implements SimpleListener<Boolean, Void> {
 
-        private MainActivity connectActivity;
+        private MainActivity mainActivity;
 
-        private RegistrationListener(MainActivity connectActivity) {
-            this.connectActivity = connectActivity;
+        private RegistrationListener(MainActivity mainActivity) {
+            this.mainActivity = mainActivity;
         }
 
         @Override
@@ -302,31 +327,34 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             try {
                 if (!success) {
                     Log.e(LOG_TAG, "Failed to establish connection with host");
-                    if (!connectActivity.isDestroyed()) {
-                        connectActivity.showError(getString(R.string.view_error_connection_failed));
-                    }
+                    mainActivity.showError(getString(R.string.view_error_connection_failed));
                     clientNetworkService.closeClientSocket();
                     return;
                 }
 
                 // In case we closed the activity while waiting for a connection, stop here.
-                if (connectActivity.isDestroyed()) {
+                if (mainActivity.isDestroyed()) {
+                    //TODO: Perhaps this is redundant now
                     clientNetworkService.closeClientSocket();
                     return;
                 }
             } catch (IOException e) {
                 throw new IllegalStateException("Closing the Client Server Socket failed");
             }
+
             // start the client service again -- THIS IS INTENTIONAL
             // it will keep the service alive across different activities.
-            Intent serverIntent = new Intent(connectActivity, ClientNetworkService.class);
-            connectActivity.startService(serverIntent);
+            Intent serverIntent = new Intent(mainActivity, ClientNetworkService.class);
+            mainActivity.startService(serverIntent);
+
+            //Unbind the service discovery as we don't need it anymore
+            unbindService(cNetServiceConnection);
+            clientNetworkServiceBound = false;
 
             // Initialize Playlist
-            Intent playlistIntent = new Intent(connectActivity, PlaylistActivity.class);
+            Intent playlistIntent = new Intent(mainActivity, PlaylistActivity.class);
             playlistIntent.putExtra(ch.ethz.inf.vs.kompose.MainActivity.KEY_NETWORKSERVICE, serverIntent);
-            connectActivity.startActivity(playlistIntent);
-            connectActivity.finish();
+            mainActivity.startActivity(playlistIntent);
         }
     }
 

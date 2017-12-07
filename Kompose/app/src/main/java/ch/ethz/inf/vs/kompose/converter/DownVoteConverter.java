@@ -33,7 +33,6 @@ public class DownVoteConverter implements IBaseConverter<DownVoteModel, DownVote
 
     /** Data --> Model **/
     public DownVoteModel convert(DownVote downVote) {
-
         UUID clientUUID = UUID.fromString(downVote.getClientUuid());
         ClientModel clientModel = null;
         for (ClientModel model : clientModels) {
@@ -42,8 +41,6 @@ public class DownVoteConverter implements IBaseConverter<DownVoteModel, DownVote
                 break;
             }
         }
-
-
         return new DownVoteModel(UUID.fromString(downVote.getUuid()), clientModel, downVoteFor);
     }
 

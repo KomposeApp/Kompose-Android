@@ -120,6 +120,12 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         }
     }
 
+    public void openSettingsClicked(View v){
+        if (clickListener != null) {
+            clickListener.openSettingsClicked();
+        }
+    }
+
     public interface ClickListener {
         void createSessionClicked();
 
@@ -130,5 +136,7 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         void openHelpClicked();
 
         void openHistoryClicked();
+
+        void openSettingsClicked();
     }
 }
