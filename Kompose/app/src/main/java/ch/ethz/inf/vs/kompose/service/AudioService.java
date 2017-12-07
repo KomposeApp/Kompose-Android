@@ -333,7 +333,7 @@ public class AudioService extends Service {
                 int numDownloaded = 0;
 
                 int index = 0;
-                while (numDownloaded <= numSongsPreload && index < sessionModel.getPlayQueue().size()) {
+                while (numDownloaded <numSongsPreload && index < sessionModel.getPlayQueue().size()) {
                     try {
                         final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
                         if (!nextDownload.getSongStatus().equals(SongStatus.RESOLVING) && nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {

@@ -99,11 +99,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         // setup toolbar
         Toolbar mainToolbar = (Toolbar) findViewById(R.id.kompose_toolbar_playlist);
         setSupportActionBar(mainToolbar);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
 
         // bind to audio service
         if (StateSingleton.getInstance().getActiveSession().getIsHost()) {
@@ -112,8 +107,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             bindService(audioServiceIntent, audioServiceConnection, BIND_AUTO_CREATE);
         }
     }
-
-
 
 
     @Override

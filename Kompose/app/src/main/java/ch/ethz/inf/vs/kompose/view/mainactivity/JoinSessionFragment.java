@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,7 +49,10 @@ public class JoinSessionFragment extends Fragment {
         // Inflate the layout for this fragment
         FragmentJoinSessionBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.fragment_join_session, container, false);
         //TODO: Figure out why viewModel is null after a restart
-        if (viewModel == null) return binding.getRoot();
+        if (viewModel == null){
+            Log.e("## BIG FAT BUG:", "VIEWMODEL WAS NULL!!!!!!!!!!!!!!!!!!!!!!!!!!!!!11");
+            return binding.getRoot();
+        }
         binding.setViewModel(viewModel);
         binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
         binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), viewModel));

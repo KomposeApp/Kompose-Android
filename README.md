@@ -30,8 +30,5 @@ Tobias Brodmann (brotobia) 15-934-565
 
 ### Known bugs
 
-- PlaylistActivity sometimes calls onCreate more than once, which leads to the following exception:
-java.lang.NullPointerException: Attempt to invoke virtual method 'ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList ch.ethz.inf.vs.kompose.model.SessionModel.getPlayQueue()' on a null object reference
-- PlaylistActivity rebinds the Audio Service every single time we bring it into focus
 - Video Downloading is sometimes called more than 10 times in a row for whatever reason. When this happens, playback and caching fails completely.
 

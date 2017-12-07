@@ -2,20 +2,11 @@ package ch.ethz.inf.vs.kompose;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.widget.Toast;
-
-import java.net.URI;
-import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
-import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.SongRequestListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
 import ch.ethz.inf.vs.kompose.service.handler.SongResolveHandler;
 
 public class ShareActivity extends BaseActivity {
