@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -33,12 +32,8 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
 
     private static final String LOG_TAG = "## Playlist Activity";
-
-    //View
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().getActiveSession(), this);
     private Dialog songRequestDialog;
-
-    //Networking
     private OutgoingMessageHandler responseHandler;
 
     /* Intents of Services originating from the preceeding Activities
@@ -60,15 +55,22 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            Log.d(LOG_TAG, "AudioService disconnected");
-            audioServiceBound = false;
+            Log.w(LOG_TAG, "AudioService died");
+            audioService = null;
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0) {
+            Log.w(LOG_TAG, "Binding died");
+            audioService = null;
         }
     };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_playlist);
+
+        // Signals to ShareActivity that the playlist is active and songs can be requested
         StateSingleton.getInstance().setPlaylistIsActive(true);
 
         // Set title to active session's name
@@ -97,7 +99,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         findViewById(R.id.currently_playing_title).setSelected(true);
 
         // setup toolbar
-        Toolbar mainToolbar = (Toolbar) findViewById(R.id.kompose_toolbar_playlist);
+        Toolbar mainToolbar = findViewById(R.id.kompose_toolbar_playlist);
         setSupportActionBar(mainToolbar);
 
         // bind to audio service
@@ -112,6 +114,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        // ShareActivity should no longer recognize us at this point
+        StateSingleton.getInstance().setPlaylistIsActive(false);
 
         responseHandler.sendUnRegisterClient();
 
@@ -128,7 +133,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             audioServiceBound = false;
         }
 
-        StateSingleton.getInstance().setPlaylistIsActive(false);
     }
 
     @Override
@@ -140,11 +144,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        //set display size
-        DisplayMetrics displaymetrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(displaymetrics);
-        int width = (int) (displaymetrics.widthPixels * 0.9);
-        int height = (int) (displaymetrics.heightPixels * 0.7);
 
         // Handle item selection
         switch (item.getItemId()) {
@@ -218,14 +217,14 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
     @Override
     public void playClicked(View v) {
-        if (audioServiceBound) {
+        if (hostServerServiceIntent != null && audioServiceBound) {
             audioService.startPlaying();
         }
     }
 
     @Override
     public void pauseClicked(View v) {
-        if (audioServiceBound) {
+        if (hostServerServiceIntent != null && audioServiceBound) {
             audioService.stopPlaying();
         }
     }

@@ -45,9 +45,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     public static final boolean DESIGN_MODE = false;
 
-    private MainViewModel viewModel;
+    private final MainViewModel viewModel = new MainViewModel(this);;
 
-    private ServiceConnection cNetServiceConnection;
     private ClientNetworkService clientNetworkService;
     private boolean clientNetworkServiceBound = false;
 
@@ -55,8 +54,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        viewModel = new MainViewModel(this);
 
         // Initialize the preference utility, and sets a flag to prevent ShareActivity from killing Kompose
         StateSingleton.getInstance().setStartedFromMainActivity();
@@ -107,35 +104,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
             }
         });
-
-        cNetServiceConnection =  new ServiceConnection() {
-            @Override
-            public void onServiceConnected(ComponentName className, IBinder service) {
-                Log.d(LOG_TAG, "ClientNetworkService bound");
-                ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
-                clientNetworkService = binder.getService();
-                clientNetworkServiceBound = true;
-                clientNetworkService.findNetworkServices(viewModel.getSessionModels());
-            }
-
-            @Override
-            public void onServiceDisconnected(ComponentName arg0) {
-                Log.w(LOG_TAG, "ClientNetworkService died");
-                breakdown();
-            }
-
-            @Override
-            public void onBindingDied(ComponentName arg0) {
-                Log.w(LOG_TAG, "Binding with ClientNetworkService died");
-                breakdown();
-            }
-
-            private void breakdown(){
-                showError("Discovery of Kompose Sessions has stopped unexpectedly.");
-                clientNetworkService = null;
-                unbindService(this);
-            }
-        };
 
         //bind client network service
         Intent cnsIntent = new Intent(this.getBaseContext(), ClientNetworkService.class);
@@ -316,6 +284,33 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         startActivity(playlistIntent);
     }
 
+    private final ServiceConnection cNetServiceConnection =  new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "ClientNetworkService bound");
+            ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
+            clientNetworkService = binder.getService();
+            clientNetworkServiceBound = true;
+            clientNetworkService.findNetworkServices(viewModel.getSessionModels());
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG_TAG, "ClientNetworkService died");
+            breakdown();
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0) {
+            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
+            breakdown();
+        }
+
+        private void breakdown(){
+            showError("Discovery of Kompose Sessions has stopped unexpectedly.");
+            clientNetworkService = null;
+        }
+    };
 
     /**
      * This listener is intended to be a callback for when we successfully join a session

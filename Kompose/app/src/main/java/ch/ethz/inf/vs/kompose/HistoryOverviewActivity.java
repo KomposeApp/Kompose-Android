@@ -30,15 +30,8 @@ public class HistoryOverviewActivity extends AppCompatActivity implements PastSe
         binding.list.setAdapter(new PastSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
 
-        if (MainActivity.DESIGN_MODE) {
-            SampleService sampleService = new SampleService();
-            viewModel.getSessionModels().add(sampleService.getSampleSession("session 1"));
-            viewModel.getSessionModels().add(sampleService.getSampleSession("session 2"));
-            viewModel.getSessionModels().add(sampleService.getSampleSession("session 3"));
-        } else {
-            StorageHandler storageHandler = new StorageHandler(this);
-            storageHandler.load(viewModel.getSessionModels());
-        }
+        StorageHandler storageHandler = new StorageHandler(this);
+        storageHandler.load(viewModel.getSessionModels());
     }
 
     @Override
