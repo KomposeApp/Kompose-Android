@@ -27,11 +27,11 @@
     <string name="setting_error_sessionname">Please choose a valid session name</string>
     <string name="setting_error_hostport">Please choose a valid port for the host session</string>
     <string name="setting_error_clientport">Please choose a valid port for the client session</string>
-    <string name="view_error_clientname">please choose a non-empty  username</string>
-    <string name="view_error_sessionname">please choose a non-empty session name</string>
-    <string name="view_error_connection_failed">Failed to establish connection to host.</string>
-    <string name="view_error_socket_dead">Establishing connection failed: Host is unreachable.</string>
-    <string name="view_error_socket_closed">Establishing connection failed: Host socket port is closed.</string>
+    <string name="view_error_clientname">Please choose a non-empty username</string>
+    <string name="view_error_sessionname">Please choose a non-empty session name</string>
+    <string name="view_error_connection_failed">Failed to establish connection to host</string>
+    <string name="view_error_socket_dead">Establishing connection failed: Host is unreachable</string>
+    <string name="view_error_socket_closed">Establishing connection failed: Host socket port is closed</string>
 
     <!-- Android Developer Icons -->
     <string name="icons_ai_halt">\ue874</string>
@@ -53,52 +53,50 @@
     <string name="action_history">History</string>
     <string name="action_help">Help</string>
 
-    <!-- Uncategorized -->
+    <!--Other-->
     <string name="join">join</string>
     <string name="client_name">My name</string>
     <string name="create_party">create party</string>
-    <string name="session_name">session name</string>
-    <string name="downvote">downvote</string>
-    <string name="youtube_service.download_failed">could not resolve the song details :(</string>
+    <string name="session_name">Session name</string>
+    <string name="downvote">Downvote</string>
+    <string name="youtube_service.download_failed">Could not resolve the song details</string>
     <string name="title_activity_test_frontend">TestFrontendActivity</string>
-    <string name="youtube_link">youtube link</string>
-
-    <string name="add_youtube_link">add youtube link</string>
-    <string name="confirm">confirm</string>
-    <string name="close">close</string>
-    <string name="add_song">add song</string>
-    <string name="thumbnail">thumbnail</string>
-    <string name="proposed_by">proposed by</string>
+    <string name="youtube_link">YouTube link</string>
+    <string name="add_youtube_link">Add youtube link</string>
+    <string name="confirm">Confirm</string>
+    <string name="close">Close</string>
+    <string name="add_song">Add song</string>
+    <string name="thumbnail">Thumbnail</string>
+    <string name="proposed_by">added by</string>
     <string name="down_vote">down vote</string>
-    <string name="play">play</string>
+    <string name="play">Play</string>
     <string name="songs_contained">songs contained</string>
-    <string name="pause">pause</string>
-    <string name="add_songs">tell others to join your party, or add songs yourself from youtube using the menu top right</string>
-    <string name="add_more_songs">add more songs, the play queue is empty!</string>
-    <string name="wait_a_second">please wait</string>
-    <string name="downvote_button">downvote button</string>
-    <string name="song_is_resolved">please wait, we try to fetch the song…</string>
-    <string name="your_name">your name</string>
-    <string name="join_party">join party</string>
-
+    <string name="pause">Pause</string>
+    <string name="add_songs">Tell others to join your party, or add songs yourself from the menu on the top right.</string>
+    <string name="add_more_songs">Add more songs, the play queue is empty!</string>
+    <string name="wait_a_second">Please wait</string>
+    <string name="downvote_button">Downvote button</string>
+    <string name="song_is_resolved">Please wait, we try to fetch the song…</string>
+    <string name="your_name">Your name</string>
+    <string name="join_party">Join Party</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="looking_for_parties">we are looking for parties…</string>
-    <string name="create">create</string>
-    <string name="manual">manual</string>
-    <string name="history">history</string>
+    <string name="looking_for_parties">looking for parties…</string>
+    <string name="create">Create</string>
+    <string name="manual">Manual</string>
+    <string name="history">History</string>
     <string name="ip_address">IP address</string>
     <string name="ip_address_placeholder">192.168.1.1</string>
     <string name="port_placeholder">7261</string>
-    <string name="port">port</string>
-    <string name="join_manually">join manually</string>
-    <string name="host">hosted by</string>
-    <string name="creation_date_time">created at</string>
+    <string name="port">Port</string>
+    <string name="join_manually">Join manually</string>
+    <string name="host">Hosted by</string>
+    <string name="creation_date_time">Created at</string>
     <string name="title_activity_scrolling">ScrollingActivity</string>
-    <string name="join_existing_party">join an existing party and add your own songs to the playlist</string>
-    <string name="start_own_party">connect your device to the music station, and start your own party</string>
-    <string name="connect_manually">having trouble connecting to the party host? connect here manually</string>
-    <string name="songs">songs</string>
-    <string name="use_to_manually_connect">use the IP and the port to manually connect to the host if you cannot join the session normally</string>
-    <string name="past_link">simply paste a link from youtube to include it into the playlist</string>
-    <string name="resolving_song">resolving url...</string>
+    <string name="join_existing_party">Join an existing party and add your own songs to the playlist</string>
+    <string name="start_own_party">Connect your device to the music station, and start your own party</string>
+    <string name="connect_manually">Having trouble connecting to the party host? connect here manually</string>
+    <string name="songs">Songs</string>
+    <string name="use_to_manually_connect">Use the IP and the port to manually connect to the host</string>
+    <string name="past_link">Simply paste a link from youtube to include it into the playlist</string>
+    <string name="resolving_song">Resolving url…</string>
 </resources>
