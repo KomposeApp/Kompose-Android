@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -21,7 +22,6 @@ import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogHostInfoBinding;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.AudioService;
-import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.handler.SongResolveHandler;
@@ -142,7 +142,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 songRequestDialog.setCancelable(true);
 
                 DialogAddYoutubeLinkBinding binding = DataBindingUtil.inflate(
-                        getLayoutInflater().from(this), R.layout.dialog_add_youtube_link,
+                        LayoutInflater.from(this), R.layout.dialog_add_youtube_link,
                         null, false);
 
                 songRequestDialog.setContentView(binding.getRoot());
@@ -165,7 +165,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 Dialog hostInfoDialog = new Dialog(this);
                 hostInfoDialog.setCancelable(true);
                 DialogHostInfoBinding hostInfoBinding = DataBindingUtil.inflate(
-                        getLayoutInflater().from(this), R.layout.dialog_host_info,
+                        LayoutInflater.from(this), R.layout.dialog_host_info,
                         null, false);
 
                 hostInfoDialog.setContentView(hostInfoBinding.getRoot());

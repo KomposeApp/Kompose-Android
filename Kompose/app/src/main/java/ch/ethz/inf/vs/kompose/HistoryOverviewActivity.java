@@ -9,7 +9,6 @@ import android.util.Log;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryOverviewBinding;
-import ch.ethz.inf.vs.kompose.service.SampleService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.handler.StorageHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.PastSessionAdapter;

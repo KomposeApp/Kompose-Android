@@ -10,8 +10,10 @@ import android.util.Log;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -52,35 +54,37 @@ public class YoutubeDownloadUtility {
      * @return true if the download succeeded, false otherwise
      */
     public File downloadSong(final SongModel songModel) {
-
         String videoID = songModel.getVideoID();
+        Log.d(LOG_TAG, "Video ID: " + videoID);
+
         if (videoID == null){
-            Log.e(LOG_TAG, "File download failed");
+            Log.e(LOG_TAG, "File resolving failed");
             return null;
         }
 
         final File storedFile;
         if (StateSingleton.getInstance().checkCacheByKey(videoID)) {
+            //Song found in cache
             storedFile = StateSingleton.getInstance().retrieveSongFromCache(videoID);
         }
         else{
             //Song not found in cache:
+            InputStream input = null;
+            OutputStream output = null;
             try {
-                Log.d(LOG_TAG, "Video ID: " + songModel.getVideoID());
                 URL url = new URL(songModel.getDownloadUrl().toString());
                 URLConnection connection = url.openConnection();
                 connection.connect();
 
+                input = new BufferedInputStream(connection.getInputStream());
+                storedFile = new File(context.getCacheDir(), songModel.getFileName());
+                output = new FileOutputStream(storedFile);
+
                 // Detect the file length
                 final int fileLength = connection.getContentLength();
 
-                final InputStream input = new BufferedInputStream(connection.getInputStream());
-                storedFile = new File(context.getCacheDir(), songModel.getFileName());
-                final OutputStream output = new FileOutputStream(storedFile);
-
-                byte[] buffer = new byte[1024];
-                int count;
-                int total = 0;
+                byte[] buffer = new byte[4096];
+                int count, total = 0;
                 while ((count = input.read(buffer)) != -1) {
                     output.write(buffer, 0, count);
                     total += count;
@@ -89,48 +93,60 @@ public class YoutubeDownloadUtility {
                     new Handler(Looper.getMainLooper()).post(new Runnable() {
                         @Override
                         public void run() {
-                            songModel.setDownloadProgress((int) (currentTotal * 100 / fileLength));
+                            songModel.setDownloadProgress(currentTotal * 100 / fileLength);
                         }
                     });
                 }
-                input.close();
-                output.close();
-
-                StateSingleton.getInstance().addSongToCache(videoID, storedFile);
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Log.e(LOG_TAG, "File download failed");
-                e.printStackTrace();
                 return null;
+            } finally {
+                try {
+                    if (input != null)  input.close();
+                    if (output != null) output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(LOG_TAG, "Failed to close input/outputstream. This will probably have consequences.");
+                }
             }
+
+            StateSingleton.getInstance().addSongToCache(videoID, storedFile);
         }
         return storedFile;
     }
 
     public Drawable downloadThumb(SongModel songModel) {
+        
+        // We don't cache thumbnails because they're extremely lightweight
+        InputStream input = null;
+        OutputStream output = null;
         try {
-
             URL url = new URL(songModel.getThumbnailUrl().toString());
             URLConnection connection = url.openConnection();
             connection.connect();
 
-            final InputStream input = new BufferedInputStream(connection.getInputStream());
+            input = new BufferedInputStream(connection.getInputStream());
             File thumbFile = new File(context.getCacheDir(), "thumb_" + songModel.getUUID() + ".jpg");
-            final OutputStream output = new FileOutputStream(thumbFile);
+            output = new FileOutputStream(thumbFile);
 
-            byte[] buffer = new byte[1024];
+            byte[] buffer = new byte[4096];
             int count;
-            int total = 0;
             while ((count = input.read(buffer)) != -1) {
                 output.write(buffer, 0, count);
-                total += count;
             }
-            input.close();
-            output.close();
-
             return Drawable.createFromPath(thumbFile.getAbsolutePath());
-
         } catch (Exception e) {
+            Log.e(LOG_TAG, "Thumbnail download failed");
+            e.printStackTrace();
             return null;
+        } finally {
+            try {
+                if (input != null)  input.close();
+                if (output != null) output.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(LOG_TAG, "Failed to close input/outputstream. This will probably have consequences.");
+            }
         }
     }
 }
