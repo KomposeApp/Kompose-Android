@@ -4,11 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <import type="android.view.View" />
-
         <import type="ch.ethz.inf.vs.kompose.enums.DownloadStatus" />
-
         <import type="ch.ethz.inf.vs.kompose.enums.SongStatus" />
 
         <variable
@@ -78,7 +75,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@{`, proposed by ` + viewHolder.item.proposedBy.name}"
+                        android:text="@{`, added by ` + viewHolder.item.proposedBy.name}"
                         tools:text=", proposed by Kompose" />
                 </LinearLayout>
             </LinearLayout>
@@ -93,7 +90,7 @@
                 android:indeterminateOnly="false"
                 android:max="100"
                 android:progress="@{viewHolder.item.downloadProgress}"
-                android:visibility="@{viewHolder.item.downloadStatus == DownloadStatus.STARTED ? View.VISIBLE : View.GONE}"
+                android:visibility="@{(viewHolder.item.partOfSession.isHost &amp;&amp; viewHolder.item.downloadStatus == DownloadStatus.STARTED) ? View.VISIBLE : View.GONE}"
                 tools:progress="25"
                 tools:visibility="visible" />
 

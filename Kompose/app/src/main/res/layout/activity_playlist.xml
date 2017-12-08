@@ -36,7 +36,6 @@
             android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.ACTIVE) ? View.VISIBLE : View.GONE}"
             tools:visibility="visible">
 
-
             <RelativeLayout
                 android:id="@+id/currently_playing"
                 style="@style/TileLayout"
@@ -58,6 +57,7 @@
                     android:contentDescription="@string/thumbnail"
                     android:scaleType="centerCrop"
                     android:src="@{viewModel.sessionModel.currentlyPlaying.thumbnail}"
+                    tools:visibility="@{viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}"
                     tools:src="@drawable/sample_thumbnail" />
 
                 <RelativeLayout
@@ -85,7 +85,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_below="@id/currently_playing_title"
-                        android:text="@{viewModel.sessionModel.currentlyPlaying.songLengthMinSec + ` (Added by: ` + viewModel.sessionModel.currentlyPlaying.proposedBy.name + `)`}"
+                        android:text="@{viewModel.sessionModel.currentlyPlaying.songLengthMinSec + ` (added by: ` + viewModel.sessionModel.currentlyPlaying.proposedBy.name + `)`}"
                         tools:text="4:20 (Added by: Big Shaq)" />
 
                     <!--<TextView-->
@@ -108,8 +108,7 @@
                         android:max="100"
                         android:progress="@{viewModel.sessionModel.currentlyPlaying.playbackProgress}"
                         tools:progress="25"
-                        tools:visibility="visible" />
-
+                        tools:visibility="@{viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}" />
 
                     <!--Play button wrapper-->
 
@@ -125,7 +124,7 @@
                         android:enabled="@{viewModel.sessionModel.isHost}"
                         android:onClick="@{viewModel.onPlayClicked}"
                         android:text="@string/icons_ai_playback_play"
-                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PAUSED) ? View.VISIBLE : View.GONE}"
+                        android:visibility="@{(viewModel.sessionModel.isHost &amp;&amp; viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PAUSED)) ? View.VISIBLE : View.GONE}"
                         tools:visibility="gone" />
 
                     <!--pause button-->
@@ -141,7 +140,7 @@
                         android:fontFamily="@font/androidicons"
                         android:onClick="@{viewModel.onPauseClicked}"
                         android:text="@string/icons_ai_playback_pause"
-                        android:visibility="@{viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING) ? View.VISIBLE : View.GONE}"
+                        android:visibility="@{(viewModel.sessionModel.isHost &amp;&amp; viewModel.sessionModel.currentlyPlaying.songStatus.equals(SongStatus.PLAYING)) ? View.VISIBLE : View.GONE}"
                         tools:visibility="visible" />
 
                     <!--Down vote button-->
@@ -209,22 +208,6 @@
                 android:layout_height="match_parent"
                 android:text="@string/add_songs" />
 
-
-        </LinearLayout>
-
-        <LinearLayout
-            style="@style/TextContentLayout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="@{!viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}"
-            tools:visibility="visible">
-
-            <TextView
-                style="@style/SecondaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="@string/wait_a_second" />
 
         </LinearLayout>
     </LinearLayout>
