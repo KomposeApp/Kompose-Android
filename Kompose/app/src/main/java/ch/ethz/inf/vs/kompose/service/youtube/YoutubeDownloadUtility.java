@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.service;
+package ch.ethz.inf.vs.kompose.service.youtube;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
@@ -13,12 +13,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.youtube.YouTubeExtractor;
+import ch.ethz.inf.vs.kompose.service.SimpleListener;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.service.youtube.extractor.YouTubeExtractor;
 
 
 public class YoutubeDownloadUtility {
@@ -116,7 +117,7 @@ public class YoutubeDownloadUtility {
     }
 
     public Drawable downloadThumb(SongModel songModel) {
-        
+
         // We don't cache thumbnails because they're extremely lightweight
         InputStream input = null;
         OutputStream output = null;

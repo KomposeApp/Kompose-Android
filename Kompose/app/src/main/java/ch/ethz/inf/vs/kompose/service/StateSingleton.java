@@ -4,12 +4,12 @@ import android.content.Context;
 import android.util.Log;
 
 import java.io.File;
-import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.Phaser;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
+import ch.ethz.inf.vs.kompose.service.preferences.PreferenceUtility;
+import ch.ethz.inf.vs.kompose.service.audio.SongCacheMap;
 
 /**
  * Stores all relevant information for the active application
@@ -23,8 +23,8 @@ public class StateSingleton {
     private ClientModel activeClient;
     private SessionModel activeHistorySession;
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
-    private boolean hasMainActivity; //Required for the Share Activity.
-    private boolean playlistIsActive;
+    private boolean hasMainActivity; //Required for the Share Activity
+    private boolean playlistIsActive; //Required for the Share Activity
     private Phaser audioServicePhaser;
 
     private StateSingleton() {

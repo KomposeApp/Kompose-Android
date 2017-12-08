@@ -50,7 +50,7 @@
             android:name=".service.host.HostServerService"
             android:stopWithTask="true" />
         <service android:name=".service.client.ClientNetworkService" />
-        <service android:name=".service.AudioService" />
+        <service android:name=".service.audio.AudioService" />
 
         <!-- Activity used exclusively to share songs -->
         <activity

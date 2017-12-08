@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.preferences;
+package ch.ethz.inf.vs.kompose.service.preferences;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

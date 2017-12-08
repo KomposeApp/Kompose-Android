@@ -10,8 +10,7 @@ import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
-import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.service.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 

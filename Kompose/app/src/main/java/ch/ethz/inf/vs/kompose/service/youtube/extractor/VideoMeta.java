@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.service.youtube;
+package ch.ethz.inf.vs.kompose.service.youtube.extractor;
 
 public class VideoMeta {
 

@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.service;
+package ch.ethz.inf.vs.kompose.service.audio;
 
 import android.util.Log;
 

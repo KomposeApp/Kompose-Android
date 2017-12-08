@@ -7,7 +7,7 @@ import android.util.Log;
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.handler.SongResolveHandler;
+import ch.ethz.inf.vs.kompose.service.audio.SongResolveHandler;
 
 public class ShareActivity extends BaseActivity {
 

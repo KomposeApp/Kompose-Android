@@ -1,7 +1,8 @@
-package ch.ethz.inf.vs.kompose.service.handler;
+package ch.ethz.inf.vs.kompose.service.audio;
 
 import android.content.Context;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.net.URI;
 import java.util.UUID;
@@ -13,9 +14,10 @@ import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.SongRequestListener;
+import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility;
+import ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility;
+import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public abstract class SongResolveHandler {
 
@@ -93,5 +95,38 @@ public abstract class SongResolveHandler {
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(ctx);
         youtubeService.resolveSong(songModel, new SongRequestListener(ctx));
         return true;
+    }
+
+    private static class SongRequestListener implements SimpleListener<Integer, SongModel> {
+
+        private final String LOG_TAG = "## SongRequestListener";
+
+        private Context ctx;
+
+        private SongRequestListener(Context ctx) {
+            this.ctx = ctx;
+        }
+
+        @Override
+        public void onEvent(Integer status, SongModel value) {
+            if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
+                value.setSongStatus(SongStatus.REQUESTED);
+                try {
+                    StateSingleton.getInstance().getAudioServicePhaser().register();
+                } catch (Exception ex) {
+                    //we dont case
+                }
+                Log.d(LOG_TAG, "resolved download url: " + value.getDownloadUrl());
+                new OutgoingMessageHandler(ctx).sendRequestSong(value);
+            } else {
+                Log.e(LOG_TAG, "resolving url failed");
+                Toast.makeText(ctx, "Failed to resolve Youtube URL", Toast.LENGTH_LONG).show();
+
+                SessionModel sessionModel = StateSingleton.getInstance().getActiveSession();
+                if (sessionModel != null && sessionModel.getPlayQueue().contains(value)) {
+                    sessionModel.getPlayQueue().remove(value);
+                }
+            }
+        }
     }
 }

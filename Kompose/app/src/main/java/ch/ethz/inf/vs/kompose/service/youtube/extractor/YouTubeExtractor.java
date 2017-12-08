@@ -1,4 +1,4 @@
-package ch.ethz.inf.vs.kompose.service.youtube;
+package ch.ethz.inf.vs.kompose.service.youtube.extractor;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -35,8 +35,8 @@ import java.util.regex.Pattern;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 
-import static ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility.RESOLVE_FAILED;
-import static ch.ethz.inf.vs.kompose.service.YoutubeDownloadUtility.RESOLVE_SUCCESS;
+import static ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility.RESOLVE_FAILED;
+import static ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility.RESOLVE_SUCCESS;
 
 public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile>> {
 

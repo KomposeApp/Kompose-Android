@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.io.IOException;
 import java.net.ServerSocket;
 
-import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
+import ch.ethz.inf.vs.kompose.service.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 public class SettingsActivity extends AppCompatActivity {
