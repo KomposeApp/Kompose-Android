@@ -85,6 +85,7 @@ public abstract class SongResolveHandler {
         songModel.setTitle("downloading info...");
         songModel.setSongStatus(SongStatus.RESOLVING);
         songModel.setVideoID(videoID);
+        songModel.setOrder(activeSession.getAllSongs().size());
 
         activeSession.getPlayQueue().add(songModel);
         activeSession.getAllSongs().add(songModel);

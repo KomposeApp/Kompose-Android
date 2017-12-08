@@ -63,9 +63,9 @@ public class IncomingMessageHandler implements Runnable {
     private Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String json = input.readLine();
-        Log.d(LOG_TAG, "message read from stream: " + json.toString());
+        Log.d(LOG_TAG, "message read from stream: " + json);
 
-        Message message = JsonConverter.fromMessageJsonString(json.toString());
+        Message message = JsonConverter.fromMessageJsonString(json);
         input.close();
         return message;
     }
@@ -301,7 +301,7 @@ public class IncomingMessageHandler implements Runnable {
                 return new Runnable() {
                     @Override
                     public void run() {
-                        updateSong(songModel, songModel1);
+                        updateSong(songModel, songModel1, sessionModel);
                     }
                 };
             }
@@ -431,7 +431,7 @@ public class IncomingMessageHandler implements Runnable {
                     boolean found = false;
                     for (SongModel activeSong : activeSessionModel.getAllSongs()) {
                         if (updateSong.getUUID().equals(activeSong.getUUID())) {
-                            updateSong(updateSong, activeSong);
+                            updateSong(updateSong, activeSong, activeSessionModel);
                             found = true;
                             boolean downvoteCasted = false;
 
@@ -458,7 +458,7 @@ public class IncomingMessageHandler implements Runnable {
                                     activeSong.getDownVotes().add(model);
                                 }
                             }
-                            updateSong.setSkipVoteCasted(downvoteCasted);
+                            activeSong.setSkipVoteCasted(downvoteCasted);
 
                             //remove all still contained down votes because they have not been found
                             for (DownVoteModel activeDownVote : activeDownVotes) {
@@ -483,12 +483,28 @@ public class IncomingMessageHandler implements Runnable {
         target.setIsActive(source.getIsActive());
     }
 
-    private void updateSong(SongModel source, SongModel target) {
+    private void updateSong(SongModel source, SongModel target, SessionModel sessionModel) {
         target.setCreationDateTime(source.getCreationDateTime());
         target.setTitle(source.getTitle());
         target.setDownloadPath(source.getDownloadPath());
         target.setDownloadUrl(source.getDownloadUrl());
-        target.setOrder(source.getOrder());
+        if (source.getOrder() != target.getOrder()) {
+            //remove from all list so they are forcibly readded
+            if (sessionModel.getAllSongs().contains(target)) {
+                sessionModel.getAllSongs().remove(target);
+                sessionModel.getAllSongs().add(target);
+            }
+            if (sessionModel.getPlayQueue().contains(target)) {
+                sessionModel.getPlayQueue().remove(target);
+            }
+            if (sessionModel.getPastSongs().contains(target)) {
+                sessionModel.getPastSongs().remove(target);
+            }
+            if (sessionModel.getPlayQueueWithDislikedSongs().contains(target)) {
+                sessionModel.getPlayQueueWithDislikedSongs().remove(target);
+            }
+            target.setOrder(source.getOrder());
+        }
         target.setSongStatus(source.getSongStatus());
         target.setSourceUrl(source.getSourceUrl());
         target.setThumbnailUrl(source.getThumbnailUrl());

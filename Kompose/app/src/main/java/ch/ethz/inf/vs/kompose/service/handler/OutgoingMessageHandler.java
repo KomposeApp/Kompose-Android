@@ -104,8 +104,13 @@ public class OutgoingMessageHandler {
 
     public void sendSessionUpdate() {
         if (getSession().getIsHost()) {
+            SessionModel sessionModel = getSession();
+            if (sessionModel.getSessionStatus().equals(SessionStatus.WAITING)) {
+                sessionModel.setSessionStatus(SessionStatus.ACTIVE);
+            }
+
             SessionConverter sessionConverter = new SessionConverter();
-            Session session = sessionConverter.convert(getSession());
+            Session session = sessionConverter.convert(sessionModel);
             Message message = getBaseMessageHost(MessageType.SESSION_UPDATE);
             message.setSession(session);
 
