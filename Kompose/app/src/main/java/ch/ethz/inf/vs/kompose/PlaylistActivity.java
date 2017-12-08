@@ -73,12 +73,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         // Signals to ShareActivity that the playlist is active and songs can be requested
         StateSingleton.getInstance().setPlaylistIsActive(true);
 
-        if (MainActivity.DESIGN_MODE) {
-            viewModel.setSearchLink("https://www.youtube.com/watch?v=qT6XCvDUUsU");
-            SampleService sampleService = new SampleService();
-            sampleService.fillSampleSession(viewModel.getSessionModel());
-        }
-
         Intent intent = getIntent();
         responseHandler = new OutgoingMessageHandler(this);
         hostServerServiceIntent = intent.getParcelableExtra(MainActivity.KEY_SERVERSERVICE);

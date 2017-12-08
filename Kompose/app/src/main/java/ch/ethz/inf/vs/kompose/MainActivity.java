@@ -46,8 +46,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     public static final String SERVICE_TYPE = "_kompose._tcp";
     public static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
 
-    public static final boolean DESIGN_MODE = false;
-
     private final MainViewModel viewModel = new MainViewModel(this);
 
     private ClientNetworkService clientNetworkService;
@@ -74,19 +72,13 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         Toolbar mainToolbar = findViewById(R.id.kompose_toolbar);
         setSupportActionBar(mainToolbar);
 
-        if (MainActivity.DESIGN_MODE) {
-            SampleService sampleService = new SampleService();
-            for (int i = 0; i < 15; i++) {
-                viewModel.getSessionModels().add(sampleService.getSampleSession("design session " + i));
-            }
-        }
-
         // Insert default names
         viewModel.setFromPreferences(StateSingleton.getInstance().getPreferenceUtility());
 
         final TabLayout tabLayout = findViewById(R.id.tabLayout);
         final ViewPager viewPager = findViewById(R.id.viewPager);
         final PagerAdapter adapter = new MainActivityPagerAdapter(getSupportFragmentManager(), viewModel);
+
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -167,7 +159,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     /**
      * Join tab -- join existing rooms by clicking on their fragment.
-     *
      * @param sessionModel Session to join
      */
     @Override
@@ -217,23 +208,12 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     @Override
     public void joinManualClicked() {
-        String clientName = viewModel.getClientName();
-
-        // Client's name must not be empty
-        if (clientName == null || clientName.trim().isEmpty()) {
-            showError(getString(R.string.view_error_clientname));
-            return;
-        }
-        clientName = clientName.trim();
 
         UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
 
         // Create a stub session
+        // NOTE: Don't care for now what we put as Session or Host UUID.
         SessionModel sessionModel = new SessionModel(deviceUUID, null, false);
-
-        ClientModel clientModel = new ClientModel(deviceUUID, sessionModel);
-        clientModel.setName(clientName);
-        clientModel.setIsActive(true);
 
         // Get IP / port
         try {
@@ -247,31 +227,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             return;
         }
 
-        // Set active session and our own active client
-        StateSingleton.getInstance().setActiveSession(sessionModel);
-        StateSingleton.getInstance().setActiveClient(clientModel);
-        try {
-            if (!clientNetworkServiceBound || clientNetworkService == null)
-                throw new IllegalStateException("Failed to properly set up Client Network Service");
-
-            RegistrationListener listener = new RegistrationListener(this);
-            clientNetworkService.initSocketListener();
-            clientNetworkService.registerClientOnHost(listener, clientName);
-        } catch (SocketException s) {
-            s.printStackTrace();
-            try {
-                clientNetworkService.closeClientSocket();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Cleaning up the Client Socket failed.");
-                e.printStackTrace();
-            }
-            showError("Failed to set up connection.");
-        } catch (IllegalStateException | IOException io) {
-            io.printStackTrace();
-            showError("Failed to set up connection.");
-        }
-
-        viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
+        joinSessionClicked(sessionModel);
     }
 
     @Override

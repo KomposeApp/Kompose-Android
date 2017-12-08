@@ -140,7 +140,7 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         preferences.setSessionName(getSessionName());
         preferences.setDefaultPort(getPort());
         preferences.setDefaultIp(getIpAddress());
-        preferences.commitChanges();
+        preferences.applyChanges();
     }
 
     public interface ClickListener {

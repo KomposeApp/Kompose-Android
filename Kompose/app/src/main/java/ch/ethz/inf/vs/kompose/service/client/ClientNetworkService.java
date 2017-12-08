@@ -186,7 +186,6 @@ public class ClientNetworkService extends Service {
     /**
      * Sends the register message to the host and waits for a response.
      * Currently only a single attempt is made.
-     * TODO: Perhaps we should send more info to the host than just the name. Also, should we do more than one attempt?
      * @param callbackListener Callback listener with which we will update the corresponding activity
      * @param clientName Name of the client to register on the host
      * @throws SocketException Thrown should opening the socket fail for some reason.
