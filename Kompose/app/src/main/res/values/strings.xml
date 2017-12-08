@@ -5,8 +5,8 @@
     <string name="label_main">Kompose</string>
     <string name="label_settings">Settings</string>
     <string name="label_playlist">Placeholder</string>
-    <string name="label_history">Playlist History</string>
-    <string name="label_details">Placeholder</string>
+    <string name="label_history">History</string>
+    <string name="label_details">History</string>
 
     <!-- Settings Strings -->
     <string name="settings_menu">Settings</string>

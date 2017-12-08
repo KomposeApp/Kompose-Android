@@ -5,6 +5,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 
@@ -31,6 +32,10 @@ public class HistoryOverviewActivity extends AppCompatActivity implements PastSe
 
         StorageHandler storageHandler = new StorageHandler(this);
         storageHandler.load(viewModel.getSessionModels());
+
+        // setup toolbar
+        Toolbar toolbar = findViewById(R.id.history_overview_toolbar);
+        setSupportActionBar(toolbar);
     }
 
     @Override

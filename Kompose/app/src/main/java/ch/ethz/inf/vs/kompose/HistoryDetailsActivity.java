@@ -4,6 +4,7 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryDetailsBinding;
@@ -25,11 +26,14 @@ public class HistoryDetailsActivity extends AppCompatActivity implements PlayedS
         super.onCreate(savedInstanceState);
         Log.d(LOG_TAG, "Viewing details for Playlist: " + viewModel.getSessionModel().getName());
 
-        setTitle("Playlist: " + viewModel.getSessionModel().getName());
         ActivityHistoryDetailsBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_history_details);
 
         binding.list.setLayoutManager(new LinearLayoutManager(this));
         binding.list.setAdapter(new PlayedSongAdapter(viewModel.getSessionModel().getAllSongs(), getLayoutInflater(), this));
         binding.setViewModel(viewModel);
+
+        // setup toolbar
+        Toolbar toolbar = findViewById(R.id.history_details_toolbar);
+        setSupportActionBar(toolbar);
     }
 }

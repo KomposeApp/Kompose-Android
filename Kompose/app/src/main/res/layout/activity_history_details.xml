@@ -18,6 +18,16 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/history_details_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:elevation="4dp"
+            android:theme="@style/ToolbarStyle"
+            android:background="@color/colorPrimary"
+            app:title="@{viewModel.sessionModel.name}"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+
         <LinearLayout
             style="@style/TileLayout"
             android:layout_width="match_parent"
