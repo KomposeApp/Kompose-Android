@@ -19,6 +19,8 @@ public class PreferenceUtility {
     private static final String KEY_SESSIONNAME = "k_session";
     private static final String KEY_HPORT = "k_host_port";
     private static final String KEY_CPORT = "k_client_port";
+    private static final String KEY_DEFAULT_IP = "k_default_ip";
+    private static final String KEY_DEFAULT_PORT = "k_default_port";
 
     private static final String DEFAULT_USERNAME = "Komposer";
     private static final String DEFAULT_SESSIONNAME = "Default Session";
@@ -30,63 +32,90 @@ public class PreferenceUtility {
     private boolean hasChanged;
 
     @SuppressLint("CommitPrefEdits")
-    public PreferenceUtility(Context ctx){
+    public PreferenceUtility(Context ctx) {
         this.sPrefs = ctx.getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
         this.sEdits = sPrefs.edit();
     }
 
-    public void applyChanges(){
+    public void applyChanges() {
         sEdits.apply();
         hasChanged = true;
     }
 
-    public void commitChanges(){
+    public void commitChanges() {
         sEdits.commit();
         hasChanged = true;
     }
 
-    public boolean hasChanged(){
+    public boolean hasChanged() {
         boolean rvalue = hasChanged;
         hasChanged = false;
         return rvalue;
     }
 
-    public void setUsername(String username){
+    public void setUsername(String username) {
         sEdits.putString(KEY_USERNAME, username);
     }
-    public void setSessionName(String sessionName){
+
+    public void setSessionName(String sessionName) {
         sEdits.putString(KEY_SESSIONNAME, sessionName);
     }
-    public void setHostPort(int port){
+
+    public void setHostPort(int port) {
         sEdits.putInt(KEY_HPORT, port);
     }
+
     public void setClientPort(int port) {
         sEdits.putInt(KEY_CPORT, port);
     }
-    public void setPreload( int preload){
+
+    public void setPreload(int preload) {
         sEdits.putInt(KEY_PRELOAD, preload);
     }
-    public void setCurrentCacheSize( int cacheSize){
+
+    public void setCurrentCacheSize(int cacheSize) {
         sEdits.putInt(KEY_CACHESIZE, cacheSize);
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return sPrefs.getString(KEY_USERNAME, DEFAULT_USERNAME);
     }
-    public String getSessionName(){
+
+    public String getSessionName() {
         return sPrefs.getString(KEY_SESSIONNAME, DEFAULT_SESSIONNAME);
     }
-    public int getHostPort(){
+
+    public int getHostPort() {
         return sPrefs.getInt(KEY_HPORT, DEFAULT_PORT);
     }
-    public int getClientPort(){
+
+    public int getClientPort() {
         return sPrefs.getInt(KEY_CPORT, DEFAULT_PORT);
     }
-    public int getPreload(){
+
+    public int getPreload() {
         return sPrefs.getInt(KEY_PRELOAD, DEFAULT_PRELOAD);
     }
-    public int getCurrentCacheSize(){
+
+    public int getCurrentCacheSize() {
         return sPrefs.getInt(KEY_CACHESIZE, DEFAULT_PRELOAD);
+    }
+
+
+    public void setDefaultIp(String defaultIp) {
+        sEdits.putString(KEY_DEFAULT_IP, defaultIp);
+    }
+
+    public void setDefaultPort(String port) {
+        sEdits.putString(KEY_DEFAULT_PORT, port);
+    }
+
+    public String getDefaultPort() {
+        return sPrefs.getString(KEY_DEFAULT_PORT, "");
+    }
+
+    public String getDefaultIp() {
+        return sPrefs.getString(KEY_DEFAULT_IP, "");
     }
 
     /**

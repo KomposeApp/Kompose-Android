@@ -10,6 +10,8 @@ import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
+import ch.ethz.inf.vs.kompose.preferences.PreferenceUtility;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
@@ -120,10 +122,25 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         }
     }
 
-    public void openSettingsClicked(View v){
+    public void openSettingsClicked(View v) {
         if (clickListener != null) {
             clickListener.openSettingsClicked();
         }
+    }
+
+    public void setFromPreferences(PreferenceUtility preferences) {
+        this.setClientName(preferences.getUsername());
+        this.setSessionName(preferences.getSessionName());
+        this.setPort(preferences.getDefaultPort());
+        this.setIpAddress(preferences.getDefaultIp());
+    }
+
+    public void saveToPreferences(PreferenceUtility preferences) {
+        preferences.setUsername(getClientName());
+        preferences.setSessionName(getSessionName());
+        preferences.setDefaultPort(getPort());
+        preferences.setDefaultIp(getIpAddress());
+        preferences.commitChanges();
     }
 
     public interface ClickListener {

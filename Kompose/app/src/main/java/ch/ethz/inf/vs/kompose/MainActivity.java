@@ -82,8 +82,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
 
         // Insert default names
-        viewModel.setClientName(StateSingleton.getInstance().getPreferenceUtility().getUsername());
-        viewModel.setSessionName(StateSingleton.getInstance().getPreferenceUtility().getSessionName());
+        viewModel.setFromPreferences(StateSingleton.getInstance().getPreferenceUtility());
 
         final TabLayout tabLayout = findViewById(R.id.tabLayout);
         final ViewPager viewPager = findViewById(R.id.viewPager);
@@ -168,6 +167,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     /**
      * Join tab -- join existing rooms by clicking on their fragment.
+     *
      * @param sessionModel Session to join
      */
     @Override
@@ -191,6 +191,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         //Set active session and our own active client
         StateSingleton.getInstance().setActiveSession(sessionModel);
         StateSingleton.getInstance().setActiveClient(clientModel);
+
         try {
             if (!clientNetworkServiceBound || clientNetworkService == null)
                 throw new IllegalStateException("Failed to properly set up Client Network Service");
@@ -211,9 +212,9 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             io.printStackTrace();
             showError("Failed to set up connection.");
         }
+        viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
     }
 
-    // TODO
     @Override
     public void joinManualClicked() {
         String clientName = viewModel.getClientName();
@@ -269,15 +270,17 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             io.printStackTrace();
             showError("Failed to set up connection.");
         }
+
+        viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
     }
 
     @Override
     public void openHelpClicked() {
-        //todo: open help
+        //todo: make
     }
 
     @Override
-    public void openSettingsClicked(){
+    public void openSettingsClicked() {
         Intent settingsIntent = new Intent(this, SettingsActivity.class);
         startActivity(settingsIntent);
     }
@@ -333,10 +336,12 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
         playlistIntent.putExtra(MainActivity.KEY_SERVERSERVICE, serverIntent);
         startActivity(playlistIntent);
+
+        viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
     }
 
 
-    private final ServiceConnection cNetServiceConnection =  new ServiceConnection() {
+    private final ServiceConnection cNetServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d(LOG_TAG, "ClientNetworkService bound");
@@ -358,7 +363,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             breakdown();
         }
 
-        private void breakdown(){
+        private void breakdown() {
             showError("Discovery of Kompose Sessions has stopped unexpectedly.");
             clientNetworkService = null;
         }

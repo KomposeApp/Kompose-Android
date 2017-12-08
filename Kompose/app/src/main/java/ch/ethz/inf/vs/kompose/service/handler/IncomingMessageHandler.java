@@ -118,10 +118,10 @@ public class IncomingMessageHandler implements Runnable {
                 sessionUIChanges = requestSong(message, activeSessionModel);
                 break;
             case CAST_SKIP_SONG_VOTE:
-                sessionUIChanges = castSkipSongVote(message, activeSessionModel);
+                sessionUIChanges = castSkipSongVote(message, activeSessionModel, myClientModel);
                 break;
             case REMOVE_SKIP_SONG_VOTE:
-                sessionUIChanges = removeSkipSongVote(message, activeSessionModel);
+                sessionUIChanges = removeSkipSongVote(message, activeSessionModel, myClientModel);
                 break;
             case KEEP_ALIVE:
                 //already handled by refreshClientTimeout before
@@ -318,7 +318,7 @@ public class IncomingMessageHandler implements Runnable {
         };
     }
 
-    private Runnable castSkipSongVote(Message message, SessionModel activeSessionModel) {
+    private Runnable castSkipSongVote(Message message, SessionModel activeSessionModel, final ClientModel clientModel) {
         SongModel downVoteTarget = null;
         String requestedSongUUID = message.getSongDetails().getUuid();
         String senderUUID = message.getSenderUuid();
@@ -356,13 +356,15 @@ public class IncomingMessageHandler implements Runnable {
         return new Runnable() {
             @Override
             public void run() {
-                finalDownVoteTarget.setSkipVoteCasted(true);
+                if (clientModel.getUUID().equals(downVoteModel.getClientModel().getUUID())) {
+                    finalDownVoteTarget.setSkipVoteCasted(true);
+                }
                 finalDownVoteTarget.getDownVotes().add(downVoteModel);
             }
         };
     }
 
-    private Runnable removeSkipSongVote(Message message, SessionModel activeSessionModel) {
+    private Runnable removeSkipSongVote(Message message, SessionModel activeSessionModel, final ClientModel clientModel) {
         // find the song in the session
         for (int i = 0; i < activeSessionModel.getAllSongs().size(); i++) {
             final SongModel songModel = activeSessionModel.getAllSongs().get(i);
@@ -381,7 +383,9 @@ public class IncomingMessageHandler implements Runnable {
                         return new Runnable() {
                             @Override
                             public void run() {
-                                songModel.setSkipVoteCasted(false);
+                                if (clientModel.getUUID().equals(finalDownVoteModel.getClientModel().getUUID())) {
+                                    songModel.setSkipVoteCasted(false);
+                                }
                                 songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
                                 songModel.getDownVotes().remove(finalDownVoteModel);
                             }
@@ -429,6 +433,7 @@ public class IncomingMessageHandler implements Runnable {
                         if (updateSong.getUUID().equals(activeSong.getUUID())) {
                             updateSong(updateSong, activeSong);
                             found = true;
+                            boolean downvoteCasted = false;
 
                             List<DownVoteModel> activeDownVotes = new ArrayList<>(activeSong.getDownVotes());
                             for (DownVoteModel updateDownVote : updateSong.getDownVotes()) {
@@ -438,7 +443,7 @@ public class IncomingMessageHandler implements Runnable {
                                         //found; remove it from the list
                                         DownVoteModel downVoteModel = activeDownVotes.get(i);
                                         if (downVoteModel.getClientModel().getUUID().equals(myClientModel.getUUID())) {
-                                            updateSong.setSkipVoteCasted(false);
+                                            downvoteCasted = true;
                                         }
                                         activeDownVotes.remove(downVoteModel);
                                         downVoteFound = true;
@@ -448,11 +453,12 @@ public class IncomingMessageHandler implements Runnable {
                                 if (!downVoteFound) {
                                     DownVoteModel model = new DownVoteModel(updateDownVote.getUuid(), updateDownVote.getClientModel(), updateDownVote.getDownVoteFor());
                                     if (model.getClientModel().getUUID().equals(myClientModel.getUUID())) {
-                                        updateSong.setSkipVoteCasted(true);
+                                        downvoteCasted = true;
                                     }
                                     activeSong.getDownVotes().add(model);
                                 }
                             }
+                            updateSong.setSkipVoteCasted(downvoteCasted);
 
                             //remove all still contained down votes because they have not been found
                             for (DownVoteModel activeDownVote : activeDownVotes) {
@@ -465,6 +471,8 @@ public class IncomingMessageHandler implements Runnable {
                         activeSessionModel.getAllSongs().add(updateSong);
                     }
                 }
+
+                setActiveDevices(activeSessionModel);
             }
         };
     }
