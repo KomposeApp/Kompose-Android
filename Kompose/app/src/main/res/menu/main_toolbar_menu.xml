@@ -15,11 +15,4 @@
         android:title="@string/action_settings"
         app:showAsAction="ifRoom" />
 
-    <item
-        android:id="@+id/main_toolbar_help"
-        android:icon="@drawable/ic_action_help"
-        android:title="@string/action_help"
-        app:showAsAction="ifRoom"/>
-
-
 </menu>

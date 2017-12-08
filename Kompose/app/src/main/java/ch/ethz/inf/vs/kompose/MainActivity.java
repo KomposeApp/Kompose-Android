@@ -137,9 +137,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                 viewModel.openHistoryClicked(null);
                 return true;
 
-            case R.id.main_toolbar_help:
-                viewModel.openHelpClicked(null);
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
