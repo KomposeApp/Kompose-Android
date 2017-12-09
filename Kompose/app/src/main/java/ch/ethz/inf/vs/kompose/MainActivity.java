@@ -62,7 +62,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         int currentCacheSize = StateSingleton.getInstance().getPreferenceUtility().getCurrentCacheSize();
         StateSingleton.getInstance().initializeSongCache(currentPreload, currentCacheSize);
 
-        //Initialize Content View
+        // Initialize Content View
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setViewModel(viewModel);
 

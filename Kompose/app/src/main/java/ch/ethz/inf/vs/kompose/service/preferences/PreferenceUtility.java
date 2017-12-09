@@ -3,6 +3,7 @@ package ch.ethz.inf.vs.kompose.service.preferences;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import java.util.UUID;
 
@@ -10,22 +11,22 @@ public class PreferenceUtility {
 
     private final String LOG_TAG = "## Preferences";
 
-    private static final String PREFERENCE_FILENAME = "kompose.prefs";
+    public static final String PREFERENCE_FILENAME = "kompose.prefs";
 
-    private static final String KEY_UUID = "device_uuid";
-    private static final String KEY_PRELOAD = "k_preload";
-    private static final String KEY_CACHESIZE = "k_cachesize";
-    private static final String KEY_USERNAME = "k_user";
-    private static final String KEY_SESSIONNAME = "k_session";
-    private static final String KEY_HPORT = "k_host_port";
-    private static final String KEY_CPORT = "k_client_port";
-    private static final String KEY_DEFAULT_IP = "k_default_ip";
-    private static final String KEY_DEFAULT_PORT = "k_default_port";
+    public static final String KEY_UUID = "device_uuid";
+    public static final String KEY_PRELOAD = "k_preload";
+    public static final String KEY_CACHESIZE = "k_cachesize";
+    public static final String KEY_USERNAME = "k_user";
+    public static final String KEY_SESSIONNAME = "k_session";
+    public static final String KEY_HPORT = "k_host_port";
+    public static final String KEY_CPORT = "k_client_port";
+    public static final String KEY_DEFAULT_IP = "k_default_ip";
+    public static final String KEY_DEFAULT_PORT = "k_default_port";
 
-    private static final String DEFAULT_USERNAME = "Komposer";
-    private static final String DEFAULT_SESSIONNAME = "Default Session";
-    private static final int DEFAULT_PRELOAD = 3;
-    private static final int DEFAULT_PORT = 0;
+    public static final String DEFAULT_USERNAME = "Komposer";
+    public static final String DEFAULT_SESSIONNAME = "Default Session";
+    public static final int DEFAULT_PRELOAD = 3;
+    public static final int DEFAULT_PORT = 0;
 
     private SharedPreferences sPrefs;
     private SharedPreferences.Editor sEdits;
@@ -33,7 +34,7 @@ public class PreferenceUtility {
 
     @SuppressLint("CommitPrefEdits")
     public PreferenceUtility(Context ctx) {
-        this.sPrefs = ctx.getSharedPreferences(PREFERENCE_FILENAME, Context.MODE_PRIVATE);
+        this.sPrefs = PreferenceManager.getDefaultSharedPreferences(ctx);
         this.sEdits = sPrefs.edit();
     }
 
@@ -51,6 +52,10 @@ public class PreferenceUtility {
         boolean rvalue = hasChanged;
         hasChanged = false;
         return rvalue;
+    }
+
+    public void setChanged() {
+        hasChanged = true;
     }
 
     public void setUsername(String username) {

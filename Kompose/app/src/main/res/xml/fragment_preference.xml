@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+    <PreferenceCategory
+            android:title="@string/general_settings">
+
+        <EditTextPreference
+            android:key="@string/KEY_USERNAME"
+            android:title="@string/username_setting_title"
+            android:dialogTitle="@string/username_setting_dialog_title"
+            android:summary="" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/host_settings">
+
+        <EditTextPreference
+            android:key="@string/KEY_SESSIONNAME"
+            android:title="@string/session_name_setting_title"
+            android:dialogTitle="@string/session_name_setting_dialog_title"
+            android:summary="" />
+
+        <ch.ethz.inf.vs.kompose.service.preferences.NumberPickerPreference
+            android:key="@string/KEY_PRELOAD"
+            android:title="@string/preload_size_setting_dialog_title"
+            android:dialogTitle="@string/preload_size_setting_dialog_title"
+            android:defaultValue="@string/default_preload"
+            android:summary="" />
+
+        <ch.ethz.inf.vs.kompose.service.preferences.NumberPickerPreference
+            android:key="@string/KEY_CACHESIZE"
+            android:title="@string/cache_size_setting_dialog_title"
+            android:dialogTitle="@string/cache_size_setting_dialog_title"
+            android:defaultValue="@string/default_cachesize"
+            android:summary="" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>
