@@ -201,7 +201,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     @Override
     public void pauseClicked(View v) {
         if (audioServiceBound) {
-            audioService.stopPlaying();
+            audioService.pausePlaying();
         }
     }
 

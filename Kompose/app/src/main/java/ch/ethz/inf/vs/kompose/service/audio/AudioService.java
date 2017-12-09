@@ -30,7 +30,7 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
-public class AudioService extends Service {
+public class AudioService extends Service{
 
     private static final String LOG_TAG = "## AudioService";
     private final IBinder binder = new LocalBinder();
@@ -90,45 +90,50 @@ public class AudioService extends Service {
     public void onDestroy() {
         super.onDestroy();
 
-        if (sessionModel != null) sessionModel.removeOnPropertyChangedCallback(sessionModelCallback);
+        if (sessionModel != null) {
+            sessionModel.removeOnPropertyChangedCallback(sessionModelCallback);
+            MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
+            if (mp!=null) mp.release();
+            sessionModel.setCurrentlyPlaying(null);
+        }
         if (connectedSongModel!= null) connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
         if (downloadWorker != null) {
             downloadWorker.cancel(true);
         }
+
     }
 
-    public void stopPlaying() {
-        final SongModel currentSong = sessionModel.getCurrentlyPlaying();
-        final MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
-        if (currentSong.getSongStatus() == SongStatus.PLAYING && mediaPlayer != null) {
-            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                @Override
-                public void run() {
-                    mediaPlayer.pause();
-                    currentSong.setSongStatus(SongStatus.PAUSED);
+    /**
+     * Pause the Song when in "playing" state
+     * Runs on main thread through events from the Activity.
+     */
+    public void pausePlaying() {
+        SongModel currentSong = sessionModel.getCurrentlyPlaying();
+        MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
 
-                    new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
-                }
-            });
+        if (currentSong.getSongStatus().equals(SongStatus.PLAYING)) {
+            mediaPlayer.pause();
+            currentSong.setSongStatus(SongStatus.PAUSED);
+            //TODO: Why would the client care?
+            new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
         }
     }
 
+    /**
+     * Resume the Song when in "paused" state.
+     * Runs on main thread through events from the Activity.
+     */
     public void startPlaying() {
-        if (sessionModel.getIsHost()) {
-            final SongModel currentSong = sessionModel.getCurrentlyPlaying();
-            final MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
-            if (currentSong.getSongStatus() == SongStatus.PAUSED && mediaPlayer != null) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        mediaPlayer.start();
-                        currentSong.setSongStatus(SongStatus.PLAYING);
+        SongModel currentSong = sessionModel.getCurrentlyPlaying();
+        MediaPlayer mediaPlayer = currentSong.getMediaPlayer();
 
-                        new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
-                    }
-                });
-            }
+        if (currentSong.getSongStatus().equals(SongStatus.PAUSED)) {
+            mediaPlayer.start();
+            currentSong.setSongStatus(SongStatus.PLAYING);
+            //TODO: Why would the client care?
+            new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
         }
+
     }
 
     private void checkOnCurrentSong() {
@@ -139,17 +144,30 @@ public class AudioService extends Service {
         }
     }
 
-    private void goToNextSong(final SongModel localModel) {
+    /**
+     * Advance to the next song in the playlist.
+     * @param workaroundSong Parameter for when the current song is downvoted.
+     *                  For some weird reason, the current song in the sessionmodel
+     *                  is set to null when that happens.
+     */
+    private void goToNextSong(final SongModel workaroundSong) {
+
+        // Apparently we need to run this on the main thread because Observable Objects
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
                 synchronized (StateSingleton.getInstance()) {
                     Log.d(LOG_TAG, "updating currently playing song");
-                    SongModel songToStop = sessionModel.getCurrentlyPlaying();
-                    if (localModel != null) {
-                        songToStop = localModel;
+                    SongModel songToStop;
+
+                    // If previous song is specified as an argument, stop that one.
+                    if (workaroundSong != null) {
+                        songToStop = workaroundSong;
+                    } else{
+                        songToStop = sessionModel.getCurrentlyPlaying();
                     }
 
+                    // Cleanup of the song that was previously playing
                     if (songToStop != null) {
                         MediaPlayer mp = songToStop.getMediaPlayer();
                         mp.stop();
@@ -158,23 +176,27 @@ public class AudioService extends Service {
                         songToStop.setMediaPlayer(null);
                     }
 
-                    if (sessionModel.getCurrentlyPlaying() != null) {
-                        SongModel songModel = sessionModel.getCurrentlyPlaying();
-                        songModel.setSongStatus(SongStatus.PLAYED);
+                    // Flag the current song as finished and remove it
+                    SongModel currentSong = sessionModel.getCurrentlyPlaying();
+                    if (currentSong != null) {
+                        currentSong.setSongStatus(SongStatus.FINISHED);
 
                         sessionModel.setCurrentlyPlaying(null);
                         Log.d(LOG_TAG, "stopping & removing current song");
                     }
 
+                    // Look for a new song in the queue
                     if (sessionModel.getPlayQueue().size() > 0) {
                         SongModel chosenSong = null;
 
+                        // Loop over all the songs in the queue to remove ones where the download has
+                        // unexpectedly stopped with an error. On finding the first working song, break out.
                         for (SongModel songModel : new ArrayList<>(sessionModel.getPlayQueue())) {
                             if (songModel.getDownloadStatus() == DownloadStatus.FINISHED) {
                                 chosenSong = songModel;
                                 break;
                             } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
-                                //directly to trash :P
+                                //directly to trash
                                 sessionModel.getPlayQueue().remove(songModel);
                                 sessionModel.getPastSongs().add(songModel);
                                 songModel.setSongStatus(SongStatus.SKIPPED_BY_ERROR);
@@ -184,12 +206,14 @@ public class AudioService extends Service {
                             }
                         }
                         if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
+                            //When playing a new song, remove it from the ObservableList
                             sessionModel.getPlayQueue().remove(chosenSong);
 
                             chosenSong.setSongStatus(SongStatus.PLAYING);
                             sessionModel.setCurrentlyPlaying(chosenSong);
 
                             MediaPlayer mediaPlayer = chosenSong.getMediaPlayer();
+                            // Note: Error listener is redundant, as it will call the following Listener as well
                             mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                                 @Override
                                 public void onCompletion(MediaPlayer mp) {
@@ -205,11 +229,13 @@ public class AudioService extends Service {
                         }
                     }
 
+                    // TODO: restrict to cases where it's actually necessary
                     new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
                 }
             }
         });
     }
+
 
     private class PlaybackProgressObserver implements Runnable {
         private AtomicBoolean stop = new AtomicBoolean(false);
@@ -223,31 +249,31 @@ public class AudioService extends Service {
 
         @Override
         public void run() {
-            while (true) {
-                if (!songModel.getSongStatus().equals(SongStatus.PAUSED) && !songModel.getSongStatus().equals(SongStatus.PLAYING)) {
-                    break;
+            while (songModel.getSongStatus().equals(SongStatus.PAUSED) || songModel.getSongStatus().equals(SongStatus.PLAYING)) {
+                try {
+                    final int position = mediaPlayer.getCurrentPosition();
+                    final int duration = mediaPlayer.getDuration();
+                    new Handler(Looper.getMainLooper()).post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Double d = (double) position / duration * 100;
+                            songModel.setPlaybackProgress(d.intValue());
+                        }
+                    });
+                }catch(IllegalStateException e){
+                    Log.d(LOG_TAG, "MediaPlayer no longer available, stopping progress tracker...");
+                    return;
                 }
 
-                final int position = mediaPlayer.getCurrentPosition();
-                final int duration = mediaPlayer.getDuration();
-
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        Double dounb = (double) position / duration * 100;
-                        songModel.setPlaybackProgress(dounb.intValue());
-                    }
-                });
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    Log.w(LOG_TAG, "Media progress sleeper was interrupted");
                 }
             }
         }
     }
-
-
+    
     public class LocalBinder extends Binder {
         public AudioService getService() {
             return AudioService.this;

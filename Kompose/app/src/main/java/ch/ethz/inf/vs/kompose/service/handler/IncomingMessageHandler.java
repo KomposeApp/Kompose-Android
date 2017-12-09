@@ -176,7 +176,7 @@ public class IncomingMessageHandler implements Runnable {
         boolean playingSet = false;
         int quorum = sessionModel.getActiveDevices() / 2;
         for (SongModel songModel : sessionModel.getAllSongs()) {
-            if (songModel.getSongStatus().equals(SongStatus.PLAYED) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_ERROR)) {
+            if (songModel.getSongStatus().equals(SongStatus.FINISHED) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) || songModel.getSongStatus().equals(SongStatus.SKIPPED_BY_ERROR)) {
                 //in played queue
                 sessionModel.getPastSongs().add(songModel);
                 if (sessionModel.getPlayQueue().contains(songModel)) {
