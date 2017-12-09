@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
 import android.os.AsyncTask;
+import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -14,11 +15,14 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Collections;
 import java.util.List;
 
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_NAME;
@@ -37,18 +41,31 @@ public class HostServerService extends Service {
     private NsdManager.RegistrationListener nsdRegistrationListener;
     private ServerTask serverTask;
     private ServerSocket serverSocket;
+    private IBinder binder = new LocalBinder();
+
+    private SimpleListener<Integer,String> callbackListener;
 
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
+    public class LocalBinder extends Binder {
+        public HostServerService getService() {
+            return HostServerService.this;
+        }
+    }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        Log.d(LOG_TAG, "started");
+    /**
+     * Initializes NSDSender and the Host's ServerSocket
+     */
+    public void startHostServices(SimpleListener<Integer,String> listener) {
 
+        // Required in case an error occurs
+        this.callbackListener = listener;
+
+        // Retrieve ServerSocket and port
         int actualPort;
         try {
             int hostPort = StateSingleton.getInstance().getPreferenceUtility().getHostPort();
@@ -58,10 +75,8 @@ public class HostServerService extends Service {
             actualPort = serverSocket.getLocalPort();
         } catch (IOException e) {
             e.printStackTrace();
-            //TODO: Find a way to stop the MainActivity from advancing should this happen
-            Log.e(LOG_TAG, "Failed to set up the ServerSocket");
-            stopSelf();
-            return START_STICKY;
+            listener.onEvent(1,"Failed to set up the ServerSocket");
+            return;
         }
 
         // register network service
@@ -72,16 +87,18 @@ public class HostServerService extends Service {
         // Retrieve active session and components
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
         if (activeSession == null) {
-            //idk what to do here
-            return Service.START_REDELIVER_INTENT;
+            listener.onEvent(2,"There is no active session.");
+            return;
         }
 
         // set connection details for "Host info" in PlaylistActivity
         try {
             activeSession.setConnectionDetails(new ServerConnectionDetails(
                     InetAddress.getByName(getIPAddress(true)), serverSocket.getLocalPort()));
-        } catch (Exception e) {
+        } catch (UnknownHostException e) {
             e.printStackTrace();
+            listener.onEvent(3,"Given IP Address did not match a known host");
+            return;
         }
 
         String sessionName = activeSession.getName();
@@ -108,14 +125,13 @@ public class HostServerService extends Service {
         if (nsdManager != null)
             nsdManager.registerService(serviceInfo, NsdManager.PROTOCOL_DNS_SD, nsdRegistrationListener);
         else {
-            //TODO: Failure case if this happens, same issue as above
+            listener.onEvent(4, "Failed to instantiate NSDManager");
+            return;
         }
 
         // start server task
         serverTask = new ServerTask(this, serverSocket);
         serverTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-
-        return START_STICKY;
     }
 
     @Override
@@ -138,13 +154,6 @@ public class HostServerService extends Service {
         }
     }
 
-    //TODO: Decide whether this can be removed or not
-    @Override
-    public void onTaskRemoved(Intent rootIntent) {
-        Log.d(LOG_TAG, "task removed");
-        stopSelf();
-    }
-
     /**
      * Listener for the registration of the NSD Service
      */
@@ -158,7 +167,7 @@ public class HostServerService extends Service {
         @Override
         public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
             Log.d(LOG_TAG, "Service registration failed: " + errorCode);
-            //TODO: Error handling in conjunction with the activity
+            callbackListener.onEvent(5, "Registering the NSDListener failed");
         }
 
         @Override
@@ -194,8 +203,9 @@ public class HostServerService extends Service {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (SocketException e) {
             e.printStackTrace();
+            Log.e(LOG_TAG, "Failed to retrieve Network Interfaces");
         }
         return null;
     }

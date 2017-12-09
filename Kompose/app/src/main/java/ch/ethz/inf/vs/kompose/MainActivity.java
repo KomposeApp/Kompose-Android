@@ -31,7 +31,6 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.client.ClientNetworkService;
-import ch.ethz.inf.vs.kompose.service.host.HostServerService;
 import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
@@ -84,6 +83,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
+                viewModel.getSessionModels().clear();
             }
 
             @Override
@@ -280,13 +280,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         unbindService(cNetServiceConnection);
         clientNetworkServiceBound = false;
 
-        // start the server service
-        Intent serverIntent = new Intent(this, HostServerService.class);
-        startService(serverIntent);
-
         // Start the playlist activity
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
-        playlistIntent.putExtra(MainActivity.KEY_SERVERSERVICE, serverIntent);
         startActivity(playlistIntent);
 
         viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());

@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2014, Benjamin Huber
+
+Adjusted for use with Kompose
+ */
 package ch.ethz.inf.vs.kompose.service.youtube.extractor;
 
 public class Format {
@@ -28,6 +33,8 @@ public class Format {
         this.audioBitrate = -1;
         this.isDashContainer = isDashContainer;
         this.isHlsContent = false;
+        this.vCodec = vCodec;
+        this.aCodec = aCodec;
     }
 
     Format(int itag, String ext, VCodec vCodec, ACodec aCodec, int audioBitrate, boolean isDashContainer) {
@@ -38,6 +45,8 @@ public class Format {
         this.audioBitrate = audioBitrate;
         this.isDashContainer = isDashContainer;
         this.isHlsContent = false;
+        this.vCodec = vCodec;
+        this.aCodec = aCodec;
     }
 
     Format(int itag, String ext, int height, VCodec vCodec, ACodec aCodec, int audioBitrate,
@@ -49,6 +58,8 @@ public class Format {
         this.audioBitrate = audioBitrate;
         this.isDashContainer = isDashContainer;
         this.isHlsContent = false;
+        this.vCodec = vCodec;
+        this.aCodec = aCodec;
     }
 
     Format(int itag, String ext, int height, VCodec vCodec, ACodec aCodec, int audioBitrate,
@@ -60,6 +71,8 @@ public class Format {
         this.audioBitrate = audioBitrate;
         this.isDashContainer = isDashContainer;
         this.isHlsContent = isHlsContent;
+        this.vCodec = vCodec;
+        this.aCodec = aCodec;
     }
 
     Format(int itag, String ext, int height, VCodec vCodec, int fps, ACodec aCodec, boolean isDashContainer) {
@@ -70,6 +83,8 @@ public class Format {
         this.fps = fps;
         this.isDashContainer = isDashContainer;
         this.isHlsContent = false;
+        this.vCodec = vCodec;
+        this.aCodec = aCodec;
     }
 
     /**

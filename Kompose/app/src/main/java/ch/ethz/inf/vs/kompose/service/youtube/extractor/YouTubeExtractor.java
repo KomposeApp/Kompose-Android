@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2014, Benjamin Huber
+
+Adjusted for use with Kompose
+ */
 package ch.ethz.inf.vs.kompose.service.youtube.extractor;
 
 import android.content.Context;
@@ -44,7 +49,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
 
     protected static boolean LOGGING = false;
 
-    private final static String LOG_TAG = "YouTubeExtractor";
+    private final static String LOG_TAG = "## YouTubeExtractor";
     private final static String CACHE_FILE_NAME = "decipher_js_funct";
     private final static int DASH_PARSE_RETRIES = 5;
 
@@ -166,63 +171,57 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
     }
 
 
-    protected void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta, SongModel songModel) {
-        try {
+    private void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta, SongModel songModel) {
+        if (ytFiles != null) {
+            // find the best audio track
+            int iTag = -1;
+            int maxBitrate = 0;
+            for (int i = 0, temp_itag; i < ytFiles.size(); i++) {
+                temp_itag = ytFiles.keyAt(i);
+                YtFile file = ytFiles.get(temp_itag);
 
-            if (ytFiles != null) {
-                // find the best audio track
-                int iTag = -1;
-                int maxBitrate = 0;
-                for (int i = 0, temp_itag; i < ytFiles.size(); i++) {
-
-                    temp_itag = ytFiles.keyAt(i);
-                    YtFile file = ytFiles.get(temp_itag);
-
-                    int fBitrate = file.getFormat().getAudioBitrate();
-                    if ((file.getFormat().getHeight() == -1) && (fBitrate > maxBitrate)) {
-                        iTag = temp_itag;
-                        maxBitrate = fBitrate;
-                    }
+                int fBitrate = file.getFormat().getAudioBitrate();
+                if ((file.getFormat().getHeight() == -1) && (fBitrate > maxBitrate)) {
+                    iTag = temp_itag;
+                    maxBitrate = fBitrate;
                 }
+            }
 
-                Log.d(LOG_TAG, "Selected itag: " + iTag);
+            Log.d(LOG_TAG, "Selected itag: " + iTag);
 
-                if (iTag == -1) {
-                    Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
-                    listener.onEvent(RESOLVE_FAILED, songModel);
-                    return;
-                }
-
-                // get URI & title
-                String downloadUrl = ytFiles.get(iTag).getUrl();
-                String videoID = videoMeta.getVideoId();
-                String thumbnailUrl = videoMeta.getHqImageUrl();
-                String title = videoMeta.getTitle();
-                long length = videoMeta.getVideoLength();
-
-                if (downloadUrl.isEmpty() || length <= 0) {
-                    Log.e(LOG_TAG, "Download link was empty or length was too short");
-                    listener.onEvent(RESOLVE_FAILED, songModel);
-                    return;
-                }
-
-                // add content to song model
-                songModel.setTitle(title);
-                songModel.setVideoID(videoID);
-
-                if (downloadUrl.contains("\"")) {
-                    downloadUrl = downloadUrl.replace("\"", "");
-                }
-                songModel.setDownloadUrl(URI.create(downloadUrl));
-                songModel.setThumbnailUrl(URI.create(thumbnailUrl));
-                songModel.setSecondsLength((int) length);
-
-                // notify listener
-                listener.onEvent(RESOLVE_SUCCESS, songModel);
+            if (iTag == -1) {
+                Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
+                listener.onEvent(RESOLVE_FAILED, songModel);
                 return;
             }
-        } catch (Exception ex) {
-            Log.e(LOG_TAG, ex.toString());
+
+            // get URI & title
+            String downloadUrl = ytFiles.get(iTag).getUrl();
+            String videoID = videoMeta.getVideoId();
+            String thumbnailUrl = videoMeta.getHqImageUrl();
+            String title = videoMeta.getTitle();
+            long length = videoMeta.getVideoLength();
+
+            if (downloadUrl.isEmpty() || length <= 0) {
+                Log.e(LOG_TAG, "Download link was empty or length was too short");
+                listener.onEvent(RESOLVE_FAILED, songModel);
+                return;
+            }
+
+            // add content to song model
+            songModel.setTitle(title);
+            songModel.setVideoID(videoID);
+
+            if (downloadUrl.contains("\"")) {
+                downloadUrl = downloadUrl.replace("\"", "");
+            }
+            songModel.setDownloadUrl(URI.create(downloadUrl));
+            songModel.setThumbnailUrl(URI.create(thumbnailUrl));
+            songModel.setSecondsLength((int) length);
+
+            // notify listener
+            listener.onEvent(RESOLVE_SUCCESS, songModel);
+            return;
         }
         Log.w(LOG_TAG, "Failed to resolve youtube URL -- possible malformed link");
         listener.onEvent(RESOLVE_FAILED, songModel);

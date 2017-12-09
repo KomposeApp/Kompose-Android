@@ -1,3 +1,8 @@
+/*
+Copyright (c) 2014, Benjamin Huber
+
+Adjusted for use with Kompose
+ */
 package ch.ethz.inf.vs.kompose.service.youtube.extractor;
 
 public class VideoMeta {

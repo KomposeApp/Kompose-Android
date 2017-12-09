@@ -13,6 +13,7 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 /*
  * Standard Android API service discovery with NSD.
@@ -35,13 +36,18 @@ public class KomposeResolveListener implements NsdManager.ResolveListener {
 
     @Override
     public void onServiceResolved(NsdServiceInfo serviceInfo) {
-        Log.d(LOG_TAG, "Resolve Succeeded. " + serviceInfo);
+        Log.d(LOG_TAG, "Resolve Succeeded.");
+        Log.d(LOG_TAG, "Session info: " + serviceInfo.toString());
 
         Map<String, byte[]> attributes = serviceInfo.getAttributes();
-
-        UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
         UUID hostUUID = UUID.fromString(new String(attributes.get("host_uuid")));
 
+        if (hostUUID.equals(StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID())){
+            Log.d(LOG_TAG, "Session host is us, skipping...");
+            return;
+        }
+
+        UUID sessionUUID = UUID.fromString(new String(attributes.get("uuid")));
         final SessionModel sessionModel = new SessionModel(sessionUUID, hostUUID);
 
         int port = serviceInfo.getPort();
