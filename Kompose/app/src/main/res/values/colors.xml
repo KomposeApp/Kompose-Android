@@ -3,12 +3,12 @@
     <color name="colorPrimary">#EE3B39</color>
     <color name="colorPrimaryDark">#a43938</color>
 
-
     <color name="colorAccent">#EE3B39</color>
     <color name="colorBlack">#000000</color>
     <color name="colorWhite">#FFFFFF</color>
     <color name="buttonColor">#EFEFEF</color>
     <color name="textColor">#4B4B4B</color>
+    <color name="lightGrey">#9f9f9f</color>
 
     <color name="greyBackground">#EFEFEF</color>
     <color name="shadowColor">#9f9f9f</color>

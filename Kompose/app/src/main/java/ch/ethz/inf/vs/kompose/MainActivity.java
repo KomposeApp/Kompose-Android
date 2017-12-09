@@ -69,6 +69,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         // setup toolbar
         Toolbar mainToolbar = findViewById(R.id.kompose_toolbar);
         setSupportActionBar(mainToolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         // Insert default names
         viewModel.setFromPreferences(StateSingleton.getInstance().getPreferenceUtility());

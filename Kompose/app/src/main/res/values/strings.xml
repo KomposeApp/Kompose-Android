@@ -121,7 +121,7 @@
     <string name="title_activity_scrolling">ScrollingActivity</string>
     <string name="join_existing_party">Join an existing party and add your own songs to the playlist</string>
     <string name="start_own_party">Connect your device to the music station, and start your own party</string>
-    <string name="connect_manually">Having trouble connecting to the party host? connect here manually</string>
+    <string name="connect_manually">Having trouble connecting to the party host? Connect manually here</string>
     <string name="songs">Songs</string>
     <string name="use_to_manually_connect">Use the IP and the port to manually connect to the host</string>
     <string name="past_link">Simply paste a link from youtube to include it into the playlist</string>

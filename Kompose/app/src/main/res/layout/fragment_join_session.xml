@@ -23,14 +23,12 @@
             android:orientation="vertical">
 
             <TextView
-                style="@style/SecondaryTextView"
+                style="@style/TileLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="3sp"
-                android:layout_marginTop="3sp"
+                android:layout_marginTop="8sp"
+                android:layout_marginBottom="8sp"
                 android:text="@string/join_existing_party" />
-
-            <LinearLayout style="@style/HorizontalDividerLayout" />
 
             <TextView
                 style="@style/LabelTextView"
@@ -56,6 +54,7 @@
 
                 <TextView
                     style="@style/SecondaryTextView"
+                    android:textColor="@color/lightGrey"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/looking_for_parties" />

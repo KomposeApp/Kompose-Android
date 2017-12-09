@@ -16,34 +16,47 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/kompose_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:elevation="4dp"
-            android:theme="@style/ToolbarStyle"
-            android:background="@color/colorPrimary"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
-
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:elevation="0.5pt"
             android:clipToPadding="false"
+            android:elevation="5dp"
+            android:orientation="vertical"
             android:background="@color/greyBackground">
 
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/kompose_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                android:theme="@style/ToolbarStyle"
+                android:background="@color/colorPrimary"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/label_main"
+                    android:layout_gravity="center"
+                    android:fontFamily="@font/russoone_regular"
+                    android:textSize="25sp"
+                    android:textColor="@color/colorWhite"
+                    android:id="@+id/toolbar_title" />
+
+            </android.support.v7.widget.Toolbar>
+
             <android.support.design.widget.TabLayout
+                android:id="@+id/tabLayout"
+                style="@style/AppTabLayout"
+                android:background="@color/colorPrimary"
                 app:tabMaxWidth="0dp"
                 app:tabGravity="fill"
                 app:tabMode="fixed"
-                android:id="@+id/tabLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <android.support.design.widget.TabItem
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:minWidth="60dp"
                     android:text="@string/join" />
 
                 <android.support.design.widget.TabItem
@@ -58,7 +71,7 @@
 
             </android.support.design.widget.TabLayout>
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <android.support.v4.view.ViewPager
             android:id="@+id/viewPager"

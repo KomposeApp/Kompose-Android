@@ -17,14 +17,12 @@
         android:orientation="vertical">
 
         <TextView
-            style="@style/SecondaryTextView"
-            android:layout_marginTop="3sp"
-            android:layout_marginBottom="3sp"
+            style="@style/TileLayout"
+            android:layout_marginTop="8sp"
+            android:layout_marginBottom="8sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/connect_manually" />
-
-        <LinearLayout style="@style/HorizontalDividerLayout" />
 
         <TextView
             style="@style/LabelTextView"
@@ -113,6 +111,7 @@
 
         <Button
             style="@style/PrimaryButton"
+            android:layout_marginTop="2dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="@{viewModel.joinManualClicked}"
