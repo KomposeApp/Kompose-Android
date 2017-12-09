@@ -136,7 +136,7 @@ public class YoutubeDownloadUtility {
                 output.write(buffer, 0, count);
             }
             return Drawable.createFromPath(thumbFile.getAbsolutePath());
-        } catch (Exception e) {
+        } catch (IOException e) {
             Log.e(LOG_TAG, "Thumbnail download failed");
             e.printStackTrace();
             return null;

@@ -245,7 +245,8 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
         if (videoID != null) {
             try {
                 return getStreamUrls();
-            } catch (Exception e) {
+            } catch (IOException| InterruptedException e) {
+                Log.e(LOG_TAG, "Failed to retrieve Video Data");
                 e.printStackTrace();
             }
         } else {
@@ -590,7 +591,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
                     Log.d(LOG_TAG, "Decipher Function: " + decipherFunctions);
                 decipherViaWebView(encSignatures);
                 if (CACHING) {
-                    writeDeciperFunctToChache();
+                    writeDeciperFunctToCache();
                 }
             } else {
                 return false;
@@ -687,13 +688,15 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
                     decipherJsFileName = reader.readLine();
                     decipherFunctionName = reader.readLine();
                     decipherFunctions = reader.readLine();
-                } catch (Exception e) {
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Failed to read cache file");
                     e.printStackTrace();
                 } finally {
                     if (reader != null) {
                         try {
                             reader.close();
                         } catch (IOException e) {
+                            Log.e(LOG_TAG, "Failed to close cache reader");
                             e.printStackTrace();
                         }
                     }
@@ -729,7 +732,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
         this.useHttp = useHttp;
     }
 
-    private void writeDeciperFunctToChache() {
+    private void writeDeciperFunctToCache() {
         if (context != null) {
             File cacheFile = new File(context.get().getCacheDir().getAbsolutePath() + "/" + CACHE_FILE_NAME);
             BufferedWriter writer = null;
@@ -738,13 +741,15 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
                 writer.write(decipherJsFileName + "\n");
                 writer.write(decipherFunctionName + "\n");
                 writer.write(decipherFunctions);
-            } catch (Exception e) {
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "Failed to write data to YTfile");
                 e.printStackTrace();
             } finally {
                 if (writer != null) {
                     try {
                         writer.close();
                     } catch (IOException e) {
+                        Log.e(LOG_TAG, "Failed to close YTfile writer");
                         e.printStackTrace();
                     }
                 }
