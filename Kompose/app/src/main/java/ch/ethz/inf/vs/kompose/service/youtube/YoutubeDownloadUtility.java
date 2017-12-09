@@ -111,6 +111,7 @@ public class YoutubeDownloadUtility {
                 }
             }
 
+            Log.d(LOG_TAG,"Filesize: " + storedFile.length());
             StateSingleton.getInstance().addSongToCache(videoID, storedFile);
         }
         return storedFile;

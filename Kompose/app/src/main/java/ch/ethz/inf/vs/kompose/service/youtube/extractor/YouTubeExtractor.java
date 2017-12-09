@@ -170,30 +170,69 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
         onExtractionComplete(ytFiles, videoMeta, songModel);
     }
 
+    // Google is evil and throttles m4a download speeds. Hence we will use mp4 instead.
+    // TODO: Find out whether there are more formats that download quickly. Add them to the REGEX.
+    private final String PREFERRED_MEDIA_FORMATS = "mp4|mp3";
+    private final String SUPPORTED_MEDIA_FORMATS = "3gp|mp4|mp3|m4a|aac|flac|ts|mkv|wav|ogg|webm";
 
     private void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta, SongModel songModel) {
-        if (ytFiles != null) {
+        if (ytFiles != null && ytFiles.size() != 0) {
             // find the best audio track
-            int iTag = -1;
-            int maxBitrate = 0;
+            int primary_iTag = -1, audio_iTag = -1, fallback_iTag = -1;
+            int maxPrimaryBitrate = 0, maxAudioOnlyBitrate = 0, maxFallbackBitrate = 0;
             for (int i = 0, temp_itag; i < ytFiles.size(); i++) {
                 temp_itag = ytFiles.keyAt(i);
                 YtFile file = ytFiles.get(temp_itag);
 
                 int fBitrate = file.getFormat().getAudioBitrate();
-                if ((file.getFormat().getHeight() == -1) && (fBitrate > maxBitrate)) {
-                    iTag = temp_itag;
-                    maxBitrate = fBitrate;
+                if ((file.getFormat().getExt().matches(PREFERRED_MEDIA_FORMATS)) &&
+                        (fBitrate > maxPrimaryBitrate)){
+                    primary_iTag = temp_itag;
+                    maxPrimaryBitrate = fBitrate;
+                }
+                else if ((file.getFormat().getHeight() == -1) && file.getFormat().getExt().
+                        matches(SUPPORTED_MEDIA_FORMATS) && (fBitrate > maxAudioOnlyBitrate)) {
+                    audio_iTag = temp_itag;
+                    maxAudioOnlyBitrate = fBitrate;
+                }
+                else if ((file.getFormat().getExt().matches(SUPPORTED_MEDIA_FORMATS)) &&
+                        (fBitrate > maxFallbackBitrate)){
+                    fallback_iTag = temp_itag;
+                    maxFallbackBitrate = fBitrate;
                 }
             }
 
-            Log.d(LOG_TAG, "Selected itag: " + iTag);
-
-            if (iTag == -1) {
-                Log.e(LOG_TAG, "Failed to find audio track for given Youtube Link");
+            int iTag;
+            if (primary_iTag != -1) {
+                // Primary choice -- Performance
+                // Downloads roughly a billion times faster than anything else.
+                Log.d(LOG_TAG, "Found the preferred format");
+                iTag = primary_iTag;
+            }
+            else if (audio_iTag  != -1) {
+                // Secondary choice -- Storage
+                // Download an audio-only file if we didn't find our preferred format. Saves storage space.
+                Log.w(LOG_TAG, "Failed to find mp4, using an audio file instead...");
+                iTag = audio_iTag;
+            }
+            else if (fallback_iTag != -1) {
+                // Fallback choice -- Functionality
+                // Download literally anything else as long as it has sound
+                Log.w(LOG_TAG, "Failed to find audio track for given Youtube Link, " +
+                        "using a different video link with audio instead...");
+                iTag = fallback_iTag;
+            }
+            else {
+                // Failure
+                // Couldn't find a video track with sound for some strange reason
+                Log.e(LOG_TAG, "Failed to find a format with audio");
                 listener.onEvent(RESOLVE_FAILED, songModel);
                 return;
             }
+
+            Log.d(LOG_TAG, "Selected itag: " + iTag);
+            Log.d(LOG_TAG, "Downloading the following format: " + ytFiles.get(iTag).getFormat().getExt());
+            Log.d(LOG_TAG, "At the following bitrate: " + ytFiles.get(iTag).getFormat().getAudioBitrate());
 
             // get URI & title
             String downloadUrl = ytFiles.get(iTag).getUrl();

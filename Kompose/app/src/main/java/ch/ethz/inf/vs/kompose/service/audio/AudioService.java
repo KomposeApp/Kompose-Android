@@ -37,39 +37,9 @@ public class AudioService extends Service {
 
     private SessionModel sessionModel;
     private DownloadWorker downloadWorker;
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        Log.d(LOG_TAG, "started");
-        sessionModel = StateSingleton.getInstance().getActiveSession();
-        sessionModel.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
-
-            @Override
-            public void onPropertyChanged(Observable observable, int i) {
-                if (i == BR.currentlyPlaying) {
-                    SessionModel sessionModel = (SessionModel) observable;
-                    if (connectedSongModel != sessionModel.getCurrentlyPlaying()) {
-                        if (connectedSongModel != null) {
-                            connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
-                            connectedSongModel = null;
-                        }
-                        if (sessionModel.getCurrentlyPlaying() != null) {
-                            connectedSongModel = sessionModel.getCurrentlyPlaying();
-                            sessionModel.getCurrentlyPlaying().addOnPropertyChangedCallback(songModelCallback);
-                        }
-                    }
-                }
-            }
-        });
-
-        // start the download worker
-        downloadWorker = new DownloadWorker(this, sessionModel);
-        downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-    }
-
     private SongModel connectedSongModel;
+
+    //Callback listener for when one of the songs change
     private Observable.OnPropertyChangedCallback songModelCallback = new Observable.OnPropertyChangedCallback() {
         @Override
         public void onPropertyChanged(Observable observable, int i) {
@@ -82,9 +52,46 @@ public class AudioService extends Service {
         }
     };
 
+    // Callback listener for when the current session model changes
+    private Observable.OnPropertyChangedCallback sessionModelCallback = new Observable.OnPropertyChangedCallback() {
+
+        @Override
+        public void onPropertyChanged(Observable observable, int i) {
+            if (i == BR.currentlyPlaying) {
+                SessionModel sessionModel = (SessionModel) observable;
+                if (connectedSongModel != sessionModel.getCurrentlyPlaying()) {
+                    if (connectedSongModel != null) {
+                        connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
+                        connectedSongModel = null;
+                    }
+                    if (sessionModel.getCurrentlyPlaying() != null) {
+                        connectedSongModel = sessionModel.getCurrentlyPlaying();
+                        sessionModel.getCurrentlyPlaying().addOnPropertyChangedCallback(songModelCallback);
+                    }
+                }
+            }
+        }
+    };
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Log.d(LOG_TAG, "started");
+        sessionModel = StateSingleton.getInstance().getActiveSession();
+        sessionModel.addOnPropertyChangedCallback(sessionModelCallback);
+
+        // start the download worker
+        downloadWorker = new DownloadWorker(this, sessionModel);
+        downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
+
+        if (sessionModel != null) sessionModel.removeOnPropertyChangedCallback(sessionModelCallback);
+        if (connectedSongModel!= null) connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
         if (downloadWorker != null) {
             downloadWorker.cancel(true);
         }
