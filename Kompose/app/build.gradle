@@ -41,4 +41,6 @@ dependencies {
 
     // screw Google's buggy DNS-SD implementation
     compile 'com.youview:tinydnssd:1.2.7'
+
+    compile 'com.android.support:design:26.1.0'
 }

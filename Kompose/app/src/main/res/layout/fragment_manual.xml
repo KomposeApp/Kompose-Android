@@ -18,34 +18,32 @@
 
         <TextView
             style="@style/TileLayout"
-            android:layout_marginTop="8sp"
-            android:layout_marginBottom="8sp"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="12sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/connect_manually" />
 
-        <TextView
-            style="@style/LabelTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/your_name"/>
-
-        <EditText
-            style="@style/DefaultEditText"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="3sp"
-            android:hint="@string/your_name"
-            android:inputType="textPersonName"
-            android:text="@={viewModel.clientName}"
-            tools:text="hi mom"/>
+            android:layout_marginBottom="5sp">
+
+            <EditText
+                style="@style/DefaultEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:hint="@string/your_name"
+                android:text="@={viewModel.clientName}"
+                tools:text="hi mom" />
+        </android.support.design.widget.TextInputLayout>
 
         <!--IP / port container-->
         <LinearLayout
             android:id="@+id/ip_port_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="3sp"
             android:baselineAligned="false"
             android:orientation="horizontal">
 
@@ -55,27 +53,19 @@
                 android:layout_weight="1"
                 android:layout_height="match_parent">
 
-                <TextView
-                    style="@style/LabelTextView"
-                    android:id="@+id/ip_text_box_desc"
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignStart="@id/ip_text_box"
-
-                    android:text="@string/ip_address" />
-
-                <EditText
-                    android:id="@+id/ip_text_box"
-                    style="@style/DefaultEditText"
-
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/ip_text_box_desc"
+                    android:layout_height="wrap_content">
 
-                    android:hint="@string/ip_address_placeholder"
-                    android:inputType="textPersonName"
-                    android:text="@={viewModel.ipAddress}" />
+                    <EditText
+                        style="@style/DefaultEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:hint="@string/ip_address"
+                        android:text="@={viewModel.ipAddress}"
+                        tools:text="hi mom" />
+                </android.support.design.widget.TextInputLayout>
 
             </RelativeLayout>
 
@@ -85,34 +75,27 @@
                 android:layout_weight="0.5"
                 android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/port_text_box_desc"
-                    style="@style/LabelTextView"
-
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignStart="@id/port_text_box"
-
-                    android:text="@string/port" />
-
-                <EditText
-                    android:id="@+id/port_text_box"
-                    style="@style/DefaultEditText"
-
+                <android.support.design.widget.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/port_text_box_desc"
+                    android:layout_height="wrap_content">
 
-                    android:hint="@string/port_placeholder"
-                    android:inputType="textPersonName"
-                    android:text="@={viewModel.port}" />
+                    <EditText
+                        style="@style/DefaultEditText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:singleLine="true"
+                        android:hint="@string/port"
+                        android:text="@={viewModel.port}"
+                        tools:text="hi mom" />
+                </android.support.design.widget.TextInputLayout>
+
             </RelativeLayout>
         </LinearLayout>
 
         <Button
             style="@style/PrimaryButton"
-            android:layout_marginTop="2dp"
-            android:layout_width="wrap_content"
+            android:layout_marginTop="13sp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="@{viewModel.joinManualClicked}"
             android:text="@string/join_manually" />

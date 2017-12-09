@@ -18,47 +18,45 @@
 
         <TextView
             style="@style/TileLayout"
-            android:layout_marginTop="8sp"
-            android:layout_marginBottom="8sp"
+            android:layout_marginTop="5sp"
+            android:layout_marginBottom="12sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/start_own_party" />
 
-        <TextView
-            style="@style/LabelTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/your_name" />
-
-        <EditText
-            style="@style/DefaultEditText"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/your_name"
-            android:inputType="textPersonName"
-            android:text="@={viewModel.clientName}"
-            tools:text="hi mom" />
+            android:layout_marginBottom="5sp">
 
-        <TextView
-            style="@style/LabelTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/session_name" />
+            <EditText
+                style="@style/DefaultEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:text="@={viewModel.clientName}"
+                android:hint="@string/your_name"
+                tools:text="hi mom" />
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            style="@style/DefaultEditText"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="3sp"
-            android:hint="@string/session_name"
-            android:inputType="textPersonName"
-            android:text="@={viewModel.sessionName}"
-            tools:text="hi mom" />
+            android:layout_height="wrap_content">
+
+            <EditText
+                style="@style/DefaultEditText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:singleLine="true"
+                android:hint="@string/session_name"
+                android:text="@={viewModel.sessionName}"
+                tools:text="hi mom" />
+        </android.support.design.widget.TextInputLayout>
 
         <Button
             style="@style/PrimaryButton"
-            android:layout_marginTop="2dp"
-            android:layout_width="wrap_content"
+            android:layout_marginTop="13sp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="@{viewModel.createSession}"
             android:text="@string/create_party" />
