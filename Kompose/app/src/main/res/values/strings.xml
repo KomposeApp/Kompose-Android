@@ -53,6 +53,33 @@
     <string name="action_history">History</string>
     <string name="action_help">Help</string>
 
+    <!--Settings categories-->
+    <string name="client_settings">Client settings</string>
+    <string name="host_settings">Host settings</string>
+    <string name="general_settings">General</string>
+
+    <!--Setting titles-->
+    <string name="username_setting_title">Default username</string>
+    <string name="username_setting_dialog_title">Username</string>
+    <string name="session_name_setting_title">Default session name</string>
+    <string name="session_name_setting_dialog_title">Session name</string>
+    <string name="preload_size_setting_title">Number of items preloaded</string>
+    <string name="cache_size_setting_title">Number of items cached</string>
+    <string name="preload_size_setting_dialog_title">Preloaded items</string>
+    <string name="cache_size_setting_dialog_title">Cached items</string>
+
+    <!--Setting defaults-->
+    <string name="default_username">Rick Astley</string>
+    <string name="default_session_name">Big party</string>
+    <string name="default_preload">3</string>
+    <string name="default_cachesize">3</string>
+
+    <!--SharedPreferences keys-->
+    <string name="KEY_USERNAME">k_user</string>
+    <string name="KEY_SESSIONNAME">k_session</string>
+    <string name="KEY_PRELOAD">k_preload</string>
+    <string name="KEY_CACHESIZE">k_cachesize</string>
+
     <!--Other-->
     <string name="join">join</string>
     <string name="client_name">My name</string>

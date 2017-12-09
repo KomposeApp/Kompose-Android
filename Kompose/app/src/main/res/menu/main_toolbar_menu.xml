@@ -8,11 +8,11 @@
         android:id="@+id/main_toolbar_history"
         android:icon="@drawable/ic_action_database"
         android:title="@string/action_history"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item android:id="@+id/main_toolbar_settings"
         android:icon="@drawable/ic_settings_white_24dp"
         android:title="@string/action_settings"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 
 </menu>
