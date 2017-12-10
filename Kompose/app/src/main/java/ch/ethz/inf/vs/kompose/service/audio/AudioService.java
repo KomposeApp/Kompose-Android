@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
@@ -32,7 +33,7 @@ import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public class AudioService extends Service{
 
-    private static final String LOG_TAG = "## AudioService";
+    private static final String LOG_TAG = "##AudioService";
     private final IBinder binder = new LocalBinder();
 
     private SessionModel sessionModel;
@@ -56,8 +57,8 @@ public class AudioService extends Service{
     private Observable.OnPropertyChangedCallback sessionModelCallback = new Observable.OnPropertyChangedCallback() {
 
         @Override
-        public void onPropertyChanged(Observable observable, int i) {
-            if (i == BR.currentlyPlaying) {
+        public void onPropertyChanged(Observable observable, int index) {
+            if (index == BR.currentlyPlaying) {
                 SessionModel sessionModel = (SessionModel) observable;
                 if (connectedSongModel != sessionModel.getCurrentlyPlaying()) {
                     if (connectedSongModel != null) {
@@ -92,9 +93,11 @@ public class AudioService extends Service{
 
         if (sessionModel != null) {
             sessionModel.removeOnPropertyChangedCallback(sessionModelCallback);
-            MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
-            if (mp!=null) mp.release();
-            sessionModel.setCurrentlyPlaying(null);
+            if (sessionModel.getCurrentlyPlaying() != null) {
+                MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
+                if (mp != null) mp.release();
+                sessionModel.setCurrentlyPlaying(null);
+            }
         }
         if (connectedSongModel!= null) connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
         if (downloadWorker != null) {
@@ -114,7 +117,6 @@ public class AudioService extends Service{
         if (currentSong.getSongStatus().equals(SongStatus.PLAYING)) {
             mediaPlayer.pause();
             currentSong.setSongStatus(SongStatus.PAUSED);
-            //TODO: Why would the client care?
             new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
         }
     }
@@ -130,13 +132,15 @@ public class AudioService extends Service{
         if (currentSong.getSongStatus().equals(SongStatus.PAUSED)) {
             mediaPlayer.start();
             currentSong.setSongStatus(SongStatus.PLAYING);
-            //TODO: Why would the client care?
             new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
         }
 
     }
 
-    private void checkOnCurrentSong() {
+    /**
+     * Check if there is currently no song playing. If so, advance to the next one.
+     */
+    public void checkOnCurrentSong() {
         synchronized (StateSingleton.getInstance()) {
             if (sessionModel.getCurrentlyPlaying() == null) {
                 goToNextSong(null);
@@ -229,7 +233,6 @@ public class AudioService extends Service{
                         }
                     }
 
-                    // TODO: restrict to cases where it's actually necessary
                     new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
                 }
             }
@@ -238,7 +241,6 @@ public class AudioService extends Service{
 
 
     private class PlaybackProgressObserver implements Runnable {
-        private AtomicBoolean stop = new AtomicBoolean(false);
         private SongModel songModel;
         private MediaPlayer mediaPlayer;
 
@@ -273,7 +275,7 @@ public class AudioService extends Service{
             }
         }
     }
-    
+
     public class LocalBinder extends Binder {
         public AudioService getService() {
             return AudioService.this;
@@ -286,138 +288,4 @@ public class AudioService extends Service{
         return binder;
     }
 
-    private static class PlaylistListener extends ObservableList.OnListChangedCallback {
-
-        private final String LOG_TAG = "## PlaylistListener";
-        AudioService audioService;
-
-        PlaylistListener(AudioService audioService) {
-            this.audioService = audioService;
-        }
-
-        @Override
-        public void onChanged(ObservableList observableList) {
-        }
-
-        @Override
-        public void onItemRangeChanged(ObservableList observableList, int i, int i1) {
-        }
-
-        @Override
-        public void onItemRangeInserted(ObservableList observableList, int i, int i1) {
-            Log.d(LOG_TAG, i1 + " new items in play queue");
-            audioService.checkOnCurrentSong();
-            try {
-                StateSingleton.getInstance().getAudioServicePhaser().register();
-            } catch (Exception e) {
-                //whatever
-            }
-        }
-
-        @Override
-        public void onItemRangeMoved(ObservableList observableList, int i, int i1, int i2) {
-        }
-
-        @Override
-        public void onItemRangeRemoved(ObservableList observableList, int i, int i1) {
-            Log.d(LOG_TAG, i1 + " items removed from play queue");
-            try {
-                StateSingleton.getInstance().getAudioServicePhaser().register();
-            } catch (Exception e) {
-                //whatever
-            }
-        }
-    }
-
-    private static class DownloadWorker extends AsyncTask<Void, Void, Void> {
-
-        private final String LOG_TAG = "## DownloadWorker";
-        private int numSongsPreload;
-        private WeakReference<AudioService> context;
-        private SessionModel sessionModel;
-
-        DownloadWorker(AudioService context, SessionModel sessionModel) {
-            this.context = new WeakReference<>(context);
-            this.sessionModel = sessionModel;
-
-            this.numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
-            StateSingleton.getInstance().setAudioServicePhaser(new Phaser(1));
-            sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(context));
-        }
-
-        private MediaPlayer mediaPlayerFromFile(File file) {
-            return MediaPlayer.create(context.get(), Uri.fromFile(file));
-        }
-
-        @Override
-        protected Void doInBackground(Void... voids) {
-            YoutubeDownloadUtility youtubeDownloadUtility = new YoutubeDownloadUtility(context.get());
-
-            while (!isCancelled()) {
-                // wait until the Phaser is unblocked (initially and when a new item enters
-                // the download queue)
-                // TODO: lock is fucked
-                int registered = StateSingleton.getInstance().getAudioServicePhaser().getRegisteredParties();
-                StateSingleton.getInstance().getAudioServicePhaser().arriveAndDeregister();
-
-                int numDownloaded = 0;
-                int index = 0;
-
-                while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
-                    try {
-                        final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
-                        if (!nextDownload.getSongStatus().equals(SongStatus.RESOLVING) && nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
-                            Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
-
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    nextDownload.setDownloadStatus(DownloadStatus.STARTED);
-                                }
-                            });
-
-                            final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
-                            final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
-
-                            if (storedFile != null) {
-                                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        nextDownload.setDownloadPath(storedFile);
-                                        nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
-                                        nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
-                                        if (thumbDrawable != null) {
-                                            Log.d(LOG_TAG, "thumbnail downloaded " + thumbDrawable.isVisible());
-                                            nextDownload.setThumbnail(thumbDrawable);
-                                        }
-
-                                        context.get().checkOnCurrentSong();
-                                    }
-                                });
-                                numDownloaded++;
-
-                            } else {
-                                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                    @Override
-                                    public void run() {
-                                        nextDownload.setDownloadStatus(DownloadStatus.FAILED);
-                                    }
-                                });
-                            }
-
-                            new OutgoingMessageHandler(context.get()).sendSessionUpdate();
-                            index = 0;
-                        } else {
-                            numDownloaded++;
-                            index++;
-                        }
-                    } catch (Exception ex) {
-                        //error occurs when playlist is empty because .size() is retarded (return > 0 even though its 0)
-                    }
-                }
-            }
-
-            return null;
-        }
-    }
 }

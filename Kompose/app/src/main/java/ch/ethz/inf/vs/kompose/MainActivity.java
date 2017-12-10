@@ -36,7 +36,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
 public class MainActivity extends BaseActivity implements MainViewModel.ClickListener {
 
-    private final String LOG_TAG = "## Main Activity";
+    private final String LOG_TAG = "##MainActivity";
 
     public static final String KEY_NETWORKSERVICE = "ClientNetworkService";
     public static final String KEY_SERVERSERVICE = "HostServerService";

@@ -11,7 +11,7 @@ import ch.ethz.inf.vs.kompose.service.audio.SongResolveHandler;
 
 public class ShareActivity extends BaseActivity {
 
-    private final String LOG_TAG = "## ShareActivity";
+    private final String LOG_TAG = "##ShareActivity";
     private final int TIME_UNTIL_DEATH = 3000; // Time until process is killed
 
     @Override

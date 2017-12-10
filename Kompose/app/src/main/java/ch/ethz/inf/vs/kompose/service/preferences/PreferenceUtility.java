@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public class PreferenceUtility {
 
-    private final String LOG_TAG = "## Preferences";
+    private final String LOG_TAG = "##Preferences";
 
     public static final String PREFERENCE_FILENAME = "kompose.prefs";
 

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class SongCacheMap extends LinkedHashMap<String, File> {
 
-    private final String LOG_TAG = "## SongCacheMap";
+    private final String LOG_TAG = "##SongCacheMap";
     private int maxCacheSize;
 
     public SongCacheMap(int cacheSize){

@@ -28,7 +28,7 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
  */
 public class StorageHandler {
 
-    private final String LOG_TAG = "## StorageHandler";
+    private final String LOG_TAG = "##StorageHandler";
     private final String SESSION_FOLDER = "sessions";
     private Context context;
 
@@ -36,21 +36,30 @@ public class StorageHandler {
         this.context = context;
     }
 
+    /**
+     * Accessor method to persist the given session
+     * @param session session to persist
+     */
     public void persist(Session session) {
         try {
             String content = JsonConverter.toJsonString(session);
-            persist(SESSION_FOLDER, session.getCreationDateTime(), content);
+            boolean success = persist(SESSION_FOLDER, session.getCreationDateTime(), content);
+            if (!success) Log.e(LOG_TAG, "Failed to persist session: " + session.getSessionName());
         } catch (JsonProcessingException e) {
+            Log.e(LOG_TAG, "Failed to persist session: " + session.getSessionName());
             e.printStackTrace();
         }
     }
 
+    /**
+     * Load stored history sessions into the provided list object
+     * @param sessionList List to load SessionModels into
+     */
     public void load(final List<SessionModel> sessionList) {
         String[] files = retrieveAllFiles(SESSION_FOLDER);
         SessionConverter sessionConverter = new SessionConverter();
         if (files != null) {
-            for (String file :
-                    files) {
+            for (String file : files) {
                 try {
                     Session content = JsonConverter.fromSessionJsonString(file);
                     final SessionModel model = sessionConverter.convert(content);
@@ -60,11 +69,22 @@ public class StorageHandler {
                             sessionList.add(model);
                         }
                     });
-                } catch (Exception e) {
+                } catch (IOException e) {
+                    Log.e(LOG_TAG, "Failed to convert stored sessions.");
                     e.printStackTrace();
                 }
             }
         }
+    }
+
+    public void deleteAll(final List<SessionModel> sessionList){
+        clearDirectory(SESSION_FOLDER, false);
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                sessionList.clear();
+            }
+        });
     }
 
     /**
@@ -167,11 +187,7 @@ public class StorageHandler {
 
         String[] fileContents = new String[numFiles];
         for (int i = 0; i < numFiles; i++) {
-            try {
-                fileContents[i] = readFile(regularFiles.get(i));
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            fileContents[i] = readFile(regularFiles.get(i));
         }
 
         return fileContents;
@@ -185,17 +201,42 @@ public class StorageHandler {
      * @return a string with the file content
      */
     private String retrieveFile(String directory, String fileName) {
-        try {
-            String child = fileName;
-            if (directory != null && directory.length() > 0) {
-                child = directory + "/" + fileName;
-            }
 
-            File file = new File(context.getFilesDir(), child);
-            return readFile(file);
-        } catch (Exception e) {
-            e.printStackTrace();
+        String child = fileName;
+        if (directory != null && directory.length() > 0) {
+                child = directory + "/" + fileName;
         }
-        return null;
+
+        File file = new File(context.getFilesDir(), child);
+        return readFile(file);
+    }
+
+    /**
+     * Delete contents of a directory.
+     */
+    private void clearDirectory(String directory, boolean recursive){
+
+        // Check if the directory exists
+        File file = new File(context.getFilesDir(), directory);
+        if (!file.exists() || !file.isDirectory()) {
+            return;
+        }
+
+        File[] children = file.listFiles();
+        for (File f : children) {
+            String filename = f.getName();
+            if (f.isFile()) {
+                if (f.delete()) Log.d(LOG_TAG, "Successfully deleted file: " + filename);
+                else Log.e(LOG_TAG, "Failed to delete file: " + filename);
+            }
+            else if (f.isDirectory() && recursive){
+                clearDirectory(f.getPath(), true);
+                if (f.delete()) Log.d(LOG_TAG, "Successfully deleted directory: " + filename);
+                else Log.e(LOG_TAG, "Failed to delete directory: " + filename);
+            }
+            else{
+                Log.e(LOG_TAG, "Failed to delete: " + f.getPath());
+            }
+        }
     }
 }

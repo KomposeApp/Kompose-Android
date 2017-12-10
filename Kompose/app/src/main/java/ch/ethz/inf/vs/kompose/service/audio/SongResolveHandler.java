@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
@@ -21,7 +22,7 @@ import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public abstract class SongResolveHandler {
 
-    private static final String LOG_TAG = "## SongResolveHandler";
+    private static final String LOG_TAG = "##SongResolveHandler";
 
     /**
      * Handles the song requesting per URL. Required by at least two activities.
@@ -89,6 +90,7 @@ public abstract class SongResolveHandler {
         songModel.setVideoID(videoID);
         songModel.setOrder(activeSession.getAllSongs().size());
 
+        //If this is removed, the download bar won't show up. Something is deadlocking in the IncomingMessageHandler.
         activeSession.getPlayQueue().add(songModel);
         activeSession.getAllSongs().add(songModel);
 
@@ -97,9 +99,10 @@ public abstract class SongResolveHandler {
         return true;
     }
 
+
     private static class SongRequestListener implements SimpleListener<Integer, SongModel> {
 
-        private final String LOG_TAG = "## SongRequestListener";
+        private final String LOG_TAG = "##SongRequestListener";
 
         private Context ctx;
 
@@ -111,11 +114,6 @@ public abstract class SongResolveHandler {
         public void onEvent(Integer status, SongModel value) {
             if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
                 value.setSongStatus(SongStatus.REQUESTED);
-                try {
-                    StateSingleton.getInstance().getAudioServicePhaser().register();
-                } catch (Exception ex) {
-                    //we dont case
-                }
                 Log.d(LOG_TAG, "resolved download url: " + value.getDownloadUrl());
                 new OutgoingMessageHandler(ctx).sendRequestSong(value);
             } else {
@@ -123,8 +121,11 @@ public abstract class SongResolveHandler {
                 Toast.makeText(ctx, "Failed to resolve Youtube URL", Toast.LENGTH_LONG).show();
 
                 SessionModel sessionModel = StateSingleton.getInstance().getActiveSession();
-                if (sessionModel != null && sessionModel.getPlayQueue().contains(value)) {
-                    sessionModel.getPlayQueue().remove(value);
+                if (sessionModel != null) {
+                    value.setDownloadStatus(DownloadStatus.FAILED);
+                    /*if (sessionModel.getPlayQueue().contains(value)) {
+                        sessionModel.getPlayQueue().remove(value);
+                    }*/
                 }
             }
         }

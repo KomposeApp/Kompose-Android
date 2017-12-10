@@ -24,7 +24,7 @@ import ch.ethz.inf.vs.kompose.service.youtube.extractor.YouTubeExtractor;
 
 public class YoutubeDownloadUtility {
 
-    private final String LOG_TAG = "## Download Utility";
+    private final String LOG_TAG = "##DownloadUtility";
 
     public static final int RESOLVE_SUCCESS = 0x1;
     public static final int RESOLVE_FAILED = 0x2;

@@ -21,7 +21,7 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
  */
 public class KomposeResolveListener implements NsdManager.ResolveListener {
 
-    private final String LOG_TAG = "## Resolver";
+    private final String LOG_TAG = "##Resolver";
 
     private ObservableList<SessionModel> sessionModels;
 

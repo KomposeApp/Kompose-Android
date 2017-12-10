@@ -49,7 +49,7 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
 
     protected static boolean LOGGING = false;
 
-    private final static String LOG_TAG = "## YouTubeExtractor";
+    private final static String LOG_TAG = "##YouTubeExtractor";
     private final static String CACHE_FILE_NAME = "decipher_js_funct";
     private final static int DASH_PARSE_RETRIES = 5;
 

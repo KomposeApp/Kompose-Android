@@ -6,6 +6,7 @@ import android.util.Log;
 import java.io.File;
 import java.util.concurrent.Phaser;
 
+import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.preferences.PreferenceUtility;
@@ -17,7 +18,7 @@ import ch.ethz.inf.vs.kompose.service.audio.SongCacheMap;
 
 public class StateSingleton {
 
-    private final String LOG_TAG = "## State Singleton:";
+    private final String LOG_TAG = "##StateSingleton:";
 
     private SessionModel activeSession;
     private ClientModel activeClient;
@@ -25,19 +26,10 @@ public class StateSingleton {
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
     private boolean hasMainActivity; //Required for the Share Activity
     private boolean playlistIsActive; //Required for the Share Activity
-    private Phaser audioServicePhaser;
 
     private StateSingleton() {
         hasMainActivity = false;
         playlistIsActive = false;
-    }
-
-    public Phaser getAudioServicePhaser() {
-        return audioServicePhaser;
-    }
-
-    public void setAudioServicePhaser(Phaser audioServicePhaser) {
-        this.audioServicePhaser = audioServicePhaser;
     }
 
     private static class LazyHolder {
@@ -140,7 +132,7 @@ public class StateSingleton {
         if (songCache == null){
             throw new IllegalStateException("Cache has not been initialized.");
         }
-        Log.d("## SongCacheMap", "Retrieving file with VideoID: " + id + " from the cache");
+        Log.d("##SongCacheMap", "Retrieving file with VideoID: " + id + " from the cache");
         return songCache.get(id);
     }
 
@@ -161,7 +153,7 @@ public class StateSingleton {
 
     public void clearCache() {
         if (songCache!= null) songCache.clear();
-        Log.d("## SongCacheMap", "Cache cleared");
+        Log.d("##SongCacheMap", "Cache cleared");
     }
 
 

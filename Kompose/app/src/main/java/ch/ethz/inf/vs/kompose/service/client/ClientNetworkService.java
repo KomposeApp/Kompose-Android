@@ -31,7 +31,7 @@ import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE_NSD;
 
 public class ClientNetworkService extends Service {
 
-    private final String LOG_TAG = "## ClientNetworkService";
+    private final String LOG_TAG = "##ClientNetworkService";
 
     private IBinder binder = new LocalBinder();
     private boolean initialized = false;
@@ -207,7 +207,7 @@ public class ClientNetworkService extends Service {
      */
     private static class ClientListenerTask extends AsyncTask<Void, Void, Void> {
 
-        private final String LOG_TAG = "## ClientListenerTask";
+        private final String LOG_TAG = "##ClientListenerTask";
 
         private ServerSocket serverSocket;
         private int localPort;

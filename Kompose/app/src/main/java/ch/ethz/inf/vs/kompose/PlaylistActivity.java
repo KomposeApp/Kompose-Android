@@ -17,15 +17,20 @@ import android.view.MenuItem;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
+import ch.ethz.inf.vs.kompose.converter.SessionConverter;
+import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.databinding.ActivityPlaylistBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogAddYoutubeLinkBinding;
 import ch.ethz.inf.vs.kompose.databinding.DialogHostInfoBinding;
+import ch.ethz.inf.vs.kompose.enums.SessionStatus;
+import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.audio.AudioService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.audio.SongResolveHandler;
+import ch.ethz.inf.vs.kompose.service.handler.StorageHandler;
 import ch.ethz.inf.vs.kompose.service.host.HostServerService;
 import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.InQueueSongViewHolder;
@@ -33,7 +38,7 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 
 public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
 
-    private static final String LOG_TAG = "## Playlist Activity";
+    private static final String LOG_TAG = "##PlaylistActivity";
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().getActiveSession(), this);
     private Dialog songRequestDialog;
     private OutgoingMessageHandler responseHandler;
@@ -94,8 +99,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         // ShareActivity should no longer recognize us at this point
         StateSingleton.getInstance().setPlaylistIsActive(false);
 
-        responseHandler.sendUnRegisterClient();
+        // Store the Session we just played on disk, to be later viewed in the history
+        SessionModel endedSession = StateSingleton.getInstance().getActiveSession();
+        if (endedSession!=null){
+            if (!endedSession.getAllSongs().isEmpty()) {
+                Session historyEntry = new SessionConverter().convert(endedSession);
+                new StorageHandler(this).persist(historyEntry);
+            }
 
+            // Either sends an unregister message if client, or finishes session if host.
+            if (!endedSession.getSessionStatus().equals(SessionStatus.FINISHED))
+                responseHandler.sendUnRegisterClient();
+        }
         if (clientNetworkServiceIntent != null) {
             Log.d(LOG_TAG, "Stopping ClientNetworkService");
             stopService(clientNetworkServiceIntent);
@@ -108,7 +123,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             unbindService(audioServiceConnection);
             audioServiceBound = false;
         }
-
     }
 
     @Override

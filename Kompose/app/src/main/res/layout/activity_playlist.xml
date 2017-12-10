@@ -210,5 +210,18 @@
 
 
         </LinearLayout>
+
+        <LinearLayout
+            style="@style/TextContentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.FINISHED) ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone">
+
+
+            <!--TODO: ADD LAYOUT FOR FINISHED SESSION -->
+
+        </LinearLayout>
     </LinearLayout>
 </layout>

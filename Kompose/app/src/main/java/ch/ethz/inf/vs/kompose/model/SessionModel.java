@@ -159,6 +159,7 @@ public class SessionModel extends UniqueModel {
         return clients;
     }
 
+
     @Bindable
     public int getActiveDevices() {
         return activeDevices;

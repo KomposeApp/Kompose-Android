@@ -13,7 +13,7 @@ import ch.ethz.inf.vs.kompose.model.base.UniqueModel;
  * Don't use any other method of adding elements than `add`.
  */
 public class ObservableUniqueSortedList<T extends UniqueModel> extends ObservableArrayList<T> {
-    private static final String LOG_TAG = "ObservableUniqueSortedL";
+    private static final String LOG_TAG = "##ObsUniqueSortedList";
     private Comparator<T> orderComparator;
     private Comparator<T> uniqueComparator;
 
@@ -50,7 +50,7 @@ public class ObservableUniqueSortedList<T extends UniqueModel> extends Observabl
         }
 
         if (sameIdFound) {
-            Log.wtf(LOG_TAG, "PANTS ON FIRE: tried to add duplicate object with same UUID!");
+            Log.wtf(LOG_TAG, "Tried to add duplicate object with same UUID!");
             return false;
         }
 
