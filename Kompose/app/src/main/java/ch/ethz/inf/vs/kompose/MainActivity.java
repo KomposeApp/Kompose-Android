@@ -227,11 +227,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     }
 
     @Override
-    public void openHelpClicked() {
-        //todo: make
-    }
-
-    @Override
     public void openSettingsClicked() {
         Intent settingsIntent = new Intent(this, SettingsActivity.class);
         startActivity(settingsIntent);
