@@ -11,6 +11,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.util.concurrent.Phaser;
 
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
@@ -32,8 +33,9 @@ public class DownloadWorker extends AsyncTask<Void, Void, Void> {
         this.context = new WeakReference<>(context);
         this.sessionModel = sessionModel;
 
-        this.playlistListener = new PlaylistListener(context);
-        this.sessionModel.getPlayQueue().addOnListChangedCallback(playlistListener);
+        sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(context));
+        StateSingleton.getInstance().setAudioServicePhaser(new Phaser(1));
+
     }
 
     private MediaPlayer mediaPlayerFromFile(File file) {
@@ -43,79 +45,70 @@ public class DownloadWorker extends AsyncTask<Void, Void, Void> {
     @Override
     protected Void doInBackground(Void... voids) {
         YoutubeDownloadUtility youtubeDownloadUtility = new YoutubeDownloadUtility(context.get());
+
         int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
-
-
-        restart: while (!isCancelled()) {
+        while (!isCancelled()) {
+            // wait until the Phaser is unblocked (initially and when a new item enters
+            // the download queue)
+            int registered = StateSingleton.getInstance().getAudioServicePhaser().getRegisteredParties();
+            StateSingleton.getInstance().getAudioServicePhaser().arriveAndDeregister();
             int numDownloaded = 0;
             int index = 0;
 
-            //TODO: Data race on playqueue
             while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
-                final SongModel nextDownload;
                 try {
-                     nextDownload = sessionModel.getPlayQueue().get(index);
-                }catch(IndexOutOfBoundsException e){
-                    Log.e(LOG_TAG, "Cheap attempt to avert the data race");
-                    break restart;
-                }
-                if (!nextDownload.getSongStatus().equals(SongStatus.RESOLVING) &&
-                        nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
-                    Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
+                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
+                    if (!nextDownload.getSongStatus().equals(SongStatus.RESOLVING) &&
+                            nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
+                        Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
 
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            nextDownload.setDownloadStatus(DownloadStatus.STARTED);
-                        }
-                    });
-
-                    final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
-                    final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
-
-                    if (storedFile != null) {
                         new Handler(Looper.getMainLooper()).post(new Runnable() {
                             @Override
                             public void run() {
-                                nextDownload.setDownloadPath(storedFile);
-                                nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
-                                nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
-                                if (thumbDrawable != null) {
-                                    Log.d(LOG_TAG, "thumbnail downloaded " + thumbDrawable.isVisible());
-                                    nextDownload.setThumbnail(thumbDrawable);
+                                nextDownload.setDownloadStatus(DownloadStatus.STARTED);
+                            }
+                        });
+
+                        final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
+                        final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
+
+                        if (storedFile != null) {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    nextDownload.setDownloadPath(storedFile);
+                                    nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
+                                    nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
+                                    if (thumbDrawable != null) {
+                                        Log.d(LOG_TAG, "thumbnail downloaded " + thumbDrawable.isVisible());
+                                        nextDownload.setThumbnail(thumbDrawable);
+                                    }
+
+                                    context.get().checkOnCurrentSong();
                                 }
-
-                                context.get().checkOnCurrentSong();
-                            }
-                        });
-                        numDownloaded++;
+                            });
+                            numDownloaded++;
+                        } else {
+                            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    nextDownload.setDownloadStatus(DownloadStatus.FAILED);
+                                }
+                            });
+                        }
+                        new OutgoingMessageHandler(context.get()).sendSessionUpdate();
+                        index = 0;
                     } else {
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                nextDownload.setDownloadStatus(DownloadStatus.FAILED);
-                                context.get().checkOnCurrentSong();
-                            }
-                        });
+                        numDownloaded++;
+                        index++;
                     }
-
-                    //TODO: Is this really necessary?
-                    new OutgoingMessageHandler(context.get()).sendSessionUpdate();
-                    index = 0;
-                } else {
-                    numDownloaded++;
-                    index++;
+                } catch (Exception ex) {
+                    //error occurs when playlist is empty because .size() is retarded (return > 0 even though its 0)
                 }
+
             }
-
         }
-
         return null;
-    }
-
-    @Override
-    protected void onPostExecute(Void r){
-        this.sessionModel.getPlayQueue().removeOnListChangedCallback(playlistListener);
     }
 
     private static class PlaylistListener extends ObservableList.OnListChangedCallback {

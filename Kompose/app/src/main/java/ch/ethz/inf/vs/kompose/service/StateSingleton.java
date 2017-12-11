@@ -26,10 +26,19 @@ public class StateSingleton {
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
     private boolean hasMainActivity; //Required for the Share Activity
     private boolean playlistIsActive; //Required for the Share Activity
+    private Phaser audioServicePhaser;
 
     private StateSingleton() {
         hasMainActivity = false;
         playlistIsActive = false;
+    }
+
+    public Phaser getAudioServicePhaser() {
+        return audioServicePhaser;
+    }
+
+    public void setAudioServicePhaser(Phaser audioServicePhaser) {
+        this.audioServicePhaser = audioServicePhaser;
     }
 
     private static class LazyHolder {
