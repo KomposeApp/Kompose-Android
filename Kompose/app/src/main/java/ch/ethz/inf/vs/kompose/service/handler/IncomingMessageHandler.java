@@ -251,7 +251,6 @@ public class IncomingMessageHandler implements Runnable {
             public void run() {
                 Log.d(LOG_TAG, "SESSION FINISHED");
                 sessionModel.setSessionStatus(SessionStatus.FINISHED);
-                //TODO: Somehow make it able to quit after this happens
             }
         };
     }
@@ -360,7 +359,7 @@ public class IncomingMessageHandler implements Runnable {
     private Runnable addDownVoteToSong(Message message, SessionModel activeSessionModel, final ClientModel clientModel) {
         SongModel downVoteTarget = null;
         String requestedSongUUID = message.getSongDetails().getUuid();
-        String senderUUID = message.getSenderUuid();
+        UUID senderUUID = UUID.fromString(message.getSenderUuid());
 
         // find the song in the session model
         for (SongModel song : activeSessionModel.getAllSongs()) {
@@ -368,7 +367,7 @@ public class IncomingMessageHandler implements Runnable {
             if (requestedSongUUID.equals(songUUID)) {
                 // check if song already downvoted by this client
                 for (DownVoteModel downVote : song.getDownVotes()) {
-                    if (downVote.getClientModel().getUUID().toString().equals(senderUUID)) {
+                    if (downVote.getClientModel().getUUID().equals(senderUUID)) {
                         //already received downvote request
                         return null;
                     }
@@ -416,7 +415,7 @@ public class IncomingMessageHandler implements Runnable {
             String requestedSongUUID = message.getSongDetails().getUuid();
             if (songUUID.equals(requestedSongUUID)) {
                 // find the corresponding DownVoteModel
-                for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
+                for (DownVoteModel downVoteModel : new ArrayList<>(songModel.getDownVotes())) {
                     String downvoteClientUUID = downVoteModel.getClientModel().getUUID().toString();
                     String clientUUID = message.getSenderUuid();
                     if (downvoteClientUUID.equals(clientUUID)) {

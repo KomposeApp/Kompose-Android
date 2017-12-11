@@ -84,7 +84,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
-                viewModel.getSessionModels().clear();
             }
 
             @Override

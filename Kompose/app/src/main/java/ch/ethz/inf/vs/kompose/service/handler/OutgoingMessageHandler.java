@@ -6,6 +6,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.ConnectException;
 import java.net.InetAddress;
 import java.net.Socket;
 
@@ -187,6 +188,8 @@ public class OutgoingMessageHandler {
                 printWriter.close();
                 socket.close();
 
+            } catch (ConnectException c){
+                Log.d(LOG_TAG, "Connection refused");
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Failed to send message. Reason: " + e.getMessage());
                 e.printStackTrace();

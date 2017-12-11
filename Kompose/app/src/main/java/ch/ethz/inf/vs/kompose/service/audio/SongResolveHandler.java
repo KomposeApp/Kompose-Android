@@ -9,7 +9,6 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
@@ -17,8 +16,8 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
+import ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility;
 
 public abstract class SongResolveHandler {
 
@@ -121,11 +120,10 @@ public abstract class SongResolveHandler {
                 Toast.makeText(ctx, "Failed to resolve Youtube URL", Toast.LENGTH_LONG).show();
 
                 SessionModel sessionModel = StateSingleton.getInstance().getActiveSession();
-                if (sessionModel != null) {
-                    value.setDownloadStatus(DownloadStatus.FAILED);
-                    /*if (sessionModel.getPlayQueue().contains(value)) {
+                if (sessionModel != null && sessionModel.getPlayQueue().contains(value)) {
+                    if (sessionModel.getPlayQueue().contains(value)) {
                         sessionModel.getPlayQueue().remove(value);
-                    }*/
+                    }
                 }
             }
         }

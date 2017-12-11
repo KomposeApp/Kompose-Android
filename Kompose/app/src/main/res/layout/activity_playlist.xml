@@ -16,7 +16,7 @@
     <LinearLayout
         style="@style/RootLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
@@ -28,6 +28,7 @@
             android:theme="@style/ToolbarStyle"
             app:title="@{viewModel.sessionModel.name}"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -193,35 +194,50 @@
         </LinearLayout>
 
 
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
             style="@style/TextContentLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.WAITING) ? View.VISIBLE : View.GONE}"
             tools:visibility="gone">
 
-
             <TextView
-                style="@style/SecondaryTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:text="@string/add_songs" />
+                style="@style/TileLayout"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                android:textColor="@color/colorBlack"
+                android:text="@string/add_songs"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.4"
+                />
 
 
-        </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
 
-        <LinearLayout
+        <android.support.constraint.ConstraintLayout
             style="@style/TextContentLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="vertical"
             android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.FINISHED) ? View.VISIBLE : View.GONE}"
             tools:visibility="gone">
 
+            <TextView
+                style="@style/TileLayout"
+                android:textAlignment="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="18sp"
+                android:textColor="@color/colorBlack"
+                android:text="@string/session_finished"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintVertical_bias="0.4" />
 
-            <!--TODO: ADD LAYOUT FOR FINISHED SESSION -->
-
-        </LinearLayout>
+        </android.support.constraint.ConstraintLayout>
     </LinearLayout>
 </layout>
