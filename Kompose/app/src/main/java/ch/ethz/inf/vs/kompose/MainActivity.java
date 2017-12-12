@@ -218,7 +218,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             ServerConnectionDetails serverConnectionDetails = new ServerConnectionDetails(
                     inetAddress, port);
             sessionModel.setConnectionDetails(serverConnectionDetails);
-        } catch (UnknownHostException e) {
+        } catch (Exception e) {
             showError("Unknown host");
             return;
         }

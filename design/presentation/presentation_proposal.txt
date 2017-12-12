@@ -1,25 +1,17 @@
-welcome audience
+Hi!
+I'll have the pleasure of introducing you to Kompose, our playlist application.
 
-we will present you the newest, sexiest app for android
+First, connect your device to the audio system.
+Then open kompose, create a new party and add songs from youtube to the playlist.
+Those are downloaded, and will be played as soon as they are available.
 
-do you know the problem, when you're with friends and one of them occupies the music box with real shitty music all night long?
+Now other members can join your party, and they will see the playlist on their own device.
 
-the only solution to this problem is hijacking the station to play YOUR awesome songs, which often ends in a little fight.
+They can even add their own songs to the play queue.
 
-We are very friendly people and embrace peace, therefore we thought of a solution, to this awful problem:
+As a bonus, we've added a downvote button which can shield you from shitty music: 
+if enough members dislike a song, it is removed from the play queue.
 
-KOMPOSE!!!
+The app is available on the ... store.
 
-long story short we created a distributed playlist that anyone can add songs to. 
-
-
-As you can see on the picture, everyone that makes part of a party can add their favorite music to the playlist.
-
-to not expose you to shitty music, we added a fair voting system:
-if a majority of clients downvotes a song, it will be removed from the queue.
-
-if the eth policy allows it, we will make it available opensource, else you can soon find it on google play store, dont miss to download!!!
-
-We wish you awesome nights with your friends with the best music.
-
-Thanks and come see us later.
+come see us late for a demonstration, thanks for your attention!
