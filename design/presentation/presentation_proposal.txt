@@ -1,5 +1,9 @@
-Hi!
-I'll have the pleasure of introducing you to Kompose, our playlist application.
+Have you ever been out with friends and one of them occupies the music box with real shitty music all night long?
+Till now, the only solution to this problem is hijacking the station, and force YOUR own songs to be played.
+
+As this tends to end in fights, and as we tend to lose those fights, we've needed another solution.
+
+Meet Kompose.
 
 First, connect your device to the audio system.
 Then open kompose, create a new party and add songs from youtube to the playlist.
@@ -10,8 +14,8 @@ Now other members can join your party, and they will see the playlist on their o
 They can even add their own songs to the play queue.
 
 As a bonus, we've added a downvote button which can shield you from shitty music: 
-if enough members dislike a song, it is removed from the play queue.
+If enough members dislike a song, it is removed.
 
 The app is available on the ... store.
 
-come see us late for a demonstration, thanks for your attention!
+Come see us late for a demonstration, thanks for your attention!
