@@ -1,0 +1,25 @@
+welcome audience
+
+we will present you the newest, sexiest app for android
+
+do you know the problem, when you're with friends and one of them occupies the music box with real shitty music all night long?
+
+the only solution to this problem is hijacking the station to play YOUR awesome songs, which often ends in a little fight.
+
+We are very friendly people and embrace peace, therefore we thought of a solution, to this awful problem:
+
+KOMPOSE!!!
+
+long story short we created a distributed playlist that anyone can add songs to. 
+
+
+As you can see on the picture, everyone that makes part of a party can add their favorite music to the playlist.
+
+to not expose you to shitty music, we added a fair voting system:
+if a majority of clients downvotes a song, it will be removed from the queue.
+
+if the eth policy allows it, we will make it available opensource, else you can soon find it on google play store, dont miss to download!!!
+
+We wish you awesome nights with your friends with the best music.
+
+Thanks and come see us later.
