@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
@@ -22,6 +23,7 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
@@ -212,23 +214,18 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         SessionModel sessionModel = new SessionModel(deviceUUID, null, false);
 
         // Get IP / port
-        try {
-            InetAddress inetAddress = InetAddress.getByName(viewModel.getIpAddress());
-            int port = Integer.parseInt(viewModel.getPort());
-            ServerConnectionDetails serverConnectionDetails = new ServerConnectionDetails(
-                    inetAddress, port);
-            sessionModel.setConnectionDetails(serverConnectionDetails);
-        } catch (UnknownHostException e) {
+        InetAddress inetAddress = getInetAddressByNameAsync(viewModel.getIpAddress());
+        if (inetAddress == null) {
             showError("Unknown host");
             return;
         }
 
-        joinSessionClicked(sessionModel);
-    }
+        int port = Integer.parseInt(viewModel.getPort());
+        ServerConnectionDetails serverConnectionDetails = new ServerConnectionDetails(
+                inetAddress, port);
+        sessionModel.setConnectionDetails(serverConnectionDetails);
 
-    @Override
-    public void openHelpClicked() {
-        //todo: make
+        joinSessionClicked(sessionModel);
     }
 
     @Override
@@ -354,6 +351,28 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             Intent playlistIntent = new Intent(mainActivity, PlaylistActivity.class);
             playlistIntent.putExtra(ch.ethz.inf.vs.kompose.MainActivity.KEY_NETWORKSERVICE, serverIntent);
             mainActivity.startActivity(playlistIntent);
+        }
+    }
+
+    // getByName can cause NetworkOnMainThreadException, so we have to wrap it in an AsyncTask
+    private InetAddress getInetAddressByNameAsync(String ip) {
+        try {
+            GetByNameTask getByNameTask = new GetByNameTask();
+            return getByNameTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, ip).get();
+        } catch (InterruptedException | ExecutionException e) {
+            return null;
+        }
+    }
+
+    private static class GetByNameTask extends AsyncTask<String, Void, InetAddress> {
+
+        @Override
+        protected InetAddress doInBackground(String... strings) {
+            try {
+                return InetAddress.getByName(strings[0]);
+            } catch (UnknownHostException e) {
+                return null;
+            }
         }
     }
 }

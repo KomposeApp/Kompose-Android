@@ -1,0 +1,17 @@
+Hi!
+I'll have the pleasure of introducing you to Kompose, our playlist application.
+
+First, connect your device to the audio system.
+Then open kompose, create a new party and add songs from youtube to the playlist.
+Those are downloaded, and will be played as soon as they are available.
+
+Now other members can join your party, and they will see the playlist on their own device.
+
+They can even add their own songs to the play queue.
+
+As a bonus, we've added a downvote button which can shield you from shitty music: 
+if enough members dislike a song, it is removed from the play queue.
+
+The app is available on the ... store.
+
+come see us late for a demonstration, thanks for your attention!
