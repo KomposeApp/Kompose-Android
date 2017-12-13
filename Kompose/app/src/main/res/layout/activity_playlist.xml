@@ -4,8 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <import type="android.view.View" />
+
         <import type="ch.ethz.inf.vs.kompose.enums.SessionStatus" />
+
         <import type="ch.ethz.inf.vs.kompose.enums.SongStatus" />
 
         <variable
@@ -26,8 +29,8 @@
             android:background="@color/colorPrimary"
             android:elevation="4dp"
             android:theme="@style/ToolbarStyle"
-            app:title="@{viewModel.sessionModel.name}"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="@{viewModel.sessionModel.name}" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -57,8 +60,8 @@
                     android:contentDescription="@string/thumbnail"
                     android:scaleType="centerCrop"
                     android:src="@{viewModel.sessionModel.currentlyPlaying.thumbnail}"
-                    tools:visibility="@{viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}"
-                    tools:src="@drawable/sample_thumbnail" />
+                    tools:src="@drawable/sample_thumbnail"
+                    tools:visibility="@{viewModel.sessionModel.isHost ? View.VISIBLE : View.GONE}" />
 
                 <RelativeLayout
                     android:id="@+id/currently_playing_description"
@@ -201,14 +204,30 @@
             android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.WAITING) ? View.VISIBLE : View.GONE}"
             tools:visibility="gone">
 
-
             <TextView
                 style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="@string/add_songs" />
 
+        </LinearLayout>
+
+
+        <LinearLayout
+            style="@style/TextContentLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="@{viewModel.sessionModel.sessionStatus.equals(SessionStatus.FINISHED) ? View.VISIBLE : View.GONE}"
+            tools:visibility="gone">
+
+            <TextView
+                style="@style/SecondaryTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="@string/session_finished" />
 
         </LinearLayout>
+
     </LinearLayout>
 </layout>
