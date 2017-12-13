@@ -1,23 +1,10 @@
 {
+  "type": "SESSION_UPDATE",
   "error_message": null,
-  "port": 0,
-  "sender_username": null,
+  "sender_username": "Boney M",
   "sender_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
   "session": {
-    "clients": [
-      {
-        "is_active": true,
-        "name": "Boney M",
-        "port": 0,
-        "uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5"
-      },
-      {
-        "is_active": true,
-        "name": "Rick Astley",
-        "port": 48357,
-        "uuid": "70998773-4dcd-4411-80f8-85c0a4f90832"
-      }
-    ],
+    "uuid": "e8d75a93-3b7c-4132-ba2e-82841be5fe1c",
     "creation_date_time": "2017-12-13T16:16:37.428Z",
     "host_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
     "session_name": "Disco Party",
@@ -38,7 +25,18 @@
         "videoID": "T5emcbg_wZk"
       }
     ],
-    "uuid": "e8d75a93-3b7c-4132-ba2e-82841be5fe1c"
+    "clients": [
+      {
+        "uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+        "name": "Boney M",
+        "is_active": true
+      },
+      {
+        "uuid": "70998773-4dcd-4411-80f8-85c0a4f90832",
+        "name": "Rick Astley",
+        "is_active": true
+      }
+    ]
   },
   "song_details": {
     "down_votes": [],
@@ -53,7 +51,6 @@
     "title": "EPICA - Unchain Utopia (OFFICIAL LYRIC VIDEO)",
     "uuid": "3fa6aea0-5ebd-4376-b189-d60dfda35099",
     "videoID": "c1idAsPYfd4"
-  },
-  "type": "SESSION_UPDATE"
+  }
 }
 
