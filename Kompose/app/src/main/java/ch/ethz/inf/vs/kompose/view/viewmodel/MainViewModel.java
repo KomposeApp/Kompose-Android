@@ -109,12 +109,6 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         }
     }
 
-    public void openHelpClicked(View v) {
-        if (clickListener != null) {
-            clickListener.openHelpClicked();
-        }
-    }
-
     public void openHistoryClicked(View v) {
         if (clickListener != null) {
             clickListener.openHistoryClicked();
@@ -148,8 +142,6 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         void joinSessionClicked(SessionModel sessionModel);
 
         void joinManualClicked();
-
-        void openHelpClicked();
 
         void openHistoryClicked();
 
