@@ -221,7 +221,13 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             return;
         }
 
-        int port = Integer.parseInt(viewModel.getPort());
+        int port;
+        try {
+            port = Integer.parseInt(viewModel.getPort());
+        } catch(NumberFormatException e) {
+            showError("Invalid port");
+            return;
+        }
         ServerConnectionDetails serverConnectionDetails = new ServerConnectionDetails(
                 inetAddress, port);
         sessionModel.setConnectionDetails(serverConnectionDetails);
