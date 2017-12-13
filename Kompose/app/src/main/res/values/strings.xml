@@ -99,7 +99,7 @@
     <string name="play">Play</string>
     <string name="songs_contained">songs contained</string>
     <string name="pause">Pause</string>
-    <string name="add_songs">Tell others to join your party, or add songs yourself from the menu on the top right.</string>
+    <string name="add_songs">Tell others to join your party, or add songs yourself with the + button.</string>
     <string name="add_more_songs">Add more songs, the play queue is empty!</string>
     <string name="wait_a_second">Please wait</string>
     <string name="downvote_button">Downvote button</string>
