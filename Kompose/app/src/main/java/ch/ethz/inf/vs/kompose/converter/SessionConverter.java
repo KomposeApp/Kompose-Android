@@ -16,6 +16,7 @@ import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 
 /**
  * Convert Session data representation to model representation, and vice-versa.
@@ -79,15 +80,14 @@ public class SessionConverter implements IBaseConverter<SessionModel, Session> {
         //convert song models to data
         SongConverter songConverter = new SongConverter(clientModels);
         List<Song> songs = new ArrayList<>();
-        for (int i = 0; i < sessionModel.getAllSongs().size(); i++) {
-            //TODO: I don't get it -- why are we skipping these in particular? Please discuss before removing this TODO.
+        for (SongModel csong :sessionModel.getAllSongs()) {
             //exclude resolving songs as they only should exist temporarily
-            if (sessionModel.getAllSongs().get(i).getSongStatus() != SongStatus.RESOLVING) {
-                songs.add(songConverter.convert(sessionModel.getAllSongs().get(i)));
+            if (csong.getSongStatus() != SongStatus.RESOLVING) {
+                songs.add(songConverter.convert(csong));
             }
         }
         if (songs.size() > 0) {
-            session.setSongs((Song[]) songs.toArray(new Song[0]));
+            session.setSongs(songs.toArray(new Song[0]));
         } else {
             session.setSongs(new Song[0]);
         }

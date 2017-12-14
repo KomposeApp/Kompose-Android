@@ -75,11 +75,11 @@ public class SettingsActivity extends AppCompatActivity {
         public void setDefaults() {
             PreferenceUtility preferenceUtility = StateSingleton.getInstance().getPreferenceUtility();
 
-            Preference userNamePref = findPreference(PreferenceUtility.KEY_USERNAME);
-            userNamePref.setSummary("Current: " + preferenceUtility.getUsername());
+            Preference clientPortPref = findPreference(PreferenceUtility.KEY_CPORT);
+            clientPortPref.setSummary("Current: " + preferenceUtility.getClientPort());
 
-            Preference sessionNamePref = findPreference(PreferenceUtility.KEY_SESSIONNAME);
-            sessionNamePref.setSummary("Current: " + preferenceUtility.getSessionName());
+            Preference hostPortPref = findPreference(PreferenceUtility.KEY_HPORT);
+            hostPortPref.setSummary("Current: " + preferenceUtility.getHostPort());
 
             Preference preloadPref = findPreference(PreferenceUtility.KEY_PRELOAD);
             preloadPref.setSummary("Current: " + preferenceUtility.getPreload());

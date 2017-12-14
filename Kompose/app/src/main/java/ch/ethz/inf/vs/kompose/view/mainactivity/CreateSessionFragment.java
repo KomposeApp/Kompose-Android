@@ -43,7 +43,8 @@ public class CreateSessionFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        FragmentCreateSessionBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.fragment_create_session, container, false);
+        FragmentCreateSessionBinding binding = DataBindingUtil.inflate(getLayoutInflater(),
+                R.layout.fragment_create_session, container, false);
         binding.setViewModel(viewModel);
         return binding.getRoot();
     }

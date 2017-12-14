@@ -25,8 +25,7 @@
     <string name="setting_error_cache">Maximum cache size is </string>
     <string name="setting_error_username">Please choose a valid username</string>
     <string name="setting_error_sessionname">Please choose a valid session name</string>
-    <string name="setting_error_hostport">Please choose a valid port for the host session</string>
-    <string name="setting_error_clientport">Please choose a valid port for the client session</string>
+    <string name="setting_error_port">Input rejected. Please choose a valid port.</string>
     <string name="view_error_clientname">Please choose a non-empty username</string>
     <string name="view_error_sessionname">Please choose a non-empty session name</string>
     <string name="view_error_connection_failed">Failed to establish connection to host</string>
@@ -61,6 +60,10 @@
     <!--Setting titles-->
     <string name="username_setting_title">Default username</string>
     <string name="username_setting_dialog_title">Username</string>
+    <string name="clientport_setting_dialog_title">Client Port</string>
+    <string name="hostport_setting_dialog_title">Host Port</string>
+    <string name="client_port">Port when Connecting</string>
+    <string name="host_port">Port when Hosting</string>
     <string name="session_name_setting_title">Default session name</string>
     <string name="session_name_setting_dialog_title">Session name</string>
     <string name="preload_size_setting_title">Number of items preloaded</string>
@@ -79,6 +82,8 @@
     <string name="KEY_SESSIONNAME">k_session</string>
     <string name="KEY_PRELOAD">k_preload</string>
     <string name="KEY_CACHESIZE">k_cachesize</string>
+    <string name="KEY_HPORT">k_host_port</string>
+    <string name="KEY_CPORT">k_client_port</string>
 
     <!--Other-->
     <string name="join">join</string>

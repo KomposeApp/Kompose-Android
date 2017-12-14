@@ -3,10 +3,7 @@ package ch.ethz.inf.vs.kompose.service.audio;
 import android.app.Service;
 import android.content.Intent;
 import android.databinding.Observable;
-import android.databinding.ObservableList;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
@@ -15,20 +12,14 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.concurrent.Phaser;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
-import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public class AudioService extends Service{

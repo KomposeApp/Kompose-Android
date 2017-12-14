@@ -2,7 +2,11 @@ package ch.ethz.inf.vs.kompose.enums;
 
 public enum SessionStatus {
     /**
-     * if session has no songs yet, or default status if server has not responded yet
+     * Session is not ready
+     */
+    UNINITIALIZED,
+    /**
+     * if session has no songs yet, but is ready
      */
     WAITING,
     /**
