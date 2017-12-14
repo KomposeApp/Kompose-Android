@@ -37,20 +37,12 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         return sessionModels;
     }
 
-    private boolean enableState;
 
     private String clientName;
     private String sessionName;
     private String ipAddress;
     private String port;
 
-    public void setEnabled(boolean enabled){
-        enableState = enabled;
-    }
-
-    public boolean isEnabled(){
-        return enableState;
-    }
 
     @Bindable
     public String getClientName() {
@@ -97,14 +89,14 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     }
 
     public void createSession(View view) {
-        if (clickListener != null && isEnabled()) {
+        if (clickListener != null ) {
             clickListener.createSessionClicked();
         }
     }
 
     @Override
     public void joinButtonClicked(View v, int position) {
-        if (clickListener != null && isEnabled()) {
+        if (clickListener != null ) {
             if (getSessionModels().size() > position) {
                 SessionModel pressedSession = getSessionModels().get(position);
                 if (pressedSession != null) {
@@ -115,19 +107,19 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     }
 
     public void joinManualClicked(View v) {
-        if (clickListener != null && isEnabled()) {
+        if (clickListener != null ) {
             clickListener.joinManualClicked();
         }
     }
 
     public void openHistoryClicked(View v) {
-        if (clickListener != null && isEnabled()) {
+        if (clickListener != null ) {
             clickListener.openHistoryClicked();
         }
     }
 
     public void openSettingsClicked(View v) {
-        if (clickListener != null && isEnabled()) {
+        if (clickListener != null) {
             clickListener.openSettingsClicked();
         }
     }

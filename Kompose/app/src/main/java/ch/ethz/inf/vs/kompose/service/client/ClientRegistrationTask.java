@@ -20,7 +20,7 @@ public class ClientRegistrationTask implements Runnable {
 
     private final String LOG_TAG = "##RegistrationTask";
     private final int NUM_RETRIES = 1;
-    private final int SOCKET_TIMEOUT = 2500;
+    private final int SOCKET_TIMEOUT = 3000;
 
     private ServerSocket clientServerSocket;
     private SimpleListener<Boolean, Void> callbackListener;

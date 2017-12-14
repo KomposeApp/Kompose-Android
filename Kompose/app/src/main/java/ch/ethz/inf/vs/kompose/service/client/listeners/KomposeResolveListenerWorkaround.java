@@ -17,6 +17,7 @@ import java.util.UUID;
 
 import ch.ethz.inf.vs.kompose.data.network.ServerConnectionDetails;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 /*
 * Workaround library for API < 24: https://github.com/youviewtv/tinydnssd
@@ -37,6 +38,7 @@ public class KomposeResolveListenerWorkaround implements DiscoverResolver.Listen
     public void onServicesChanged(Map<String, MDNSDiscover.Result> services) {
         Log.d(LOG_TAG, "mDNS service changed");
 
+        UUID ourDeviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
         final List<SessionModel> newSessions = new ArrayList<>();
 
         // Find the new services
@@ -45,6 +47,11 @@ public class KomposeResolveListenerWorkaround implements DiscoverResolver.Listen
             UUID hostUUID = UUID.fromString(r.txt.dict.get("host_uuid"));
             String hostName = r.txt.dict.get("host_name");
             String sessionName = r.txt.dict.get("session");
+
+            if (hostUUID.equals(ourDeviceUUID)){
+                Log.d(LOG_TAG, "Session host is us, skipping...");
+                continue;
+            }
 
             int port = r.srv.port;
             InetAddress host;

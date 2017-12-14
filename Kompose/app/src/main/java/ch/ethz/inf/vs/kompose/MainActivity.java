@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose;
 
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -31,7 +33,6 @@ import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.client.NSDListenerService;
 import ch.ethz.inf.vs.kompose.service.client.ClientRegistrationTask;
-import ch.ethz.inf.vs.kompose.view.mainactivity.CustomViewPager;
 import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
@@ -44,13 +45,11 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     private TabLayout tabLayout;
     private NSDListenerService NSDListenerService;
     private boolean nsdListenerServiceBound = false;
+    private ProgressDialog connectionProgress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // Enable the ViewModel inputs
-        viewModel.setEnabled(true);
 
         // Initialize the preference utility, and sets a flag to prevent ShareActivity from killing Kompose
         StateSingleton.getInstance().setStartedFromMainActivity();
@@ -74,10 +73,9 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         viewModel.setFromPreferences(StateSingleton.getInstance().getPreferenceUtility());
 
         tabLayout = findViewById(R.id.tabLayout);
-        final CustomViewPager viewPager = findViewById(R.id.viewPager);
+        final ViewPager viewPager = findViewById(R.id.viewPager);
         final PagerAdapter adapter = new MainActivityPagerAdapter(getSupportFragmentManager(), viewModel);
 
-        viewPager.initializeViewModel(viewModel);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
@@ -154,23 +152,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         StateSingleton.getInstance().clearCache();
     }
 
-    private void disableViews(){
-        viewModel.setEnabled(false);
-        LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
-        tabStrip.setEnabled(false);
-        for(int i = 0; i < tabStrip.getChildCount(); i++) {
-            tabStrip.getChildAt(i).setClickable(false);
-        }
-    }
-
-    private void enableViews(){
-        viewModel.setEnabled(true);
-        LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
-        tabStrip.setEnabled(true);
-        for(int i = 0; i < tabStrip.getChildCount(); i++) {
-            tabStrip.getChildAt(i).setClickable(true);
-        }
-    }
 
     /**
      * Join tab -- join existing rooms by clicking on their fragment.
@@ -178,16 +159,11 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
      */
     @Override
     public void joinSessionClicked(SessionModel sessionModel) {
-        //disable inputs
-        if (viewModel.isEnabled()) {
-            disableViews();
-        }
 
         String clientName = viewModel.getClientName();
         // Client's name must not be empty
         if (clientName == null || clientName.trim().isEmpty()) {
             showError(getString(R.string.view_error_clientname));
-            enableViews();
             return;
         }
         clientName = clientName.trim();
@@ -210,20 +186,16 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         } catch (IOException e) {
             e.printStackTrace();
             showError(getString(R.string.view_error_connection_failed));
-            enableViews();
             return;
         }
 
+        connectionProgress = ProgressDialog.show(this,"Connecting to Host...", "This may take a moment.", true, false);
         viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
         registrationTask.start();
     }
 
     @Override
     public void joinManualClicked() {
-        //disable inputs
-        if (viewModel.isEnabled()) {
-            disableViews();
-        }
 
         UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
 
@@ -390,7 +362,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                     return;
                 }
             } finally {
-                enableViews();
+                connectionProgress.cancel();
             }
 
             //Unbind the service discovery as we don't need it anymore
