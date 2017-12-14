@@ -7,12 +7,12 @@ import android.util.Log;
 
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 
-import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE_NSD;
+import static ch.ethz.inf.vs.kompose.service.client.NSDListenerService.SERVICE_TYPE_NSD;
 
-    /*
-     * Used in conjunction with standard Android API service discovery with NSD.
-     * This only works correctly for API >= 24
-     */
+/*
+ * Used in conjunction with standard Android API service discovery with NSD.
+ * This only works correctly for API >= 24
+ */
     public class ClientServiceListener implements NsdManager.DiscoveryListener {
 
         private final String LOG_TAG = "##DiscoveryListener";

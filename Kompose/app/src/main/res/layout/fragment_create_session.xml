@@ -29,13 +29,19 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5sp">
 
-            <EditText
+            <EditText android:id="@+id/fragment_create_name_input"
                 style="@style/DefaultEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@={viewModel.clientName}"
                 android:hint="@string/your_name"
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:maxLength="128"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@id/fragment_create_session_input"
+                android:selectAllOnFocus="true"
                 tools:text="hi mom" />
         </android.support.design.widget.TextInputLayout>
 
@@ -43,17 +49,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <EditText
+            <EditText android:id="@+id/fragment_create_session_input"
                 style="@style/DefaultEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:hint="@string/session_name"
                 android:text="@={viewModel.sessionName}"
-                tools:text="hi mom" />
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:maxLength="128"
+                android:imeOptions="actionDone"
+                android:selectAllOnFocus="true"
+                tools:text="hi mom"/>
         </android.support.design.widget.TextInputLayout>
 
-        <Button
+        <Button android:id="@+id/fragment_create_button"
             style="@style/PrimaryButton"
             android:layout_marginTop="13sp"
             android:layout_width="match_parent"

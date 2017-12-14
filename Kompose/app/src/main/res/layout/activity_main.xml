@@ -73,12 +73,10 @@
 
         </LinearLayout>
 
-        <android.support.v4.view.ViewPager
+        <ch.ethz.inf.vs.kompose.view.mainactivity.CustomViewPager
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </android.support.v4.view.ViewPager>
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </layout>

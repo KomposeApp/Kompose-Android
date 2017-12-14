@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.kompose.view.viewmodel;
 
 import android.databinding.Bindable;
 import android.databinding.ObservableList;
+import android.util.Log;
 import android.view.View;
 
 import java.util.Comparator;
@@ -36,8 +37,20 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         return sessionModels;
     }
 
+    private boolean enableState;
 
     private String clientName;
+    private String sessionName;
+    private String ipAddress;
+    private String port;
+
+    public void setEnabled(boolean enabled){
+        enableState = enabled;
+    }
+
+    public boolean isEnabled(){
+        return enableState;
+    }
 
     @Bindable
     public String getClientName() {
@@ -49,7 +62,7 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         notifyPropertyChanged(BR.clientName);
     }
 
-    private String sessionName;
+
 
     @Bindable
     public String getSessionName() {
@@ -61,9 +74,7 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         notifyPropertyChanged(BR.sessionName);
     }
 
-    private String ipAddress;
 
-    private String port;
 
     @Bindable
     public String getIpAddress() {
@@ -86,14 +97,14 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     }
 
     public void createSession(View view) {
-        if (clickListener != null) {
+        if (clickListener != null && isEnabled()) {
             clickListener.createSessionClicked();
         }
     }
 
     @Override
     public void joinButtonClicked(View v, int position) {
-        if (clickListener != null) {
+        if (clickListener != null && isEnabled()) {
             if (getSessionModels().size() > position) {
                 SessionModel pressedSession = getSessionModels().get(position);
                 if (pressedSession != null) {
@@ -104,25 +115,19 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     }
 
     public void joinManualClicked(View v) {
-        if (clickListener != null) {
+        if (clickListener != null && isEnabled()) {
             clickListener.joinManualClicked();
         }
     }
 
-    public void openHelpClicked(View v) {
-        if (clickListener != null) {
-            clickListener.openHelpClicked();
-        }
-    }
-
     public void openHistoryClicked(View v) {
-        if (clickListener != null) {
+        if (clickListener != null && isEnabled()) {
             clickListener.openHistoryClicked();
         }
     }
 
     public void openSettingsClicked(View v) {
-        if (clickListener != null) {
+        if (clickListener != null && isEnabled()) {
             clickListener.openSettingsClicked();
         }
     }
@@ -135,8 +140,8 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     }
 
     public void saveToPreferences(PreferenceUtility preferences) {
-        preferences.setUsername(getClientName());
-        preferences.setSessionName(getSessionName());
+        preferences.setUsername(getClientName().trim());
+        preferences.setSessionName(getSessionName().trim());
         preferences.setDefaultPort(getPort());
         preferences.setDefaultIp(getIpAddress());
         preferences.applyChanges();
@@ -148,8 +153,6 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         void joinSessionClicked(SessionModel sessionModel);
 
         void joinManualClicked();
-
-        void openHelpClicked();
 
         void openHistoryClicked();
 

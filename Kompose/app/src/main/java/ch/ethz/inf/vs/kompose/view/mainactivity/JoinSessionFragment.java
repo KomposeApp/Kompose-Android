@@ -49,8 +49,8 @@ public class JoinSessionFragment extends Fragment {
         // Inflate the layout for this fragment
         FragmentJoinSessionBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.fragment_join_session, container, false);
         binding.setViewModel(viewModel);
-        binding.list.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.list.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), viewModel));
+        binding.fragmentJoinRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.fragmentJoinRecyclerview.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), viewModel));
         return binding.getRoot();
     }
 }

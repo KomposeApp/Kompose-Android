@@ -18,7 +18,8 @@
             android:name=".MainActivity"
             android:label="@string/label_main"
             android:configChanges="orientation|screenSize"
-            android:screenOrientation="portrait">
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="stateUnchanged">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -49,8 +50,9 @@
         <service
             android:name=".service.host.HostServerService"
             android:stopWithTask="true" />
-        <service android:name=".service.client.ClientNetworkService" />
+        <service android:name=".service.client.NSDListenerService" />
         <service android:name=".service.audio.AudioService" />
+        <service android:name=".service.client.ClientServerService" />
 
         <!-- Activity used exclusively to share songs -->
         <activity

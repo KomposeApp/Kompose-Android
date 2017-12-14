@@ -29,13 +29,20 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="5sp">
 
-            <EditText
+            <EditText android:id="@+id/fragment_manual_name_input"
                 style="@style/DefaultEditText"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:hint="@string/your_name"
                 android:text="@={viewModel.clientName}"
+                android:inputType="textPersonName"
+                android:maxLines="1"
+                android:maxLength="128"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@id/fragment_manual_ip_input"
+                android:nextFocusRight="@id/fragment_manual_ip_input"
+                android:selectAllOnFocus="true"
                 tools:text="hi mom" />
         </android.support.design.widget.TextInputLayout>
 
@@ -57,14 +64,22 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <EditText
+                    <EditText android:id="@+id/fragment_manual_ip_input"
                         style="@style/DefaultEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:singleLine="true"
                         android:hint="@string/ip_address"
                         android:text="@={viewModel.ipAddress}"
-                        tools:text="hi mom" />
+                        android:digits="0123456789."
+                        android:inputType="textNoSuggestions"
+                        android:maxLines="1"
+                        android:maxLength="45"
+                        android:imeOptions="actionNext"
+                        android:nextFocusDown="@id/fragment_manual_port_input"
+                        android:nextFocusRight="@id/fragment_manual_port_input"
+                        android:selectAllOnFocus="true"
+                        tools:text="255.255.255.255" />
                 </android.support.design.widget.TextInputLayout>
 
             </RelativeLayout>
@@ -79,20 +94,25 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
 
-                    <EditText
+                    <EditText android:id="@+id/fragment_manual_port_input"
                         style="@style/DefaultEditText"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:singleLine="true"
                         android:hint="@string/port"
                         android:text="@={viewModel.port}"
-                        tools:text="hi mom" />
+                        android:inputType="number"
+                        android:maxLines="1"
+                        android:maxLength="5"
+                        android:imeOptions="actionDone"
+                        android:selectAllOnFocus="true"
+                        tools:text="65535" />
                 </android.support.design.widget.TextInputLayout>
 
             </RelativeLayout>
         </LinearLayout>
 
-        <Button
+        <Button android:id="@+id/fragment_manual_button"
             style="@style/PrimaryButton"
             android:layout_marginTop="13sp"
             android:layout_width="match_parent"

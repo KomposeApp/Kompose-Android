@@ -36,12 +36,17 @@
 
                 <EditText
                     style="@style/DefaultEditText"
-                    android:id="@+id/input_name"
+                    android:id="@+id/fragment_join_name_input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:text="@={viewModel.clientName}"
                     android:hint="@string/your_name"
+                    android:inputType="textPersonName"
+                    android:maxLines="1"
+                    android:maxLength="128"
+                    android:imeOptions="actionDone"
+                    android:selectAllOnFocus="true"
                     tools:text="hi mom" />
             </android.support.design.widget.TextInputLayout>
 
@@ -63,7 +68,7 @@
             </LinearLayout>
 
             <android.support.v7.widget.RecyclerView
-                android:id="@+id/list"
+                android:id="@+id/fragment_join_recyclerview"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 tools:listitem="@layout/session_join_view">

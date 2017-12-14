@@ -25,8 +25,8 @@ import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
-import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_NAME;
-import static ch.ethz.inf.vs.kompose.MainActivity.SERVICE_TYPE;
+import static ch.ethz.inf.vs.kompose.service.client.NSDListenerService.SERVICE_NAME;
+import static ch.ethz.inf.vs.kompose.service.client.NSDListenerService.SERVICE_TYPE;
 
 /**
  * Android service that starts the server.

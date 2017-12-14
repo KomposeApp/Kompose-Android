@@ -279,9 +279,11 @@ public class IncomingMessageHandler implements Runnable {
         return new Runnable() {
             @Override
             public void run() {
-                sessionModel.getClients().add(client);
-                setActiveDevices(sessionModel);
-                Log.d(LOG_TAG, "Added client " + client.getName() + " to the active clients.");
+                if (!sessionModel.getClients().contains(client)) {
+                    sessionModel.getClients().add(client);
+                    setActiveDevices(sessionModel);
+                    Log.d(LOG_TAG, "Added client " + client.getName() + " to the active clients.");
+                }
             }
         };
     }

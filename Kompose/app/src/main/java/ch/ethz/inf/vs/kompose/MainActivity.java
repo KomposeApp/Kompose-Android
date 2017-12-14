@@ -8,18 +8,17 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import org.joda.time.DateTime;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.util.UUID;
 
@@ -30,7 +29,9 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.client.ClientNetworkService;
+import ch.ethz.inf.vs.kompose.service.client.NSDListenerService;
+import ch.ethz.inf.vs.kompose.service.client.ClientRegistrationTask;
+import ch.ethz.inf.vs.kompose.view.mainactivity.CustomViewPager;
 import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
@@ -38,20 +39,18 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     private final String LOG_TAG = "##MainActivity";
 
-    public static final String KEY_NETWORKSERVICE = "ClientNetworkService";
-    public static final String KEY_SERVERSERVICE = "HostServerService";
-    public static final String SERVICE_NAME = "Kompose";
-    public static final String SERVICE_TYPE = "_kompose._tcp";
-    public static final String SERVICE_TYPE_NSD = "_kompose._tcp.";
-
     private final MainViewModel viewModel = new MainViewModel(this);
 
-    private ClientNetworkService clientNetworkService;
-    private boolean clientNetworkServiceBound = false;
+    private TabLayout tabLayout;
+    private NSDListenerService NSDListenerService;
+    private boolean nsdListenerServiceBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Enable the ViewModel inputs
+        viewModel.setEnabled(true);
 
         // Initialize the preference utility, and sets a flag to prevent ShareActivity from killing Kompose
         StateSingleton.getInstance().setStartedFromMainActivity();
@@ -74,13 +73,15 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         // Insert default names
         viewModel.setFromPreferences(StateSingleton.getInstance().getPreferenceUtility());
 
-        final TabLayout tabLayout = findViewById(R.id.tabLayout);
-        final ViewPager viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
+        final CustomViewPager viewPager = findViewById(R.id.viewPager);
         final PagerAdapter adapter = new MainActivityPagerAdapter(getSupportFragmentManager(), viewModel);
 
+        viewPager.initializeViewModel(viewModel);
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 viewPager.setCurrentItem(tab.getPosition());
@@ -98,8 +99,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         });
 
         //bind client network service
-        Intent cnsIntent = new Intent(this.getBaseContext(), ClientNetworkService.class);
-        bindService(cnsIntent, cNetServiceConnection, BIND_AUTO_CREATE);
+        Intent cnsIntent = new Intent(this.getBaseContext(), NSDListenerService.class);
+        bindService(cnsIntent, nsdListenerConnection, BIND_AUTO_CREATE);
     }
 
     @Override
@@ -111,9 +112,9 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
 
         //rebind client network service if it's gone when returning
-        if (!clientNetworkServiceBound) {
-            Intent intent = new Intent(this.getBaseContext(), ClientNetworkService.class);
-            bindService(intent, cNetServiceConnection, BIND_AUTO_CREATE);
+        if (!nsdListenerServiceBound) {
+            Intent intent = new Intent(this.getBaseContext(), NSDListenerService.class);
+            bindService(intent, nsdListenerConnection, BIND_AUTO_CREATE);
         }
 
         super.onResume();
@@ -145,12 +146,30 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (clientNetworkServiceBound) {
-            unbindService(cNetServiceConnection);
-            clientNetworkServiceBound = false;
+        if (nsdListenerServiceBound) {
+            unbindService(nsdListenerConnection);
+            nsdListenerServiceBound = false;
         }
         //Clear song cache
         StateSingleton.getInstance().clearCache();
+    }
+
+    private void disableViews(){
+        viewModel.setEnabled(false);
+        LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
+        tabStrip.setEnabled(false);
+        for(int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(false);
+        }
+    }
+
+    private void enableViews(){
+        viewModel.setEnabled(true);
+        LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
+        tabStrip.setEnabled(true);
+        for(int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(true);
+        }
     }
 
     /**
@@ -159,11 +178,16 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
      */
     @Override
     public void joinSessionClicked(SessionModel sessionModel) {
-        String clientName = viewModel.getClientName();
+        //disable inputs
+        if (viewModel.isEnabled()) {
+            disableViews();
+        }
 
+        String clientName = viewModel.getClientName();
         // Client's name must not be empty
         if (clientName == null || clientName.trim().isEmpty()) {
             showError(getString(R.string.view_error_clientname));
+            enableViews();
             return;
         }
         clientName = clientName.trim();
@@ -179,42 +203,46 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         StateSingleton.getInstance().setActiveSession(sessionModel);
         StateSingleton.getInstance().setActiveClient(clientModel);
 
+        RegistrationListener listener = new RegistrationListener(this);
+        Thread registrationTask;
         try {
-            if (!clientNetworkServiceBound || clientNetworkService == null)
-                throw new IllegalStateException("Failed to properly set up Client Network Service");
-
-            RegistrationListener listener = new RegistrationListener(this);
-            clientNetworkService.initSocketListener();
-            clientNetworkService.registerClientOnHost(listener, clientName);
-        } catch (SocketException s) {
-            s.printStackTrace();
-            try {
-                clientNetworkService.closeClientSocket();
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Cleaning up the Client Socket failed.");
-                e.printStackTrace();
-            }
-            showError("Failed to set up connection.");
-        } catch (IllegalStateException | IOException io) {
-            io.printStackTrace();
-            showError("Failed to set up connection.");
+            registrationTask = new Thread(new ClientRegistrationTask(this,clientName, listener));
+        } catch (IOException e) {
+            e.printStackTrace();
+            showError(getString(R.string.view_error_connection_failed));
+            enableViews();
+            return;
         }
+
         viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
+        registrationTask.start();
     }
 
     @Override
     public void joinManualClicked() {
+        //disable inputs
+        if (viewModel.isEnabled()) {
+            disableViews();
+        }
 
         UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
 
+        String addressText = viewModel.getIpAddress();
+        String portText = viewModel.getPort();
+
+        if (!checkIPandPort(addressText, portText)){
+            showError("Invalid IP Address or Port Values.");
+            return;
+        }
+
         // Create a stub session
-        // NOTE: Don't care for now what we put as Session or Host UUID.
+        // TODO: Make sure these are updated...
         SessionModel sessionModel = new SessionModel(deviceUUID, null, false);
 
         // Get IP / port
         try {
-            InetAddress inetAddress = InetAddress.getByName(viewModel.getIpAddress());
-            int port = Integer.parseInt(viewModel.getPort());
+            InetAddress inetAddress = InetAddress.getByName(addressText);
+            int port = Integer.parseInt(portText);
             ServerConnectionDetails serverConnectionDetails = new ServerConnectionDetails(
                     inetAddress, port);
             sessionModel.setConnectionDetails(serverConnectionDetails);
@@ -226,9 +254,34 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         joinSessionClicked(sessionModel);
     }
 
-    @Override
-    public void openHelpClicked() {
-        //todo: make
+
+    private boolean checkIPandPort(String ipText, String portText){
+        //Check if both Strings exist
+        if (ipText == null || portText == null){
+            return false;
+        }
+
+        //Check size of port, and last character of ip
+        int port = Integer.valueOf(portText);
+        if ((port <= 0) || (port > 65535) || ipText.endsWith(".")){
+            return false;
+        }
+
+        //Check length of the IP (note: must ensure only numbers and periods are permitted inputs)
+        String[] addressSegments = ipText.split("\\.");
+        if (addressSegments.length!=4){
+            return false;
+        }
+
+        //Check the size of each segment
+        for (String addressSegment : addressSegments) {
+            if (Integer.valueOf(addressSegment) > 255) {
+                return false;
+            }
+        }
+
+        //If all checks passed, return true
+        return true;
     }
 
     @Override
@@ -277,8 +330,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         StateSingleton.getInstance().setActiveSession(newSession);
 
         //Unbind the service discovery as we don't need it anymore
-        unbindService(cNetServiceConnection);
-        clientNetworkServiceBound = false;
+        unbindService(nsdListenerConnection);
+        nsdListenerServiceBound = false;
 
         // Start the playlist activity
         Intent playlistIntent = new Intent(this, PlaylistActivity.class);
@@ -288,31 +341,31 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     }
 
 
-    private final ServiceConnection cNetServiceConnection = new ServiceConnection() {
+    private final ServiceConnection nsdListenerConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d(LOG_TAG, "ClientNetworkService bound");
-            ClientNetworkService.LocalBinder binder = (ClientNetworkService.LocalBinder) service;
-            clientNetworkService = binder.getService();
-            clientNetworkServiceBound = true;
-            clientNetworkService.findNetworkServices(viewModel.getSessionModels());
+            Log.d(LOG_TAG, "NSDListenerService bound");
+            NSDListenerService.LocalBinder binder = (NSDListenerService.LocalBinder) service;
+            NSDListenerService = binder.getService();
+            nsdListenerServiceBound = true;
+            NSDListenerService.findNetworkServices(viewModel.getSessionModels());
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            Log.w(LOG_TAG, "ClientNetworkService died");
+            Log.w(LOG_TAG, "NSDListenerService died");
             breakdown();
         }
 
         @Override
         public void onBindingDied(ComponentName arg0) {
-            Log.w(LOG_TAG, "Binding with ClientNetworkService died");
+            Log.w(LOG_TAG, "Binding with NSDListenerService died");
             breakdown();
         }
 
         private void breakdown() {
             showError("Discovery of Kompose Sessions has stopped unexpectedly.");
-            clientNetworkService = null;
+            NSDListenerService = null;
         }
     };
 
@@ -332,27 +385,20 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         public void onEvent(Boolean success, Void v) {
             try {
                 if (!success) {
-                    Log.e(LOG_TAG, "Failed to establish connection with host");
+                    Log.w(LOG_TAG, "Failed to establish connection with host");
                     mainActivity.showError(getString(R.string.view_error_connection_failed));
-                    clientNetworkService.closeClientSocket();
                     return;
                 }
-            } catch (IOException e) {
-                throw new IllegalStateException("Closing the Client Server Socket failed");
+            } finally {
+                enableViews();
             }
 
-            // start the client service through startService -- THIS IS INTENTIONAL
-            // it will keep the service alive across different activities.
-            Intent serverIntent = new Intent(mainActivity, ClientNetworkService.class);
-            mainActivity.startService(serverIntent);
-
             //Unbind the service discovery as we don't need it anymore
-            unbindService(cNetServiceConnection);
-            clientNetworkServiceBound = false;
+            unbindService(nsdListenerConnection);
+            nsdListenerServiceBound = false;
 
             // Initialize Playlist
             Intent playlistIntent = new Intent(mainActivity, PlaylistActivity.class);
-            playlistIntent.putExtra(ch.ethz.inf.vs.kompose.MainActivity.KEY_NETWORKSERVICE, serverIntent);
             mainActivity.startActivity(playlistIntent);
         }
     }

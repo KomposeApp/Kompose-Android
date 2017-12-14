@@ -16,6 +16,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 
+import java.io.IOException;
+
 import ch.ethz.inf.vs.kompose.base.BaseActivity;
 import ch.ethz.inf.vs.kompose.converter.SessionConverter;
 import ch.ethz.inf.vs.kompose.data.json.Session;
@@ -28,6 +30,7 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.audio.AudioService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.service.client.ClientServerService;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.audio.SongResolveHandler;
 import ch.ethz.inf.vs.kompose.service.handler.StorageHandler;
@@ -43,9 +46,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private Dialog songRequestDialog;
     private OutgoingMessageHandler responseHandler;
 
-    /* Intent of Service originating from the preceeding Activities*/
-    private Intent clientNetworkServiceIntent;
-
     // Audio Service
     private AudioService audioService;
     private boolean audioServiceBound = false;
@@ -54,6 +54,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     private HostServerService hostService;
     private boolean hostServiceBound = false;
 
+    // Client Service
+    private ClientServerService clientService;
+    private boolean clientServiceBound = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,10 +64,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         // Signals to ShareActivity that the playlist is active and songs can be requested
         StateSingleton.getInstance().setPlaylistIsActive(true);
-
-        Intent intent = getIntent();
         responseHandler = new OutgoingMessageHandler(this);
-        clientNetworkServiceIntent = intent.getParcelableExtra(MainActivity.KEY_NETWORKSERVICE);
 
         ActivityPlaylistBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_playlist);
         binding.list.setLayoutManager(new LinearLayoutManager(this));
@@ -88,7 +88,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             bindService(hostServerIntent, hostServiceConnection, BIND_AUTO_CREATE);
         }
         else{
-
+            Log.d(LOG_TAG, "binding ClientServerService");
+            Intent clientServerIntent = new Intent(this.getBaseContext(), ClientServerService.class);
+            bindService(clientServerIntent, clientServiceConnection, BIND_AUTO_CREATE);
         }
     }
 
@@ -111,17 +113,21 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             if (!endedSession.getSessionStatus().equals(SessionStatus.FINISHED))
                 responseHandler.sendUnRegisterClient();
         }
-        if (clientNetworkServiceIntent != null) {
-            Log.d(LOG_TAG, "Stopping ClientNetworkService");
-            stopService(clientNetworkServiceIntent);
-        }
+
         if (hostServiceBound) {
             Log.d(LOG_TAG, "Stopping HostServerService");
             unbindService(hostServiceConnection);
+            hostServiceBound = false;
         }
         if (audioServiceBound) {
+            Log.d(LOG_TAG, "Stopping AudioService");
             unbindService(audioServiceConnection);
             audioServiceBound = false;
+        }
+        if (clientServiceBound) {
+            Log.d(LOG_TAG, "Stopping ClientServerService");
+            unbindService(clientServiceConnection);
+            clientServiceBound = false;
         }
     }
 
@@ -226,6 +232,31 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
 
     /**
+     * Audio Service Connection Listener
+     */
+    private ServiceConnection audioServiceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d(LOG_TAG, "AudioService connected");
+            audioServiceBound = true;
+            audioService = ((AudioService.LocalBinder) service).getService();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            Log.w(LOG_TAG, "AudioService died");
+            audioService = null;
+        }
+
+        @Override
+        public void onBindingDied(ComponentName arg0) {
+            Log.w(LOG_TAG, "Binding died");
+            audioService = null;
+        }
+    };
+
+    /**
      * Host Server Service Listener
      */
     private ServiceConnection hostServiceConnection = new ServiceConnection() {
@@ -260,28 +291,36 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             hostService = null;
         }
     };
+
     /**
-     * Audio Service Connection Listener
+     * Client Server Service Listener
      */
-    private ServiceConnection audioServiceConnection = new ServiceConnection() {
+    private ServiceConnection clientServiceConnection = new ServiceConnection() {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
-            Log.d(LOG_TAG, "AudioService connected");
-            audioServiceBound = true;
-            audioService = ((AudioService.LocalBinder) service).getService();
+            Log.d(LOG_TAG, "ClientServerService connected");
+            clientServiceBound = true;
+            clientService = ((ClientServerService.LocalBinder) service).getService();
+            try {
+                clientService.startClientListener();
+            } catch (IOException e) {
+                Log.e(LOG_TAG, "There was an error setting up the ClientServerService.");
+                showError("Client services could not be set up properly.");
+                finish();
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
-            Log.w(LOG_TAG, "AudioService died");
-            audioService = null;
+            Log.e(LOG_TAG, "ClientServerService died");
+            clientService = null;
         }
 
         @Override
         public void onBindingDied(ComponentName arg0) {
-            Log.w(LOG_TAG, "Binding died");
-            audioService = null;
+            Log.e(LOG_TAG, "ClientServerService Binding died");
+            clientService = null;
         }
     };
 }
