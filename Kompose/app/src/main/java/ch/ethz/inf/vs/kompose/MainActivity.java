@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
 
 import org.joda.time.DateTime;
 
@@ -31,8 +30,8 @@ import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
-import ch.ethz.inf.vs.kompose.service.client.NSDListenerService;
 import ch.ethz.inf.vs.kompose.service.client.ClientRegistrationTask;
+import ch.ethz.inf.vs.kompose.service.client.NSDListenerService;
 import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
@@ -42,7 +41,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     private final MainViewModel viewModel = new MainViewModel(this);
 
-    private TabLayout tabLayout;
     private NSDListenerService NSDListenerService;
     private boolean nsdListenerServiceBound = false;
     private ProgressDialog connectionProgress;
@@ -72,7 +70,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         // Insert default names
         viewModel.setFromPreferences(StateSingleton.getInstance().getPreferenceUtility());
 
-        tabLayout = findViewById(R.id.tabLayout);
+        final TabLayout tabLayout = findViewById(R.id.tabLayout);
         final ViewPager viewPager = findViewById(R.id.viewPager);
         final PagerAdapter adapter = new MainActivityPagerAdapter(getSupportFragmentManager(), viewModel);
 
@@ -189,7 +187,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             return;
         }
 
-        connectionProgress = ProgressDialog.show(this,"Connecting to Host...", "This may take a moment.", true, false);
+        connectionProgress = ProgressDialog.show(this,getString(R.string.action_connect_title),
+                getString(R.string.action_connect_desc), true, false);
         viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
         registrationTask.start();
     }
