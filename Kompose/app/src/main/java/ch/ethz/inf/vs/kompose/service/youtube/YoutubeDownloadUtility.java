@@ -2,6 +2,7 @@ package ch.ethz.inf.vs.kompose.service.youtube;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.media.MediaPlayer;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -9,10 +10,13 @@ import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -21,10 +25,12 @@ import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.youtube.extractor.YouTubeExtractor;
 
+//Note: The caching here ignores the CacheQuota size
 
 public class YoutubeDownloadUtility {
 
     private final String LOG_TAG = "##DownloadUtility";
+    private final String FILENAME_PREFIX="yt.dl.";
 
     public static final int RESOLVE_SUCCESS = 0x1;
     public static final int RESOLVE_FAILED = 0x2;
@@ -49,7 +55,7 @@ public class YoutubeDownloadUtility {
     }
 
     /**
-     * Download the file from the specified URL and notify observers when done.
+     * Download the file from the specified URL and notify observers when done. (or retrieve it from cache)
      * The notifier will carry a MediaPlayer that can be used to play the file.
      * TODO: BUG: Find out why this is sometimes called 10+ times in a row
      * @return true if the download succeeded, false otherwise
@@ -63,43 +69,72 @@ public class YoutubeDownloadUtility {
             return null;
         }
 
-        final File storedFile;
-        if (StateSingleton.getInstance().checkCacheByKey(videoID)) {
-            //Song found in cache
-            storedFile = StateSingleton.getInstance().retrieveSongFromCache(videoID);
+        // Open an URL connection and retrieve the actual filesize
+        URLConnection connection;
+        int fileLength;
+        try {
+            URL url = new URL(songModel.getDownloadUrl().toString());
+            connection = url.openConnection();
+
+            // Detect the file length
+            fileLength = connection.getContentLength();
+            if (fileLength <= 0){
+                throw new IOException("Target Youtube Video is empty or far too large.");
+            }
+        } catch (IOException io){
+            Log.e(LOG_TAG, "File download failed");
+            io.printStackTrace();
+            return null;
         }
-        else{
-            //Song not found in cache:
+
+        // Filter the cache for the desired file:
+        final String fileName = FILENAME_PREFIX + videoID;
+        File[] matchingFiles = context.getCacheDir().listFiles(new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return (fileName.equals(pathname.getName()));
+            }
+        });
+
+        //Check if the file that's stored is complete in size (if not, continue)
+        File storedFile = null;
+        for (File cachedFile: matchingFiles){
+            long cachedLength = cachedFile.length();
+            Log.d(LOG_TAG, "Filesize on Cache: " + cachedLength + " ----- Filesize on Youtube: " + fileLength);
+            if (cachedLength == fileLength){
+                storedFile = cachedFile;
+                break;
+            }
+        }
+
+        if (storedFile == null){
+            Log.d(LOG_TAG, "No matching file cached. Proceeding to download from Youtube...");
             InputStream input = null;
             OutputStream output = null;
             try {
-                URL url = new URL(songModel.getDownloadUrl().toString());
-                URLConnection connection = url.openConnection();
+                //TODO: Filesize limit check from settings
+
+                //Establish direct connection
                 connection.connect();
 
+                // Open streams
                 input = new BufferedInputStream(connection.getInputStream());
-                storedFile = new File(context.getCacheDir(), songModel.getFileName());
+                storedFile = new File(context.getCacheDir(), fileName);
                 output = new FileOutputStream(storedFile);
 
-                // Detect the file length
-                final int fileLength = connection.getContentLength();
-
+                //Download the file and update the UI display
                 byte[] buffer = new byte[4096];
-                int count, total = 0;
-                while ((count = input.read(buffer)) != -1) {
-                    output.write(buffer, 0, count);
-                    total += count;
+                int in; int total = 0;
+                while ((in = input.read(buffer)) != -1) {
+                    output.write(buffer, 0, in);
+                    total += in;
 
-                    final int currentTotal = total;
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            songModel.setDownloadProgress(currentTotal * 100 / fileLength);
-                        }
-                    });
+                    double currentProgress = (double) total / fileLength * 100.0;
+                    songModel.setDownloadProgress((int) currentProgress);
                 }
             } catch (IOException e) {
                 Log.e(LOG_TAG, "File download failed");
+                e.printStackTrace();
                 return null;
             } finally {
                 try {
@@ -107,19 +142,15 @@ public class YoutubeDownloadUtility {
                     if (output != null) output.close();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    Log.e(LOG_TAG, "Failed to close input/outputstream. This will probably have consequences.");
+                    Log.e(LOG_TAG, "Failed to close input/outputstream. This will have consequences.");
                 }
             }
-
-            Log.d(LOG_TAG,"Filesize: " + storedFile.length());
-            StateSingleton.getInstance().addSongToCache(videoID, storedFile);
         }
         return storedFile;
     }
 
     public Drawable downloadThumb(SongModel songModel) {
-
-        // We don't cache thumbnails because they're extremely lightweight
+        // We won't cache this since it's tiny by comparison
         InputStream input = null;
         OutputStream output = null;
         try {

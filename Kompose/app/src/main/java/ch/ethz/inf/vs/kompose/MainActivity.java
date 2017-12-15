@@ -59,11 +59,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         StateSingleton.getInstance().setStartedFromMainActivity();
         StateSingleton.getInstance().setPreferenceUtility(this);
 
-        // Initialize the song cache
-        int currentPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
-        int currentCacheSize = StateSingleton.getInstance().getPreferenceUtility().getCurrentCacheSize();
-        StateSingleton.getInstance().initializeSongCache(currentPreload, currentCacheSize);
-
         // Initialize Content View
         ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setViewModel(viewModel);
@@ -158,8 +153,6 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             unbindService(nsdListenerConnection);
             nsdListenerServiceBound = false;
         }
-        //Clear song cache
-        StateSingleton.getInstance().clearCache();
     }
 
 

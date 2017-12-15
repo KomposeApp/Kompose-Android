@@ -244,15 +244,11 @@ public class AudioService extends Service{
         public void run() {
             while (songModel.getSongStatus().equals(SongStatus.PAUSED) || songModel.getSongStatus().equals(SongStatus.PLAYING)) {
                 try {
-                    final int position = mediaPlayer.getCurrentPosition();
-                    final int duration = mediaPlayer.getDuration();
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Double d = (double) position / duration * 100;
-                            songModel.setPlaybackProgress(d.intValue());
-                        }
-                    });
+                    int position = mediaPlayer.getCurrentPosition();
+                    int duration = mediaPlayer.getDuration();
+                    Double d = (double) position / duration * 100;
+                    songModel.setPlaybackProgress(d.intValue());
+
                 }catch(IllegalStateException e){
                     Log.d(LOG_TAG, "MediaPlayer no longer available, stopping progress tracker...");
                     return;
