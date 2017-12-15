@@ -36,9 +36,9 @@ public class ClientServerService extends Service {
     }
 
 
-    public void startClientListener() throws IOException {
+    public void startClientListener(int actualClientPort) throws IOException {
 
-        clientSocket = new ServerSocket(StateSingleton.getInstance().getPreferenceUtility().getClientPort());
+        clientSocket = new ServerSocket(actualClientPort);
 
         clientListenerTask = new Thread(new ClientListenerTask(this, clientSocket));
         clientListenerTask.start();

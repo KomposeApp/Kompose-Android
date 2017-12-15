@@ -23,11 +23,13 @@ public class ClientRegistrationTask implements Runnable {
     private final int SOCKET_TIMEOUT = 3000;
 
     private ServerSocket clientServerSocket;
-    private SimpleListener<Boolean, Void> callbackListener;
+    private int clientPort;
+
+    private SimpleListener<Boolean, Integer> callbackListener;
     private WeakReference<Context> context;
     private String clientName;
 
-    public ClientRegistrationTask(Context ctx, String clientName, SimpleListener<Boolean, Void> callbackListener)
+    public ClientRegistrationTask(Context ctx, String clientName, SimpleListener<Boolean, Integer> callbackListener)
             throws IOException {
         this.context = new WeakReference<>(ctx);
         this.callbackListener = callbackListener;
@@ -35,6 +37,7 @@ public class ClientRegistrationTask implements Runnable {
 
         this.clientServerSocket = new ServerSocket(StateSingleton.getInstance().getPreferenceUtility().getClientPort());
         this.clientServerSocket.setSoTimeout(SOCKET_TIMEOUT);
+        this.clientPort = clientServerSocket.getLocalPort();
     }
 
 
@@ -46,7 +49,7 @@ public class ClientRegistrationTask implements Runnable {
 
         while (counter < NUM_RETRIES && !Thread.interrupted()) {
 
-            new OutgoingMessageHandler(context.get()).sendRegisterClient(clientName, clientServerSocket.getLocalPort());
+            new OutgoingMessageHandler(context.get()).sendRegisterClient(clientName, clientPort);
             try {
                 Socket connection = clientServerSocket.accept();
                 Log.d(LOG_TAG, "message received");
@@ -55,6 +58,7 @@ public class ClientRegistrationTask implements Runnable {
                 msgHandler.start();
 
                 success = true;
+                break;
             } catch (SocketTimeoutException to) {
                 Log.d(LOG_TAG, "Timeout reached");
                 counter++;
@@ -75,7 +79,7 @@ public class ClientRegistrationTask implements Runnable {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                callbackListener.onEvent(result, null);
+                callbackListener.onEvent(result, clientPort);
             }
         });
     }

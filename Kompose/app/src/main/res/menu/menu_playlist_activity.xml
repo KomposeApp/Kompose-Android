@@ -6,20 +6,23 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activity.MainActivity">
 
-    <item android:id="@+id/add_link"
-        android:title="@string/add_link"
-        android:icon="@drawable/ic_action_add"
-        app:showAsAction="ifRoom" />
+    <group>
+        <item android:id="@+id/playlist_menu_add_link"
+            android:title="@string/add_link"
+            android:icon="@drawable/ic_action_add"
+            app:showAsAction="ifRoom" />
 
-    <item android:id="@+id/show_history"
-        android:title="@string/show_history"
-        app:showAsAction="never" />
+        <item android:id="@+id/playlist_menu_show_history"
+            android:title="@string/show_history"
+            app:showAsAction="never" />
 
-    <item android:id="@+id/leave_session"
-        android:title="@string/leave_session"
-        app:showAsAction="never" />
+        <item android:id="@+id/playlist_menu_leave_session"
+            android:title="@string/leave_session"
+            app:showAsAction="never" />
 
-    <item android:id="@+id/host_info"
-        android:title="@string/host_info"
-        app:showAsAction="never" />
+        <item android:id="@+id/playlist_menu_host_info"
+            android:title="@string/host_info"
+            app:showAsAction="never" />
+    </group>
+
 </menu>

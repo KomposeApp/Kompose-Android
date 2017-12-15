@@ -5,6 +5,7 @@ import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.support.v7.widget.LinearLayoutManager;
@@ -42,6 +43,8 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.PlaylistViewModel;
 public class PlaylistActivity extends BaseActivity implements InQueueSongViewHolder.ClickListener, PlaylistViewModel.ClickListener {
 
     private static final String LOG_TAG = "##PlaylistActivity";
+    public static final String KEY_PORT = "acp";
+
     private final PlaylistViewModel viewModel = new PlaylistViewModel(StateSingleton.getInstance().getActiveSession(), this);
     private Dialog songRequestDialog;
     private OutgoingMessageHandler responseHandler;
@@ -57,6 +60,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     // Client Service
     private ClientServerService clientService;
     private boolean clientServiceBound = false;
+    private int actualClientPort;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +95,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             Log.d(LOG_TAG, "binding ClientServerService");
             Intent clientServerIntent = new Intent(this.getBaseContext(), ClientServerService.class);
             bindService(clientServerIntent, clientServiceConnection, BIND_AUTO_CREATE);
+
+            actualClientPort = getIntent().getIntExtra(KEY_PORT, 0);
+            if (actualClientPort == 0) throw new IllegalStateException("Actual Client Port must not be zero under any circumstances");
+
+            StateSingleton.getInstance().getActiveSession().addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+                @Override
+                public void onPropertyChanged(Observable observable, int i) {
+                    if (i == BR.sessionStatus) {
+                        invalidateOptionsMenu();
+                    }
+                }
+            });
         }
     }
 
@@ -110,8 +126,9 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             }
 
             // Either sends an unregister message if client, or finishes session if host.
-            if (!endedSession.getSessionStatus().equals(SessionStatus.FINISHED))
+            if (!endedSession.getSessionStatus().equals(SessionStatus.FINISHED)) {
                 responseHandler.sendUnRegisterClient();
+            }
         }
 
         if (hostServiceBound) {
@@ -132,6 +149,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        SessionModel model = StateSingleton.getInstance().getActiveSession();
+
+        if ( model != null && SessionStatus.FINISHED.equals(model.getSessionStatus())){
+            menu.findItem(R.id.playlist_menu_add_link).setVisible(false);
+        } else{
+            menu.findItem(R.id.playlist_menu_add_link).setVisible(true);
+        }
+        return true;
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.menu_playlist_activity, menu);
@@ -143,7 +172,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         // Handle item selection
         switch (item.getItemId()) {
-            case R.id.add_link:
+            case R.id.playlist_menu_add_link:
                 songRequestDialog = new Dialog(this);
                 songRequestDialog.setCancelable(true);
 
@@ -156,18 +185,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 songRequestDialog.show();
                 return true;
 
-            case R.id.leave_session:
+            case R.id.playlist_menu_leave_session:
                 Log.d(LOG_TAG, "Left the party by pressing the button");
                 finish();
                 return true;
 
-            case R.id.show_history:
+            case R.id.playlist_menu_show_history:
                 Log.d(LOG_TAG, "History button pressed from Playlist Activity");
                 Intent historyIntent = new Intent(this, HistoryOverviewActivity.class);
                 startActivity(historyIntent);
                 return true;
 
-            case R.id.host_info:
+            case R.id.playlist_menu_host_info:
                 Dialog hostInfoDialog = new Dialog(this);
                 hostInfoDialog.setCancelable(true);
                 DialogHostInfoBinding hostInfoBinding = DataBindingUtil.inflate(
@@ -303,7 +332,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             clientServiceBound = true;
             clientService = ((ClientServerService.LocalBinder) service).getService();
             try {
-                clientService.startClientListener();
+                clientService.startClientListener(actualClientPort);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "There was an error setting up the ClientServerService.");
                 showError("Client services could not be set up properly.");

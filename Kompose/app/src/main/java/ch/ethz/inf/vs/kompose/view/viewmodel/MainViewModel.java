@@ -17,6 +17,8 @@ import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
 
 public class MainViewModel extends BaseViewModel implements JoinSessionViewHolder.ClickListener {
+    private final String LOG_TAG = "##ViewModel";
+
     private ObservableList<SessionModel> sessionModels;
     private ClickListener clickListener;
 
@@ -37,12 +39,20 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         return sessionModels;
     }
 
+    private boolean enableState;
 
     private String clientName;
     private String sessionName;
     private String ipAddress;
     private String port;
 
+    public void setEnabled(boolean enabled){
+        enableState = enabled;
+    }
+
+    public boolean isEnabled(){
+        return enableState;
+    }
 
     @Bindable
     public String getClientName() {
@@ -89,38 +99,48 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     }
 
     public void createSession(View view) {
-        if (clickListener != null ) {
+        if (clickListener != null && isEnabled()) {
             clickListener.createSessionClicked();
+        }else{
+            Log.wtf(LOG_TAG, "Prevented consecutive \"Create Session\" button pushing.");
         }
     }
 
     @Override
     public void joinButtonClicked(View v, int position) {
-        if (clickListener != null ) {
+        if (clickListener != null && isEnabled()) {
             if (getSessionModels().size() > position) {
                 SessionModel pressedSession = getSessionModels().get(position);
                 if (pressedSession != null) {
                     clickListener.joinSessionClicked(pressedSession);
                 }
             }
+        }else{
+            Log.wtf(LOG_TAG, "Prevented consecutive Join button pushing.");
         }
     }
 
     public void joinManualClicked(View v) {
-        if (clickListener != null ) {
+        if (clickListener != null && isEnabled()) {
             clickListener.joinManualClicked();
+        }else{
+            Log.wtf(LOG_TAG, "Prevented consecutive Manual Join button pushing.");
         }
     }
 
     public void openHistoryClicked(View v) {
-        if (clickListener != null ) {
+        if (clickListener != null && isEnabled()) {
             clickListener.openHistoryClicked();
+        } else{
+            Log.wtf(LOG_TAG, "Prevented consecutive History button pushing.");
         }
     }
 
     public void openSettingsClicked(View v) {
-        if (clickListener != null) {
+        if (clickListener != null && isEnabled()) {
             clickListener.openSettingsClicked();
+        } else{
+            Log.wtf(LOG_TAG, "Prevented consecutive Settings button pushing.");
         }
     }
 

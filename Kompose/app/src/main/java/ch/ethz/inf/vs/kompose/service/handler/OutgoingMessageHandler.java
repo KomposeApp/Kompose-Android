@@ -85,7 +85,6 @@ public class OutgoingMessageHandler {
     }
 
     public void sendUnRegisterClient() {
-        getSession().setSessionStatus(SessionStatus.FINISHED);
         if (getSession().getIsHost()) {
             Message msg = getBaseMessage(MessageType.FINISH_SESSION);
             sendMessageToClients(msg);
@@ -93,6 +92,7 @@ public class OutgoingMessageHandler {
             Message msg = getBaseMessage(MessageType.UNREGISTER_CLIENT);
             sendMessageToHost(msg);
         }
+        getSession().setSessionStatus(SessionStatus.FINISHED);
     }
 
     public void sendSessionUpdate() {

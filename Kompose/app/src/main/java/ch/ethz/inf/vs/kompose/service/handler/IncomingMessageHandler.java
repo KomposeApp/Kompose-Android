@@ -449,17 +449,19 @@ public class IncomingMessageHandler implements Runnable {
      * @return Runnable to be executed on the main thread
      */
     private Runnable sessionUpdate(Message message, final SessionModel activeSessionModel, final ClientModel myClientModel) {
-        final Session receivedSession = message.getSession();
+        Session receivedSession = message.getSession();
 
         SessionConverter converter = new SessionConverter();
         final SessionModel receivedSessionModel = converter.convert(receivedSession);
-
 
         return new Runnable() {
             @Override
             public void run() {
                 Log.d(LOG_TAG, "Performing session update...");
                 activeSessionModel.setName(receivedSessionModel.getName());
+                activeSessionModel.rectifyUUID(receivedSessionModel.getUUID());
+                activeSessionModel.setHostUUID(receivedSessionModel.getHostUUID());
+                activeSessionModel.setHostName(receivedSessionModel.getHostName());
                 activeSessionModel.setCreationDateTime(receivedSessionModel.getCreationDateTime());
                 activeSessionModel.setSessionStatus(receivedSessionModel.getSessionStatus());
 

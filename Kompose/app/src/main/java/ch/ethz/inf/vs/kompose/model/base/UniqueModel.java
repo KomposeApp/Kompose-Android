@@ -16,4 +16,8 @@ public abstract class UniqueModel extends BaseObservable {
     public UUID getUUID() {
         return uuid;
     }
+
+    public void rectifyUUID(UUID newUUID){
+        if(uuid == null) uuid = newUUID;
+    }
 }

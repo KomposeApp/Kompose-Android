@@ -32,7 +32,7 @@ public class SessionModel extends UniqueModel {
         if (isHost) {
             //host & session created; therefore
             sessionStatus = SessionStatus.WAITING;
-        } else{
+        } else {
             sessionStatus = SessionStatus.UNINITIALIZED;
         }
     }
@@ -135,6 +135,10 @@ public class SessionModel extends UniqueModel {
 
     public UUID getHostUUID() {
         return hostUUID;
+    }
+
+    public void setHostUUID(UUID hostUUID) {
+        this.hostUUID = hostUUID;
     }
 
     @Bindable

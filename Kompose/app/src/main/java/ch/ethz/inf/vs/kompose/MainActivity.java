@@ -15,6 +15,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import org.joda.time.DateTime;
 
@@ -32,6 +33,7 @@ import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.client.ClientRegistrationTask;
 import ch.ethz.inf.vs.kompose.service.client.NSDListenerService;
+import ch.ethz.inf.vs.kompose.view.mainactivity.CustomViewPager;
 import ch.ethz.inf.vs.kompose.view.mainactivity.MainActivityPagerAdapter;
 import ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel;
 
@@ -40,6 +42,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     private final String LOG_TAG = "##MainActivity";
 
     private final MainViewModel viewModel = new MainViewModel(this);
+    private TabLayout tabLayout;
 
     private NSDListenerService NSDListenerService;
     private boolean nsdListenerServiceBound = false;
@@ -48,6 +51,9 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Enable the ViewModel inputs
+        viewModel.setEnabled(true);
 
         // Initialize the preference utility, and sets a flag to prevent ShareActivity from killing Kompose
         StateSingleton.getInstance().setStartedFromMainActivity();
@@ -70,9 +76,11 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         // Insert default names
         viewModel.setFromPreferences(StateSingleton.getInstance().getPreferenceUtility());
 
-        final TabLayout tabLayout = findViewById(R.id.tabLayout);
-        final ViewPager viewPager = findViewById(R.id.viewPager);
+        tabLayout = findViewById(R.id.tabLayout);
+        final CustomViewPager viewPager = findViewById(R.id.viewPager);
         final PagerAdapter adapter = new MainActivityPagerAdapter(getSupportFragmentManager(), viewModel);
+
+        viewPager.initializeViewModel(viewModel);
 
         viewPager.setAdapter(adapter);
         viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
@@ -111,6 +119,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         if (!nsdListenerServiceBound) {
             Intent intent = new Intent(this.getBaseContext(), NSDListenerService.class);
             bindService(intent, nsdListenerConnection, BIND_AUTO_CREATE);
+        }
+
+        if (!viewModel.isEnabled()){
+            enableViews();
         }
 
         super.onResume();
@@ -157,11 +169,16 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
      */
     @Override
     public void joinSessionClicked(SessionModel sessionModel) {
+        //disable inputs
+        if (viewModel.isEnabled()) {
+            disableViews();
+        }
 
         String clientName = viewModel.getClientName();
         // Client's name must not be empty
         if (clientName == null || clientName.trim().isEmpty()) {
             showError(getString(R.string.view_error_clientname));
+            enableViews();
             return;
         }
         clientName = clientName.trim();
@@ -184,6 +201,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         } catch (IOException e) {
             e.printStackTrace();
             showError(getString(R.string.view_error_connection_failed));
+            enableViews();
             return;
         }
 
@@ -195,8 +213,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     @Override
     public void joinManualClicked() {
-
-        UUID deviceUUID = StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID();
+        //disable inputs
+        if (viewModel.isEnabled()) {
+            disableViews();
+        }
 
         String addressText = viewModel.getIpAddress();
         String portText = viewModel.getPort();
@@ -206,9 +226,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             return;
         }
 
-        // Create a stub session
-        // TODO: Make sure these are updated...
-        SessionModel sessionModel = new SessionModel(deviceUUID, null, false);
+        // Create a stub session (attributes will later be filled in)
+        SessionModel sessionModel = new SessionModel(null, null, false);
 
         // Get IP / port
         try {
@@ -269,14 +288,20 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
     @Override
     public void createSessionClicked() {
+        if (viewModel.isEnabled()) {
+            disableViews();
+        }
+
         String clientName = viewModel.getClientName();
         if (clientName == null || clientName.trim().isEmpty()) {
             showError(getString(R.string.view_error_clientname));
+            enableViews();
             return;
         }
         String sessionName = viewModel.getSessionName();
         if (sessionName == null || sessionName.trim().isEmpty()) {
             showError(getString(R.string.view_error_sessionname));
+            enableViews();
             return;
         }
 
@@ -340,11 +365,31 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
     };
 
+    private void disableViews(){
+        viewModel.setEnabled(false);
+        LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
+        tabStrip.setEnabled(false);
+        for(int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(false);
+        }
+    }
+
+    private void enableViews(){
+        viewModel.setEnabled(true);
+        LinearLayout tabStrip = ((LinearLayout)tabLayout.getChildAt(0));
+        tabStrip.setEnabled(true);
+        for(int i = 0; i < tabStrip.getChildCount(); i++) {
+            tabStrip.getChildAt(i).setClickable(true);
+        }
+    }
+
+
+
     /**
      * This listener is intended to be a callback for when we successfully join a session
      * Needs to close the ServerSocket in the client in case the connection fails
      */
-    private class RegistrationListener implements SimpleListener<Boolean, Void> {
+    private class RegistrationListener implements SimpleListener<Boolean, Integer> {
 
         private MainActivity mainActivity;
 
@@ -353,24 +398,25 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
 
         @Override
-        public void onEvent(Boolean success, Void v) {
+        public void onEvent(Boolean success, Integer clientPort) {
             try {
                 if (!success) {
                     Log.w(LOG_TAG, "Failed to establish connection with host");
                     mainActivity.showError(getString(R.string.view_error_connection_failed));
                     return;
                 }
-            } finally {
+                //Unbind the service discovery as we don't need it anymore
+                unbindService(nsdListenerConnection);
+                nsdListenerServiceBound = false;
+
+                // Initialize Playlist
+                Intent playlistIntent = new Intent(mainActivity, PlaylistActivity.class);
+                playlistIntent.putExtra(PlaylistActivity.KEY_PORT, clientPort);
+                mainActivity.startActivity(playlistIntent);
+            }finally {
+                enableViews();
                 connectionProgress.cancel();
             }
-
-            //Unbind the service discovery as we don't need it anymore
-            unbindService(nsdListenerConnection);
-            nsdListenerServiceBound = false;
-
-            // Initialize Playlist
-            Intent playlistIntent = new Intent(mainActivity, PlaylistActivity.class);
-            mainActivity.startActivity(playlistIntent);
         }
     }
 }
