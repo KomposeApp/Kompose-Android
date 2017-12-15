@@ -4,7 +4,6 @@ import android.app.Service;
 import android.content.Intent;
 import android.databinding.Observable;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -28,7 +27,7 @@ public class AudioService extends Service{
     private final IBinder binder = new LocalBinder();
 
     private SessionModel sessionModel;
-    private DownloadWorker downloadWorker;
+    private Thread downloadWorkerThread;
     private SongModel connectedSongModel;
 
     //Callback listener for when one of the songs change
@@ -74,8 +73,8 @@ public class AudioService extends Service{
         sessionModel.addOnPropertyChangedCallback(sessionModelCallback);
 
         // start the download worker
-        downloadWorker = new DownloadWorker(this, sessionModel);
-        downloadWorker.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        downloadWorkerThread = new Thread(new DownloadWorker(this, sessionModel));
+        downloadWorkerThread.start();
     }
 
     @Override
@@ -91,8 +90,8 @@ public class AudioService extends Service{
             }
         }
         if (connectedSongModel!= null) connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
-        if (downloadWorker != null) {
-            downloadWorker.cancel(true);
+        if (downloadWorkerThread != null) {
+            downloadWorkerThread.interrupt();
         }
 
     }

@@ -1,7 +1,6 @@
 package ch.ethz.inf.vs.kompose.service.handler;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
-import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 /**
@@ -119,8 +117,8 @@ public class OutgoingMessageHandler {
                         + " (" + c.getUUID().toString() + ")");
                 InetAddress clientIP = c.getClientConnectionDetails().getIp();
                 int clientPort = c.getClientConnectionDetails().getPort();
-                AsyncSender asyncSender = new AsyncSender(message, clientIP, clientPort);
-                asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                SenderRunnable asyncSender = new SenderRunnable(message, clientIP, clientPort);
+                new Thread(asyncSender).start();
             }
         }
     }
@@ -151,9 +149,10 @@ public class OutgoingMessageHandler {
         if (connectionDetails == null) {
             Log.e(LOG_TAG, "tried to send message but no active connection");
         } else {
-            AsyncSender asyncSender = new AsyncSender(message,
-                    connectionDetails.getHostIP(), connectionDetails.getHostPort());
-            asyncSender.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+            InetAddress hostIP = connectionDetails.getHostIP();
+            int hostPort = connectionDetails.getHostPort();
+            SenderRunnable asyncSender = new SenderRunnable(message, hostIP, hostPort);
+            new Thread(asyncSender).start();
         }
     }
 
@@ -161,7 +160,7 @@ public class OutgoingMessageHandler {
         return StateSingleton.getInstance().getActiveSession();
     }
 
-    private static class AsyncSender extends AsyncTask<Void, Void, Void> {
+    private class SenderRunnable implements Runnable{
 
         private final String LOG_TAG = "##AsyncSender";
 
@@ -169,14 +168,14 @@ public class OutgoingMessageHandler {
         private int hostPort;
         private Message message;
 
-        AsyncSender(Message msg, InetAddress ip, int port) {
+        SenderRunnable(Message msg, InetAddress ip, int port) {
             this.message = msg;
             this.hostIP = ip;
             this.hostPort = port;
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        public void run() {
             try {
                 Socket socket = new Socket(hostIP, hostPort);
 
@@ -194,7 +193,6 @@ public class OutgoingMessageHandler {
                 Log.e(LOG_TAG, "Failed to send message. Reason: " + e.getMessage());
                 e.printStackTrace();
             }
-            return null;
         }
     }
 }

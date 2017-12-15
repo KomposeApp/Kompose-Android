@@ -2,27 +2,21 @@ package ch.ethz.inf.vs.kompose.service.youtube;
 
 import android.content.Context;
 import android.graphics.drawable.Drawable;
-import android.media.MediaPlayer;
 import android.os.AsyncTask;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileOutputStream;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
-import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.youtube.extractor.YouTubeExtractor;
 
 //Note: The caching here ignores the CacheQuota size

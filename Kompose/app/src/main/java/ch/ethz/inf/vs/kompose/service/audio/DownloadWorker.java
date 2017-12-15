@@ -4,7 +4,6 @@ import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -21,7 +20,7 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 import ch.ethz.inf.vs.kompose.service.youtube.YoutubeDownloadUtility;
 
-public class DownloadWorker extends AsyncTask<Void, Void, Void> {
+public class DownloadWorker implements Runnable{
 
     private final String LOG_TAG = "##DownloadWorker";
 
@@ -43,11 +42,11 @@ public class DownloadWorker extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
-    protected Void doInBackground(Void... voids) {
+    public void run(){
         YoutubeDownloadUtility youtubeDownloadUtility = new YoutubeDownloadUtility(context.get());
 
         int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
-        while (!isCancelled()) {
+        while (!Thread.interrupted()) {
             // wait until the Phaser is unblocked (initially and when a new item enters
             // the download queue)
             int registered = StateSingleton.getInstance().getAudioServicePhaser().getRegisteredParties();
@@ -108,7 +107,6 @@ public class DownloadWorker extends AsyncTask<Void, Void, Void> {
 
             }
         }
-        return null;
     }
 
     private static class PlaylistListener extends ObservableList.OnListChangedCallback {

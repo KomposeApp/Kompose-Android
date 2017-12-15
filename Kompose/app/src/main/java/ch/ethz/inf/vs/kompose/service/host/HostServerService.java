@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.nsd.NsdManager;
 import android.net.nsd.NsdServiceInfo;
-import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
@@ -30,8 +29,8 @@ import static ch.ethz.inf.vs.kompose.service.client.NSDListenerService.SERVICE_T
 
 /**
  * Android service that starts the server.
- * First the service is registered on the network, then an AsyncTask
- * that accepts connections is started.
+ * First the service is registered on the network,
+ * then a thread that accepts connections is started.
  */
 public class HostServerService extends Service {
 
@@ -39,7 +38,7 @@ public class HostServerService extends Service {
 
     private NsdManager nsdManager;
     private NsdManager.RegistrationListener nsdRegistrationListener;
-    private ServerTask serverTask;
+    private Thread serverThread;
     private ServerSocket serverSocket;
     private IBinder binder = new LocalBinder();
 
@@ -130,8 +129,8 @@ public class HostServerService extends Service {
         }
 
         // start server task
-        serverTask = new ServerTask(this, serverSocket);
-        serverTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        serverThread = new Thread(new ServerTask(this, serverSocket));
+        serverThread.start();
     }
 
     @Override
@@ -141,16 +140,15 @@ public class HostServerService extends Service {
             Log.d(LOG_TAG, "Shutting down the NSD Sender");
             nsdManager.unregisterService(nsdRegistrationListener);
         }
-        if (serverTask != null && !serverTask.isCancelled()) {
+        if (serverThread != null && serverThread.isAlive()) {
             Log.d(LOG_TAG, "Shutting down the Message Server");
-            serverTask.cancel(true);
+            serverThread.interrupt();
             try {
                 serverSocket.close();
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Closing the ServerSocket failed.");
                 e.printStackTrace();
             }
-            serverTask = null;
         }
     }
 

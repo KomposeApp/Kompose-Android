@@ -52,7 +52,7 @@ public class ClientServerService extends Service {
     public boolean onUnbind(Intent intent) {
 
         // cancel client task
-        if (clientListenerTask != null && !clientListenerTask.isInterrupted()){
+        if (clientListenerTask != null && clientListenerTask.isAlive()){
             Log.d(LOG_TAG, "Shutting down the Message Receiver");
             clientListenerTask.interrupt();
         }
