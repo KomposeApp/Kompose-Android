@@ -22,6 +22,7 @@ import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.data.json.Song;
 import ch.ethz.inf.vs.kompose.data.network.ClientConnectionDetails;
+import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
@@ -34,7 +35,6 @@ import ch.ethz.inf.vs.kompose.service.StateSingleton;
 
 public class IncomingMessageHandler implements Runnable {
     private final String LOG_TAG = "##InMessageHandler";
-    public final String SESSION_UPDATED_EVENT = "IncomingMessageHandler.SESSION_UPDATED_EVENT";
 
     private Socket socket;
     private Message message;
@@ -79,30 +79,24 @@ public class IncomingMessageHandler implements Runnable {
     @Override
     public void run() {
         Log.d(LOG_TAG, "Message handler dispatched");
-        if (socket != null) {
-            try {
-                message = readMessage(socket);
-            } catch (IOException e) {
-                Log.e(LOG_TAG, "Failed to read message from socket");
-                e.printStackTrace();
-            }
-        }
-        // Can be non-null if initialized with the second constructor
-        if (message == null) {
-            Log.e(LOG_TAG, "Did not receive a valid message");
+        try{
+            if (socket != null) message = readMessage(socket);
+            if (message == null) throw new IOException("Did not receive a valid message");
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Message handling failed.");
+            e.printStackTrace();
             return;
         }
 
         final SessionModel activeSessionModel = StateSingleton.getInstance().getActiveSession();
         final ClientModel myClientModel = StateSingleton.getInstance().getActiveClient();
         
-        final MessageType messageType;
-        ClientModel sender;
+        final MessageType messageType; ClientModel sender;
         try {
              messageType = MessageType.valueOf(message.getType());
              sender = getClientModel(UUID.fromString(message.getSenderUuid()), activeSessionModel);
         }catch (IllegalArgumentException | NullPointerException e){
-            Log.w(LOG_TAG, "Received a message with correct format but malformed data.");
+            Log.e(LOG_TAG, "Received a message with correct format but malformed data.");
             return;
         }
 
@@ -187,48 +181,41 @@ public class IncomingMessageHandler implements Runnable {
      */
     private void adaptLists(SessionModel sessionModel) {
 
-        if (!(Looper.myLooper() == Looper.getMainLooper())){
-            throw new IllegalStateException("adaptLists was not called on the UI thread");
-        }
-
         boolean hasSongPlaying = false;
-        ObservableUniqueSortedList<SongModel> playQueueWithDisliked = sessionModel.getPlayQueueWithDislikedSongs();
-        ObservableUniqueSortedList<SongModel> pastSongs = sessionModel.getPastSongs();
         ObservableUniqueSortedList<SongModel> playQueue = sessionModel.getPlayQueue();
+        ObservableUniqueSortedList<SongModel> downloadQueue = sessionModel.getDownloadedQueue();
 
         int quorum = sessionModel.getActiveDevices() / 2;
+
         for (SongModel songModel : sessionModel.getAllSongs()) {
             SongStatus currentStatus = songModel.getSongStatus();
             if (currentStatus.equals(SongStatus.FINISHED) || currentStatus.equals(SongStatus.SKIPPED)) {
-                pastSongs.add(songModel);
-                checkAndRemove(playQueue, songModel);
-                checkAndRemove(playQueueWithDisliked, songModel);
+                checkAndRemove(playQueue,downloadQueue, songModel);
+
             }
             else if (currentStatus.equals(SongStatus.PLAYING) || currentStatus.equals(SongStatus.PAUSED)) {
                 hasSongPlaying = true;
-                checkAndRemove(playQueue, songModel);
-                checkAndRemove(playQueueWithDisliked, songModel);
-                checkAndRemove(pastSongs, songModel);
-                if (songModel.getValidDownVoteCount() > quorum) {
+                checkAndRemove(playQueue,downloadQueue, songModel); // Remove from play queue
+                if (songModel.getDownVoteCount() > quorum) {
                     songModel.setSongStatus(SongStatus.SKIPPED);
                     sessionModel.setCurrentlyPlaying(null);
                 } else {
                     sessionModel.setCurrentlyPlaying(songModel);
                 }
             }
-            else if (currentStatus.equals(SongStatus.IN_QUEUE) ||
-                    currentStatus.equals(SongStatus.REQUESTED)) {
-
-                checkAndRemove(pastSongs, songModel);
-                if (songModel.getValidDownVoteCount() > quorum) {
-                    songModel.setSongStatus(SongStatus.SKIPPED);
+            else if (currentStatus.equals(SongStatus.IN_QUEUE)) {
+                if (songModel.getDownVoteCount() > quorum) {
                     //add to skipped if not played
-                    checkAndRemove(playQueue, songModel);
-                    playQueueWithDisliked.add(songModel);
+                    checkAndRemove(playQueue,downloadQueue, songModel);
+                    songModel.setSongStatus(SongStatus.SKIPPED);
                 } else {
-                    playQueue.add(songModel);
-                    playQueueWithDisliked.add(songModel);
+                    synchronized (playQueue) {
+                        playQueue.add(songModel);
+                        playQueue.notify();
+                    }
                 }
+            } else{
+                Log.wtf(LOG_TAG, "You're not supposed to be here -Develord");
             }
         }
 
@@ -313,7 +300,7 @@ public class IncomingMessageHandler implements Runnable {
                 for (SongModel songModel : sessionModel.getAllSongs()) {
                     for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
                         if (downVoteModel.getUuid().equals(clientUUID)) {
-                            songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
+                            songModel.setDownVoteCount(songModel.getDownVoteCount() - 1);
                             songModel.getDownVotes().remove(downVoteModel);
                             Log.d(LOG_TAG, "Removing downvote of client " +
                                     downVoteModel.getClientModel().getName() +
@@ -395,7 +382,7 @@ public class IncomingMessageHandler implements Runnable {
                 if (clientModel.getUUID().equals(downVoteModel.getClientModel().getUUID())) {
                     finalDownVoteTarget.setSkipVoteCasted(true);
                 }
-                finalDownVoteTarget.setValidDownVoteCount(finalDownVoteTarget.getValidDownVoteCount() + 1);
+                finalDownVoteTarget.setDownVoteCount(finalDownVoteTarget.getDownVoteCount() + 1);
                 finalDownVoteTarget.getDownVotes().add(downVoteModel);
                 Log.d(LOG_TAG, "Downvote cast for the song: " + finalDownVoteTarget.getTitle());
             }
@@ -427,7 +414,7 @@ public class IncomingMessageHandler implements Runnable {
                                 if (clientModel.getUUID().equals(finalDownVoteModel.getClientModel().getUUID())) {
                                     songModel.setSkipVoteCasted(false);
                                 }
-                                songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() - 1);
+                                songModel.setDownVoteCount(songModel.getDownVoteCount() - 1);
                                 songModel.getDownVotes().remove(finalDownVoteModel);
                             }
                         };
@@ -545,15 +532,16 @@ public class IncomingMessageHandler implements Runnable {
                 sessionModel.getAllSongs().remove(target);
                 sessionModel.getAllSongs().add(target);
             }
-            checkAndRemove(sessionModel.getPlayQueue(), target);
-            checkAndRemove(sessionModel.getPastSongs(), target);
-            checkAndRemove(sessionModel.getPlayQueueWithDislikedSongs(), target);
+            if (sessionModel.getPlayQueue().contains(target)){
+                sessionModel.getPlayQueue().remove(target);
+            }
+            //checkAndRemove(sessionModel.getPlayQueue(), target);
             target.setOrder(source.getOrder());
         }
         target.setSongStatus(source.getSongStatus());
         target.setSourceUrl(source.getSourceUrl());
         target.setThumbnailUrl(source.getThumbnailUrl());
-        target.setValidDownVoteCount(source.getValidDownVoteCount());
+        target.setDownVoteCount(source.getDownVoteCount());
         target.setSkipVoteCasted(source.getSkipVoteCasted());
         target.setSecondsLength(source.getSecondsLength());
     }
@@ -580,15 +568,21 @@ public class IncomingMessageHandler implements Runnable {
         sessionModel.setActiveDevices(validClientCount);
     }
 
+
     /**
-     * Small helper method.
-     * Checks if a songModel is contained in the provided list, and if so, removes it.
-     * @param sortedList List to check
-     * @param songModel SongModel to remove
+     * Helper method for Playqueue. Please don't use it with another queue
+     * @param playQueue
+     * @param songModel
      */
-    private void checkAndRemove(ObservableUniqueSortedList<SongModel> sortedList, SongModel songModel){
-        if (sortedList.contains(songModel)) {
-            sortedList.remove(songModel);
+    private void checkAndRemove(ObservableUniqueSortedList<SongModel> playQueue, ObservableUniqueSortedList<SongModel> downloadQueue, SongModel songModel){
+        if (playQueue.contains(songModel)) {
+            playQueue.remove(songModel);
+        }
+
+        if (downloadQueue.contains(songModel) &&
+                (songModel.getDownloadStatus().equals(DownloadStatus.FINISHED) ||
+                        songModel.getDownloadStatus().equals(DownloadStatus.FAILED))){
+            downloadQueue.remove(songModel);
         }
     }
 }

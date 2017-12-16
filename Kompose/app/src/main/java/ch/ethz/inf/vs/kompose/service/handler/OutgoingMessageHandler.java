@@ -110,7 +110,8 @@ public class OutgoingMessageHandler {
         }
     }
 
-    private void sendMessageToClients(Message message) {// send message to all clients, but not to itself
+    private void sendMessageToClients(Message message) {
+        // send message to all clients, but not to itself
         for (ClientModel c : getSession().getClients()) {
             if (!c.getUUID().equals(StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID())) {
                 Log.d(LOG_TAG, "sending message to: " + c.getName()

@@ -61,7 +61,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         songModel.setSecondsLength(song.getLengthInSeconds());
 
         songModel.setOrder(song.getOrder());
-        songModel.setValidDownVoteCount(0);
+        songModel.setDownVoteCount(0);
 
         songModel.setDownloadUrl(URI.create(song.getDownloadUrl()));
         songModel.setThumbnailUrl(URI.create(song.getThumbnailUrl()));
@@ -78,7 +78,7 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
                     DownVoteModel model = downVoteConverter.convert(song.getDownVotes()[i]);
                     songModel.getDownVotes().add(model);
                     if (model.getClientModel() != null && model.getClientModel().getIsActive()) {
-                        songModel.setValidDownVoteCount(songModel.getValidDownVoteCount() + 1);
+                        songModel.setDownVoteCount(songModel.getDownVoteCount() + 1);
                     }
                 }
             }

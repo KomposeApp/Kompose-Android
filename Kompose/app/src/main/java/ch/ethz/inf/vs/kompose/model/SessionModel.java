@@ -53,17 +53,14 @@ public class SessionModel extends UniqueModel {
             new SongComparator(), new UniqueModelComparator<SongModel>()
     );
 
+    private final ObservableUniqueSortedList<SongModel> downloadedQueue = new ObservableUniqueSortedList<>(
+            new SongComparator(), new UniqueModelComparator<SongModel>()
+    );
+
     private final ObservableUniqueSortedList<SongModel> allSongList = new ObservableUniqueSortedList<>(
             new SongComparator(), new UniqueModelComparator<SongModel>()
     );
 
-    private final ObservableUniqueSortedList<SongModel> playedSongs = new ObservableUniqueSortedList<>(
-            new SongComparator(), new UniqueModelComparator<SongModel>()
-    );
-
-    private final ObservableUniqueSortedList<SongModel> skippedSongs = new ObservableUniqueSortedList<>(
-            new SongComparator(), new UniqueModelComparator<SongModel>()
-    );
 
     /**
      * @return all songs waiting to be played
@@ -72,26 +69,17 @@ public class SessionModel extends UniqueModel {
         return playQueue;
     }
 
-    /**
-     * @return all songs already played
-     */
-    public ObservableUniqueSortedList<SongModel> getPastSongs() {
-        return playedSongs;
+    public ObservableUniqueSortedList<SongModel> getDownloadedQueue(){
+        return downloadedQueue;
     }
 
     /**
-     * @return all songs from this session, weather played, not yet played or skipped
+     * @return all songs from this session
      */
     public ObservableUniqueSortedList<SongModel> getAllSongs() {
         return allSongList;
     }
 
-    /**
-     * @return the songs which are / were skipped
-     */
-    public ObservableUniqueSortedList<SongModel> getPlayQueueWithDislikedSongs() {
-        return skippedSongs;
-    }
 
     public ServerConnectionDetails getConnectionDetails() {
         return connectionDetails;

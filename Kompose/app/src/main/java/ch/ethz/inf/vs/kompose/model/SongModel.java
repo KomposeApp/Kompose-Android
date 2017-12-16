@@ -41,7 +41,7 @@ public class SongModel extends UniqueModel {
     private boolean skipVoteCasted;
     private DateTime creationDateTime;
 
-    private SongStatus songStatus = SongStatus.REQUESTED;
+    private SongStatus songStatus = SongStatus.RESOLVING;
     private DownloadStatus downloadStatus = DownloadStatus.NOT_STARTED;
     private int downloadProgress = 0;
     private int playbackProgress = 0;
@@ -82,13 +82,13 @@ public class SongModel extends UniqueModel {
     }
 
     @Bindable
-    public int getValidDownVoteCount() {
+    public int getDownVoteCount() {
         return validDownVoteCount;
     }
 
-    public void setValidDownVoteCount(int validDownVoteCount) {
+    public void setDownVoteCount(int validDownVoteCount) {
         this.validDownVoteCount = validDownVoteCount;
-        notifyPropertyChanged(BR.validDownVoteCount);
+        notifyPropertyChanged(BR.downVoteCount);
     }
 
     public ObservableList<DownVoteModel> getDownVotes() {

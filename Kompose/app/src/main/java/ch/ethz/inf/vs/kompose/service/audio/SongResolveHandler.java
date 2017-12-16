@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose.service.audio;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.util.Log;
 import android.widget.Toast;
@@ -9,6 +10,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.ethz.inf.vs.kompose.R;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
@@ -88,12 +90,15 @@ public abstract class SongResolveHandler {
         songModel.setTitle("downloading info...");
         songModel.setSongStatus(SongStatus.RESOLVING);
         songModel.setVideoID(videoID);
-        songModel.setOrder(activeSession.getAllSongs().size());
 
-        //TODO: Add a different resolving UI overlay, the current one is fundamentally flawed
+        ProgressDialog pDialog = null;
+        if (StateSingleton.getInstance().isPlaylistInForeground()) {
+         pDialog = ProgressDialog.show(ctx, "Resolving Video...",
+                    "This may take a moment...", true, false);
+        }
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(ctx);
-        youtubeService.resolveSong(songModel, new SongRequestListener(ctx));
+        youtubeService.resolveSong(songModel, new SongRequestListener(ctx, pDialog));
         return true;
     }
 
@@ -103,13 +108,16 @@ public abstract class SongResolveHandler {
         private final String LOG_TAG = "##SongRequestListener";
 
         private Context ctx;
+        private ProgressDialog progressDialog;
 
-        private SongRequestListener(Context ctx) {
+        private SongRequestListener(Context ctx, ProgressDialog progressDialog) {
             this.ctx = ctx;
+            this.progressDialog = progressDialog;
         }
 
         @Override
         public void onEvent(Integer status, SongModel value) {
+           if (progressDialog != null) progressDialog.cancel();
             if (status == YoutubeDownloadUtility.RESOLVE_SUCCESS) {
                 value.setSongStatus(SongStatus.REQUESTED);
                 Log.d(LOG_TAG, "resolved download url: " + value.getDownloadUrl());
@@ -117,13 +125,6 @@ public abstract class SongResolveHandler {
             } else {
                 Log.e(LOG_TAG, "resolving url failed");
                 Toast.makeText(ctx, "Failed to resolve Youtube URL", Toast.LENGTH_LONG).show();
-
-                SessionModel sessionModel = StateSingleton.getInstance().getActiveSession();
-                if (sessionModel != null && sessionModel.getPlayQueue().contains(value)) {
-                    if (sessionModel.getPlayQueue().contains(value)) {
-                        sessionModel.getPlayQueue().remove(value);
-                    }
-                }
             }
         }
     }

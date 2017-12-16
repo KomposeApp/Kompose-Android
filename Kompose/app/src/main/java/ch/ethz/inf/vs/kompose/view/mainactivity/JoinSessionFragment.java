@@ -50,7 +50,9 @@ public class JoinSessionFragment extends Fragment {
         FragmentJoinSessionBinding binding = DataBindingUtil.inflate(getLayoutInflater(), R.layout.fragment_join_session, container, false);
         binding.setViewModel(viewModel);
         binding.fragmentJoinRecyclerview.setLayoutManager(new LinearLayoutManager(getContext()));
-        binding.fragmentJoinRecyclerview.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), viewModel));
+
+        if(viewModel!=null) binding.fragmentJoinRecyclerview.setAdapter(new JoinSessionAdapter(viewModel.getSessionModels(), getLayoutInflater(), viewModel));
+        else Log.wtf("##RELOAD_ERROR", "Binding tried to reload and completely screwed up. Please restart");
         return binding.getRoot();
     }
 }

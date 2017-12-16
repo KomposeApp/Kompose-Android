@@ -2,7 +2,6 @@ package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Context;
 
-import java.util.concurrent.Phaser;
 import java.util.concurrent.Semaphore;
 
 import ch.ethz.inf.vs.kompose.model.ClientModel;
@@ -21,8 +20,7 @@ public class StateSingleton {
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
     private boolean hasMainActivity; //Required for the Share Activity
     private boolean playlistIsActive; //Required for the Share Activity
-
-    private Semaphore dwSemaphore;
+    private boolean isInForeground; // Required for the Share Activity
 
     private StateSingleton() {
         hasMainActivity = false;
@@ -85,16 +83,13 @@ public class StateSingleton {
         playlistIsActive = value;
     }
 
-    public void setDWsemaphore(Semaphore semaphore){
-        this.dwSemaphore = semaphore;
+    public boolean isPlaylistInForeground() {
+        return isInForeground;
     }
 
-    public void acquireDWSemaphore() throws InterruptedException {
-        dwSemaphore.acquire();
+    public void setInForeground(boolean value) {
+        isInForeground = value;
     }
 
-    public void releaseDWSemaphore(){
-        dwSemaphore.release();
-    }
 
 }

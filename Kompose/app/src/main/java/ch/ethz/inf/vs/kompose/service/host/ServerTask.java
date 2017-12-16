@@ -38,5 +38,6 @@ public class ServerTask implements Runnable{
                 Log.d(LOG_TAG, "An exception occurred: " + io.getMessage());
             }
         }
+        Log.e(LOG_TAG, "HostServerService is now dead");
     }
 }

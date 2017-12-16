@@ -40,9 +40,6 @@ public class AudioService extends Service{
                     DownloadStatus dlstatus = connectedSongModel.getDownloadStatus();
                     if (dlstatus.equals(DownloadStatus.STARTED)){
                         connectedSongModel.setDownloadStatus(DownloadStatus.FAILED);
-                        StateSingleton.getInstance().releaseDWSemaphore();
-                    } else if (dlstatus.equals(DownloadStatus.FINISHED)){
-                        StateSingleton.getInstance().releaseDWSemaphore();
                     }
                     goToNextSong(connectedSongModel);
                 }
@@ -96,25 +93,30 @@ public class AudioService extends Service{
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public boolean onUnbind(Intent intent) {
+        Log.d(LOG_TAG, "Unbound Service");
 
         //Cleanup
         if (sessionModel != null) {
+            Log.d(LOG_TAG, "Removing callback from sessionmodel");
             sessionModel.removeOnPropertyChangedCallback(sessionModelCallback);
             if (sessionModel.getCurrentlyPlaying() != null) {
+                Log.d(LOG_TAG, "Stopping playback");
                 MediaPlayer mp = sessionModel.getCurrentlyPlaying().getMediaPlayer();
                 if (mp != null) mp.release();
                 sessionModel.setCurrentlyPlaying(null);
             }
         }
+
         if (connectedSongModel!= null) {
+            Log.d(LOG_TAG, "Removing callback from songmodel");
             connectedSongModel.removeOnPropertyChangedCallback(songModelCallback);
         }
         if (downloadWorkerThread != null) {
+            Log.d(LOG_TAG, "Attempting to interrupt downloadWorker");
             downloadWorkerThread.interrupt();
         }
-
+        return false;
     }
 
     /**
@@ -207,7 +209,12 @@ public class AudioService extends Service{
                         } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
                             //directly to trash
                             sessionModel.getPlayQueue().remove(songModel);
-                            sessionModel.getPastSongs().add(songModel);
+
+                            synchronized (sessionModel.getDownloadedQueue()) {
+                                sessionModel.getDownloadedQueue().remove(songModel);
+                                sessionModel.getDownloadedQueue().notify();
+                            }
+
                             songModel.setSongStatus(SongStatus.SKIPPED);
                         } else {
                             //else wait for download to finish
@@ -217,6 +224,10 @@ public class AudioService extends Service{
                     if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
                         //When playing a new song, remove it from the ObservableList
                         sessionModel.getPlayQueue().remove(chosenSong);
+                        synchronized (sessionModel.getDownloadedQueue()) {
+                            sessionModel.getDownloadedQueue().remove(chosenSong);
+                            sessionModel.getDownloadedQueue().notify();
+                        }
 
                         chosenSong.setSongStatus(SongStatus.PLAYING);
                         sessionModel.setCurrentlyPlaying(chosenSong);
@@ -226,7 +237,6 @@ public class AudioService extends Service{
                         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                             @Override
                             public void onCompletion(MediaPlayer mp) {
-                                StateSingleton.getInstance().releaseDWSemaphore();
                                 goToNextSong(null);
                             }
                         });

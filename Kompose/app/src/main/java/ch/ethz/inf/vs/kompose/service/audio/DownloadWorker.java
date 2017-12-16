@@ -10,7 +10,6 @@ import android.util.Log;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Semaphore;
 
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
@@ -31,8 +30,6 @@ public class DownloadWorker implements Runnable{
         this.context = new WeakReference<>(context);
         this.sessionModel = sessionModel;
 
-        int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
-        StateSingleton.getInstance().setDWsemaphore(new Semaphore(numSongsPreload));
         sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(context));
 
     }
@@ -45,28 +42,48 @@ public class DownloadWorker implements Runnable{
     public void run(){
         YoutubeDownloadUtility youtubeDownloadUtility = new YoutubeDownloadUtility(context.get());
 
+        int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
+
         while (!Thread.interrupted()) {
 
-            int numDownloaded = 0;
-            int index = 0;
-
-            while(sessionModel.getPlayQueue().size() == 0){
-
+            synchronized (sessionModel.getPlayQueue()) {
+                while (sessionModel.getPlayQueue().size() == 0) {
+                    try {
+                        Log.d(LOG_TAG, "DownloadWorker blocked, Playqueue empty.");
+                        sessionModel.getPlayQueue().wait();
+                        Log.d(LOG_TAG, "DownloadWorker unblocked.");
+                    } catch (InterruptedException e) {
+                        Log.e(LOG_TAG, "PlayQueue waiter interruped with reason: " + e.getMessage());
+                    }
+                }
             }
-            int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
-            while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
-                try {
-                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
-                    if (!nextDownload.getSongStatus().equals(SongStatus.RESOLVING) &&
-                            nextDownload.getDownloadStatus() == DownloadStatus.NOT_STARTED) {
-                        Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
 
-                        new Handler(Looper.getMainLooper()).post(new Runnable() {
-                            @Override
-                            public void run() {
-                                nextDownload.setDownloadStatus(DownloadStatus.STARTED);
-                            }
-                        });
+            synchronized (sessionModel.getDownloadedQueue()) {
+                if (sessionModel.getDownloadedQueue().size() >= numSongsPreload) {
+                    try {
+                        Log.d(LOG_TAG, "DownloadWorker blocked, Preload limit reached.");
+                        sessionModel.getDownloadedQueue().wait();
+                        Log.d(LOG_TAG, "DownloadWorker unblocked");
+                    } catch (InterruptedException e) {
+                        Log.e(LOG_TAG, "DownloadQueue waiter interrupted with reason: " + e.getMessage());
+                        break;
+                    }
+                }
+            }
+
+            int index = 0;
+            synchronized (sessionModel.getPlayQueue()) {
+                while (index < sessionModel.getPlayQueue().size()) {
+                    final SongModel nextDownload = sessionModel.getPlayQueue().get(index);
+                    if (nextDownload.getSongStatus().equals(SongStatus.RESOLVING) ||
+                            !nextDownload.getDownloadStatus().equals(DownloadStatus.NOT_STARTED)) {
+                        //Skip if we're already downloading this one
+                        index++;
+                    } else {
+                        Log.d(LOG_TAG, "Index is: " + index);
+                        Log.d(LOG_TAG, "Downloading: " + nextDownload.getTitle());
+                        nextDownload.setDownloadStatus(DownloadStatus.STARTED);
+                        sessionModel.getDownloadedQueue().add(nextDownload);
 
                         final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
                         final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
@@ -86,27 +103,27 @@ public class DownloadWorker implements Runnable{
                                     context.get().checkOnCurrentSong();
                                 }
                             });
-                            numDownloaded++;
                         } else {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
-                                    nextDownload.setDownloadStatus(DownloadStatus.FAILED);
-                                }
-                            });
+                            nextDownload.setDownloadStatus(DownloadStatus.FAILED);
                         }
                         new OutgoingMessageHandler(context.get()).sendSessionUpdate();
-                        index = 0;
-                    } else {
-                        numDownloaded++;
-                        index++;
+                        break;
                     }
-                } catch (Exception ex) {
-                    //error occurs when playlist is empty because .size() is retarded (return > 0 even though its 0)
                 }
 
+                if(index == sessionModel.getPlayQueue().size()){
+                    try {
+                        Log.d(LOG_TAG, "DownloadWorker blocked, reached index limit.");
+                        sessionModel.getPlayQueue().wait();
+                        Log.d(LOG_TAG, "DownloadWorker unblocked, received new elements.");
+                    } catch (InterruptedException e) {
+                        Log.e(LOG_TAG, "PlayQueue waiter interrupted with reason: " + e.getMessage());
+                        break;
+                    }
+                }
             }
         }
+        Log.e(LOG_TAG, "DownloadWorker is now dead");
     }
 
     private static class PlaylistListener extends ObservableList.OnListChangedCallback {

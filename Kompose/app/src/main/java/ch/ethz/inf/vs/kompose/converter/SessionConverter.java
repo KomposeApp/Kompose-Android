@@ -1,6 +1,7 @@
 package ch.ethz.inf.vs.kompose.converter;
 
 import android.databinding.ObservableList;
+import android.util.Log;
 
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -23,6 +24,8 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
  **/
 
 public class SessionConverter implements IBaseConverter<SessionModel, Session> {
+
+    private final String LOG_TAG = "##SessionConverter";
 
     /**
      * Data --> Model

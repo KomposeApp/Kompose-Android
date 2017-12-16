@@ -105,6 +105,7 @@ public class ClientServerService extends Service {
                     Log.d(LOG_TAG, "An exception occured: " + io.getMessage());
                 }
             }
+            Log.e(LOG_TAG, "ClientServerService is now dead");
         }
     }
 }

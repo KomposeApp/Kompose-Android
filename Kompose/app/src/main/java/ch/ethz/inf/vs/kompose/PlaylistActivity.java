@@ -111,6 +111,18 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
     }
 
     @Override
+    public void onResume() {
+        StateSingleton.getInstance().setInForeground(true);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        StateSingleton.getInstance().setInForeground(false);
+        super.onPause();
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
 
@@ -127,7 +139,6 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 //Make sure no more songs are in the queues
                 endedSession.getAllSongs().clear();
                 endedSession.getPlayQueue().clear();
-                endedSession.getPastSongs().clear();
             }
 
             // Either sends an unregister message if client, or finishes session if host.
