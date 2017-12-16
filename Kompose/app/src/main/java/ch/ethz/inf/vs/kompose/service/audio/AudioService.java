@@ -208,8 +208,9 @@ public class AudioService extends Service{
                             break;
                         } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
                             //directly to trash
-                            sessionModel.getPlayQueue().remove(songModel);
-
+                            synchronized (sessionModel.getPlayQueue()) {
+                                sessionModel.getPlayQueue().remove(songModel);
+                            }
                             synchronized (sessionModel.getDownloadedQueue()) {
                                 sessionModel.getDownloadedQueue().remove(songModel);
                                 sessionModel.getDownloadedQueue().notify();
@@ -223,7 +224,9 @@ public class AudioService extends Service{
                     }
                     if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
                         //When playing a new song, remove it from the ObservableList
-                        sessionModel.getPlayQueue().remove(chosenSong);
+                        synchronized (sessionModel.getPlayQueue()) {
+                            sessionModel.getPlayQueue().remove(chosenSong);
+                        }
                         synchronized (sessionModel.getDownloadedQueue()) {
                             sessionModel.getDownloadedQueue().remove(chosenSong);
                             sessionModel.getDownloadedQueue().notify();

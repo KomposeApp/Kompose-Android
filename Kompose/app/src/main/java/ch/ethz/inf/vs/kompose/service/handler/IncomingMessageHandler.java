@@ -190,12 +190,15 @@ public class IncomingMessageHandler implements Runnable {
         for (SongModel songModel : sessionModel.getAllSongs()) {
             SongStatus currentStatus = songModel.getSongStatus();
             if (currentStatus.equals(SongStatus.FINISHED) || currentStatus.equals(SongStatus.SKIPPED)) {
-                checkAndRemove(playQueue,downloadQueue, songModel);
-
+                synchronized (playQueue) {
+                    checkAndRemove(playQueue, downloadQueue, songModel);
+                }
             }
             else if (currentStatus.equals(SongStatus.PLAYING) || currentStatus.equals(SongStatus.PAUSED)) {
                 hasSongPlaying = true;
-                checkAndRemove(playQueue,downloadQueue, songModel); // Remove from play queue
+                synchronized (playQueue) {
+                    checkAndRemove(playQueue, downloadQueue, songModel); // Remove from play queue
+                }
                 if (songModel.getDownVoteCount() > quorum) {
                     songModel.setSongStatus(SongStatus.SKIPPED);
                     sessionModel.setCurrentlyPlaying(null);
@@ -206,7 +209,9 @@ public class IncomingMessageHandler implements Runnable {
             else if (currentStatus.equals(SongStatus.IN_QUEUE)) {
                 if (songModel.getDownVoteCount() > quorum) {
                     //add to skipped if not played
-                    checkAndRemove(playQueue,downloadQueue, songModel);
+                    synchronized (playQueue) {
+                        checkAndRemove(playQueue, downloadQueue, songModel);
+                    }
                     songModel.setSongStatus(SongStatus.SKIPPED);
                 } else {
                     synchronized (playQueue) {
@@ -532,8 +537,10 @@ public class IncomingMessageHandler implements Runnable {
                 sessionModel.getAllSongs().remove(target);
                 sessionModel.getAllSongs().add(target);
             }
-            if (sessionModel.getPlayQueue().contains(target)){
-                sessionModel.getPlayQueue().remove(target);
+            synchronized (sessionModel.getPlayQueue()) {
+                if (sessionModel.getPlayQueue().contains(target)) {
+                    sessionModel.getPlayQueue().remove(target);
+                }
             }
             //checkAndRemove(sessionModel.getPlayQueue(), target);
             target.setOrder(source.getOrder());
@@ -574,15 +581,17 @@ public class IncomingMessageHandler implements Runnable {
      * @param playQueue
      * @param songModel
      */
-    private void checkAndRemove(ObservableUniqueSortedList<SongModel> playQueue, ObservableUniqueSortedList<SongModel> downloadQueue, SongModel songModel){
+    private void checkAndRemove(ObservableUniqueSortedList<SongModel> playQueue, ObservableUniqueSortedList<SongModel> downloadQueue, SongModel songModel) {
         if (playQueue.contains(songModel)) {
             playQueue.remove(songModel);
         }
 
-        if (downloadQueue.contains(songModel) &&
-                (songModel.getDownloadStatus().equals(DownloadStatus.FINISHED) ||
-                        songModel.getDownloadStatus().equals(DownloadStatus.FAILED))){
-            downloadQueue.remove(songModel);
+        synchronized (downloadQueue) {
+            if (downloadQueue.contains(songModel) &&
+                    (songModel.getDownloadStatus().equals(DownloadStatus.FINISHED) ||
+                            songModel.getDownloadStatus().equals(DownloadStatus.FAILED))) {
+                downloadQueue.remove(songModel);
+            }
         }
     }
 }
