@@ -12,8 +12,6 @@ import ch.ethz.inf.vs.kompose.service.preferences.PreferenceUtility;
 
 public class SettingsActivity extends AppCompatActivity {
 
-    private static final String LOG_TAG = "##SettingsActivity";
-
     private SettingsFragment settingsFragment;
 
     @Override

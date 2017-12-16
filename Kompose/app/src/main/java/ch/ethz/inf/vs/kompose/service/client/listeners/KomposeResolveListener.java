@@ -63,12 +63,10 @@ public class KomposeResolveListener implements NsdManager.ResolveListener {
         Runnable uiTask = new Runnable() {
             @Override
             public void run() {
-                synchronized (this) {
-                    for (SessionModel s : sessionModels) {
-                        if (s.getUUID().equals(sessionModel.getUUID())) return;
-                    }
-                    sessionModels.add(sessionModel);
+                for (SessionModel s : sessionModels) {
+                    if (s.getUUID().equals(sessionModel.getUUID())) return;
                 }
+                sessionModels.add(sessionModel);
             }
         };
         Handler handler = new Handler(Looper.getMainLooper());

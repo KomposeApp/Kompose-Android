@@ -9,6 +9,7 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
@@ -89,9 +90,7 @@ public abstract class SongResolveHandler {
         songModel.setVideoID(videoID);
         songModel.setOrder(activeSession.getAllSongs().size());
 
-        //If this is removed, the download bar won't show up. Something is deadlocking in the IncomingMessageHandler.
-        activeSession.getPlayQueue().add(songModel);
-        activeSession.getAllSongs().add(songModel);
+        //TODO: Add a different resolving UI overlay, the current one is fundamentally flawed
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(ctx);
         youtubeService.resolveSong(songModel, new SongRequestListener(ctx));

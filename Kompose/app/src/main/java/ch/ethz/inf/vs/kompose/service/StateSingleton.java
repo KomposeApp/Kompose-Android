@@ -1,16 +1,13 @@
 package ch.ethz.inf.vs.kompose.service;
 
 import android.content.Context;
-import android.util.Log;
 
-import java.io.File;
 import java.util.concurrent.Phaser;
+import java.util.concurrent.Semaphore;
 
-import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.service.preferences.PreferenceUtility;
-import ch.ethz.inf.vs.kompose.service.audio.SongCacheMap;
 
 /**
  * Stores all relevant information for the active application
@@ -18,27 +15,18 @@ import ch.ethz.inf.vs.kompose.service.audio.SongCacheMap;
 
 public class StateSingleton {
 
-    private final String LOG_TAG = "##StateSingleton:";
-
     private SessionModel activeSession;
     private ClientModel activeClient;
     private SessionModel activeHistorySession;
     private PreferenceUtility preferenceUtility; // Main access point for all preferences
     private boolean hasMainActivity; //Required for the Share Activity
     private boolean playlistIsActive; //Required for the Share Activity
-    private Phaser audioServicePhaser;
+
+    private Semaphore dwSemaphore;
 
     private StateSingleton() {
         hasMainActivity = false;
         playlistIsActive = false;
-    }
-
-    public Phaser getAudioServicePhaser() {
-        return audioServicePhaser;
-    }
-
-    public void setAudioServicePhaser(Phaser audioServicePhaser) {
-        this.audioServicePhaser = audioServicePhaser;
     }
 
     private static class LazyHolder {
@@ -95,6 +83,18 @@ public class StateSingleton {
 
     public void setPlaylistIsActive(boolean value) {
         playlistIsActive = value;
+    }
+
+    public void setDWsemaphore(Semaphore semaphore){
+        this.dwSemaphore = semaphore;
+    }
+
+    public void acquireDWSemaphore() throws InterruptedException {
+        dwSemaphore.acquire();
+    }
+
+    public void releaseDWSemaphore(){
+        dwSemaphore.release();
     }
 
 }

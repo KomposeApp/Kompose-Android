@@ -10,7 +10,7 @@ import android.util.Log;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.concurrent.Phaser;
+import java.util.concurrent.Semaphore;
 
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
@@ -26,14 +26,14 @@ public class DownloadWorker implements Runnable{
 
     private WeakReference<AudioService> context;
     private SessionModel sessionModel;
-    private PlaylistListener playlistListener;
 
     DownloadWorker(AudioService context, SessionModel sessionModel) {
         this.context = new WeakReference<>(context);
         this.sessionModel = sessionModel;
 
+        int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
+        StateSingleton.getInstance().setDWsemaphore(new Semaphore(numSongsPreload));
         sessionModel.getPlayQueue().addOnListChangedCallback(new PlaylistListener(context));
-        StateSingleton.getInstance().setAudioServicePhaser(new Phaser(1));
 
     }
 
@@ -45,15 +45,15 @@ public class DownloadWorker implements Runnable{
     public void run(){
         YoutubeDownloadUtility youtubeDownloadUtility = new YoutubeDownloadUtility(context.get());
 
-        int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
         while (!Thread.interrupted()) {
-            // wait until the Phaser is unblocked (initially and when a new item enters
-            // the download queue)
-            int registered = StateSingleton.getInstance().getAudioServicePhaser().getRegisteredParties();
-            StateSingleton.getInstance().getAudioServicePhaser().arriveAndDeregister();
+
             int numDownloaded = 0;
             int index = 0;
 
+            while(sessionModel.getPlayQueue().size() == 0){
+
+            }
+            int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
             while (numDownloaded < numSongsPreload && index < sessionModel.getPlayQueue().size()) {
                 try {
                     final SongModel nextDownload = sessionModel.getPlayQueue().get(index);

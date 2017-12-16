@@ -29,11 +29,11 @@ import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
-import ch.ethz.inf.vs.kompose.service.audio.AudioService;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.service.audio.AudioService;
+import ch.ethz.inf.vs.kompose.service.audio.SongResolveHandler;
 import ch.ethz.inf.vs.kompose.service.client.ClientServerService;
 import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
-import ch.ethz.inf.vs.kompose.service.audio.SongResolveHandler;
 import ch.ethz.inf.vs.kompose.service.handler.StorageHandler;
 import ch.ethz.inf.vs.kompose.service.host.HostServerService;
 import ch.ethz.inf.vs.kompose.view.adapter.InQueueSongAdapter;
@@ -119,10 +119,15 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
 
         // Store the Session we just played on disk, to be later viewed in the history
         SessionModel endedSession = StateSingleton.getInstance().getActiveSession();
+
         if (endedSession!=null){
             if (!endedSession.getAllSongs().isEmpty()) {
                 Session historyEntry = new SessionConverter().convert(endedSession);
                 new StorageHandler(this).persist(historyEntry);
+                //Make sure no more songs are in the queues
+                endedSession.getAllSongs().clear();
+                endedSession.getPlayQueue().clear();
+                endedSession.getPastSongs().clear();
             }
 
             // Either sends an unregister message if client, or finishes session if host.
@@ -146,6 +151,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             unbindService(clientServiceConnection);
             clientServiceBound = false;
         }
+
     }
 
     @Override
@@ -270,6 +276,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             Log.d(LOG_TAG, "AudioService connected");
             audioServiceBound = true;
             audioService = ((AudioService.LocalBinder) service).getService();
+            audioService.startDownloadWorker();
         }
 
         @Override

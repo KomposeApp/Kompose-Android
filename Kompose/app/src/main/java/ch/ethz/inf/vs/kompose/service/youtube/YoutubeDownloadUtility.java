@@ -15,6 +15,7 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
 import ch.ethz.inf.vs.kompose.service.youtube.extractor.YouTubeExtractor;
@@ -119,13 +120,17 @@ public class YoutubeDownloadUtility {
                 //Download the file and update the UI display
                 byte[] buffer = new byte[4096];
                 int in; int total = 0;
-                while ((in = input.read(buffer)) != -1) {
+                while ((in = input.read(buffer)) != -1 && !songModel.getSongStatus().equals(SongStatus.SKIPPED)) {
                     output.write(buffer, 0, in);
                     total += in;
 
                     double currentProgress = (double) total / fileLength * 100.0;
                     songModel.setDownloadProgress((int) currentProgress);
                 }
+
+                if (songModel.getSongStatus().equals(SongStatus.SKIPPED))
+                    throw new IOException("Song was skipped before download could complete");
+
             } catch (IOException e) {
                 Log.e(LOG_TAG, "File download failed");
                 e.printStackTrace();

@@ -199,8 +199,7 @@ public class IncomingMessageHandler implements Runnable {
         int quorum = sessionModel.getActiveDevices() / 2;
         for (SongModel songModel : sessionModel.getAllSongs()) {
             SongStatus currentStatus = songModel.getSongStatus();
-            if (currentStatus.equals(SongStatus.FINISHED) || currentStatus.equals(SongStatus.SKIPPED_BY_POPULAR_VOTE) ||
-                    currentStatus.equals(SongStatus.SKIPPED_BY_ERROR)) {
+            if (currentStatus.equals(SongStatus.FINISHED) || currentStatus.equals(SongStatus.SKIPPED)) {
                 pastSongs.add(songModel);
                 checkAndRemove(playQueue, songModel);
                 checkAndRemove(playQueueWithDisliked, songModel);
@@ -211,7 +210,7 @@ public class IncomingMessageHandler implements Runnable {
                 checkAndRemove(playQueueWithDisliked, songModel);
                 checkAndRemove(pastSongs, songModel);
                 if (songModel.getValidDownVoteCount() > quorum) {
-                    songModel.setSongStatus(SongStatus.SKIPPED_BY_POPULAR_VOTE);
+                    songModel.setSongStatus(SongStatus.SKIPPED);
                     sessionModel.setCurrentlyPlaying(null);
                 } else {
                     sessionModel.setCurrentlyPlaying(songModel);
@@ -222,7 +221,7 @@ public class IncomingMessageHandler implements Runnable {
 
                 checkAndRemove(pastSongs, songModel);
                 if (songModel.getValidDownVoteCount() > quorum) {
-                    songModel.setSongStatus(SongStatus.SKIPPED_BY_POPULAR_VOTE);
+                    songModel.setSongStatus(SongStatus.SKIPPED);
                     //add to skipped if not played
                     checkAndRemove(playQueue, songModel);
                     playQueueWithDisliked.add(songModel);
