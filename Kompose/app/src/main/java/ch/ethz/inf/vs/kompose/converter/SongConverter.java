@@ -48,11 +48,13 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
         //resolve client / session
         ClientModel proposedBy = null;
         SessionModel sessionModel = null;
-        UUID proposedUUID = UUID.fromString(song.getProposedByClientUuid());
-        for (ClientModel clientModel : clientModels) {
-            if (clientModel.getUUID().equals(proposedUUID)) {
-                proposedBy = clientModel;
-                sessionModel = clientModel.getPartOfSession();
+        if (song.getProposedByClientUuid() != null) {
+            UUID proposedUUID = UUID.fromString(song.getProposedByClientUuid());
+            for (ClientModel clientModel : clientModels) {
+                if (clientModel.getUUID().equals(proposedUUID)) {
+                    proposedBy = clientModel;
+                    sessionModel = clientModel.getPartOfSession();
+                }
             }
         }
 

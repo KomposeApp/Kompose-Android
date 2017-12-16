@@ -88,9 +88,8 @@ public class DownloadWorker implements Runnable{
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
+                                final File storedFile =youtubeDownloadUtility.downloadSong(nextDownload);
                                 final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
-
                                 if (storedFile != null) {
                                     nextDownload.setDownloadPath(storedFile);
                                     nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
@@ -99,12 +98,11 @@ public class DownloadWorker implements Runnable{
                                         Log.d(LOG_TAG, "thumbnail downloaded " + thumbDrawable.isVisible());
                                         nextDownload.setThumbnail(thumbDrawable);
                                     }
-
-                                    context.get().checkOnCurrentSong();
                                 } else {
                                     nextDownload.setDownloadStatus(DownloadStatus.FAILED);
                                 }
 
+                                context.get().checkOnCurrentSong();
                                 new OutgoingMessageHandler(context.get()).sendSessionUpdate();
                             }
                         }).start();
