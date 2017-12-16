@@ -186,9 +186,9 @@ public class IncomingMessageHandler implements Runnable {
         ObservableUniqueSortedList<SongModel> downloadQueue = sessionModel.getDownloadedQueue();
 
         int quorum = sessionModel.getActiveDevices() / 2;
-
         for (SongModel songModel : sessionModel.getAllSongs()) {
             SongStatus currentStatus = songModel.getSongStatus();
+            Log.d(LOG_TAG,  songModel.getTitle() + " DownvoteCount: " + songModel.getDownVoteCount());
             if (currentStatus.equals(SongStatus.FINISHED) || currentStatus.equals(SongStatus.SKIPPED)) {
                 synchronized (playQueue) {
                     checkAndRemove(playQueue, downloadQueue, songModel);
@@ -254,6 +254,14 @@ public class IncomingMessageHandler implements Runnable {
      */
     private Runnable registerClient(Message message, final SessionModel sessionModel) {
 
+        ArrayList<ClientModel> listcopy = new ArrayList<>(sessionModel.getClients());
+        for (ClientModel model :listcopy){
+            if (model.getUUID().toString().equals(message.getSenderUuid())){
+                Log.d(LOG_TAG, "Client already registered");
+                return null;
+            }
+        }
+
         final ClientModel client = new ClientModel(UUID.fromString(message.getSenderUuid()), sessionModel);
         client.setIsActive(true);
         client.setName(message.getSenderUsername());
@@ -270,11 +278,9 @@ public class IncomingMessageHandler implements Runnable {
         return new Runnable() {
             @Override
             public void run() {
-                if (!sessionModel.getClients().contains(client)) {
-                    sessionModel.getClients().add(client);
-                    setActiveDevices(sessionModel);
-                    Log.d(LOG_TAG, "Added client " + client.getName() + " to the active clients.");
-                }
+                sessionModel.getClients().add(client);
+                setActiveDevices(sessionModel);
+                Log.d(LOG_TAG, "Added client " + client.getName() + " to the active clients.");
             }
         };
     }
@@ -298,15 +304,14 @@ public class IncomingMessageHandler implements Runnable {
                 Log.d(LOG_TAG, "Removing client " + clientModel.getName() + " from active clients.");
                 clientModel.setIsActive(false);
                 clientModel.setClientConnectionDetails(null);
-                setActiveDevices(sessionModel);
 
                 // remove the client's downvotes
                 UUID clientUUID = clientModel.getUUID();
                 for (SongModel songModel : sessionModel.getAllSongs()) {
-                    for (DownVoteModel downVoteModel : songModel.getDownVotes()) {
-                        if (downVoteModel.getUuid().equals(clientUUID)) {
-                            songModel.setDownVoteCount(songModel.getDownVoteCount() - 1);
+                    for (DownVoteModel downVoteModel : new ArrayList<>(songModel.getDownVotes())) {
+                        if (downVoteModel.getClientModel().getUUID().equals(clientUUID)) {
                             songModel.getDownVotes().remove(downVoteModel);
+                            songModel.setDownVoteCount(songModel.getDownVoteCount() - 1);
                             Log.d(LOG_TAG, "Removing downvote of client " +
                                     downVoteModel.getClientModel().getName() +
                                     "from song " + songModel.getTitle());
@@ -315,6 +320,7 @@ public class IncomingMessageHandler implements Runnable {
                     }
                 }
                 sessionModel.getClients().remove(clientModel);
+                setActiveDevices(sessionModel);
             }
         };
     }
@@ -483,7 +489,7 @@ public class IncomingMessageHandler implements Runnable {
                             for (DownVoteModel updateDownVote : updateSong.getDownVotes()) {
                                 boolean downVoteFound = false;
                                 for (DownVoteModel downVoteModel : activeDownVotes) {
-                                    if (downVoteModel.getUuid().equals(updateDownVote.getUuid())) {
+                                    if (downVoteModel.getUUID().equals(updateDownVote.getUUID())) {
                                         //found; remove it from the list
                                         if (downVoteModel.getClientModel().getUUID().equals(myClientModel.getUUID())) {
                                             downvoteCasted = true;
@@ -494,7 +500,7 @@ public class IncomingMessageHandler implements Runnable {
                                     }
                                 }
                                 if (!downVoteFound) {
-                                    DownVoteModel model = new DownVoteModel(updateDownVote.getUuid(), updateDownVote.getClientModel(), updateDownVote.getDownVoteFor());
+                                    DownVoteModel model = new DownVoteModel(updateDownVote.getUUID(), updateDownVote.getClientModel(), updateDownVote.getDownVoteFor());
                                     if (model.getClientModel().getUUID().equals(myClientModel.getUUID())) {
                                         downvoteCasted = true;
                                     }
@@ -542,7 +548,6 @@ public class IncomingMessageHandler implements Runnable {
                     sessionModel.getPlayQueue().remove(target);
                 }
             }
-            //checkAndRemove(sessionModel.getPlayQueue(), target);
             target.setOrder(source.getOrder());
         }
         target.setSongStatus(source.getSongStatus());
@@ -555,7 +560,7 @@ public class IncomingMessageHandler implements Runnable {
 
     // find a ClientModel in a session by UUID
     private ClientModel getClientModel(UUID clientUUID, SessionModel sessionModel) {
-        for (ClientModel client : sessionModel.getClients()) {
+        for (ClientModel client : new ArrayList<ClientModel>(sessionModel.getClients())) {
             if (client.getUUID().equals(clientUUID)) {
                 return client;
             }
@@ -571,7 +576,7 @@ public class IncomingMessageHandler implements Runnable {
                 validClientCount += 1;
             }
         }
-
+        Log.d(LOG_TAG, "Active devices: " + validClientCount);
         sessionModel.setActiveDevices(validClientCount);
     }
 

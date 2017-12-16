@@ -113,7 +113,8 @@ public class OutgoingMessageHandler {
     private void sendMessageToClients(Message message) {
         // send message to all clients, but not to itself
         for (ClientModel c : getSession().getClients()) {
-            if (!c.getUUID().equals(StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID())) {
+            if (!c.getUUID().equals(StateSingleton.getInstance().getPreferenceUtility().retrieveDeviceUUID())
+                    && c.getIsActive()) {
                 Log.d(LOG_TAG, "sending message to: " + c.getName()
                         + " (" + c.getUUID().toString() + ")");
                 InetAddress clientIP = c.getClientConnectionDetails().getIp();

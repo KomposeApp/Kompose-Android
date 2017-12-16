@@ -47,7 +47,7 @@ public class DownVoteConverter implements IBaseConverter<DownVoteModel, DownVote
     /** Model --> Data **/
     public DownVote convert(DownVoteModel downVoteModel) {
         DownVote downVote = new DownVote();
-        downVote.setUuid(downVoteModel.getUuid().toString());
+        downVote.setUuid(downVoteModel.getUUID().toString());
         if (downVoteModel.getClientModel() != null)
             downVote.setClientUuid(downVoteModel.getClientModel().getUUID().toString());
         return downVote;

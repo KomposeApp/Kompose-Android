@@ -16,7 +16,7 @@ public class DownVoteModel extends BaseObservable {
     private ClientModel clientModel;
     private SongModel downVoteFor;
 
-    public UUID getUuid() {
+    public UUID getUUID() {
         return uuid;
     }
 
