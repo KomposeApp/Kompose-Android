@@ -1,8 +1,10 @@
 package ch.ethz.inf.vs.kompose.converter;
 
 import android.databinding.ObservableList;
+import android.util.Log;
 
 import java.net.URI;
+import java.security.acl.LastOwnerException;
 import java.util.List;
 import java.util.UUID;
 
@@ -102,7 +104,13 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
 
         song.setSongStatus(songModel.getSongStatus().toString());
         song.setDownloadStatus(songModel.getDownloadStatus().toString());
-        song.setProposedByClientUuid(songModel.getProposedBy().getUUID().toString());
+        //
+        if (songModel.getProposedBy() != null) {
+            song.setProposedByClientUuid(songModel.getProposedBy().getUUID().toString());
+        } else{
+            //Workaround
+            Log.d("##Issue", "ProposedBy was set to null for some reason!");
+        }
 
         DownVoteConverter downVoteConverter = new DownVoteConverter(clientModels, songModel);
         List<DownVoteModel> downVoteModels = songModel.getDownVotes();

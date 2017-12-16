@@ -220,7 +220,7 @@ public class IncomingMessageHandler implements Runnable {
                     }
                 }
             } else{
-                Log.wtf(LOG_TAG, "You're not supposed to be here -Develord");
+                Log.wtf(LOG_TAG, "You're not supposed to be here");
             }
         }
 

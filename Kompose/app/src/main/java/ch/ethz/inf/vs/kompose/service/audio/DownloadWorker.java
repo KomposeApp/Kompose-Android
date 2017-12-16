@@ -40,7 +40,7 @@ public class DownloadWorker implements Runnable{
 
     @Override
     public void run(){
-        YoutubeDownloadUtility youtubeDownloadUtility = new YoutubeDownloadUtility(context.get());
+        final YoutubeDownloadUtility youtubeDownloadUtility = new YoutubeDownloadUtility(context.get());
 
         int numSongsPreload = StateSingleton.getInstance().getPreferenceUtility().getPreload();
 
@@ -85,13 +85,13 @@ public class DownloadWorker implements Runnable{
                         nextDownload.setDownloadStatus(DownloadStatus.STARTED);
                         sessionModel.getDownloadedQueue().add(nextDownload);
 
-                        final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
-                        final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                final File storedFile = youtubeDownloadUtility.downloadSong(nextDownload);
+                                final Drawable thumbDrawable = youtubeDownloadUtility.downloadThumb(nextDownload);
 
-                        if (storedFile != null) {
-                            new Handler(Looper.getMainLooper()).post(new Runnable() {
-                                @Override
-                                public void run() {
+                                if (storedFile != null) {
                                     nextDownload.setDownloadPath(storedFile);
                                     nextDownload.setDownloadStatus(DownloadStatus.FINISHED);
                                     nextDownload.setMediaPlayer(mediaPlayerFromFile(storedFile));
@@ -101,12 +101,13 @@ public class DownloadWorker implements Runnable{
                                     }
 
                                     context.get().checkOnCurrentSong();
+                                } else {
+                                    nextDownload.setDownloadStatus(DownloadStatus.FAILED);
                                 }
-                            });
-                        } else {
-                            nextDownload.setDownloadStatus(DownloadStatus.FAILED);
-                        }
-                        new OutgoingMessageHandler(context.get()).sendSessionUpdate();
+
+                                new OutgoingMessageHandler(context.get()).sendSessionUpdate();
+                            }
+                        }).start();
                         break;
                     }
                 }

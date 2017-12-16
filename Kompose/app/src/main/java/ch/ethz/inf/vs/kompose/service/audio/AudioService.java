@@ -25,7 +25,6 @@ public class AudioService extends Service{
 
     private static final String LOG_TAG = "##AudioService";
 
-
     private SessionModel sessionModel;
     private Thread downloadWorkerThread;
     private SongModel connectedSongModel;
@@ -155,7 +154,12 @@ public class AudioService extends Service{
      */
     public void checkOnCurrentSong() {
         if (sessionModel.getCurrentlyPlaying() == null) {
-            goToNextSong(null);
+            new Handler(Looper.getMainLooper()).post(new Runnable() {
+                @Override
+                public void run() {
+                    goToNextSong(null);
+                }
+            });
         }
     }
 
@@ -164,98 +168,93 @@ public class AudioService extends Service{
      * @param workaroundSong Parameter for when the current song is downvoted.
      */
     private void goToNextSong(final SongModel workaroundSong) {
-        // Apparently we need to run this on the main thread because Observable Objects
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(LOG_TAG, "updating currently playing song");
-                SongModel songToStop;
+        Log.d(LOG_TAG, "updating currently playing song");
+        SongModel songToStop;
 
-                // If previous song is specified as an argument, stop that one.
-                if (workaroundSong != null) {
-                    songToStop = workaroundSong;
-                } else {
-                    songToStop = sessionModel.getCurrentlyPlaying();
-                }
+        // If previous song is specified as an argument, stop that one.
+        if (workaroundSong != null) {
+            songToStop = workaroundSong;
+        } else {
+            songToStop = sessionModel.getCurrentlyPlaying();
+        }
 
-                // Cleanup of the song that was previously playing
-                if (songToStop != null) {
-                    MediaPlayer mp = songToStop.getMediaPlayer();
-                    mp.stop();
-                    mp.release();
+        // Cleanup of the song that was previously playing
+        if (songToStop != null) {
+            MediaPlayer mp = songToStop.getMediaPlayer();
+            mp.stop();
+            mp.release();
 
-                    songToStop.setMediaPlayer(null);
-                }
+            songToStop.setMediaPlayer(null);
+        }
 
-                // Flag the current song as finished and remove it
-                SongModel currentSong = sessionModel.getCurrentlyPlaying();
-                if (currentSong != null) {
-                    currentSong.setSongStatus(SongStatus.FINISHED);
+        // Flag the current song as finished and remove it
+        SongModel currentSong = sessionModel.getCurrentlyPlaying();
+        if (currentSong != null) {
+            currentSong.setSongStatus(SongStatus.FINISHED);
 
-                    sessionModel.setCurrentlyPlaying(null);
-                    Log.d(LOG_TAG, "stopping & removing current song");
-                }
+            sessionModel.setCurrentlyPlaying(null);
+            Log.d(LOG_TAG, "stopping & removing current song");
+        }
 
-                // Look for a new song in the queue
-                if (sessionModel.getPlayQueue().size() > 0) {
-                    SongModel chosenSong = null;
+        // Look for a new song in the queue
+        synchronized (sessionModel.getPlayQueue()) {
+            if (sessionModel.getPlayQueue().size() > 0) {
+                SongModel chosenSong = null;
 
-                    // Loop over all the songs in the queue to remove ones where the download has
-                    // unexpectedly stopped with an error. On finding the first working song, break out.
-                    for (SongModel songModel : new ArrayList<>(sessionModel.getPlayQueue())) {
-                        if (songModel.getDownloadStatus() == DownloadStatus.FINISHED) {
-                            chosenSong = songModel;
-                            break;
-                        } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
-                            //directly to trash
-                            synchronized (sessionModel.getPlayQueue()) {
-                                sessionModel.getPlayQueue().remove(songModel);
-                            }
-                            synchronized (sessionModel.getDownloadedQueue()) {
-                                sessionModel.getDownloadedQueue().remove(songModel);
-                                sessionModel.getDownloadedQueue().notify();
-                            }
+                // Loop over all the songs in the queue to remove ones where the download has
+                // unexpectedly stopped with an error. On finding the first working song, break out.
+                for (SongModel songModel : new ArrayList<>(sessionModel.getPlayQueue())) {
+                    if (songModel.getDownloadStatus() == DownloadStatus.FINISHED) {
+                        chosenSong = songModel;
+                        break;
+                    } else if (songModel.getDownloadStatus().equals(DownloadStatus.FAILED)) {
+                        //directly to trash
 
-                            songModel.setSongStatus(SongStatus.SKIPPED);
-                        } else {
-                            //else wait for download to finish
-                            break;
-                        }
-                    }
-                    if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
-                        //When playing a new song, remove it from the ObservableList
-                        synchronized (sessionModel.getPlayQueue()) {
-                            sessionModel.getPlayQueue().remove(chosenSong);
-                        }
+                        sessionModel.getPlayQueue().remove(songModel);
                         synchronized (sessionModel.getDownloadedQueue()) {
-                            sessionModel.getDownloadedQueue().remove(chosenSong);
+                            sessionModel.getDownloadedQueue().remove(songModel);
                             sessionModel.getDownloadedQueue().notify();
                         }
 
-                        chosenSong.setSongStatus(SongStatus.PLAYING);
-                        sessionModel.setCurrentlyPlaying(chosenSong);
-
-                        MediaPlayer mediaPlayer = chosenSong.getMediaPlayer();
-                        // Note: Error listener is redundant, as it will call the following Listener as well
-                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                            @Override
-                            public void onCompletion(MediaPlayer mp) {
-                                goToNextSong(null);
-                            }
-                        });
-                        mediaPlayer.start();
-
-                        PlaybackProgressObserver observer = new PlaybackProgressObserver(chosenSong, mediaPlayer);
-                        new Thread(observer).start();
-
-                        Log.d(LOG_TAG, "now playing song: " + sessionModel.getCurrentlyPlaying().getTitle());
+                        songModel.setSongStatus(SongStatus.SKIPPED);
+                    } else {
+                        //else wait for download to finish
+                        break;
                     }
                 }
+                if (chosenSong != null && chosenSong.getMediaPlayer() != null) {
+                    //When playing a new song, remove it from the ObservableList
 
-                new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
+                    sessionModel.getPlayQueue().remove(chosenSong);
+
+                    synchronized (sessionModel.getDownloadedQueue()) {
+                        sessionModel.getDownloadedQueue().remove(chosenSong);
+                        sessionModel.getDownloadedQueue().notify();
+                    }
+
+                    chosenSong.setSongStatus(SongStatus.PLAYING);
+                    sessionModel.setCurrentlyPlaying(chosenSong);
+
+                    MediaPlayer mediaPlayer = chosenSong.getMediaPlayer();
+                    // Note: Error listener is redundant, as it will call the following Listener as well
+                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                        @Override
+                        public void onCompletion(MediaPlayer mp) {
+                            goToNextSong(null);
+                        }
+                    });
+                    mediaPlayer.start();
+
+                    PlaybackProgressObserver observer = new PlaybackProgressObserver(chosenSong, mediaPlayer);
+                    new Thread(observer).start();
+
+                    Log.d(LOG_TAG, "now playing song: " + sessionModel.getCurrentlyPlaying().getTitle());
+                }
             }
+        }
 
-        });
+        new OutgoingMessageHandler(getBaseContext()).sendSessionUpdate();
+
     }
 
 
