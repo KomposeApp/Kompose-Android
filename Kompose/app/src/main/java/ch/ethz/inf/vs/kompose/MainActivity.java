@@ -215,6 +215,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
 
         if (!checkIPandPort(addressText, portText)){
             showError(getString(R.string.view_error_address_port));
+            enableViews();
             return;
         }
 
@@ -230,6 +231,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             sessionModel.setConnectionDetails(serverConnectionDetails);
         } catch (UnknownHostException e) {
             showError(getString(R.string.view_error_unknown_host));
+            enableViews();
             return;
         }
 
@@ -253,6 +255,10 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
     private boolean checkIPandPort(String ipText, String portText){
         //Check if both Strings exist
         if (ipText == null || portText == null){
+            return false;
+        }
+
+        if (ipText.isEmpty() || portText.isEmpty()){
             return false;
         }
 
