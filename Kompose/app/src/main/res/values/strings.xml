@@ -52,6 +52,7 @@
     <string name="icons_ai_settings">\ue807</string>
     <string name="icons_ai_database">\ue842</string>
     <string name="icons_ai_help">\ue84e</string>
+    <string name="icons_ai_youtube">\ue84f</string>
 
     <!--Playlist context menu-->
     <string name="playlist_menu_add_link">Add Youtube Link</string>
@@ -105,5 +106,6 @@
     <string name="field_ip_address">IP address</string>
     <string name="field_session_name">Session Name</string>
     <string name="field_port_display">Port</string>
+    <string name="field_video_duration">Video Duration: %s Minutes %s Seconds</string>
 
 </resources>

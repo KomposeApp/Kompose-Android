@@ -18,6 +18,7 @@
 package ch.ethz.inf.vs.kompose.view.viewholder;
 
 import android.databinding.ViewDataBinding;
+import android.view.View;
 
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.view.viewholder.base.BaseBindableViewHolder;
@@ -31,9 +32,15 @@ public class PlayedSongViewHolder<TModelViewBinding extends ViewDataBinding> ext
         this.listener = listener;
     }
 
+    public void onClickFollowURL(View v){
+        int pos = this.getAdapterPosition();
+        if (listener != null) {
+            listener.followURL(v, pos);
+        }
+    }
 
     public interface ClickListener
     {
-
+        void followURL(View v, int position);
     }
 }

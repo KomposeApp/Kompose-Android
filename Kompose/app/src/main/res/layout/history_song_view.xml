@@ -10,26 +10,44 @@
             type="ch.ethz.inf.vs.kompose.view.viewholder.PlayedSongViewHolder" />
     </data>
 
-
-    <LinearLayout
+    <RelativeLayout
         style="@style/TileLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
 
-        <TextView
-            style="@style/PrimaryTextView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{viewHolder.item.title}"
-            tools:text="example text of video" />
+            android:orientation="vertical"
+            android:layout_toLeftOf="@id/url_button">
 
+            <TextView
+                style="@style/PrimaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{viewHolder.item.title}"
+                tools:text="example text of video" />
+
+            <TextView
+                style="@style/SecondaryTextView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@{String.format(@string/field_video_duration,String.valueOf(viewHolder.item.secondsLength/60),String.valueOf(viewHolder.item.secondsLength%60))}"
+                tools:text="Length" />
+
+        </LinearLayout>
         <TextView
-            style="@style/SecondaryTextView"
-            android:layout_width="match_parent"
+            android:id="@+id/url_button"
+            style="@style/SmallIconButtonTextView"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(viewHolder.item.sourceUrl)}"
-            tools:text="URL" />
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:onClick="@{viewHolder.onClickFollowURL}"
+            android:background="@drawable/ic_ondemand_video_black_48dp"
+            android:backgroundTint="@color/colorBlack"
+            tools:textColor="@color/colorAccent"
+            tools:visibility="visible" />
 
-    </LinearLayout>
+    </RelativeLayout>
 </layout>

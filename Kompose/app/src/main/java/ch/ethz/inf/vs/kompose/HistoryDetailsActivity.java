@@ -1,6 +1,9 @@
 package ch.ethz.inf.vs.kompose;
 
+import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.databinding.DataBindingUtil;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -9,8 +12,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+
+import java.net.URI;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryDetailsBinding;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.handler.StorageHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.PlayedSongAdapter;
@@ -41,6 +48,8 @@ public class HistoryDetailsActivity extends AppCompatActivity implements PlayedS
         setSupportActionBar(toolbar);
     }
 
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
@@ -64,4 +73,12 @@ public class HistoryDetailsActivity extends AppCompatActivity implements PlayedS
         }
     }
 
+    @Override
+    public void followURL(View v, int position) {
+        v.setBackgroundTintList(ColorStateList.valueOf(getResources().getColor(R.color.colorPrimary)));
+        SongModel songModel = viewModel.getSessionModel().getAllSongs().get(position);
+        Uri source = Uri.parse(songModel.getSourceUrl().toString());
+        Intent youtubeProxy = new Intent(Intent.ACTION_VIEW, source);
+        startActivity(youtubeProxy);
+    }
 }
