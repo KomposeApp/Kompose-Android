@@ -77,14 +77,12 @@ public class StorageHandler {
         }
     }
 
-    public void deleteAll(final List<SessionModel> sessionList){
+    public void deleteSelected(String filename){
+        deleteFile(SESSION_FOLDER, filename);
+    }
+
+    public void deleteAll(){
         clearDirectory(SESSION_FOLDER, false);
-        new Handler(Looper.getMainLooper()).post(new Runnable() {
-            @Override
-            public void run() {
-                sessionList.clear();
-            }
-        });
     }
 
     /**
@@ -210,6 +208,36 @@ public class StorageHandler {
         File file = new File(context.getFilesDir(), child);
         return readFile(file);
     }
+
+    /**
+     * Delete given filename in directory
+     * @param directory directory to search in
+     * @param fileName file to delete
+     */
+    private void deleteFile(String directory, String fileName){
+
+        // Check if the directory exists
+        File file = new File(context.getFilesDir(), directory);
+        if (!file.exists() || !file.isDirectory()) {
+            return;
+        }
+
+        File[] children = file.listFiles();
+        for (File f : children) {
+            if (f.getName().equals(fileName)) {
+                if (f.delete()) {
+                    Log.d(LOG_TAG, "Successfully deleted file: " + fileName);
+                    return;
+                }
+                else{
+                    Log.e(LOG_TAG, "Failed to delete file: " + fileName);
+                    return;
+                }
+            }
+        }
+        Log.e(LOG_TAG, "File not found: " + fileName);
+    }
+
 
     /**
      * Delete contents of a directory.

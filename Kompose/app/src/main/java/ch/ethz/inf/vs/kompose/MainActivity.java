@@ -236,6 +236,19 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         joinSessionClicked(sessionModel);
     }
 
+    @Override
+    public void refreshNSDListener() {
+        //Unbind the service discovery
+        if (nsdListenerServiceBound) {
+            unbindService(nsdListenerConnection);
+            nsdListenerServiceBound = false;
+        }
+        viewModel.getSessionModels().clear();
+
+        Intent intent = new Intent(this.getBaseContext(), NSDListenerService.class);
+        bindService(intent, nsdListenerConnection, BIND_AUTO_CREATE);
+    }
+
 
     private boolean checkIPandPort(String ipText, String portText){
         //Check if both Strings exist

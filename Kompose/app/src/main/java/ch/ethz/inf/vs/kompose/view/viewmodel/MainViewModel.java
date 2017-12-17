@@ -2,8 +2,10 @@ package ch.ethz.inf.vs.kompose.view.viewmodel;
 
 import android.databinding.Bindable;
 import android.databinding.ObservableList;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 
 import java.util.Comparator;
 
@@ -46,6 +48,7 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     private String ipAddress;
     private String port;
 
+
     public void setEnabled(boolean enabled){
         enableState = enabled;
     }
@@ -53,6 +56,7 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
     public boolean isEnabled(){
         return enableState;
     }
+
 
     @Bindable
     public String getClientName() {
@@ -103,6 +107,14 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
             clickListener.createSessionClicked();
         }else{
             Log.wtf(LOG_TAG, "Prevented consecutive \"Create Session\" button pushing.");
+        }
+    }
+
+    public void refreshNSD(View view){
+        if (clickListener != null && isEnabled()) {
+            clickListener.refreshNSDListener();
+        }else{
+            Log.wtf(LOG_TAG, "Prevented consecutive Refresh button pushing.");
         }
     }
 
@@ -165,6 +177,8 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         void joinSessionClicked(SessionModel sessionModel);
 
         void joinManualClicked();
+
+        void refreshNSDListener();
 
         void openHistoryClicked();
 

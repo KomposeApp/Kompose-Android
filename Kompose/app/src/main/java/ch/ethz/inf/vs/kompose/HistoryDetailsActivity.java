@@ -6,9 +6,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import ch.ethz.inf.vs.kompose.databinding.ActivityHistoryDetailsBinding;
+import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.StateSingleton;
+import ch.ethz.inf.vs.kompose.service.handler.StorageHandler;
 import ch.ethz.inf.vs.kompose.view.adapter.PlayedSongAdapter;
 import ch.ethz.inf.vs.kompose.view.viewholder.PlayedSongViewHolder;
 import ch.ethz.inf.vs.kompose.view.viewmodel.HistoryDetailsViewModel;
@@ -36,4 +41,28 @@ public class HistoryDetailsActivity extends AppCompatActivity implements PlayedS
         Toolbar toolbar = findViewById(R.id.history_details_toolbar);
         setSupportActionBar(toolbar);
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_historydetails, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        // Delete all history contents
+        switch (item.getItemId()) {
+            case R.id.history_toolbar_deletethis:
+                new StorageHandler(this).deleteSelected(
+                        StateSingleton.getInstance().getActiveHistorySession().getCreationDateTime().toString());
+                StateSingleton.getInstance().setActiveHistorySession(null);
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 }

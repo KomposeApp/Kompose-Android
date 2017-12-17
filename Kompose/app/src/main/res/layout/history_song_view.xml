@@ -28,8 +28,8 @@
             style="@style/SecondaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@{String.valueOf(viewHolder.item.secondsLength)}"
-            tools:text="length of my video" />
+            android:text="@{String.valueOf(viewHolder.item.sourceUrl)}"
+            tools:text="URL" />
 
     </LinearLayout>
 </layout>

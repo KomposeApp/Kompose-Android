@@ -8,18 +8,20 @@
         <variable
             name="viewModel"
             type="ch.ethz.inf.vs.kompose.view.viewmodel.MainViewModel" />
+
     </data>
 
-    <LinearLayout
+    <RelativeLayout
         style="@style/RootLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <LinearLayout
+        <LinearLayout android:id="@+id/fragment_nsd_list"
             style="@style/TextContentLayout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginBottom="80dp"
             android:orientation="vertical">
 
             <TextView
@@ -75,5 +77,20 @@
 
             </android.support.v7.widget.RecyclerView>
         </LinearLayout>
-    </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true">
+
+                <Button
+                    style="@style/PrimaryButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:onClick="@{viewModel.refreshNSD}"
+                    android:text="@string/refresh_NSD" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
 </layout>
