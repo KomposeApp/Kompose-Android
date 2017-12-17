@@ -1,0 +1,56 @@
+{
+  "type": "SESSION_UPDATE",
+  "error_message": null,
+  "sender_username": "Boney M",
+  "sender_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+  "session": {
+    "uuid": "e8d75a93-3b7c-4132-ba2e-82841be5fe1c",
+    "creation_date_time": "2017-12-13T16:16:37.428Z",
+    "host_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+    "session_name": "Disco Party",
+    "session_status": "ACTIVE",
+    "songs": [
+      {
+        "down_votes": [],
+        "download_status": "FINISHED",
+        "download_url": "https://r1---sn-nfpuji-1gil.googlevideo.com/videoplayback?requiressl=yes&ip=195.176.111.10&sparams=clen%2Cdur%2Cei%2Cgir%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&gir=yes&mt=1513181799&clen=7019945&key=yt6&lmt=1458193709302183&ei=41IxWs_gD5fO1gKA6rXoCQ&expire=1513203523&mm=31&ipbits=0&mn=sn-nfpuji-1gil&itag=18&dur=291.085&initcwndbps=1416250&id=o-ADxQ7LZy0zqSWxl2hfQWyH0EXB2JUAkbWnwA34PYYMyE&pl=19&source=youtube&mv=m&mime=video%2Fmp4&ms=au&ratebypass=yes&signature=28B094C82969E74CE902FEE6A70D5530B01CB122.BA8AB5BBB0C6ACF731B7C44540AB1F86B62FEFD6",
+        "length_in_seconds": 291,
+        "order": 0,
+        "proposed_by_client_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+        "songStatus": "REQUESTED",
+        "source_url": "https://www.youtube.com/watch?v=T5emcbg_wZk",
+        "thumbnail_url": "http://i.ytimg.com/vi/T5emcbg_wZk/hqdefault.jpg",
+        "title": "Tanita Tikaram - Twist In My Sobriety",
+        "uuid": "fd3ee34f-16da-4682-add6-d1f943851d80",
+        "videoID": "T5emcbg_wZk"
+      }
+    ],
+    "clients": [
+      {
+        "uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+        "name": "Boney M",
+        "is_active": true
+      },
+      {
+        "uuid": "70998773-4dcd-4411-80f8-85c0a4f90832",
+        "name": "Rick Astley",
+        "is_active": true
+      }
+    ]
+  },
+  "song_details": {
+    "down_votes": [],
+    "download_status": "NOT_STARTED",
+    "download_url": "https://r2---sn-nfpuji-1gil.googlevideo.com/videoplayback?ms=au&mv=m&mt=1513181287&ratebypass=yes&itag=22&source=youtube&ip=195.176.111.10&initcwndbps=1395000&requiressl=yes&id=o-AOHk3kTUZ-SEsOvKeAePrv-3-154uI3QsG9Qcdg7IjCU&mn=sn-nfpuji-1gil&mm=31&expire=1513202989&ipbits=0&sparams=dur%2Cei%2Cid%2Cinitcwndbps%2Cip%2Cipbits%2Citag%2Clmt%2Cmime%2Cmm%2Cmn%2Cms%2Cmv%2Cpl%2Cratebypass%2Crequiressl%2Csource%2Cexpire&key=yt6&mime=video%2Fmp4&ei=zVAxWqjFJ4X-1gLavLeoBQ&dur=285.744&pl=19&lmt=1472269255779873&signature=56547B3F6A56A0843AC4F0CA54FA52E178883A05.A7EB1496BF0EBECB61DB05BCCADD68ACA0FD2FF8",
+    "length_in_seconds": 286,
+    "order": 3,
+    "proposed_by_client_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+    "songStatus": "REQUESTED",
+    "source_url": "https://www.youtube.com/watch?v=c1idAsPYfd4",
+    "thumbnail_url": "http://i.ytimg.com/vi/c1idAsPYfd4/hqdefault.jpg",
+    "title": "EPICA - Unchain Utopia (OFFICIAL LYRIC VIDEO)",
+    "uuid": "3fa6aea0-5ebd-4376-b189-d60dfda35099",
+    "videoID": "c1idAsPYfd4"
+  }
+}
+
