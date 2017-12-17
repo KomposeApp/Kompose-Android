@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+/* Modified for use with Kompose */
 package ch.ethz.inf.vs.kompose.view.viewholder;
 
 import android.databinding.ViewDataBinding;

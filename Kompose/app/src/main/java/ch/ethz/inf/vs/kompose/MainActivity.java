@@ -197,8 +197,8 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
             return;
         }
 
-        connectionProgress = ProgressDialog.show(this,getString(R.string.action_connect_title),
-                getString(R.string.action_connect_desc), true, false);
+        connectionProgress = ProgressDialog.show(this,getString(R.string.progress_connect_title),
+                getString(R.string.progress_be_patient), true, false);
         viewModel.saveToPreferences(StateSingleton.getInstance().getPreferenceUtility());
         registrationTask.start();
     }
@@ -214,7 +214,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         String portText = viewModel.getPort();
 
         if (!checkIPandPort(addressText, portText)){
-            showError("Invalid IP Address or Port Values.");
+            showError(getString(R.string.view_error_address_port));
             return;
         }
 
@@ -229,7 +229,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
                     inetAddress, port);
             sessionModel.setConnectionDetails(serverConnectionDetails);
         } catch (UnknownHostException e) {
-            showError("Unknown host");
+            showError(getString(R.string.view_error_unknown_host));
             return;
         }
 
@@ -365,7 +365,7 @@ public class MainActivity extends BaseActivity implements MainViewModel.ClickLis
         }
 
         private void breakdown() {
-            showError("Discovery of Kompose Sessions has stopped unexpectedly.");
+            showError(getString(R.string.view_error_nsd_crash));
             NSDListenerService = null;
         }
     };

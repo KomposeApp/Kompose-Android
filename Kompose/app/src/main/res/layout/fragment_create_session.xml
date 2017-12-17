@@ -22,7 +22,7 @@
             android:layout_marginBottom="12sp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/start_own_party" />
+            android:text="@string/main_flavortext_start_party" />
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
@@ -35,7 +35,7 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text="@={viewModel.clientName}"
-                android:hint="@string/your_name"
+                android:hint="@string/main_user_name"
                 android:inputType="textPersonName"
                 android:maxLines="1"
                 android:maxLength="128"
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:singleLine="true"
-                android:hint="@string/session_name"
+                android:hint="@string/field_session_name"
                 android:text="@={viewModel.sessionName}"
                 android:inputType="textPersonName"
                 android:maxLines="1"
@@ -70,7 +70,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:onClick="@{viewModel.createSession}"
-            android:text="@string/create_party" />
+            android:text="@string/main_button_create_party" />
 
     </LinearLayout>
 </layout>

@@ -47,7 +47,7 @@
                     style="@style/LabelTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/session_name" />
+                    android:text="@string/field_session_name" />
 
                 <TextView
                     style="@style/SecondaryTextView"
@@ -62,7 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5pt"
-                    android:text="@string/creation_date_time" />
+                    android:text="@string/history_creation_date_time" />
 
                 <TextView
                     style="@style/SecondaryTextView"
@@ -84,7 +84,7 @@
                     style="@style/LabelTextView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/host" />
+                    android:text="@string/history_hostdisplay" />
 
                 <TextView
                     style="@style/SecondaryTextView"
@@ -98,7 +98,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="5pt"
-                    android:text="@string/songs_contained" />
+                    android:text="@string/history_songs_contained" />
 
                 <TextView
                     style="@style/SecondaryTextView"

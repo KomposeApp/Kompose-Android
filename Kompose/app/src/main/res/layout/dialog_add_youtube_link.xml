@@ -21,7 +21,7 @@
             style="@style/SecondaryTextView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/past_link" />
+            android:text="@string/playlist_flavortext_add_video" />
 
         <LinearLayout
             android:id="@+id/divider"
@@ -37,7 +37,7 @@
             android:layout_below="@id/help_text"
             android:layout_marginTop="10pt"
             android:labelFor="@id/youtube_link"
-            android:text="@string/youtube_link" />
+            android:text="@string/playlist_dialog_youtube_link" />
 
         <EditText
             android:id="@+id/youtube_link"
@@ -55,7 +55,7 @@
             android:layout_alignParentEnd="true"
             android:layout_below="@id/youtube_link"
             android:onClick="@{viewModel.onLinkAddClicked}"
-            android:text="@string/add_song" />
+            android:text="@string/playlist_dialog_add_song" />
 
     </RelativeLayout>
 </layout>

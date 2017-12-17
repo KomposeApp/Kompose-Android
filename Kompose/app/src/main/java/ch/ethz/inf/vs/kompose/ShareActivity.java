@@ -30,7 +30,7 @@ public class ShareActivity extends BaseActivity {
         // Additionally, kill the process if Kompose hasn't been started beforehand.
         SessionModel activeSession = StateSingleton.getInstance().getActiveSession();
         if (activeSession == null || !StateSingleton.getInstance().getPlaylistIsActive()) {
-            showError("Kompose is not connected to a host!");
+            showError(getString(R.string.view_error_sharing));
             Log.d(LOG_TAG, "Failed to send given URL. Reason: Not connected to host.");
 
             //Prepare thread to clean up the process in case it is necessary.
@@ -65,7 +65,7 @@ public class ShareActivity extends BaseActivity {
         Log.d(LOG_TAG, "requesting URL: " + requestURL);
 
         if (!SongResolveHandler.resolveAndRequestSong(this, requestURL)){
-            showError("Invalid URL");
+            showError(getString(R.string.view_error_invalid_url));
         }
 
         //Make sure everything is cleaned up. Don't remove this or it will cause an exception.

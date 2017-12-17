@@ -11,7 +11,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import ch.ethz.inf.vs.kompose.R;
-import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SessionStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.ClientModel;
@@ -93,8 +92,8 @@ public abstract class SongResolveHandler {
 
         ProgressDialog pDialog = null;
         if (StateSingleton.getInstance().isPlaylistInForeground()) {
-         pDialog = ProgressDialog.show(ctx, "Resolving Video...",
-                    "This may take a moment...", true, false);
+         pDialog = ProgressDialog.show(ctx, ctx.getString(R.string.progress_resolve_title),
+                    ctx.getString(R.string.progress_be_patient), true, false);
         }
 
         YoutubeDownloadUtility youtubeService = new YoutubeDownloadUtility(ctx);
@@ -124,7 +123,7 @@ public abstract class SongResolveHandler {
                 new OutgoingMessageHandler(ctx).sendRequestSong(value);
             } else {
                 Log.e(LOG_TAG, "resolving url failed");
-                Toast.makeText(ctx, "Failed to resolve Youtube URL", Toast.LENGTH_LONG).show();
+                Toast.makeText(ctx, ctx.getText(R.string.view_error_resolve), Toast.LENGTH_LONG).show();
             }
         }
     }

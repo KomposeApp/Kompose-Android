@@ -252,7 +252,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
         viewModel.setSearchLink("");
         songRequestDialog.dismiss();
         if (!SongResolveHandler.resolveAndRequestSong(this, youtubeUrl)){
-            showError("Invalid URL");
+            showError(getString(R.string.view_error_invalid_url));
         }
     }
 
@@ -320,7 +320,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                     Log.e(LOG_TAG, "There was an error setting up the HostServerService.");
                     Log.e(LOG_TAG, "Error code: " + status);
                     Log.e(LOG_TAG, error);
-                    showError("Host services could not be set up properly.");
+                    showError(getString(R.string.view_error_host_services));
                     finish();
                 }
             });
@@ -353,7 +353,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
                 clientService.startClientListener(actualClientPort);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "There was an error setting up the ClientServerService.");
-                showError("Client services could not be set up properly.");
+                showError(getString(R.string.view_error_client_services));
                 finish();
             }
         }

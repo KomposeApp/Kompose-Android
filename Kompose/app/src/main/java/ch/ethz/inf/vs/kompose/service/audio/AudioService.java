@@ -87,6 +87,7 @@ public class AudioService extends Service{
 
 
     public void startDownloadWorker() {
+        Log.d(LOG_TAG, "DownloadWorker started");
         downloadWorkerThread = new Thread(new DownloadWorker(this, sessionModel));
         downloadWorkerThread.start();
     }

@@ -1,9 +1,10 @@
 package ch.ethz.inf.vs.kompose.view.viewmodel;
 
-import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
+import android.databinding.BaseObservable;
 
-public class HistoryDetailsViewModel extends BaseViewModel {
+import ch.ethz.inf.vs.kompose.model.SessionModel;
+
+public class HistoryDetailsViewModel extends BaseObservable {
     private SessionModel sessionModel;
 
     public HistoryDetailsViewModel(SessionModel sessionModel) {

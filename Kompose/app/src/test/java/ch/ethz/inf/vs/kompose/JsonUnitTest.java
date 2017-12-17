@@ -10,9 +10,6 @@ import ch.ethz.inf.vs.kompose.data.json.Message;
 import ch.ethz.inf.vs.kompose.data.json.Session;
 import ch.ethz.inf.vs.kompose.enums.MessageType;
 
-/**
- * Created by git@famoser.ch on 19/11/2017.
- */
 
 public class JsonUnitTest extends ReflectionUnitTest {
 
@@ -48,11 +45,11 @@ public class JsonUnitTest extends ReflectionUnitTest {
     public void directJsonTest() throws Exception {
         String challenge = "{\n" +
                 "    \"type\": \"REGISTER_CLIENT\",\n" +
-                "    \"sender_username\": \"Mario Huana\",\n" +
+                "    \"sender_username\": \"Mario\",\n" +
                 "    \"sender_uuid\": \"c4d435c6-c92b-11e7-9e80-d1034c1b7b33\"\n" +
                 "}";
         Message expected = new Message();
-        expected.setSenderUsername("Mario Huana");
+        expected.setSenderUsername("Mario");
         expected.setSenderUuid("c4d435c6-c92b-11e7-9e80-d1034c1b7b33");
         expected.setType("REGISTER_CLIENT");
 

@@ -74,16 +74,16 @@ public class SettingsActivity extends AppCompatActivity {
             PreferenceUtility preferenceUtility = StateSingleton.getInstance().getPreferenceUtility();
 
             Preference clientPortPref = findPreference(PreferenceUtility.KEY_CPORT);
-            clientPortPref.setSummary("Current: " + preferenceUtility.getClientPort());
+            clientPortPref.setSummary(getString(R.string.settings_prefix_current)+ "  " + preferenceUtility.getClientPort());
 
             Preference hostPortPref = findPreference(PreferenceUtility.KEY_HPORT);
-            hostPortPref.setSummary("Current: " + preferenceUtility.getHostPort());
+            hostPortPref.setSummary(getString(R.string.settings_prefix_current)+ "  " + preferenceUtility.getHostPort());
 
             Preference preloadPref = findPreference(PreferenceUtility.KEY_PRELOAD);
-            preloadPref.setSummary("Current: " + preferenceUtility.getPreload());
+            preloadPref.setSummary(getString(R.string.settings_prefix_current)+ "  " + preferenceUtility.getPreload());
 
             Preference cachePref = findPreference(PreferenceUtility.KEY_MAXDLSIZE);
-            cachePref.setSummary("Current: " + preferenceUtility.getCurrentMaxDLSize());
+            cachePref.setSummary(getString(R.string.settings_prefix_current)+ "  " + preferenceUtility.getCurrentMaxDLSize());
         }
 
         @Override

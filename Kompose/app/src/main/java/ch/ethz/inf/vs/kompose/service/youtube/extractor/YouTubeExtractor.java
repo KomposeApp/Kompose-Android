@@ -171,7 +171,6 @@ public class YouTubeExtractor extends AsyncTask<String, Void, SparseArray<YtFile
     }
 
     // Google is evil and throttles m4a download speeds. Hence we will use mp4 instead.
-    // TODO: Find out whether there are more formats that download quickly. Add them to the REGEX.
     private final String PREFERRED_MEDIA_FORMATS = "mp4|mp3";
     private final String SUPPORTED_MEDIA_FORMATS = "3gp|mp4|mp3|m4a|aac|flac|ts|mkv|wav|ogg|webm";
 

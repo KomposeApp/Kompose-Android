@@ -1,13 +1,13 @@
 package ch.ethz.inf.vs.kompose.view.viewmodel;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.view.View;
 
 import ch.ethz.inf.vs.kompose.BR;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
-import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
-public class PlaylistViewModel extends BaseViewModel {
+public class PlaylistViewModel extends BaseObservable {
     private SessionModel sessionModel;
     private ClickListener listener;
 

@@ -13,6 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/* Modified for use with Kompose */
 package ch.ethz.inf.vs.kompose.view.viewholder.base;
 
 import android.databinding.ObservableField;

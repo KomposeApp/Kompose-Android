@@ -80,7 +80,7 @@ public class PortEntryPreference extends DialogPreference{
             if(checkPortValidity(newValue) && callChangeListener(newValue)){
                 setValue(newValue);
             } else{
-                Toast.makeText(this.getContext(), this.getContext().getText(R.string.setting_error_port), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getContext(), this.getContext().getText(R.string.preference_error_port), Toast.LENGTH_SHORT).show();
             }
         }
     }

@@ -4,34 +4,44 @@
     <!-- Labels -->
     <string name="label_main">Kompose</string>
     <string name="label_settings">Settings</string>
-    <string name="label_playlist">Placeholder</string>
     <string name="label_history">History</string>
-    <string name="label_details">History</string>
 
-    <!-- Settings Strings -->
-    <string name="settings_menu">Settings</string>
-    <string name="setting_category_host">Host Settings</string>
-    <string name="setting_category_client">Client Settings</string>
-    <string name="setting_preload">Preload Size:</string>
-    <string name="setting_cache">Cache Size:</string>
-    <string name="setting_hostport">Host Server Port:</string>
-    <string name="setting_clientport">Client Port:</string>
-    <string name="setting_sessionname">Default Session Name:</string>
-    <string name="setting_username">Default Username:</string>
-    <string name="settings_confirm">Confirm Changes</string>
+    <!--Setting defaults-->
+    <string name="default_preload">3</string>
+    <string name="default_maxdlsize">1024</string>
+
+    <!--SharedPreferences keys-->
+    <string name="KEY_PRELOAD">k_preload</string>
+    <string name="KEY_MAXDLSIZE">k_maxdlsize</string>
+    <string name="KEY_HPORT">k_host_port</string>
+    <string name="KEY_CPORT">k_client_port</string>
+
+    <!--Settings-->
+    <string name="settings_category_title">General</string>
+    <string name="setting_port_client_title">Port to use when acting as a Client</string>
+    <string name="setting_port_client_desc">Port when Connecting</string>
+    <string name="setting_port_host_title">Port to use when acting as a Host</string>
+    <string name="setting_port_host_desc">Port when Hosting</string>
+    <string name="setting_preload_title">Preload Size in #Songs</string>
+    <string name="setting_preload_desc">Number of Songs to Preload</string>
+    <string name="setting_maxdl_title">Maximum Download Size in MB</string>
+    <string name="setting_maxdl_desc">Maximum Download Size in MB for Youtube Videos</string>
+    <string name="settings_prefix_current">Current:</string>
 
     <!-- Error Strings -->
-    <string name="setting_error_preload">Maximum preload size is </string>
-    <string name="setting_error_cache">Maximum cache size is </string>
-    <string name="setting_error_username">Please choose a valid username</string>
-    <string name="setting_error_sessionname">Please choose a valid session name</string>
-    <string name="setting_error_port">Input rejected. Please choose a valid port.</string>
-    <string name="setting_error_maxsize">Input rejected. Maximum Download size must be between 4 and 2048 MegaBytes.</string>
+    <string name="preference_error_port">Input rejected. Please choose a valid port</string>
+    <string name="preference_error_maxsize">Input rejected. Maximum download size must be between 4 and 2048 Megabytes</string>
     <string name="view_error_clientname">Please choose a non-empty username</string>
     <string name="view_error_sessionname">Please choose a non-empty session name</string>
     <string name="view_error_connection_failed">Failed to establish connection to host</string>
-    <string name="view_error_socket_dead">Establishing connection failed: Host is unreachable</string>
-    <string name="view_error_socket_closed">Establishing connection failed: Host socket port is closed</string>
+    <string name="view_error_resolve">Failed to resolve Youtube URL</string>
+    <string name="view_error_address_port">Invalid IP Address or Port Values</string>
+    <string name="view_error_unknown_host">Unknown Host</string>
+    <string name="view_error_nsd_crash">Discovery of Kompose Sessions has stopped unexpectedly</string>
+    <string name="view_error_invalid_url">Invalid URL</string>
+    <string name="view_error_host_services">Host services could not be set up properly</string>
+    <string name="view_error_client_services">Client services could not be set up properly</string>
+    <string name="view_error_sharing">Kompose is not connected to a host!</string>
 
     <!-- Android Developer Icons -->
     <string name="icons_ai_halt">\ue874</string>
@@ -43,101 +53,56 @@
     <string name="icons_ai_help">\ue84e</string>
 
     <!--Playlist context menu-->
-    <string name="add_link">Add youtube link</string>
-    <string name="show_history">History</string>
-    <string name="leave_session">Leave session</string>
-    <string name="host_info">Host info</string>
+    <string name="playlist_menu_add_link">Add Youtube Link</string>
+    <string name="playlist_menu_show_history">View History</string>
+    <string name="playlist_menu_leave_session">Leave Session</string>
+    <string name="playlist_menu_host_info">Host Info</string>
 
     <!--MainActivity context menu-->
-    <string name="action_settings">Settings</string>
-    <string name="action_history">History</string>
-    <string name="action_delete">Delete</string>
-    <string name="action_delete_all">Delete all History</string>
-    <string name="action_connect_title">Connecting to Host...</string>
-    <string name="action_connect_desc">This may take a moment</string>
+    <string name="main_menu_settings">Settings</string>
+    <string name="main_menu_history">History</string>
 
-    <!--Settings categories-->
-    <string name="client_settings">Client settings</string>
-    <string name="host_settings">Host settings</string>
-    <string name="general_settings">General</string>
+    <!--HistoryActivity context menus-->
+    <string name="history_menu_delete">Delete Entry</string>
+    <string name="history_menu_delete_all">Delete entire History</string>
 
-    <!--Setting titles-->
-    <string name="username_setting_title">Default username</string>
-    <string name="username_setting_dialog_title">Username</string>
-    <string name="clientport_setting_dialog_title">Port to use when acting as a client</string>
-    <string name="hostport_setting_dialog_title">Port to use when acting as a host</string>
-    <string name="client_port">Port when Connecting</string>
-    <string name="host_port">Port when Hosting</string>
-    <string name="session_name_setting_title">Default session name</string>
-    <string name="session_name_setting_dialog_title">Session name</string>
-    <string name="preload_size_setting_title">Number of items preloaded</string>
-    <string name="cache_size_setting_title">Number of items cached</string>
-    <string name="preload_size_setting_dialog_title">Preload Size in #Songs</string>
+    <!--Progress Dialog Text-->
+    <string name="progress_resolve_title">Resolving URL…</string>
+    <string name="progress_connect_title">Connecting to Host…</string>
+    <string name="progress_be_patient">This may take a moment</string>
 
-    <string name="maxdl_size_setting_dialog_title">Maximum Download Size in MB</string>
-    <string name="maxdl_size_setting_dialog_desc">Maximum Download Size in MB for Youtube Videos</string>
+    <!--Views of MainActivity-->
+    <string name="main_tab_join">Join</string>
+    <string name="main_tab_create">Create</string>
+    <string name="main_tab_manual">Manual</string>
+    <string name="main_button_refresh">Refresh</string>
+    <string name="main_button_create_party">create party</string>
+    <string name="main_button_join_manually">Join manually</string>
+    <string name="main_user_name">your name</string>
+    <string name="main_party_lookup">looking for parties…</string>
+    <string name="main_flavortext_join">Join an existing party and add your own songs!</string>
+    <string name="main_flavortext_start_party">Start your own party and be the host.</string>
+    <string name="main_flavortext_manual_join">Trouble finding the party? Connect manually here.</string>
 
-    <!--Setting defaults-->
-    <string name="default_username">Rick Astley</string>
-    <string name="default_session_name">Big party</string>
-    <string name="default_preload">3</string>
-    <string name="default_cachesize">3</string>
-    <string name="default_maxdlsize">1024</string>
+    <!--Views in PlaylistActivity-->
+    <string name="playlist_dialog_youtube_link">YouTube Link</string>
+    <string name="playlist_dialog_add_song">Add song</string>
+    <string name="playlist_thumbnail">Thumbnail</string>
+    <string name="playlist_flavortext_tell_others">Tell others to join your party, or add songs yourself from the menu on the top right.</string>
+    <string name="playlist_flavortext_add_songs">Add more songs, the play queue is empty!</string>
+    <string name="playlist_flavortext_session_finished">The host has ended the session.</string>
+    <string name="playlist_flavortext_hostinfo">Use the IP and the port to manually connect to the host</string>
+    <string name="playlist_flavortext_add_video">Simply paste a link from Youtube to include it into the playlist</string>
 
-    <!--SharedPreferences keys-->
-    <string name="KEY_USERNAME">k_user</string>
-    <string name="KEY_SESSIONNAME">k_session</string>
-    <string name="KEY_PRELOAD">k_preload</string>
-    <string name="KEY_MAXDLSIZE">k_maxdlsize</string>
-    <string name="KEY_HPORT">k_host_port</string>
-    <string name="KEY_CPORT">k_client_port</string>
+    <!--Views in History-->
+    <string name="history_songs_contained">Number of Songs</string>
+    <string name="history_hostdisplay">Hosted by</string>
+    <string name="history_creation_date_time">Created at</string>
+    <string name="history_songcount">Songs</string>
 
-    <!--Other-->
-    <string name="join">join</string>
-    <string name="client_name">My name</string>
-    <string name="create_party">create party</string>
-    <string name="session_name">Session name</string>
-    <string name="downvote">Downvote</string>
-    <string name="youtube_service.download_failed">Could not resolve the song details</string>
-    <string name="title_activity_test_frontend">TestFrontendActivity</string>
-    <string name="youtube_link">YouTube link</string>
-    <string name="add_youtube_link">Add youtube link</string>
-    <string name="confirm">Confirm</string>
-    <string name="close">Close</string>
-    <string name="add_song">Add song</string>
-    <string name="thumbnail">Thumbnail</string>
-    <string name="proposed_by">added by</string>
-    <string name="down_vote">down vote</string>
-    <string name="play">Play</string>
-    <string name="songs_contained">songs contained</string>
-    <string name="pause">Pause</string>
-    <string name="add_songs">Tell others to join your party, or add songs yourself from the menu on the top right.</string>
-    <string name="add_more_songs">Add more songs, the play queue is empty!</string>
-    <string name="session_finished">The host has ended the session.</string>
-    <string name="wait_a_second">Please wait</string>
-    <string name="downvote_button">Downvote button</string>
-    <string name="song_is_resolved">Please wait, we try to fetch the song…</string>
-    <string name="your_name">Your name</string>
-    <string name="join_party">Join Party</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="looking_for_parties">looking for parties…</string>
-    <string name="create">Create</string>
-    <string name="manual">Manual</string>
-    <string name="history">History</string>
-    <string name="ip_address">IP address</string>
-    <string name="ip_address_placeholder">192.168.1.1</string>
-    <string name="port_placeholder">7261</string>
-    <string name="port">Port</string>
-    <string name="join_manually">Join manually</string>
-    <string name="host">Hosted by</string>
-    <string name="creation_date_time">Created at</string>
-    <string name="title_activity_scrolling">ScrollingActivity</string>
-    <string name="join_existing_party">Join an existing party and add your own songs!</string>
-    <string name="start_own_party">Start your own party and be the host.</string>
-    <string name="connect_manually">Trouble finding the party? Connect manually here.</string>
-    <string name="songs">Songs</string>
-    <string name="use_to_manually_connect">Use the IP and the port to manually connect to the host</string>
-    <string name="past_link">Simply paste a link from youtube to include it into the playlist</string>
-    <string name="resolving_song">Resolving url…</string>
-    <string name="refresh_NSD">Refresh</string>
+    <!-- Shared Strings -->
+    <string name="field_ip_address">IP address</string>
+    <string name="field_session_name">Session Name</string>
+    <string name="field_port_display">Port</string>
+
 </resources>

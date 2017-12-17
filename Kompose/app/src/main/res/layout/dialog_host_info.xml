@@ -22,7 +22,7 @@
             android:id="@+id/help_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/use_to_manually_connect" />
+            android:text="@string/playlist_flavortext_hostinfo" />
 
         <LinearLayout
             android:id="@+id/divider"
@@ -49,7 +49,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2sp"
-                    android:text="@string/ip_address" />
+                    android:text="@string/field_ip_address" />
 
                 <TextView
                     style="@style/SecondaryTextView"
@@ -71,7 +71,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="2sp"
-                    android:text="@string/port" />
+                    android:text="@string/field_port_display" />
 
                 <TextView
                     style="@style/SecondaryTextView"

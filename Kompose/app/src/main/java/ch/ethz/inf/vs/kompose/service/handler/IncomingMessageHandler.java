@@ -69,7 +69,7 @@ public class IncomingMessageHandler implements Runnable {
     private Message readMessage(Socket connection) throws IOException {
         BufferedReader input = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         String json = input.readLine();
-        Log.d("#JSON:", "message read from stream: " + json);
+        //Log.d("#JSON:", "message read from stream: " + json);
 
         Message message = JsonConverter.fromMessageJsonString(json);
         input.close();
@@ -141,7 +141,7 @@ public class IncomingMessageHandler implements Runnable {
                     sessionUIChanges = removeSkipSongVote(message, activeSessionModel, myClientModel);
                 break;
             case KEEP_ALIVE:
-                //TODO
+                //future
                 //already handled by refreshClientTimeout before
                 break;
             case FINISH_SESSION:
@@ -149,8 +149,7 @@ public class IncomingMessageHandler implements Runnable {
                     sessionUIChanges = finishSession(activeSessionModel);
                 break;
             case ERROR:
-                //TODO
-                //not used so far
+                //future
                 break;
         }
 
@@ -188,7 +187,7 @@ public class IncomingMessageHandler implements Runnable {
         int quorum = sessionModel.getActiveDevices() / 2;
         for (SongModel songModel : sessionModel.getAllSongs()) {
             SongStatus currentStatus = songModel.getSongStatus();
-            Log.d(LOG_TAG,  songModel.getTitle() + " DownvoteCount: " + songModel.getDownVoteCount());
+            //Log.d(LOG_TAG,  songModel.getTitle() + " DownvoteCount: " + songModel.getDownVoteCount());
             if (currentStatus.equals(SongStatus.FINISHED) || currentStatus.equals(SongStatus.SKIPPED)) {
                 synchronized (playQueue) {
                     checkAndRemove(playQueue, downloadQueue, songModel);
@@ -220,7 +219,7 @@ public class IncomingMessageHandler implements Runnable {
                     }
                 }
             } else{
-                Log.wtf(LOG_TAG, "You're not supposed to be here");
+                Log.wtf(LOG_TAG, "Not supposed to happen");
             }
         }
 

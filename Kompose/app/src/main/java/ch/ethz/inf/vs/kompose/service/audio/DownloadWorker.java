@@ -4,8 +4,6 @@ import android.databinding.ObservableList;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 
 import java.io.File;
@@ -122,7 +120,7 @@ public class DownloadWorker implements Runnable{
                 }
             }
         }
-        Log.e(LOG_TAG, "DownloadWorker is now dead");
+        Log.d(LOG_TAG, "DownloadWorker is now dead");
     }
 
     private static class PlaylistListener extends ObservableList.OnListChangedCallback {

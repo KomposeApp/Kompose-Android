@@ -25,7 +25,6 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
 
 public class SessionConverter implements IBaseConverter<SessionModel, Session> {
 
-    private final String LOG_TAG = "##SessionConverter";
 
     /**
      * Data --> Model

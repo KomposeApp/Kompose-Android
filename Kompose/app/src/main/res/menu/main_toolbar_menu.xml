@@ -7,12 +7,12 @@
     <item
         android:id="@+id/main_toolbar_history"
         android:icon="@drawable/ic_action_database"
-        android:title="@string/action_history"
+        android:title="@string/main_menu_history"
         app:showAsAction="never"/>
 
     <item android:id="@+id/main_toolbar_settings"
         android:icon="@drawable/ic_settings_white_24dp"
-        android:title="@string/action_settings"
+        android:title="@string/main_menu_settings"
         app:showAsAction="never" />
 
 </menu>

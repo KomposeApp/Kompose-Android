@@ -31,5 +31,5 @@ public enum SongStatus {
     /**
      * the song was played
      */
-    FINISHED;
+    FINISHED
 }

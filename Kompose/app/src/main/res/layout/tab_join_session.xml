@@ -9,7 +9,7 @@
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/your_name"
+        android:hint="@string/main_user_name"
         android:inputType="textPersonName" />
 
 

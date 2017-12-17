@@ -1,11 +1,10 @@
 package ch.ethz.inf.vs.kompose.view.viewmodel;
 
+import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.ObservableList;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 
 import java.util.Comparator;
 
@@ -15,10 +14,9 @@ import ch.ethz.inf.vs.kompose.model.comparators.UniqueModelComparator;
 import ch.ethz.inf.vs.kompose.model.list.ObservableUniqueSortedList;
 import ch.ethz.inf.vs.kompose.service.preferences.PreferenceUtility;
 import ch.ethz.inf.vs.kompose.view.viewholder.JoinSessionViewHolder;
-import ch.ethz.inf.vs.kompose.view.viewmodel.base.BaseViewModel;
 
 
-public class MainViewModel extends BaseViewModel implements JoinSessionViewHolder.ClickListener {
+public class MainViewModel extends BaseObservable implements JoinSessionViewHolder.ClickListener {
     private final String LOG_TAG = "##ViewModel";
 
     private ObservableList<SessionModel> sessionModels;
@@ -136,7 +134,7 @@ public class MainViewModel extends BaseViewModel implements JoinSessionViewHolde
         if (clickListener != null && isEnabled()) {
             clickListener.joinManualClicked();
         }else{
-            Log.wtf(LOG_TAG, "Prevented consecutive Manual Join button pushing.");
+            Log.wtf(LOG_TAG, "Prevented consecutive \"Manual Join\" button pushing.");
         }
     }
 

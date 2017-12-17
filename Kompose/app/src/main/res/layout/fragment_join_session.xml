@@ -30,7 +30,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="5sp"
                 android:layout_marginBottom="12sp"
-                android:text="@string/join_existing_party" />
+                android:text="@string/main_flavortext_join" />
 
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
@@ -43,7 +43,7 @@
                     android:layout_height="wrap_content"
                     android:singleLine="true"
                     android:text="@={viewModel.clientName}"
-                    android:hint="@string/your_name"
+                    android:hint="@string/main_user_name"
                     android:inputType="textPersonName"
                     android:maxLines="1"
                     android:maxLength="128"
@@ -65,7 +65,7 @@
                     android:layout_marginStart="3pt"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="@string/looking_for_parties" />
+                    android:text="@string/main_party_lookup" />
 
             </LinearLayout>
 
@@ -88,7 +88,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="10dp"
                     android:onClick="@{viewModel.refreshNSD}"
-                    android:text="@string/refresh_NSD" />
+                    android:text="@string/main_button_refresh" />
 
         </LinearLayout>
 

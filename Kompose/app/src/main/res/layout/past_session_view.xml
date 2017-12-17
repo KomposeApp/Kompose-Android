@@ -63,7 +63,7 @@
                 style="@style/SecondaryTextView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/songs" />
+                android:text="@string/history_songcount" />
         </LinearLayout>
 
     </RelativeLayout>

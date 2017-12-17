@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory
-            android:title="@string/general_settings">
+            android:title="@string/settings_category_title">
 
         <ch.ethz.inf.vs.kompose.service.preferences.PortEntryPreference
             android:key="@string/KEY_CPORT"
-            android:title="@string/client_port"
-            android:dialogTitle="@string/clientport_setting_dialog_title"
+            android:title="@string/setting_port_client_desc"
+            android:dialogTitle="@string/setting_port_client_title"
             android:summary="" />
 
         <ch.ethz.inf.vs.kompose.service.preferences.PortEntryPreference
             android:key="@string/KEY_HPORT"
-            android:title="@string/host_port"
-            android:dialogTitle="@string/hostport_setting_dialog_title"
+            android:title="@string/setting_port_host_desc"
+            android:dialogTitle="@string/setting_port_host_title"
             android:summary="" />
 
         <ch.ethz.inf.vs.kompose.service.preferences.NumberPickerPreference
             android:key="@string/KEY_PRELOAD"
-            android:title="@string/preload_size_setting_dialog_title"
-            android:dialogTitle="@string/preload_size_setting_dialog_title"
+            android:title="@string/setting_preload_title"
+            android:dialogTitle="@string/setting_preload_desc"
             android:defaultValue="@string/default_preload"
             android:summary="" />
 
         <ch.ethz.inf.vs.kompose.service.preferences.CacheSizeEntryPreference
             android:key="@string/KEY_MAXDLSIZE"
-            android:title="@string/maxdl_size_setting_dialog_title"
-            android:dialogTitle="@string/maxdl_size_setting_dialog_desc"
+            android:title="@string/setting_maxdl_title"
+            android:dialogTitle="@string/setting_maxdl_desc"
             android:defaultValue="@string/default_maxdlsize"
             android:summary="" />
     </PreferenceCategory>

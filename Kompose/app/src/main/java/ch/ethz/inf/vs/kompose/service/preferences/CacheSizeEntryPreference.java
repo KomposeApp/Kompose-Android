@@ -78,7 +78,7 @@ public class CacheSizeEntryPreference extends DialogPreference {
             if (checkInputValidity(newValue) && callChangeListener(newValue)) {
                 setValue(newValue);
             } else {
-                Toast.makeText(this.getContext(), this.getContext().getText(R.string.setting_error_maxsize), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this.getContext(), this.getContext().getText(R.string.preference_error_maxsize), Toast.LENGTH_SHORT).show();
             }
         }
     }

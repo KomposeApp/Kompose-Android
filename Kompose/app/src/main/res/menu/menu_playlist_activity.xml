@@ -8,20 +8,20 @@
 
     <group>
         <item android:id="@+id/playlist_menu_add_link"
-            android:title="@string/add_link"
+            android:title="@string/playlist_menu_add_link"
             android:icon="@drawable/ic_action_add"
             app:showAsAction="ifRoom" />
 
         <item android:id="@+id/playlist_menu_show_history"
-            android:title="@string/show_history"
+            android:title="@string/playlist_menu_show_history"
             app:showAsAction="never" />
 
         <item android:id="@+id/playlist_menu_leave_session"
-            android:title="@string/leave_session"
+            android:title="@string/playlist_menu_leave_session"
             app:showAsAction="never" />
 
         <item android:id="@+id/playlist_menu_host_info"
-            android:title="@string/host_info"
+            android:title="@string/playlist_menu_host_info"
             app:showAsAction="never" />
     </group>
 

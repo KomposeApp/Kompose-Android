@@ -4,7 +4,6 @@ import android.databinding.ObservableList;
 import android.util.Log;
 
 import java.net.URI;
-import java.security.acl.LastOwnerException;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,6 +21,8 @@ import ch.ethz.inf.vs.kompose.model.SongModel;
  **/
 
 public class SongConverter implements IBaseConverter<SongModel, Song> {
+
+    private final String LOG_TAG = "##SongConverter";
 
     //Client pool
     private ClientModel[] clientModels;
@@ -56,6 +57,9 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
                     sessionModel = clientModel.getPartOfSession();
                 }
             }
+        } else{
+            //Workaround
+            Log.d(LOG_TAG, "ProposedBy was set to null for some reason!");
         }
 
         //create song model
@@ -106,12 +110,11 @@ public class SongConverter implements IBaseConverter<SongModel, Song> {
 
         song.setSongStatus(songModel.getSongStatus().toString());
         song.setDownloadStatus(songModel.getDownloadStatus().toString());
-        //
         if (songModel.getProposedBy() != null) {
             song.setProposedByClientUuid(songModel.getProposedBy().getUUID().toString());
         } else{
             //Workaround
-            Log.d("##Issue", "ProposedBy was set to null for some reason!");
+            Log.d(LOG_TAG, "ProposedBy was set to null for some reason!");
         }
 
         DownVoteConverter downVoteConverter = new DownVoteConverter(clientModels, songModel);

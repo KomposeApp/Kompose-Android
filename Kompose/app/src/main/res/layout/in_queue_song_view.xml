@@ -33,7 +33,7 @@
                 style="@style/SecondaryTextView"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/resolving_song" />
+                android:text="@string/progress_resolve_title" />
 
         </LinearLayout>
 

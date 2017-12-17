@@ -29,7 +29,7 @@
         <activity
             android:name=".PlaylistActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/label_playlist"
+            android:label="REPLACE ME"
             android:screenOrientation="portrait" />
         <activity
             android:name=".HistoryOverviewActivity"
@@ -39,7 +39,7 @@
         <activity
             android:name=".HistoryDetailsActivity"
             android:configChanges="orientation|screenSize"
-            android:label="@string/label_details"
+            android:label="REPLACE ME"
             android:screenOrientation="portrait" />
         <activity
             android:name=".SettingsActivity"
