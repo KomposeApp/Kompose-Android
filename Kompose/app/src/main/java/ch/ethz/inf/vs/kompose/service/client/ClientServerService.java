@@ -56,7 +56,7 @@ public class ClientServerService extends Service {
 
         if (clientKeepAliver != null && clientKeepAliver.isAlive()){
             Log.d(LOG_TAG, "Shutting down the Client Keepaliver");
-            clientListenerTask.interrupt();
+            clientKeepAliver.interrupt();
         }
 
         // cancel client task

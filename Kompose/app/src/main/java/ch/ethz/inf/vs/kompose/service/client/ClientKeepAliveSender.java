@@ -9,9 +9,9 @@ import ch.ethz.inf.vs.kompose.service.handler.OutgoingMessageHandler;
 
 public class ClientKeepAliveSender implements Runnable {
 
-    private static final String LOG_TAG = "#KeepAliver";
+    private static final String LOG_TAG = "##KeepAliver";
     private Context ctx;
-    private final int SEND_DELAY = 9000;
+    private final int SEND_DELAY = 12500;
 
     public ClientKeepAliveSender(Context ctx){
         this.ctx = ctx;

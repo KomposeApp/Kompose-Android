@@ -5,10 +5,12 @@ import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 
+import ch.ethz.inf.vs.kompose.R;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;

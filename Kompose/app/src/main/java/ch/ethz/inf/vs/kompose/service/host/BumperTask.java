@@ -1,6 +1,5 @@
 package ch.ethz.inf.vs.kompose.service.host;
 
-
 import android.content.Context;
 import android.util.Log;
 

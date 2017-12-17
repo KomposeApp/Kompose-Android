@@ -10,10 +10,14 @@ import android.os.IBinder;
 import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.util.Log;
+import android.widget.Toast;
+
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 
 import java.util.ArrayList;
 
 import ch.ethz.inf.vs.kompose.BR;
+import ch.ethz.inf.vs.kompose.R;
 import ch.ethz.inf.vs.kompose.enums.DownloadStatus;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SessionModel;
@@ -217,6 +221,7 @@ public class AudioService extends Service{
                             sessionModel.getDownloadedQueue().notify();
                         }
 
+                        Toast.makeText(this, R.string.view_error_filedownload_failed, Toast.LENGTH_LONG).show();
                         songModel.setSongStatus(SongStatus.SKIPPED);
                     } else {
                         //else wait for download to finish

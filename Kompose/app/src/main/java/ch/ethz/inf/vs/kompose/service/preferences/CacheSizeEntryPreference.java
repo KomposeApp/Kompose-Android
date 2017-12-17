@@ -55,7 +55,7 @@ public class CacheSizeEntryPreference extends DialogPreference {
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         InputFilter[] filterArray = new InputFilter[1];
-        filterArray[0] = new InputFilter.LengthFilter(5);
+        filterArray[0] = new InputFilter.LengthFilter(4);
         editText.setFilters(filterArray);
 
         FrameLayout dialogView = new FrameLayout(getContext());
