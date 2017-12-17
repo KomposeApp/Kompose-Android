@@ -101,7 +101,6 @@
     <string name="pause">Pause</string>
     <string name="add_songs">Tell others to join your party, or add songs yourself with the + button.</string>
     <string name="add_more_songs">Add more songs, the play queue is empty!</string>
-    <string name="session_finished">The host has ended the session.</string>
     <string name="wait_a_second">Please wait</string>
     <string name="downvote_button">Downvote button</string>
     <string name="song_is_resolved">Please wait, we try to fetch the song…</string>
@@ -127,4 +126,5 @@
     <string name="use_to_manually_connect">Use the IP and the port to manually connect to the host</string>
     <string name="past_link">Simply paste a link from youtube to include it into the playlist</string>
     <string name="resolving_song">Resolving url…</string>
+    <string name="session_finished">Your party has finished</string>
 </resources>
