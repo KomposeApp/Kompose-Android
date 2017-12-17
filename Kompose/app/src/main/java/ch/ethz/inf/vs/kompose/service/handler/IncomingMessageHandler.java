@@ -141,7 +141,6 @@ public class IncomingMessageHandler implements Runnable {
                     sessionUIChanges = removeSkipSongVote(message, activeSessionModel, myClientModel);
                 break;
             case KEEP_ALIVE:
-                //future
                 //already handled by refreshClientTimeout before
                 break;
             case FINISH_SESSION:

@@ -350,7 +350,7 @@ public class PlaylistActivity extends BaseActivity implements InQueueSongViewHol
             clientServiceBound = true;
             clientService = ((ClientServerService.LocalBinder) service).getService();
             try {
-                clientService.startClientListener(actualClientPort);
+                clientService.startClientTasks(actualClientPort);
             } catch (IOException e) {
                 Log.e(LOG_TAG, "There was an error setting up the ClientServerService.");
                 showError(getString(R.string.view_error_client_services));

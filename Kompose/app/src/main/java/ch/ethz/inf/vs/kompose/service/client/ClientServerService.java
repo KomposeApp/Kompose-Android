@@ -19,6 +19,7 @@ public class ClientServerService extends Service {
 
     private final String LOG_TAG = "##ClientServerService";
     private Thread clientListenerTask;
+    private Thread clientKeepAliver;
     private ServerSocket clientSocket;
 
     private IBinder binder = new ClientServerService.LocalBinder();
@@ -35,12 +36,15 @@ public class ClientServerService extends Service {
     }
 
 
-    public void startClientListener(int actualClientPort) throws IOException {
+    public void startClientTasks(int actualClientPort) throws IOException {
 
         clientSocket = new ServerSocket(actualClientPort);
 
         clientListenerTask = new Thread(new ClientListenerTask(this, clientSocket));
         clientListenerTask.start();
+
+        clientKeepAliver =  new Thread(new ClientKeepAliveSender(this));
+        clientKeepAliver.start();
     }
 
 
@@ -49,6 +53,11 @@ public class ClientServerService extends Service {
      **/
     @Override
     public boolean onUnbind(Intent intent) {
+
+        if (clientKeepAliver != null && clientKeepAliver.isAlive()){
+            Log.d(LOG_TAG, "Shutting down the Client Keepaliver");
+            clientListenerTask.interrupt();
+        }
 
         // cancel client task
         if (clientListenerTask != null && clientListenerTask.isAlive()){

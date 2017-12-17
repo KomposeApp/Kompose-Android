@@ -39,6 +39,7 @@ public class HostServerService extends Service {
     private NsdManager nsdManager;
     private NsdManager.RegistrationListener nsdRegistrationListener;
     private Thread serverThread;
+    private Thread bumperThread;
     private ServerSocket serverSocket;
     private IBinder binder = new LocalBinder();
 
@@ -131,6 +132,10 @@ public class HostServerService extends Service {
         // start server task
         serverThread = new Thread(new ServerTask(this, serverSocket));
         serverThread.start();
+
+        // start bumper task
+        bumperThread = new Thread(new BumperTask(this));
+        bumperThread.start();
     }
 
     @Override
@@ -139,6 +144,11 @@ public class HostServerService extends Service {
         if (nsdManager != null) {
             Log.d(LOG_TAG, "Shutting down the NSD Sender");
             nsdManager.unregisterService(nsdRegistrationListener);
+        }
+
+        if (bumperThread != null && bumperThread.isAlive()){
+            Log.d(LOG_TAG, "Shutting down the Client Bumper");
+            bumperThread.interrupt();
         }
         if (serverThread != null && serverThread.isAlive()) {
             Log.d(LOG_TAG, "Shutting down the Message Server");

@@ -31,6 +31,9 @@ public class OutgoingMessageHandler {
     private final String LOG_TAG = "##OutMessageHandler";
     private Context context;
 
+    private static int connectionRefusedCounter = 0;
+    private static final int CONN_REFUSED_THRESHOLD = 20;
+
     public OutgoingMessageHandler(Context context) {
         this.context = context;
     }
@@ -189,8 +192,13 @@ public class OutgoingMessageHandler {
                 printWriter.close();
                 socket.close();
 
+                connectionRefusedCounter = 0;
             } catch (ConnectException c){
                 Log.d(LOG_TAG, "Connection refused");
+                connectionRefusedCounter++;
+                if (connectionRefusedCounter > CONN_REFUSED_THRESHOLD){
+                    StateSingleton.getInstance().getActiveSession().setSessionStatus(SessionStatus.FINISHED);
+                }
             } catch (IOException e) {
                 Log.e(LOG_TAG, "Failed to send message. Reason: " + e.getMessage());
                 e.printStackTrace();
