@@ -18,6 +18,7 @@ import java.net.URLConnection;
 import ch.ethz.inf.vs.kompose.enums.SongStatus;
 import ch.ethz.inf.vs.kompose.model.SongModel;
 import ch.ethz.inf.vs.kompose.service.SimpleListener;
+import ch.ethz.inf.vs.kompose.service.StateSingleton;
 import ch.ethz.inf.vs.kompose.service.youtube.extractor.YouTubeExtractor;
 
 //Note: The caching here ignores the CacheQuota size
@@ -52,7 +53,6 @@ public class YoutubeDownloadUtility {
     /**
      * Download the file from the specified URL and notify observers when done. (or retrieve it from cache)
      * The notifier will carry a MediaPlayer that can be used to play the file.
-     * TODO: BUG: Find out why this is sometimes called 10+ times in a row
      * @return true if the download succeeded, false otherwise
      */
     public File downloadSong(final SongModel songModel) {
@@ -107,7 +107,12 @@ public class YoutubeDownloadUtility {
             InputStream input = null;
             OutputStream output = null;
             try {
-                //TODO: Filesize limit check from settings
+                // Filesize check:
+                int maxSize = StateSingleton.getInstance().getPreferenceUtility().getCurrentMaxDLSize();
+                if (maxSize != 2048){
+                    if (fileLength > (maxSize << 20))
+                        throw new IOException("Filesize exceeds user specified limit.");
+                }
 
                 //Establish direct connection
                 connection.connect();

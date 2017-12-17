@@ -16,6 +16,7 @@ public class PreferenceUtility {
     public static final String KEY_UUID = "device_uuid";
     public static final String KEY_PRELOAD = "k_preload";
     public static final String KEY_CACHESIZE = "k_cachesize";
+    public static final String KEY_MAXDLSIZE = "k_maxdlsize";
     public static final String KEY_USERNAME = "k_user";
     public static final String KEY_SESSIONNAME = "k_session";
     public static final String KEY_HPORT = "k_host_port";
@@ -26,6 +27,7 @@ public class PreferenceUtility {
     public static final String DEFAULT_USERNAME = "Komposer";
     public static final String DEFAULT_SESSIONNAME = "Default Session";
     public static final int DEFAULT_PRELOAD = 3;
+    public static final int DEFAULT_MAXDLSIZE = 1024;
     public static final int DEFAULT_PORT = 0;
 
     private SharedPreferences sPrefs;
@@ -82,6 +84,8 @@ public class PreferenceUtility {
         sEdits.putInt(KEY_CACHESIZE, cacheSize);
     }
 
+    public void setCurrentMaxDLSize(int maxDLsize) { sEdits.putInt(KEY_MAXDLSIZE, maxDLsize);}
+
     public String getUsername() {
         return sPrefs.getString(KEY_USERNAME, DEFAULT_USERNAME);
     }
@@ -106,6 +110,7 @@ public class PreferenceUtility {
         return sPrefs.getInt(KEY_CACHESIZE, DEFAULT_PRELOAD);
     }
 
+    public int getCurrentMaxDLSize() { return sPrefs.getInt(KEY_MAXDLSIZE, DEFAULT_MAXDLSIZE);}
 
     public void setDefaultIp(String defaultIp) {
         sEdits.putString(KEY_DEFAULT_IP, defaultIp);

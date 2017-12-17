@@ -26,6 +26,7 @@
     <string name="setting_error_username">Please choose a valid username</string>
     <string name="setting_error_sessionname">Please choose a valid session name</string>
     <string name="setting_error_port">Input rejected. Please choose a valid port.</string>
+    <string name="setting_error_maxsize">Input rejected. Maximum Download size must be between 4 and 2048 MegaBytes.</string>
     <string name="view_error_clientname">Please choose a non-empty username</string>
     <string name="view_error_sessionname">Please choose a non-empty session name</string>
     <string name="view_error_connection_failed">Failed to establish connection to host</string>
@@ -61,28 +62,31 @@
     <!--Setting titles-->
     <string name="username_setting_title">Default username</string>
     <string name="username_setting_dialog_title">Username</string>
-    <string name="clientport_setting_dialog_title">Client Port</string>
-    <string name="hostport_setting_dialog_title">Host Port</string>
+    <string name="clientport_setting_dialog_title">Port to use when acting as a client</string>
+    <string name="hostport_setting_dialog_title">Port to use when acting as a host</string>
     <string name="client_port">Port when Connecting</string>
     <string name="host_port">Port when Hosting</string>
     <string name="session_name_setting_title">Default session name</string>
     <string name="session_name_setting_dialog_title">Session name</string>
     <string name="preload_size_setting_title">Number of items preloaded</string>
     <string name="cache_size_setting_title">Number of items cached</string>
-    <string name="preload_size_setting_dialog_title">Preloaded items</string>
-    <string name="cache_size_setting_dialog_title">Cached items</string>
+    <string name="preload_size_setting_dialog_title">Preload Size in #Songs</string>
+
+    <string name="maxdl_size_setting_dialog_title">Maximum Download Size in MB</string>
+    <string name="maxdl_size_setting_dialog_desc">Maximum Download Size in MB for Youtube Videos</string>
 
     <!--Setting defaults-->
     <string name="default_username">Rick Astley</string>
     <string name="default_session_name">Big party</string>
     <string name="default_preload">3</string>
     <string name="default_cachesize">3</string>
+    <string name="default_maxdlsize">1024</string>
 
     <!--SharedPreferences keys-->
     <string name="KEY_USERNAME">k_user</string>
     <string name="KEY_SESSIONNAME">k_session</string>
     <string name="KEY_PRELOAD">k_preload</string>
-    <string name="KEY_CACHESIZE">k_cachesize</string>
+    <string name="KEY_MAXDLSIZE">k_maxdlsize</string>
     <string name="KEY_HPORT">k_host_port</string>
     <string name="KEY_CPORT">k_client_port</string>
 
@@ -133,4 +137,5 @@
     <string name="use_to_manually_connect">Use the IP and the port to manually connect to the host</string>
     <string name="past_link">Simply paste a link from youtube to include it into the playlist</string>
     <string name="resolving_song">Resolving url…</string>
+    <string name="refresh_NSD">Refresh</string>
 </resources>

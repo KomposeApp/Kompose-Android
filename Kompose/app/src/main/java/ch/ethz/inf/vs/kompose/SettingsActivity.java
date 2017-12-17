@@ -82,8 +82,8 @@ public class SettingsActivity extends AppCompatActivity {
             Preference preloadPref = findPreference(PreferenceUtility.KEY_PRELOAD);
             preloadPref.setSummary("Current: " + preferenceUtility.getPreload());
 
-            Preference cachePref = findPreference(PreferenceUtility.KEY_CACHESIZE);
-            cachePref.setSummary("Current: " + preferenceUtility.getCurrentCacheSize());
+            Preference cachePref = findPreference(PreferenceUtility.KEY_MAXDLSIZE);
+            cachePref.setSummary("Current: " + preferenceUtility.getCurrentMaxDLSize());
         }
 
         @Override

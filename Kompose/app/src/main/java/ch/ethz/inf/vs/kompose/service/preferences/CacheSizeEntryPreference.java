@@ -1,5 +1,6 @@
 package ch.ethz.inf.vs.kompose.service.preferences;
 
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.preference.DialogPreference;
@@ -13,33 +14,30 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import java.io.IOException;
-import java.net.ServerSocket;
-
 import ch.ethz.inf.vs.kompose.R;
 
-public class PortEntryPreference extends DialogPreference{
+public class CacheSizeEntryPreference extends DialogPreference {
 
     // allowed range
-    public static final int MIN_VALUE = 1024;
-    public static final int MAX_VALUE = 65535;
+    public static final int MIN_VALUE = 4;
+    public static final int MAX_VALUE = 2048;
 
     private EditText editText;
     private int value;
 
-    public PortEntryPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public CacheSizeEntryPreference(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public PortEntryPreference(Context context, AttributeSet attrs, int defStyleAttr) {
+    public CacheSizeEntryPreference(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public PortEntryPreference(Context context, AttributeSet attrs) {
+    public CacheSizeEntryPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PortEntryPreference(Context context) {
+    public CacheSizeEntryPreference(Context context) {
         super(context);
     }
 
@@ -52,7 +50,7 @@ public class PortEntryPreference extends DialogPreference{
 
         editText = new EditText(getContext());
         editText.setLayoutParams(layoutParams);
-        editText.setEms(5);
+        editText.setEms(4);
         editText.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
         editText.setInputType(InputType.TYPE_CLASS_NUMBER);
 
@@ -69,7 +67,7 @@ public class PortEntryPreference extends DialogPreference{
     @Override
     protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
-        editText.setText(String.valueOf(getPortValue()));
+        editText.setText(String.valueOf(getCacheValue()));
     }
 
     @Override
@@ -77,10 +75,10 @@ public class PortEntryPreference extends DialogPreference{
         if (positiveResult) {
             editText.clearFocus();
             int newValue = Integer.valueOf(editText.getText().toString());
-            if(checkPortValidity(newValue) && callChangeListener(newValue)){
+            if (checkInputValidity(newValue) && callChangeListener(newValue)) {
                 setValue(newValue);
-            } else{
-                Toast.makeText(this.getContext(), this.getContext().getText(R.string.setting_error_port), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this.getContext(), this.getContext().getText(R.string.setting_error_maxsize), Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -88,12 +86,12 @@ public class PortEntryPreference extends DialogPreference{
 
     @Override
     protected Object onGetDefaultValue(TypedArray a, int index) {
-        return a.getInt(index, 0);
+        return a.getInt(index,PreferenceUtility.DEFAULT_MAXDLSIZE);
     }
 
     @Override
     protected void onSetInitialValue(boolean restorePersistedValue, Object defaultValue) {
-        setValue(restorePersistedValue ? getPersistedInt(0) : (Integer) defaultValue);
+        setValue(restorePersistedValue ? getPersistedInt(PreferenceUtility.DEFAULT_MAXDLSIZE) : (Integer) defaultValue);
     }
 
     public void setValue(int value) {
@@ -101,26 +99,12 @@ public class PortEntryPreference extends DialogPreference{
         persistInt(this.value);
     }
 
-    public int getPortValue() {
+    public int getCacheValue() {
         return this.value;
     }
 
-    /**
-     * Checks whether the given port is not reserved or already in use.
-     * Note that 0 tells the app to use a random open port.
-     * @param port port to check
-     * @return true iff port is usable
-     */
-    private boolean checkPortValidity(int port){
-        boolean goahead = (0 == port) || ((MIN_VALUE < port) && (port <= MAX_VALUE));
-        if (goahead){
-            try{
-                new ServerSocket(port).close();
-                return true;
-            }catch(IOException io){
-                return false;
-            }
-        }
-        return false;
+    private boolean checkInputValidity(int cacheSize){
+        return ((MIN_VALUE <= cacheSize) && (cacheSize <= MAX_VALUE));
     }
+
 }

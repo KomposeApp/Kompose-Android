@@ -1,18 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
     <PreferenceCategory
-            android:title="@string/client_settings">
+            android:title="@string/general_settings">
 
         <ch.ethz.inf.vs.kompose.service.preferences.PortEntryPreference
             android:key="@string/KEY_CPORT"
             android:title="@string/client_port"
             android:dialogTitle="@string/clientport_setting_dialog_title"
             android:summary="" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory
-        android:title="@string/host_settings">
 
         <ch.ethz.inf.vs.kompose.service.preferences.PortEntryPreference
             android:key="@string/KEY_HPORT"
@@ -27,13 +22,12 @@
             android:defaultValue="@string/default_preload"
             android:summary="" />
 
-        <ch.ethz.inf.vs.kompose.service.preferences.NumberPickerPreference
-            android:key="@string/KEY_CACHESIZE"
-            android:title="@string/cache_size_setting_dialog_title"
-            android:dialogTitle="@string/cache_size_setting_dialog_title"
-            android:defaultValue="@string/default_cachesize"
+        <ch.ethz.inf.vs.kompose.service.preferences.CacheSizeEntryPreference
+            android:key="@string/KEY_MAXDLSIZE"
+            android:title="@string/maxdl_size_setting_dialog_title"
+            android:dialogTitle="@string/maxdl_size_setting_dialog_desc"
+            android:defaultValue="@string/default_maxdlsize"
             android:summary="" />
-
     </PreferenceCategory>
 
 </PreferenceScreen>
