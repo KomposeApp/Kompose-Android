@@ -1,0 +1,59 @@
+{
+  "type": "SESSION_UPDATE",
+  "error_message": null,
+  "sender_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+  "sender_username": "Boney M",
+  "session": {
+    "uuid": "e8d75a93-3b7c-4132-ba2e-82841be5fe1c",
+    "creation_date_time": "2017-12-13T16:16:37.428Z",
+    "host_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+    "session_name": "Disco Party",
+    "session_status": "ACTIVE",
+    "songs": [
+      {
+        "uuid": "fd3ee34f-16da-4682-add6-d1f943851d80",
+        "proposed_by_client_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+        "song_status": "REQUESTED",
+        "download_status": "FINISHED",
+        "order": 0,
+        "source_url": "https://www.youtube.com/watch?v=T5emcbg_wZk",
+        "title": "Tanita Tikaram - Twist In My Sobriety"
+        "length_in_seconds": 291,
+        "download_url": "https://r1---sn-nfpuji-1gil.googlevideo.com/videoplayback?mt=1513181799",
+        "thumbnail_url": "http://i.ytimg.com/vi/T5emcbg_wZk/hqdefault.jpg",
+        "down_votes": [
+		  {
+			"uuid": "29224d11-2e16-789f-1ff3-12418426f7f5",
+			"client_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+		  }
+		]
+      }
+    ],
+    "clients": [
+      {
+        "uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+        "name": "Boney M",
+        "is_active": true
+      },
+      {
+        "uuid": "70998773-4dcd-4411-80f8-85c0a4f90832",
+        "name": "Rick Astley",
+        "is_active": true
+      }
+    ]
+  },
+  "song_details": {
+    "uuid": "3fa6aea0-5ebd-4376-b189-d60dfda35099",
+    "proposed_by_client_uuid": "981e4fa1-9f26-470e-8d78-1d3095c1f7f5",
+    "song_status": "REQUESTED",
+    "download_status": "NOT_STARTED",
+    "order": 1,
+    "source_url": "https://www.youtube.com/watch?v=c1idAsPYfd4",
+    "title": "EPICA - Unchain Utopia (OFFICIAL LYRIC VIDEO)",
+    "length_in_seconds": 286,
+	"download_url": "https://r2---sn-nfpuji-1gil.googlevideo.com/videoplayback?mt=1513181287",
+    "thumbnail_url": "http://i.ytimg.com/vi/c1idAsPYfd4/hqdefault.jpg",
+    "down_votes": []
+  }
+}
+
